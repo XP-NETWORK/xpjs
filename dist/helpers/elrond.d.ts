@@ -1,4 +1,4 @@
-import { Address, ISigner, Transaction } from "@elrondnetwork/erdjs/out";
+import { Address, ISigner, Transaction } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { Faucet, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft } from "./chain";
 declare type EasyBalance = string | number | BigNumber;

@@ -18,7 +18,7 @@ import {
   TransactionPayload,
   U64Value,
   UserSigner,
-} from "@elrondnetwork/erdjs/out";
+} from "@elrondnetwork/erdjs";
 import axios, { AxiosInstance } from "axios";
 import BigNumber from "bignumber.js";
 import {
