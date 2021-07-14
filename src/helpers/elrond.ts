@@ -42,6 +42,7 @@ export type ElrondHelper = Faucet<string | Address, EasyBalance, Transaction> &
   TransferNftForeign<ISigner, string, NftInfo, Transaction> &
   UnfreezeForeignNft<ISigner, string, number, Transaction>;
 
+
 export const elrondHelperFactory: (
   node_uri: string,
   faucet_key: string,
@@ -97,7 +98,7 @@ export const elrondHelperFactory: (
         receiver: new Address(to),
         nonce: faucetAcc.nonce,
         gasLimit: new GasLimit(70000),
-        value: Balance.egld(value),
+        value: new Balance(value.toString()),
       });
 
       faucet.sign(tx);
@@ -116,7 +117,7 @@ export const elrondHelperFactory: (
         receiver: mintContract,
         nonce: account.nonce,
         gasLimit: new GasLimit(50000000),
-        value: Balance.egld(value),
+        value: new Balance(value.toString()),
         data: TransactionPayload.contractCall()
           .setFunction(new ContractFunction("freezeSend"))
           .addArg(new BytesValue(Buffer.from(to, "ascii")))
