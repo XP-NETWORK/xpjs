@@ -9,8 +9,10 @@
     "build": "tsc -p tsconfig.json"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "^4.28.3",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-functional": "^3.2.1",
     "prettier": "^2.3.2",
     "typedoc": "^0.21.0",
     "typescript": "^4.3.5"
@@ -18,6 +20,9 @@
   "dependencies": {
     "@elrondnetwork/erdjs": "^6.1.1",
     "@polkadot/api": "^5.0.1",
+    "@polkadot/api-contract": "^5.0.1",
+    "@polkadot/keyring": "^7.0.1",
+    "@polkadot/types": "^5.0.1",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1"
   }
