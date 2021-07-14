@@ -81,7 +81,7 @@ export const elrondHelperFactory: (
 
   const syncAccount = async (signer: ISigner) => {
     const account = new Account(signer.getAddress());
-    account.sync(provider);
+    await account.sync(provider);
 
     return account;
   };
@@ -91,7 +91,7 @@ export const elrondHelperFactory: (
       to: string | Address,
       value: EasyBalance
     ): Promise<Transaction> {
-      faucetAcc.sync(provider);
+      await faucetAcc.sync(provider);
 
       const tx = new Transaction({
         receiver: new Address(to),
@@ -126,7 +126,7 @@ export const elrondHelperFactory: (
       sender.sign(tx);
       await tx.send(provider);
 
-      handleEvent(tx);
+      await handleEvent(tx);
 
       return tx;
     },
@@ -153,7 +153,7 @@ export const elrondHelperFactory: (
       sender.sign(tx);
       await tx.send(provider);
 
-      handleEvent(tx);
+      await handleEvent(tx);
 
       return tx;
     },
@@ -182,7 +182,7 @@ export const elrondHelperFactory: (
       sender.sign(tx);
       await tx.send(provider);
 
-      handleEvent(tx);
+      await handleEvent(tx);
 
       return tx;
     },
@@ -211,7 +211,7 @@ export const elrondHelperFactory: (
       sender.sign(tx);
       await tx.send(provider);
 
-      handleEvent(tx);
+      await handleEvent(tx);
 
       return tx;
     },
