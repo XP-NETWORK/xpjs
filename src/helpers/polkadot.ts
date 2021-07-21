@@ -10,6 +10,7 @@ import {
   TransferNftForeign,
   UnfreezeForeign,
   UnfreezeForeignNft,
+  BalanceCheck
 } from "./chain";
 
 type ConcreteJson = {
@@ -17,18 +18,54 @@ type ConcreteJson = {
 };
 
 type EasyBalance = string | number | BigNumber;
+type EasyAddr = string | LookupSource | Address;
 
-export type PolkadotHelper = Faucet<
-  string | LookupSource | Address,
+type BasePolkadot = Faucet<
+  EasyAddr,
   EasyBalance,
   Hash
 > &
+  BalanceCheck<string, BigNumber>;
+
+export type PolkadotHelper = BasePolkadot &
   TransferForeign<KeyringPair, string, EasyBalance, Hash> &
   UnfreezeForeign<KeyringPair, string, EasyBalance, Hash>;
 
 export type PolkadotPalletHelper = PolkadotHelper &
   TransferNftForeign<KeyringPair, string, H256, Hash> &
   UnfreezeForeignNft<KeyringPair, string, H256, Hash>;
+
+async function basePolkadotHelper(
+  node_uri: string
+  ): Promise<[BasePolkadot, ApiPromise]> {
+    const provider = new WsProvider(node_uri);
+    const api = await ApiPromise.create({ provider, types: runtimeTypes });
+
+
+    const keyring = new Keyring();
+    const faucet = keyring.addFromUri("//Bob", undefined, "sr25519");
+  
+    const base = {
+      async transferFromFaucet(
+        to: string | LookupSource | Address,
+        value: EasyBalance
+      ): Promise<Hash> {
+        return await api.tx.balances
+          .transfer(to, value.toString())
+          .signAndSend(faucet);
+      },
+      async balance(
+        address: EasyAddr
+      ): Promise<BigNumber> {
+
+        const res: any = await api.query.system.account(address);
+        
+        return new BigNumber(res['data']['balance'].toString());
+      }
+    }
+
+    return [base, api]
+}
 
 export const polkadotHelperFactory: (
   node_uri: string,
@@ -39,22 +76,11 @@ export const polkadotHelperFactory: (
   freezer_addr: string,
   abi: ConcreteJson
 ) => {
-  const provider = new WsProvider(node_uri);
-  const api = await ApiPromise.create({ provider, types: runtimeTypes });
+  const [base, api] = await basePolkadotHelper(node_uri);
   const freezer = new ContractPromise(api, abi, freezer_addr);
 
-  const keyring = new Keyring();
-  const faucet = keyring.addFromUri("//Bob", undefined, "sr25519");
-
   return {
-    async transferFromFaucet(
-      to: string | LookupSource | Address,
-      value: EasyBalance
-    ): Promise<Hash> {
-      return await api.tx.balances
-        .transfer(to, value.toString())
-        .signAndSend(faucet);
-    },
+    ...base,
     async transferNativeToForeign(
       sender: KeyringPair,
       to: string,
@@ -79,19 +105,10 @@ export const polkadotHelperFactory: (
 export const polkadotPalletHelperFactory: (
   node_uri: string
 ) => Promise<PolkadotPalletHelper> = async (node_uri: string) => {
-  const provider = new WsProvider(node_uri);
-  const api = await ApiPromise.create({ provider, types: runtimeTypes });
-
-  const keyring = new Keyring();
-  const faucet = keyring.addFromUri("//Bob", undefined, "sr25519");
+  const [base, api] = await basePolkadotHelper(node_uri);
 
   return {
-    async transferFromFaucet(
-      to: string | LookupSource | Address,
-      value: number
-    ): Promise<Hash> {
-      return await api.tx.balances.transfer(to, value).signAndSend(faucet);
-    },
+    ...base,
     async transferNativeToForeign(
       sender: KeyringPair,
       to: string,

@@ -29,3 +29,9 @@ export interface UnfreezeForeignNft<Signer, ForeignAddr, NftIdent, Tx> {
     id: NftIdent
   ): Promise<Tx>;
 }
+
+export interface BalanceCheck<Addr, Balance> {
+  balance(
+    address: Addr
+  ): Promise<Balance>;
+}

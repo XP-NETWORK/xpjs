@@ -13,3 +13,6 @@ export interface TransferNftForeign<Signer, ForeignAddr, NftIdent, Tx> {
 export interface UnfreezeForeignNft<Signer, ForeignAddr, NftIdent, Tx> {
     unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftIdent): Promise<Tx>;
 }
+export interface BalanceCheck<Addr, Balance> {
+    balance(address: Addr): Promise<Balance>;
+}

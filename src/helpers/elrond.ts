@@ -22,6 +22,7 @@ import {
 import axios, { AxiosInstance } from "axios";
 import BigNumber from "bignumber.js";
 import {
+  BalanceCheck,
   Faucet,
   TransferForeign,
   TransferNftForeign,
@@ -37,6 +38,7 @@ export type NftInfo = {
 };
 
 export type ElrondHelper = Faucet<string | Address, EasyBalance, Transaction> &
+  BalanceCheck<string | Address, BigNumber> &
   TransferForeign<ISigner, string, EasyBalance, Transaction> &
   UnfreezeForeign<ISigner, string, EasyBalance, Transaction> &
   TransferNftForeign<ISigner, string, NftInfo, Transaction> &
@@ -88,6 +90,15 @@ export const elrondHelperFactory: (
   };
 
   return {
+    async balance(
+      address: string | Address
+    ): Promise<BigNumber> {
+      const wallet = new Account(new Address(address));
+
+      await wallet.sync(provider);
+
+      return wallet.balance.valueOf();
+    },
     async transferFromFaucet(
       to: string | Address,
       value: EasyBalance
