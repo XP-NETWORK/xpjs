@@ -60,7 +60,7 @@ async function basePolkadotHelper(
 
         const res: any = await api.query.system.account(address);
         
-        return new BigNumber(res['data']['balance'].toString());
+        return new BigNumber(res['data']['free'].toString());
       }
     }
 

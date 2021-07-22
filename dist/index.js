@@ -10,10 +10,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.elrondHelperFactory = exports.polkadotHelperFactory = void 0;
 __exportStar(require("./helpers/chain"), exports);
-var polkadot_1 = require("./helpers/polkadot");
-Object.defineProperty(exports, "polkadotHelperFactory", { enumerable: true, get: function () { return polkadot_1.polkadotHelperFactory; } });
-var elrond_1 = require("./helpers/elrond");
-Object.defineProperty(exports, "elrondHelperFactory", { enumerable: true, get: function () { return elrond_1.elrondHelperFactory; } });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUFnQztBQUNoQywrQ0FBMkU7QUFBbEQsaUhBQUEscUJBQXFCLE9BQUE7QUFDOUMsMkNBQXFFO0FBQTlDLDZHQUFBLG1CQUFtQixPQUFBIn0=
+__exportStar(require("./helpers/polkadot"), exports);
+__exportStar(require("./helpers/elrond"), exports);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBQUEsa0RBQWdDO0FBQ2hDLHFEQUFtQztBQUNuQyxtREFBaUMifQ==
