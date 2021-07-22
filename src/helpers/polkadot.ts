@@ -1,7 +1,6 @@
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { AnyJson, RegistryTypes } from "@polkadot/types/types";
 import { ContractPromise } from "@polkadot/api-contract";
-import { KeyringPair } from "@polkadot/keyring/types";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
 import {
@@ -12,10 +11,17 @@ import {
   UnfreezeForeignNft,
   BalanceCheck
 } from "./chain";
+import { AddressOrPair } from "@polkadot/api/types";
+import { SignerOptions } from "@polkadot/api/submittable/types";
 
 type ConcreteJson = {
   readonly [index: string]: AnyJson;
 };
+
+type Signer = {
+  sender: AddressOrPair,
+  options?: Partial<SignerOptions>
+}
 
 type EasyBalance = string | number | BigNumber;
 type EasyAddr = string | LookupSource | Address;
@@ -28,12 +34,12 @@ type BasePolkadot = Faucet<
   BalanceCheck<string, BigNumber>;
 
 export type PolkadotHelper = BasePolkadot &
-  TransferForeign<KeyringPair, string, EasyBalance, Hash> &
-  UnfreezeForeign<KeyringPair, string, EasyBalance, Hash>;
+  TransferForeign<Signer, string, EasyBalance, Hash> &
+  UnfreezeForeign<Signer, string, EasyBalance, Hash>;
 
 export type PolkadotPalletHelper = PolkadotHelper &
-  TransferNftForeign<KeyringPair, string, H256, Hash> &
-  UnfreezeForeignNft<KeyringPair, string, H256, Hash>;
+  TransferNftForeign<Signer, string, H256, Hash> &
+  UnfreezeForeignNft<Signer, string, H256, Hash>;
 
 async function basePolkadotHelper(
   node_uri: string
@@ -82,22 +88,22 @@ export const polkadotHelperFactory: (
   return {
     ...base,
     async transferNativeToForeign(
-      sender: KeyringPair,
+      sender: Signer,
       to: string,
       value: EasyBalance
     ): Promise<Hash> {
       return await freezer.tx
         .send({ value: value.toString(), gasLimit: -1 }, to)
-        .signAndSend(sender);
+        .signAndSend(sender.sender, sender.options);
     },
     async unfreezeWrapped(
-      sender: KeyringPair,
+      sender: Signer,
       to: string,
       value: EasyBalance
     ): Promise<Hash> {
       return await freezer.tx
         .withdrawWrapper({ value: 0, gasLimit: -1 }, to, value.toString())
-        .signAndSend(sender);
+        .signAndSend(sender.sender, sender.options);
     },
   };
 };
@@ -110,36 +116,36 @@ export const polkadotPalletHelperFactory: (
   return {
     ...base,
     async transferNativeToForeign(
-      sender: KeyringPair,
+      sender: Signer,
       to: string,
       value: EasyBalance
     ): Promise<Hash> {
       return await api.tx.freezer
         .send(to, value.toString())
-        .signAndSend(sender);
+        .signAndSend(sender.sender, sender.options);;
     },
     async unfreezeWrapped(
-      sender: KeyringPair,
+      sender: Signer,
       to: string,
       value: EasyBalance
     ): Promise<Hash> {
       return await api.tx.freezer
         .withdrawWrapped(to, value.toString())
-        .signAndSend(sender);
+        .signAndSend(sender.sender, sender.options);
     },
     async transferNftToForeign(
-      sender: KeyringPair,
+      sender: Signer,
       to: string,
       nft_id: H256
     ): Promise<Hash> {
-      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender);
+      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
     },
     async unfreezeWrappedNft(
-      sender: KeyringPair,
+      sender: Signer,
       to: string,
       nft_id: H256
     ): Promise<Hash> {
-      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender);
+      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
     },
   };
 };
