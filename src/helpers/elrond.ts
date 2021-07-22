@@ -72,10 +72,10 @@ export const elrondHelperFactory: (
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
 
   const handleEvent = async (tx: Transaction) => {
+	await new Promise(r => setTimeout(r, 5000))
     await tx.awaitNotarized(provider);
     const res = (await tx.getAsOnNetwork(provider))
-      .getSmartContractResults()
-      .getResultingCalls();
+      .getSmartContractResults()['items'];
 
     const id = filterEventId(res);
 
