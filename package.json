@@ -24,6 +24,7 @@
     "@polkadot/keyring": "^6.5.1",
     "@polkadot/types": "^4.17.1",
     "axios": "^0.21.1",
-    "bignumber.js": "^9.0.1"
+    "bignumber.js": "^9.0.1",
+    "ethers": "^5.4.1"
   }
 }
