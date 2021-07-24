@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, BalanceCheck } from "./chain";
-import { Contract, providers, Signer } from 'ethers';
-import { TransactionResponse } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 
 type EasyBalance = string | number | BigNumber;
@@ -12,12 +12,11 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
 
 
 export async function web3HelperFactory(
-    node_uri: string,
+	provider: Provider,
     minter_addr: string,
     minter_abi: Interface
 ): Promise<Web3Helper> {
-    const w3 = new providers.JsonRpcProvider(node_uri);
-    await w3.ready;
+    const w3 = provider;
 
     const minter = new Contract(minter_addr, minter_abi, w3);
 
