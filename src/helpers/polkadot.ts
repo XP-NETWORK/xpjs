@@ -1,15 +1,16 @@
-import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 import { AnyJson, RegistryTypes } from "@polkadot/types/types";
 import { ContractPromise } from "@polkadot/api-contract";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
 import {
-  Faucet,
   TransferForeign,
   TransferNftForeign,
   UnfreezeForeign,
   UnfreezeForeignNft,
-  BalanceCheck
+  BalanceCheck,
+  MintNft,
+  ListNft
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
@@ -26,12 +27,7 @@ type Signer = {
 type EasyBalance = string | number | BigNumber;
 type EasyAddr = string | LookupSource | Address;
 
-type BasePolkadot = Faucet<
-  EasyAddr,
-  EasyBalance,
-  Hash
-> &
-  BalanceCheck<string, BigNumber>;
+type BasePolkadot = BalanceCheck<string, BigNumber>;
 
 export type PolkadotHelper = BasePolkadot &
   TransferForeign<Signer, string, EasyBalance, Hash> &
@@ -39,27 +35,17 @@ export type PolkadotHelper = BasePolkadot &
 
 export type PolkadotPalletHelper = PolkadotHelper &
   TransferNftForeign<Signer, string, H256, Hash> &
-  UnfreezeForeignNft<Signer, string, H256, Hash>;
+  UnfreezeForeignNft<Signer, string, H256, Hash> &
+  MintNft<Signer, Uint8Array, void> &
+  ListNft<EasyAddr, BigNumber>;
 
 async function basePolkadotHelper(
   node_uri: string
   ): Promise<[BasePolkadot, ApiPromise]> {
     const provider = new WsProvider(node_uri);
     const api = await ApiPromise.create({ provider, types: runtimeTypes });
-
-
-    const keyring = new Keyring();
-    const faucet = keyring.addFromUri("//Bob", undefined, "sr25519");
   
     const base = {
-      async transferFromFaucet(
-        to: string | LookupSource | Address,
-        value: EasyBalance
-      ): Promise<Hash> {
-        return await api.tx.balances
-          .transfer(to, value.toString())
-          .signAndSend(faucet);
-      },
       async balance(
         address: EasyAddr
       ): Promise<BigNumber> {
@@ -108,6 +94,10 @@ export const polkadotHelperFactory: (
   };
 };
 
+function hasAddrField(ob: any): ob is { address: string } {
+  return ob.hasOwnField('address') && typeof ob.address == "string";
+}
+
 export const polkadotPalletHelperFactory: (
   node_uri: string
 ) => Promise<PolkadotPalletHelper> = async (node_uri: string) => {
@@ -147,6 +137,30 @@ export const polkadotPalletHelperFactory: (
     ): Promise<Hash> {
       return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
     },
+    async mintNft(
+      owner: Signer,
+      info: Uint8Array
+    ): Promise<void> {
+        let addr;
+        if (typeof owner.sender == "string") {
+          addr = owner.sender;
+        } else if (hasAddrField(owner.sender)) {
+          addr = owner.sender.address;
+        } else {
+          addr = owner.sender.toString();
+        }
+
+        await api.tx.nft.mint(addr, info)
+          .signAndSend(owner.sender, owner.options);
+    },
+    async listNft(
+      owner: EasyAddr
+    ): Promise<Array<BigNumber>> {
+      const com = await api.query.nft.commoditiesForAccounts(owner.toString());
+      const c = com.toJSON() as ConcreteJson;
+      return Object.keys(c)
+        .map((s) => new BigNumber(s.toString()))
+    }
   };
 };
 

@@ -10,20 +10,19 @@ import {
   ISigner,
   NetworkConfig,
   Nonce,
-  parseUserKey,
   ProxyProvider,
   ResultingCall,
   TokenIdentifierValue,
   Transaction,
   TransactionPayload,
   U64Value,
-  UserSigner,
 } from "@elrondnetwork/erdjs";
 import axios, { AxiosInstance } from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
-  Faucet,
+  ListNft,
+  MintNft,
   TransferForeign,
   TransferNftForeign,
   UnfreezeForeign,
@@ -32,29 +31,57 @@ import {
 
 type EasyBalance = string | number | BigNumber;
 
+const ESDT_ISSUE_ADDR = new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+const ESDT_ISSUE_COST = "50000000000000000";
+
 export type NftInfo = {
   token: string;
   nonce: number;
 };
 
-export type ElrondHelper = Faucet<string | Address, EasyBalance, Transaction> &
-  BalanceCheck<string | Address, BigNumber> &
+export type EsdtNftInfo = {
+  readonly [index: string]: { balance: string, tokenIdentifier: string };
+}
+
+type NftIssueArgs = {
+  readonly identifier: string,
+  readonly quantity: number | undefined,
+  readonly name: string,
+  readonly royalties: number | undefined,
+  readonly hash: string | undefined,
+  readonly attrs: string | undefined,
+  readonly uris: Array<string>
+}
+
+export interface IssueESDTNFT {
+  issueESDTNft(
+    sender: ISigner,
+    name: string,
+    ticker: string,
+    canFreeze: boolean | undefined,
+    canWipe: boolean | undefined,
+    canTransferNFTCreateRole: boolean | undefined
+  ): Promise<void>;
+}
+
+export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   TransferForeign<ISigner, string, EasyBalance, Transaction> &
   UnfreezeForeign<ISigner, string, EasyBalance, Transaction> &
   TransferNftForeign<ISigner, string, NftInfo, Transaction> &
-  UnfreezeForeignNft<ISigner, string, number, Transaction>;
+  UnfreezeForeignNft<ISigner, string, number, Transaction> &
+  IssueESDTNFT &
+  MintNft<ISigner, NftIssueArgs, void> &
+  ListNft<string, EsdtNftInfo>;
 
 
 export const elrondHelperFactory: (
   node_uri: string,
-  faucet_key: string,
   minter_address: string,
   middleware_uri: string,
   esdt: string,
   esdt_nft: string
 ) => Promise<ElrondHelper> = async (
   node_uri: string,
-  faucet_key: string,
   minter_address: string,
   middleware_uri: string,
   esdt: string,
@@ -63,8 +90,6 @@ export const elrondHelperFactory: (
   const provider = new ProxyProvider(node_uri);
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(minter_address);
-  const faucet = new UserSigner(parseUserKey(faucet_key));
-  const faucetAcc = new Account(faucet.getAddress());
   const eventMiddleware = axios.create({
     baseURL: middleware_uri,
   });
@@ -98,24 +123,6 @@ export const elrondHelperFactory: (
       await wallet.sync(provider);
 
       return wallet.balance.valueOf();
-    },
-    async transferFromFaucet(
-      to: string | Address,
-      value: EasyBalance
-    ): Promise<Transaction> {
-      await faucetAcc.sync(provider);
-
-      const tx = new Transaction({
-        receiver: new Address(to),
-        nonce: faucetAcc.nonce,
-        gasLimit: new GasLimit(70000),
-        value: new Balance(value.toString()),
-      });
-
-      faucet.sign(tx);
-      await tx.send(provider);
-
-      return tx;
     },
     async transferNativeToForeign(
       sender: ISigner,
@@ -227,6 +234,75 @@ export const elrondHelperFactory: (
 
       return tx;
     },
+    async issueESDTNft(
+      sender: ISigner,
+      name: string,
+      ticker: string,
+      canFreeze: boolean = false,
+      canWipe: boolean = false,
+      canTransferNFTCreateRole: boolean = false
+    ): Promise<void> {
+      const account = await syncAccount(sender);
+  
+      const tx = new Transaction({
+        receiver: ESDT_ISSUE_ADDR,
+        nonce: account.nonce,
+        value: new Balance(ESDT_ISSUE_COST),
+        gasLimit: new GasLimit(60000000),
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("issueNonFungible"))
+          .addArg(new TokenIdentifierValue(Buffer.from(name, 'utf-8')))
+          .addArg(new TokenIdentifierValue(Buffer.from(ticker, 'utf-8')))
+          .addArg(new BytesValue(Buffer.from(canFreeze ? "true" : "false", 'ascii')))
+          .addArg(new BytesValue(Buffer.from(canWipe ? "true" : "false", 'ascii')))
+          .addArg(new BytesValue(Buffer.from(canTransferNFTCreateRole ? "true" : "false", 'ascii')))
+          .build()
+      });
+
+      sender.sign(tx);
+      await tx.send(provider);
+    },
+    async mintNft(
+      owner: ISigner,
+      {
+        identifier,
+        quantity,
+        name,
+        royalties,
+        hash,
+        attrs,
+        uris
+      }: NftIssueArgs
+    ): Promise<void> {
+      const account = await syncAccount(owner);
+
+      let baseArgs = TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("ESDTNFTCreate"))
+        .addArg(new TokenIdentifierValue(Buffer.from(identifier, 'utf-8')))
+        .addArg(new BigUIntValue(new BigNumber(quantity ?? 1)))
+        .addArg(new BytesValue(Buffer.from(name, 'utf-8')))
+        .addArg(new BytesValue(Buffer.from((royalties ?? 0).toString(), 'ascii')))
+        .addArg(new BytesValue(hash ? Buffer.from(hash, 'utf-8') : Buffer.alloc(0)))
+        .addArg(new BytesValue(attrs ? Buffer.from(attrs, 'utf-8') : Buffer.alloc(0)));
+
+      for (const uri of uris) {
+        baseArgs = baseArgs.addArg(new BytesValue(Buffer.from(uri, 'utf-8')));
+      }
+
+      const tx = new Transaction({
+        receiver: account.address,
+        nonce: account.nonce,
+        gasLimit: new GasLimit(70000000), // TODO: Auto derive
+        data: baseArgs.build()
+      });
+
+      owner.sign(tx);
+      await tx.send(provider);
+    },
+    async listNft(owner: string): Promise<Array<EsdtNftInfo>> {
+      const raw = await axios.get(`${node_uri}/address/${owner}/esdt`);
+      return raw.data.data.esdts;
+    }
   };
 };
 

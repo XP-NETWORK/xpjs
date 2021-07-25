@@ -1,6 +1,3 @@
-export interface Faucet<Addr, Balance, Tx> {
-    transferFromFaucet(to: Addr, value: Balance): Promise<Tx>;
-}
 export interface TransferForeign<Signer, ForeignAddr, Balance, Tx> {
     transferNativeToForeign(sender: Signer, to: ForeignAddr, value: Balance): Promise<Tx>;
 }
@@ -15,4 +12,10 @@ export interface UnfreezeForeignNft<Signer, ForeignAddr, NftIdent, Tx> {
 }
 export interface BalanceCheck<Addr, Balance> {
     balance(address: Addr): Promise<Balance>;
+}
+export interface MintNft<Signer, Args, Identifier> {
+    mintNft(owner: Signer, options: Args): Promise<Identifier>;
+}
+export interface ListNft<Addr, Identifier> {
+    listNft(owner: Addr): Promise<Iterable<Identifier>>;
 }
