@@ -41,11 +41,28 @@ type ContractRes = {
   readonly [idx: string]: number | string;
 }
 
-export type EsdtNftInfo = {
-  readonly [index: string]: { balance: string, tokenIdentifier: string };
+export type EsdtTokenInfo = {
+  readonly balance: number;
+  readonly tokenIdentifier: string;
 }
 
-type NftIssueArgs = {
+type BEsdtNftInfo = {
+  readonly creator: string;
+  readonly name: string;
+  readonly nonce: number;
+  readonly royalties: string;
+  readonly uris: string[];
+}
+
+type MaybeEsdtNftInfo = EsdtTokenInfo & (BEsdtNftInfo | undefined);
+
+export type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
+
+function isEsdtNftInfo(maybe: MaybeEsdtNftInfo): maybe is EsdtNftInfo {
+  return maybe.creator != undefined;
+}
+
+export type NftIssueArgs = {
   readonly identifier: string,
   readonly quantity: number | undefined,
   readonly name: string,
@@ -73,7 +90,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   UnfreezeForeignNft<ISigner, string, number, Transaction> &
   IssueESDTNFT &
   MintNft<ISigner, NftIssueArgs, void> &
-  ListNft<string, EsdtNftInfo>;
+  ListNft<string, string, EsdtNftInfo>;
 
 
 export const elrondHelperFactory: (
@@ -327,9 +344,14 @@ export const elrondHelperFactory: (
       owner.sign(tx);
       await tx.send(provider);
     },
-    async listNft(owner: string): Promise<Array<EsdtNftInfo>> {
+    async listNft(owner: string): Promise<Map<string, EsdtNftInfo>> {
       const raw = await providerRest(`/address/${owner}/esdt`);
-      return raw.data.data.esdts;
+      const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
+      const ents: [string, MaybeEsdtNftInfo][] = Object.entries(dat);
+
+      return new Map(
+        ents.filter(([_ident, info]) => isEsdtNftInfo(info))
+      );
     }
   };
 };

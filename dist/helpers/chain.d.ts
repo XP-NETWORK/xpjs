@@ -16,6 +16,6 @@ export interface BalanceCheck<Addr, Balance> {
 export interface MintNft<Signer, Args, Identifier> {
     mintNft(owner: Signer, options: Args): Promise<Identifier>;
 }
-export interface ListNft<Addr, Identifier> {
-    listNft(owner: Addr): Promise<Iterable<Identifier>>;
+export interface ListNft<Addr, K, V> {
+    listNft(owner: Addr): Promise<Map<K, V>>;
 }

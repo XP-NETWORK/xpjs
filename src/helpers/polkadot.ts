@@ -19,6 +19,10 @@ type ConcreteJson = {
   readonly [index: string]: AnyJson;
 };
 
+type NftInfo = {
+  readonly [index: string]: string;
+}
+
 type Signer = {
   sender: AddressOrPair,
   options?: Partial<SignerOptions>
@@ -37,7 +41,7 @@ export type PolkadotPalletHelper = PolkadotHelper &
   TransferNftForeign<Signer, string, H256, Hash> &
   UnfreezeForeignNft<Signer, string, H256, Hash> &
   MintNft<Signer, Uint8Array, void> &
-  ListNft<EasyAddr, BigNumber>;
+  ListNft<EasyAddr, string, string>;
 
 async function basePolkadotHelper(
   node_uri: string
@@ -155,11 +159,10 @@ export const polkadotPalletHelperFactory: (
     },
     async listNft(
       owner: EasyAddr
-    ): Promise<Array<BigNumber>> {
+    ): Promise<Map<string, string>> {
       const com = await api.query.nft.commoditiesForAccounts(owner.toString());
-      const c = com.toJSON() as ConcreteJson;
-      return Object.keys(c)
-        .map((s) => new BigNumber(s.toString()))
+      const c = com.toJSON() as NftInfo;
+      return new Map(Object.entries(c));
     }
   };
 };

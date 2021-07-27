@@ -39,8 +39,8 @@ export interface MintNft<Signer, Args, Identifier> {
   ): Promise<Identifier>
 }
 
-export interface ListNft<Addr, Identifier> {
+export interface ListNft<Addr, K, V> {
   listNft(
     owner: Addr
-  ): Promise<Iterable<Identifier>>
+  ): Promise<Map<K, V>>
 }
