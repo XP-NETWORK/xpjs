@@ -122,13 +122,14 @@ export const elrondHelperFactory: (
     const uri = `/transaction/${tx_hash}?withResults=true`;
 
     while (true) {
+	  // TODO: type safety
       const res = await providerRest.get(uri);
       const data = res.data;
-      if (data["code"] != "succesful") {
+      if (data["code"] != "successful") {
         throw Error("failed to execute txn")
       }
 
-      const tx_info = res["data"]["transaction"]
+      const tx_info = data["data"]["transaction"]
       if (tx_info["status"] == "pending") {
         await new Promise(r => setTimeout(r, 5000));
         continue;
@@ -137,7 +138,7 @@ export const elrondHelperFactory: (
         throw Error("failed to execute txn")
       }
 
-      return data;
+      return tx_info;
     }
   }
 
