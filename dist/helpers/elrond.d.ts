@@ -4,7 +4,7 @@ import { BalanceCheck, ListNft, MintNft, TransferForeign, TransferNftForeign, Un
 declare type EasyBalance = string | number | BigNumber;
 export declare type NftInfo = {
     token: string;
-    nonce: number;
+    nonce: EasyBalance;
 };
 export declare type EsdtTokenInfo = {
     readonly balance: number;

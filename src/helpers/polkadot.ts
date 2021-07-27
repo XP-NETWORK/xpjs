@@ -160,7 +160,7 @@ export const polkadotPalletHelperFactory: (
     async listNft(
       owner: EasyAddr
     ): Promise<Map<string, string>> {
-      const com = await api.query.nft.commoditiesForAccounts(owner.toString());
+      const com = await api.query.nft.commoditiesForAccount(owner.toString());
       const c = com.toJSON() as NftInfo;
       return new Map(Object.entries(c));
     }

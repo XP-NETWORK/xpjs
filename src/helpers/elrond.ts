@@ -34,7 +34,7 @@ const ESDT_ISSUE_COST = "50000000000000000";
 
 export type NftInfo = {
   token: string;
-  nonce: number;
+  nonce: EasyBalance;
 };
 
 type ContractRes = {
@@ -326,7 +326,7 @@ export const elrondHelperFactory: (
         .addArg(new TokenIdentifierValue(Buffer.from(identifier, 'utf-8')))
         .addArg(new BigUIntValue(new BigNumber(quantity ?? 1)))
         .addArg(new BytesValue(Buffer.from(name, 'utf-8')))
-        .addArg(new BytesValue(Buffer.from((royalties ?? 0).toString(), 'ascii')))
+        .addArg(new U64Value(new BigNumber(royalties ?? 0)))
         .addArg(new BytesValue(hash ? Buffer.from(hash, 'utf-8') : Buffer.alloc(0)))
         .addArg(new BytesValue(attrs ? Buffer.from(attrs, 'utf-8') : Buffer.alloc(0)));
 
