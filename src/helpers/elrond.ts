@@ -9,9 +9,7 @@ import {
   GasLimit,
   ISigner,
   NetworkConfig,
-  Nonce,
   ProxyProvider,
-  ResultingCall,
   TokenIdentifierValue,
   Transaction,
   TransactionPayload,
@@ -38,6 +36,10 @@ export type NftInfo = {
   token: string;
   nonce: number;
 };
+
+type ContractRes = {
+  readonly [idx: string]: number | string;
+}
 
 export type EsdtNftInfo = {
   readonly [index: string]: { balance: string, tokenIdentifier: string };
@@ -93,14 +95,16 @@ export const elrondHelperFactory: (
   const eventMiddleware = axios.create({
     baseURL: middleware_uri,
   });
+  const providerRest = axios.create({
+    baseURL: node_uri
+  });
   const esdtHex = Buffer.from(esdt, "utf-8");
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
 
   const handleEvent = async (tx: Transaction) => {
-	await new Promise(r => setTimeout(r, 5000))
+	await new Promise(r => setTimeout(r, 3000))
     await tx.awaitNotarized(provider);
-    const res = (await tx.getAsOnNetwork(provider))
-      .getSmartContractResults()['items'];
+    const res: Array<ContractRes> = (await transactionResult(tx.getHash().toString()))["smartContractResults"];
 
     const id = filterEventId(res);
 
@@ -113,6 +117,29 @@ export const elrondHelperFactory: (
 
     return account;
   };
+
+  const transactionResult = async (tx_hash: string) => {
+    const uri = `/transaction/${tx_hash}?withResults=true`;
+
+    while (true) {
+      const res = await providerRest.get(uri);
+      const data = res.data;
+      if (data["code"] != "succesful") {
+        throw Error("failed to execute txn")
+      }
+
+      const tx_info = res["data"]["transaction"]
+      if (tx_info["status"] == "pending") {
+        await new Promise(r => setTimeout(r, 5000));
+        continue;
+      }
+      if (tx_info["status"] != "success") {
+        throw Error("failed to execute txn")
+      }
+
+      return data;
+    }
+  }
 
   return {
     async balance(
@@ -300,18 +327,18 @@ export const elrondHelperFactory: (
       await tx.send(provider);
     },
     async listNft(owner: string): Promise<Array<EsdtNftInfo>> {
-      const raw = await axios.get(`${node_uri}/address/${owner}/esdt`);
+      const raw = await providerRest(`/address/${owner}/esdt`);
       return raw.data.data.esdts;
     }
   };
 };
 
-function filterEventId(results: Array<ResultingCall>): number {
+function filterEventId(results: Array<ContractRes>): number {
   for (const res of results) {
-    if (res.nonce === new Nonce(0)) {
+    if (res["nonce"] === 0) {
       continue;
     }
-    const data = res.data.split("@");
+    const data = (res.data as string).split("@");
     if (data[0] != "" || data[1] != "6f6b" || data.length != 3) {
       continue;
     }
