@@ -33,6 +33,9 @@ export interface IssueESDTNFT {
 export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction> & TransferNftForeign<ISigner, string, NftInfo, Transaction> & UnfreezeForeignNft<ISigner, string, number, Transaction> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & {
     unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
     unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
+    unsignedTransferNftTxn(address: Address, to: string, info: NftInfo): Transaction;
+    unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
+    unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
 };
 export declare const elrondHelperFactory: (node_uri: string, minter_address: string, middleware_uri: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;

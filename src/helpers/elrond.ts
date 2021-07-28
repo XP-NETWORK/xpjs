@@ -96,6 +96,9 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ListNft<string, string, EsdtNftInfo>  & {
     unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
     unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
+    unsignedTransferNftTxn(address: Address, to: string, info: NftInfo): Transaction;
+    unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
+    unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
   };
 
@@ -124,6 +127,7 @@ export const elrondHelperFactory: (
   });
   const esdtHex = Buffer.from(esdt, "utf-8");
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
+
 
   const handleEvent = async (tx_hash: TransactionHash) => {
 	  await new Promise(r => setTimeout(r, 3000));
@@ -178,7 +182,7 @@ export const elrondHelperFactory: (
   }
 
   const unsignedTransferTxn = (
-    to: String,
+    to: string,
     value: EasyBalance
   ) => {
 
@@ -192,6 +196,78 @@ export const elrondHelperFactory: (
         .build(),
     });
   };
+
+  const unsignedMintNftTxn = (
+    owner: Address,
+    {
+      identifier,
+      quantity,
+      name,
+      royalties,
+      hash,
+      attrs,
+      uris
+    }: NftIssueArgs
+  ) => {
+    let baseArgs = TransactionPayload.contractCall()
+      .setFunction(new ContractFunction("ESDTNFTCreate"))
+      .addArg(new TokenIdentifierValue(Buffer.from(identifier, 'utf-8')))
+      .addArg(new BigUIntValue(new BigNumber(quantity ?? 1)))
+      .addArg(new BytesValue(Buffer.from(name, 'utf-8')))
+      .addArg(new U64Value(new BigNumber(royalties ?? 0)))
+      .addArg(new BytesValue(hash ? Buffer.from(hash, 'utf-8') : Buffer.alloc(0)))
+      .addArg(new BytesValue(attrs ? Buffer.from(attrs, 'utf-8') : Buffer.alloc(0)));
+
+    for (const uri of uris) {
+      baseArgs = baseArgs.addArg(new BytesValue(Buffer.from(uri, 'utf-8')));
+    }
+
+    return new Transaction({
+      receiver: owner,
+      gasLimit: new GasLimit(70000000), // TODO: Auto derive
+      data: baseArgs.build()
+    });
+  }
+
+  const unsignedTransferNftTxn = (
+    address: Address,
+    to: string,
+    { token, nonce }: NftInfo
+  ) => {
+    return new Transaction({
+      receiver: address,
+      gasLimit: new GasLimit(70000000),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("ESDTNFTTransfer"))
+        .addArg(new TokenIdentifierValue(Buffer.from(token, "utf-8")))
+        .addArg(new U64Value(new BigNumber(nonce)))
+        .addArg(new BigUIntValue(new BigNumber(1)))
+        .addArg(new AddressValue(mintContract))
+        .addArg(new BytesValue(Buffer.from("freezeSendNft", "ascii")))
+        .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .build(),
+    });
+  };
+
+  const unsignedUnfreezeNftTxn = (
+    address: Address,
+    to: string,
+    id: number
+  ) => {
+    return new Transaction({
+      receiver: address,
+      gasLimit: new GasLimit(70000000),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("ESDTNFTTransfer"))
+        .addArg(new TokenIdentifierValue(esdtNftHex))
+        .addArg(new U64Value(new BigNumber(id)))
+        .addArg(new BigUIntValue(new BigNumber(1)))
+        .addArg(new AddressValue(mintContract))
+        .addArg(new BytesValue(Buffer.from("withdrawNft", "ascii")))
+        .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .build(),
+    });
+  }
 
   const unsignedUnfreezeTxn = (
     to: string,
@@ -210,8 +286,14 @@ export const elrondHelperFactory: (
     });
   }
 
+
   return {
     handleTxnEvent: handleEvent,
+    unsignedTransferTxn,
+    unsignedUnfreezeTxn,
+    unsignedTransferNftTxn,
+    unsignedUnfreezeNftTxn,
+    unsignedMintNftTxn,
     async balance(
       address: string | Address
     ): Promise<BigNumber> {
@@ -245,32 +327,13 @@ export const elrondHelperFactory: (
 
       return tx;
     },
-    unsignedTransferTxn,
-    unsignedUnfreezeTxn,
     async transferNftToForeign(
       sender: ISigner,
       to: string,
-      { token, nonce }: NftInfo
+      info: NftInfo
     ): Promise<Transaction> {
-      const account = await syncAccount(sender);
-
-      const tx = new Transaction({
-        receiver: account.address,
-        nonce: account.nonce,
-        gasLimit: new GasLimit(70000000),
-        data: TransactionPayload.contractCall()
-          .setFunction(new ContractFunction("ESDTNFTTransfer"))
-          .addArg(new TokenIdentifierValue(Buffer.from(token, "utf-8")))
-          .addArg(new U64Value(new BigNumber(nonce)))
-          .addArg(new BigUIntValue(new BigNumber(1)))
-          .addArg(new AddressValue(mintContract))
-          .addArg(new BytesValue(Buffer.from("freezeSendNft", "ascii")))
-          .addArg(new BytesValue(Buffer.from(to, "ascii")))
-          .build(),
-      });
-
-      sender.sign(tx);
-      await tx.send(provider);
+      const txu = unsignedTransferNftTxn(sender.getAddress(), to, info);
+      const tx = await signAndSend(sender, txu);
 
       await handleEvent(tx.getHash());
 
@@ -281,25 +344,8 @@ export const elrondHelperFactory: (
       to: string,
       id: number
     ): Promise<Transaction> {
-      const account = await syncAccount(sender);
-
-      const tx = new Transaction({
-        receiver: account.address,
-        nonce: account.nonce,
-        gasLimit: new GasLimit(70000000),
-        data: TransactionPayload.contractCall()
-          .setFunction(new ContractFunction("ESDTNFTTransfer"))
-          .addArg(new TokenIdentifierValue(esdtNftHex))
-          .addArg(new U64Value(new BigNumber(id)))
-          .addArg(new BigUIntValue(new BigNumber(1)))
-          .addArg(new AddressValue(mintContract))
-          .addArg(new BytesValue(Buffer.from("withdrawNft", "ascii")))
-          .addArg(new BytesValue(Buffer.from(to, "ascii")))
-          .build(),
-      });
-
-      sender.sign(tx);
-      await tx.send(provider);
+      const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, id);
+      const tx = await signAndSend(sender, txu);
 
       await handleEvent(tx.getHash());
 
@@ -335,40 +381,11 @@ export const elrondHelperFactory: (
     },
     async mintNft(
       owner: ISigner,
-      {
-        identifier,
-        quantity,
-        name,
-        royalties,
-        hash,
-        attrs,
-        uris
-      }: NftIssueArgs
+      args: NftIssueArgs
     ): Promise<void> {
-      const account = await syncAccount(owner);
+      const txu = unsignedMintNftTxn(owner.getAddress(), args);
 
-      let baseArgs = TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("ESDTNFTCreate"))
-        .addArg(new TokenIdentifierValue(Buffer.from(identifier, 'utf-8')))
-        .addArg(new BigUIntValue(new BigNumber(quantity ?? 1)))
-        .addArg(new BytesValue(Buffer.from(name, 'utf-8')))
-        .addArg(new U64Value(new BigNumber(royalties ?? 0)))
-        .addArg(new BytesValue(hash ? Buffer.from(hash, 'utf-8') : Buffer.alloc(0)))
-        .addArg(new BytesValue(attrs ? Buffer.from(attrs, 'utf-8') : Buffer.alloc(0)));
-
-      for (const uri of uris) {
-        baseArgs = baseArgs.addArg(new BytesValue(Buffer.from(uri, 'utf-8')));
-      }
-
-      const tx = new Transaction({
-        receiver: account.address,
-        nonce: account.nonce,
-        gasLimit: new GasLimit(70000000), // TODO: Auto derive
-        data: baseArgs.build()
-      });
-
-      owner.sign(tx);
-      await tx.send(provider);
+      await signAndSend(owner, txu);
     },
     async listNft(owner: string): Promise<Map<string, EsdtNftInfo>> {
       const raw = await providerRest(`/address/${owner}/esdt`);
