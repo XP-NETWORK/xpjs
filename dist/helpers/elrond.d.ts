@@ -1,4 +1,4 @@
-import { Address, ISigner, Transaction } from "@elrondnetwork/erdjs";
+import { Address, ISigner, Transaction, TransactionHash } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, ListNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft } from "./chain";
 declare type EasyBalance = string | number | BigNumber;
@@ -30,6 +30,10 @@ export declare type NftIssueArgs = {
 export interface IssueESDTNFT {
     issueESDTNft(sender: ISigner, name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Promise<void>;
 }
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction> & TransferNftForeign<ISigner, string, NftInfo, Transaction> & UnfreezeForeignNft<ISigner, string, number, Transaction> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo>;
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction> & TransferNftForeign<ISigner, string, NftInfo, Transaction> & UnfreezeForeignNft<ISigner, string, number, Transaction> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & {
+    unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
+    unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
+    handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
+};
 export declare const elrondHelperFactory: (node_uri: string, minter_address: string, middleware_uri: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;
 export {};

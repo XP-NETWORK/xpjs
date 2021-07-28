@@ -94,8 +94,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   IssueESDTNFT &
   MintNft<ISigner, NftIssueArgs, void> &
   ListNft<string, string, EsdtNftInfo>  & {
-    unsignedTransferTxn(signer: ISigner, to: string, value: EasyBalance): Promise<Transaction>;
-    unsignedUnfreezeTxn(signer: ISigner, to: string, value: EasyBalance): Promise<Transaction>;
+    unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
+    unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
     handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
   };
 
@@ -143,6 +143,16 @@ export const elrondHelperFactory: (
     return account;
   };
 
+  const signAndSend = async (signer: ISigner, tx: Transaction) => {
+    const acc = await syncAccount(signer);
+    
+    tx.setNonce(acc.nonce);
+    await signer.sign(tx);
+    await tx.send(provider);
+
+    return tx;
+  }
+
   const transactionResult = async (tx_hash: string) => {
     const uri = `/transaction/${tx_hash}?withResults=true`;
 
@@ -167,16 +177,13 @@ export const elrondHelperFactory: (
     }
   }
 
-  const unsignedTransferTxn = async (
-    sender: ISigner,
+  const unsignedTransferTxn = (
     to: String,
     value: EasyBalance
   ) => {
-    const account = await syncAccount(sender);
 
     return new Transaction({
       receiver: mintContract,
-      nonce: account.nonce,
       gasLimit: new GasLimit(50000000),
       value: new Balance(value.toString()),
       data: TransactionPayload.contractCall()
@@ -186,16 +193,12 @@ export const elrondHelperFactory: (
     });
   };
 
-  const unsignedUnfreezeTxn = async (
-    sender: ISigner,
+  const unsignedUnfreezeTxn = (
     to: string,
     value: EasyBalance
   ) => {
-    const account = await syncAccount(sender);
-
     return new Transaction({
       receiver: mintContract,
-      nonce: account.nonce,
       gasLimit: new GasLimit(50000000),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("ESDTTransfer"))
@@ -223,10 +226,8 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance
     ): Promise<Transaction> {
-      const tx = await unsignedTransferTxn(sender, to, value);
-
-      sender.sign(tx);
-      await tx.send(provider);
+      const txu = unsignedTransferTxn(to, value)
+      const tx = await signAndSend(sender, txu);
 
       await handleEvent(tx.getHash());
 
@@ -237,12 +238,8 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance
     ): Promise<Transaction> {
-      const tx = await unsignedUnfreezeTxn(
-        sender, to, value
-      )
-
-      sender.sign(tx);
-      await tx.send(provider);
+      const txu = unsignedUnfreezeTxn(to, value);
+      const tx = await signAndSend(sender, txu);
 
       await handleEvent(tx.getHash());
 
