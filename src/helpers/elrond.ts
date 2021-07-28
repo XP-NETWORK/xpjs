@@ -12,9 +12,11 @@ import {
   ProxyProvider,
   TokenIdentifierValue,
   Transaction,
+  TransactionHash,
   TransactionPayload,
   U64Value,
 } from "@elrondnetwork/erdjs";
+import  { TransactionWatcher } from "@elrondnetwork/erdjs/out/transactionWatcher";
 import axios, { AxiosInstance } from "axios";
 import BigNumber from "bignumber.js";
 import {
@@ -83,6 +85,7 @@ export interface IssueESDTNFT {
   ): Promise<void>;
 }
 
+
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   TransferForeign<ISigner, string, EasyBalance, Transaction> &
   UnfreezeForeign<ISigner, string, EasyBalance, Transaction> &
@@ -90,7 +93,11 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   UnfreezeForeignNft<ISigner, string, number, Transaction> &
   IssueESDTNFT &
   MintNft<ISigner, NftIssueArgs, void> &
-  ListNft<string, string, EsdtNftInfo>;
+  ListNft<string, string, EsdtNftInfo>  & {
+    unsignedTransferTxn(signer: ISigner, to: string, value: EasyBalance): Promise<Transaction>;
+    unsignedUnfreezeTxn(signer: ISigner, to: string, value: EasyBalance): Promise<Transaction>;
+    handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
+  };
 
 
 export const elrondHelperFactory: (
@@ -118,10 +125,11 @@ export const elrondHelperFactory: (
   const esdtHex = Buffer.from(esdt, "utf-8");
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
 
-  const handleEvent = async (tx: Transaction) => {
-	await new Promise(r => setTimeout(r, 3000))
-    await tx.awaitNotarized(provider);
-    const res: Array<ContractRes> = (await transactionResult(tx.getHash().toString()))["smartContractResults"];
+  const handleEvent = async (tx_hash: TransactionHash) => {
+	  await new Promise(r => setTimeout(r, 3000));
+    const watcher = new TransactionWatcher(tx_hash, provider);
+    await watcher.awaitNotarized();
+    const res: Array<ContractRes> = (await transactionResult(tx_hash.toString()))["smartContractResults"];
 
     const id = filterEventId(res);
 
@@ -159,7 +167,48 @@ export const elrondHelperFactory: (
     }
   }
 
+  const unsignedTransferTxn = async (
+    sender: ISigner,
+    to: String,
+    value: EasyBalance
+  ) => {
+    const account = await syncAccount(sender);
+
+    return new Transaction({
+      receiver: mintContract,
+      nonce: account.nonce,
+      gasLimit: new GasLimit(50000000),
+      value: new Balance(value.toString()),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("freezeSend"))
+        .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .build(),
+    });
+  };
+
+  const unsignedUnfreezeTxn = async (
+    sender: ISigner,
+    to: string,
+    value: EasyBalance
+  ) => {
+    const account = await syncAccount(sender);
+
+    return new Transaction({
+      receiver: mintContract,
+      nonce: account.nonce,
+      gasLimit: new GasLimit(50000000),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("ESDTTransfer"))
+        .addArg(new TokenIdentifierValue(esdtHex))
+        .addArg(new BigUIntValue(new BigNumber(value)))
+        .addArg(new BytesValue(Buffer.from("withdraw", "ascii")))
+        .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .build(),
+    });
+  }
+
   return {
+    handleTxnEvent: handleEvent,
     async balance(
       address: string | Address
     ): Promise<BigNumber> {
@@ -174,23 +223,12 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance
     ): Promise<Transaction> {
-      const account = await syncAccount(sender);
-
-      const tx = new Transaction({
-        receiver: mintContract,
-        nonce: account.nonce,
-        gasLimit: new GasLimit(50000000),
-        value: new Balance(value.toString()),
-        data: TransactionPayload.contractCall()
-          .setFunction(new ContractFunction("freezeSend"))
-          .addArg(new BytesValue(Buffer.from(to, "ascii")))
-          .build(),
-      });
+      const tx = await unsignedTransferTxn(sender, to, value);
 
       sender.sign(tx);
       await tx.send(provider);
 
-      await handleEvent(tx);
+      await handleEvent(tx.getHash());
 
       return tx;
     },
@@ -199,28 +237,19 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance
     ): Promise<Transaction> {
-      const account = await syncAccount(sender);
-
-      const tx = new Transaction({
-        receiver: mintContract,
-        nonce: account.nonce,
-        gasLimit: new GasLimit(50000000),
-        data: TransactionPayload.contractCall()
-          .setFunction(new ContractFunction("ESDTTransfer"))
-          .addArg(new TokenIdentifierValue(esdtHex))
-          .addArg(new BigUIntValue(new BigNumber(value)))
-          .addArg(new BytesValue(Buffer.from("withdraw", "ascii")))
-          .addArg(new BytesValue(Buffer.from(to, "ascii")))
-          .build(),
-      });
+      const tx = await unsignedUnfreezeTxn(
+        sender, to, value
+      )
 
       sender.sign(tx);
       await tx.send(provider);
 
-      await handleEvent(tx);
+      await handleEvent(tx.getHash());
 
       return tx;
     },
+    unsignedTransferTxn,
+    unsignedUnfreezeTxn,
     async transferNftToForeign(
       sender: ISigner,
       to: string,
@@ -246,7 +275,7 @@ export const elrondHelperFactory: (
       sender.sign(tx);
       await tx.send(provider);
 
-      await handleEvent(tx);
+      await handleEvent(tx.getHash());
 
       return tx;
     },
@@ -275,7 +304,7 @@ export const elrondHelperFactory: (
       sender.sign(tx);
       await tx.send(provider);
 
-      await handleEvent(tx);
+      await handleEvent(tx.getHash());
 
       return tx;
     },
