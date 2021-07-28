@@ -1,4 +1,4 @@
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { AnyJson, RegistryTypes } from "@polkadot/types/types";
 import { ContractPromise } from "@polkadot/api-contract";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
@@ -106,6 +106,8 @@ export const polkadotPalletHelperFactory: (
   node_uri: string
 ) => Promise<PolkadotPalletHelper> = async (node_uri: string) => {
   const [base, api] = await basePolkadotHelper(node_uri);
+  const keyring = new Keyring();
+  const sudoSigner = keyring.createFromUri("//Alice", undefined, "sr25519");
 
   return {
     ...base,
@@ -146,6 +148,7 @@ export const polkadotPalletHelperFactory: (
       info: Uint8Array
     ): Promise<void> {
         let addr;
+        // "static typing :|"
         if (typeof owner.sender == "string") {
           addr = owner.sender;
         } else if (hasAddrField(owner.sender)) {
@@ -154,8 +157,9 @@ export const polkadotPalletHelperFactory: (
           addr = owner.sender.toString();
         }
 
-        await api.tx.nft.mint(addr, info)
-          .signAndSend(owner.sender, owner.options);
+        await api.tx.sudo.sudo(
+          api.tx.nft.mint(addr, info)
+        ).signAndSend(sudoSigner);
     },
     async listNft(
       owner: EasyAddr
