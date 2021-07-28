@@ -55,7 +55,7 @@ export function toHex(buffer: Uint8Array) {
   for (let idx = 0, edx = buffer.length; idx < edx; idx++) {
     out += LUT_HEX_8b[buffer[idx]];
   }
-  return out;
+  return `0x${out}`;
 }
 
 async function basePolkadotHelper(
