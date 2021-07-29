@@ -10,10 +10,12 @@ import {
   UnfreezeForeignNft,
   BalanceCheck,
   MintNft,
-  ListNft
+  ListNft,
+  GetLockedNft
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
+import {Option, Tuple} from "@polkadot/types";
 
 type ConcreteJson = {
   readonly [index: string]: AnyJson;
@@ -41,7 +43,8 @@ export type PolkadotPalletHelper = PolkadotHelper &
   TransferNftForeign<Signer, string, H256, Hash> &
   UnfreezeForeignNft<Signer, string, H256, Hash> &
   MintNft<Signer, Uint8Array, void> &
-  ListNft<EasyAddr, string, string>;
+  ListNft<EasyAddr, string, string> &
+  GetLockedNft<H256, Uint8Array>;
 
 
 const LUT_HEX_4b = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
@@ -149,7 +152,7 @@ export const polkadotPalletHelperFactory: (
       to: string,
       nft_id: H256
     ): Promise<Hash> {
-      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
+      return await api.tx.freetoU8azer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
     },
     async unfreezeWrappedNft(
       sender: Signer,
@@ -182,7 +185,18 @@ export const polkadotPalletHelperFactory: (
       const com = await api.query.nft.commoditiesForAccount(owner.toString());
       const c = com.toJSON() as NftInfo;
       return new Map(Object.entries(c));
-    }
+    },
+	async getLockedNft(
+		hash: H256
+	): Promise<Uint8Array | undefined> {
+		const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
+		if (com.isNone) {
+			return undefined;
+		}
+
+		const [_owner, dat] = com.unwrap();
+		return dat.toU8a();
+	}
   };
 };
 

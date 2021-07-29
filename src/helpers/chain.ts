@@ -44,3 +44,7 @@ export interface ListNft<Addr, K, V> {
     owner: Addr
   ): Promise<Map<K, V>>
 }
+
+export interface GetLockedNft<Ident, Info> {
+	getLockedNft(ident: Ident): Promise<Info | undefined>;
+}

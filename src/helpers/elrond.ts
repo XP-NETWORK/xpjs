@@ -21,6 +21,7 @@ import axios, { AxiosInstance } from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
+  GetLockedNft,
   ListNft,
   MintNft,
   TransferForeign,
@@ -93,7 +94,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   UnfreezeForeignNft<ISigner, string, number, Transaction> &
   IssueESDTNFT &
   MintNft<ISigner, NftIssueArgs, void> &
-  ListNft<string, string, EsdtNftInfo>  & {
+  ListNft<string, string, EsdtNftInfo>  &
+  GetLockedNft<NftInfo, EsdtNftInfo> & {
     unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
     unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
     unsignedTransferNftTxn(address: Address, to: string, info: NftInfo): Transaction;
@@ -286,6 +288,16 @@ export const elrondHelperFactory: (
     });
   }
 
+  const listNft = async (owner: string) => {
+      const raw = await providerRest(`/address/${owner}/esdt`);
+      const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
+      const ents: [string, MaybeEsdtNftInfo][] = Object.entries(dat);
+
+      return new Map(
+        ents.filter(([_ident, info]) => isEsdtNftInfo(info))
+      );
+    }
+
 
   return {
     handleTxnEvent: handleEvent,
@@ -387,15 +399,11 @@ export const elrondHelperFactory: (
 
       await signAndSend(owner, txu);
     },
-    async listNft(owner: string): Promise<Map<string, EsdtNftInfo>> {
-      const raw = await providerRest(`/address/${owner}/esdt`);
-      const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
-      const ents: [string, MaybeEsdtNftInfo][] = Object.entries(dat);
-
-      return new Map(
-        ents.filter(([_ident, info]) => isEsdtNftInfo(info))
-      );
-    }
+    listNft,
+	async getLockedNft({token, nonce}: NftInfo): Promise<EsdtNftInfo | undefined> {
+	  const nfts = await listNft(minter_address);
+	  return nfts.get(`${token}-0${nonce.toString(16)}`);
+	}
   };
 };
 
