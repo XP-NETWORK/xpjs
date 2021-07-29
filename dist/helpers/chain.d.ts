@@ -19,3 +19,6 @@ export interface MintNft<Signer, Args, Identifier> {
 export interface ListNft<Addr, K, V> {
     listNft(owner: Addr): Promise<Map<K, V>>;
 }
+export interface GetLockedNft<Ident, Info> {
+    getLockedNft(ident: Ident): Promise<Info | undefined>;
+}

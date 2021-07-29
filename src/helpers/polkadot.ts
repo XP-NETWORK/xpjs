@@ -1,5 +1,5 @@
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
-import { AnyJson, RegistryTypes } from "@polkadot/types/types";
+import { AnyJson, Codec, RegistryTypes } from "@polkadot/types/types";
 import { ContractPromise } from "@polkadot/api-contract";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
@@ -182,7 +182,10 @@ export const polkadotPalletHelperFactory: (
     async listNft(
       owner: EasyAddr
     ): Promise<Map<string, string>> {
-      const com = await api.query.nft.commoditiesForAccount(owner.toString());
+      const com = await api.query.nft.commoditiesForAccount(owner.toString()) as Option<Codec>;
+	  if (com.isNone) {
+		  return new Map();
+	  }
       const c = com.toJSON() as NftInfo;
       return new Map(Object.entries(c));
     },
