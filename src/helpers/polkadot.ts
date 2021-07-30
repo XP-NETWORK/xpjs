@@ -152,7 +152,7 @@ export const polkadotPalletHelperFactory: (
       to: string,
       nft_id: H256
     ): Promise<Hash> {
-      return await api.tx.freetoU8azer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
+      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
     },
     async unfreezeWrappedNft(
       sender: Signer,
