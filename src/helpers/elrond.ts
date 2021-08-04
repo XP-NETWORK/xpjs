@@ -325,22 +325,33 @@ export const elrondHelperFactory: (
   const unsignedIssueESDTNft  = (
       name: string,
       ticker: string,
-      canFreeze: boolean = false,
-      canWipe: boolean = false,
-      canTransferNFTCreateRole: boolean = false
+      canFreeze: boolean | undefined,
+      canWipe: boolean | undefined,
+      canTransferNFTCreateRole: boolean | undefined
   ) => {
+	let baseArgs = TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("issueNonFungible"))
+        .addArg(new TokenIdentifierValue(Buffer.from(name, 'utf-8')))
+        .addArg(new TokenIdentifierValue(Buffer.from(ticker, 'utf-8')));
+
+	if (canFreeze !== undefined) {
+		baseArgs = baseArgs.addArg(new BytesValue(Buffer.from("canFreeze", 'ascii')))
+		  .addArg(new BytesValue(Buffer.from(canFreeze ? "true" : "false", 'ascii')));
+	}
+	if (canWipe !== undefined) {
+	  baseArgs = baseArgs.addArg(new BytesValue(Buffer.from("canWipe", 'ascii')))
+	    .addArg(new BytesValue(Buffer.from(canWipe ? "true" : "false", "ascii")));
+	}
+	if (canTransferNFTCreateRole !== undefined) {
+		baseArgs = baseArgs.addArg(new BytesValue(Buffer.from('canTransferNFTCreateRole', 'ascii')))
+		  .addArg(new BytesValue(Buffer.from(canTransferNFTCreateRole ? "true" : "false", "ascii")));
+	}
+
     return new Transaction({
       receiver: ESDT_ISSUE_ADDR,
       value: new Balance(ESDT_ISSUE_COST),
       gasLimit: new GasLimit(60000000),
-      data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("issueNonFungible"))
-        .addArg(new TokenIdentifierValue(Buffer.from(name, 'utf-8')))
-        .addArg(new TokenIdentifierValue(Buffer.from(ticker, 'utf-8')))
-        .addArg(new BytesValue(Buffer.from(canFreeze ? "true" : "false", 'ascii')))
-        .addArg(new BytesValue(Buffer.from(canWipe ? "true" : "false", 'ascii')))
-        .addArg(new BytesValue(Buffer.from(canTransferNFTCreateRole ? "true" : "false", 'ascii')))
-        .build()
+      data: baseArgs.build()
     });
   };
 
