@@ -76,6 +76,14 @@ export type NftIssueArgs = {
 }
 
 export interface IssueESDTNFT {
+  unsignedIssueESDTNft(
+    name: string,
+    ticker: string,
+    canFreeze: boolean | undefined,
+    canWipe: boolean | undefined,
+    canTransferNFTCreateRole: boolean | undefined
+  ): Transaction;
+
   issueESDTNft(
     sender: ISigner,
     name: string,
@@ -296,7 +304,29 @@ export const elrondHelperFactory: (
       return new Map(
         ents.filter(([_ident, info]) => isEsdtNftInfo(info))
       );
-    }
+  };
+
+  const unsignedIssueESDTNft  = (
+      name: string,
+      ticker: string,
+      canFreeze: boolean = false,
+      canWipe: boolean = false,
+      canTransferNFTCreateRole: boolean = false
+  ) => {
+    return new Transaction({
+      receiver: ESDT_ISSUE_ADDR,
+      value: new Balance(ESDT_ISSUE_COST),
+      gasLimit: new GasLimit(60000000),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("issueNonFungible"))
+        .addArg(new TokenIdentifierValue(Buffer.from(name, 'utf-8')))
+        .addArg(new TokenIdentifierValue(Buffer.from(ticker, 'utf-8')))
+        .addArg(new BytesValue(Buffer.from(canFreeze ? "true" : "false", 'ascii')))
+        .addArg(new BytesValue(Buffer.from(canWipe ? "true" : "false", 'ascii')))
+        .addArg(new BytesValue(Buffer.from(canTransferNFTCreateRole ? "true" : "false", 'ascii')))
+        .build()
+    });
+  }
 
 
   return {
@@ -363,6 +393,7 @@ export const elrondHelperFactory: (
 
       return tx;
     },
+    unsignedIssueESDTNft,
     async issueESDTNft(
       sender: ISigner,
       name: string,
@@ -371,25 +402,9 @@ export const elrondHelperFactory: (
       canWipe: boolean = false,
       canTransferNFTCreateRole: boolean = false
     ): Promise<void> {
-      const account = await syncAccount(sender);
-  
-      const tx = new Transaction({
-        receiver: ESDT_ISSUE_ADDR,
-        nonce: account.nonce,
-        value: new Balance(ESDT_ISSUE_COST),
-        gasLimit: new GasLimit(60000000),
-        data: TransactionPayload.contractCall()
-          .setFunction(new ContractFunction("issueNonFungible"))
-          .addArg(new TokenIdentifierValue(Buffer.from(name, 'utf-8')))
-          .addArg(new TokenIdentifierValue(Buffer.from(ticker, 'utf-8')))
-          .addArg(new BytesValue(Buffer.from(canFreeze ? "true" : "false", 'ascii')))
-          .addArg(new BytesValue(Buffer.from(canWipe ? "true" : "false", 'ascii')))
-          .addArg(new BytesValue(Buffer.from(canTransferNFTCreateRole ? "true" : "false", 'ascii')))
-          .build()
-      });
+      const txu = unsignedIssueESDTNft(name, ticker, canFreeze, canWipe, canTransferNFTCreateRole);
 
-      sender.sign(tx);
-      await tx.send(provider);
+      await signAndSend(sender, txu);
     },
     async mintNft(
       owner: ISigner,
