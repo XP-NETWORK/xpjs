@@ -92,6 +92,20 @@ export interface IssueESDTNFT {
     canWipe: boolean | undefined,
     canTransferNFTCreateRole: boolean | undefined
   ): Promise<void>;
+};
+
+export interface SetESDTRoles {
+	unsignedSetESDTRoles(
+		token: string,
+		target: Address,
+		roles: [string]
+	): Transaction;
+
+	setESDTRole(
+		sender: ISigner,
+		token: string,
+		roles: [string]
+	): Promise<void>;
 }
 
 
@@ -327,6 +341,28 @@ export const elrondHelperFactory: (
         .addArg(new BytesValue(Buffer.from(canTransferNFTCreateRole ? "true" : "false", 'ascii')))
         .build()
     });
+  };
+
+
+  const unsignedSetESDTRoles = (
+	  token: string,
+	  target: Address,
+	  roles: [string]
+  ) => {
+    let baseArgs = TransactionPayload.contractCall()
+	  .setFunction(new ContractFunction("setSpecialRole"))
+	  .addArg(new TokenIdentifierValue(Buffer.from(token)))
+	  .addArg(new AddressValue(target));
+
+	  for (const role of roles) {
+		baseArgs = baseArgs.addArg(new BytesValue(Buffer.from(role, 'utf-8')));
+	  }
+
+	  return new Transaction({
+		  receiver: ESDT_ISSUE_ADDR,
+		  gasLimit: new GasLimit(70000000), // TODO: auto derive
+		  data: baseArgs.build()
+	  });
   }
 
 
@@ -338,6 +374,7 @@ export const elrondHelperFactory: (
     unsignedTransferNftTxn,
     unsignedUnfreezeNftTxn,
     unsignedMintNftTxn,
+	unsignedSetESDTRoles,
     async balance(
       address: string | Address
     ): Promise<BigNumber> {
@@ -420,6 +457,16 @@ export const elrondHelperFactory: (
 	async getLockedNft({token, nonce}: NftInfo): Promise<EsdtNftInfo | undefined> {
 	  const nfts = await listNft(minter_address);
 	  return nfts.get(`${token}-0${nonce.toString(16)}`);
+	},
+	async setESDTRole(
+	  manager: ISigner,
+	  token: string,
+	  target: Address,
+      roles: [string]
+	): Promise<void> {
+      const txu = unsignedSetESDTRoles(token, target, roles);
+
+	  await signAndSend(manager, txu);
 	}
   };
 };

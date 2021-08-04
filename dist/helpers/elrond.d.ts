@@ -31,6 +31,10 @@ export interface IssueESDTNFT {
     unsignedIssueESDTNft(name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Transaction;
     issueESDTNft(sender: ISigner, name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Promise<void>;
 }
+export interface SetESDTRoles {
+    unsignedSetESDTRoles(token: string, target: Address, roles: [string]): Transaction;
+    setESDTRole(sender: ISigner, token: string, roles: [string]): Promise<void>;
+}
 export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction> & TransferNftForeign<ISigner, string, NftInfo, Transaction> & UnfreezeForeignNft<ISigner, string, number, Transaction> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & {
     unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
     unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
