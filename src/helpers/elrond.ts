@@ -94,20 +94,21 @@ export interface IssueESDTNFT {
   ): Promise<void>;
 };
 
+export type ESDTRole = "ESDTRoleNFTCreate" | "ESDTRoleNFTBurn" | "ESDTRoleNFTCreate" | "ESDTRoleNFTBurn"| "ESDTRoleNFTAddQuantity";
+
 export interface SetESDTRoles {
 	unsignedSetESDTRoles(
 		token: string,
 		target: Address,
-		roles: [string]
+		roles: [ESDTRole]
 	): Transaction;
 
 	setESDTRole(
 		sender: ISigner,
 		token: string,
-		roles: [string]
+		roles: [ESDTRole]
 	): Promise<void>;
 }
-
 
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   TransferForeign<ISigner, string, EasyBalance, Transaction> &
@@ -347,7 +348,7 @@ export const elrondHelperFactory: (
   const unsignedSetESDTRoles = (
 	  token: string,
 	  target: Address,
-	  roles: [string]
+	  roles: [ESDTRole]
   ) => {
     let baseArgs = TransactionPayload.contractCall()
 	  .setFunction(new ContractFunction("setSpecialRole"))
@@ -462,7 +463,7 @@ export const elrondHelperFactory: (
 	  manager: ISigner,
 	  token: string,
 	  target: Address,
-      roles: [string]
+      roles: [ESDTRole]
 	): Promise<void> {
       const txu = unsignedSetESDTRoles(token, target, roles);
 
