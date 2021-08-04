@@ -110,6 +110,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
+	rawTxnResult(tx_hash: TransactionHash): Promise<Object>; // TODO: Typed transaction result
   };
 
 
@@ -143,7 +144,7 @@ export const elrondHelperFactory: (
 	  await new Promise(r => setTimeout(r, 3000));
     const watcher = new TransactionWatcher(tx_hash, provider);
     await watcher.awaitNotarized();
-    const res: Array<ContractRes> = (await transactionResult(tx_hash.toString()))["smartContractResults"];
+    const res: Array<ContractRes> = (await transactionResult(tx_hash))["smartContractResults"];
 
     const id = filterEventId(res);
 
@@ -167,8 +168,8 @@ export const elrondHelperFactory: (
     return tx;
   }
 
-  const transactionResult = async (tx_hash: string) => {
-    const uri = `/transaction/${tx_hash}?withResults=true`;
+  const transactionResult = async (tx_hash: TransactionHash) => {
+    const uri = `/transaction/${tx_hash.toString()}?withResults=true`;
 
     while (true) {
 	  // TODO: type safety
@@ -330,6 +331,7 @@ export const elrondHelperFactory: (
 
 
   return {
+    rawTxnResult: transactionResult,
     handleTxnEvent: handleEvent,
     unsignedTransferTxn,
     unsignedUnfreezeTxn,

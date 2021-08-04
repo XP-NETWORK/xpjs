@@ -38,6 +38,7 @@ export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & T
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
+    rawTxnResult(tx_hash: TransactionHash): Promise<Object>;
 };
 export declare const elrondHelperFactory: (node_uri: string, minter_address: string, middleware_uri: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;
 export {};
