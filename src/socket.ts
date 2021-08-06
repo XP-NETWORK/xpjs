@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import { io, ManagerOptions, SocketOptions } from "socket.io-client";
 import { TransferUniqueEvent, UnfreezeUniqueEvent } from "validator";
 
 
@@ -11,8 +11,8 @@ export type TxnSocketHelper = {
     waitTxHashElrond(id: string): Promise<string>;
 }
 
-export function txnSocketHelper(uri: string): TxnSocketHelper {
-    const socket = io(uri);
+export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper {
+    const socket = io(uri, options);
 
     const polkadot_awaiters: Awaiters = {};
     const elrond_awaiters: Awaiters = {};
