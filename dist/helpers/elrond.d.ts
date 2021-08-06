@@ -36,13 +36,14 @@ export interface SetESDTRoles {
     unsignedSetESDTRoles(token: string, target: Address, roles: [ESDTRole]): Transaction;
     setESDTRole(sender: ISigner, token: string, roles: [ESDTRole]): Promise<void>;
 }
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction> & TransferNftForeign<ISigner, string, NftInfo, Transaction> & UnfreezeForeignNft<ISigner, string, number, Transaction> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & {
+declare type EventIdent = number;
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & {
     unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
     unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
     unsignedTransferNftTxn(address: Address, to: string, info: NftInfo): Transaction;
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
-    handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
+    handleTxnEvent(tx_hash: TransactionHash): Promise<EventIdent>;
     rawTxnResult(tx_hash: TransactionHash): Promise<Object>;
 };
 export declare const elrondHelperFactory: (node_uri: string, minter_address: string, middleware_uri: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;

@@ -1,3 +1,5 @@
+// TODO: Catch Event IDs
+
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, BalanceCheck } from "./chain";
 import { Contract, Signer } from 'ethers';
@@ -7,8 +9,8 @@ import { Interface } from "ethers/lib/utils";
 type EasyBalance = string | number | BigNumber;
 
 export type Web3Helper = BalanceCheck<string, BigNumber> &
-    TransferForeign<Signer, string, EasyBalance, TransactionResponse> &
-    UnfreezeForeign<Signer, string, EasyBalance, TransactionResponse>;
+    TransferForeign<Signer, string, EasyBalance, TransactionResponse, undefined> &
+    UnfreezeForeign<Signer, string, EasyBalance, TransactionResponse, undefined>;
 
 
 export async function web3HelperFactory(
@@ -31,13 +33,13 @@ export async function web3HelperFactory(
             // ethers BigNumber is not compatible with our bignumber
             return new BigNumber(bal.toString());
         },
-        async transferNativeToForeign(sender: Signer, to: string, value: EasyBalance): Promise<TransactionResponse> {
-            return await signedMinter(sender)
-                .freeze(to, { value });
+        async transferNativeToForeign(sender: Signer, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
+            return [await signedMinter(sender)
+                .freeze(to, { value }), undefined];
         },
-        async unfreezeWrapped(sender: Signer, to: string, value: EasyBalance): Promise<TransactionResponse> {
-            return await signedMinter(sender)
-                .withdraw(to, value);
+        async unfreezeWrapped(sender: Signer, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
+            return [await signedMinter(sender)
+                .withdraw(to, value), undefined];
         }
     }
 }
