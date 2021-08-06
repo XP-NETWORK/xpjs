@@ -1,6 +1,5 @@
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
-import { AnyJson, Codec, RegistryTypes } from "@polkadot/types/types";
-import { ContractPromise } from "@polkadot/api-contract";
+import { Callback, Codec, ISubmittableResult, RegistryTypes } from "@polkadot/types/types";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
 import {
@@ -14,12 +13,8 @@ import {
   GetLockedNft
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
-import { SignerOptions } from "@polkadot/api/submittable/types";
+import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
 import {Option, Tuple} from "@polkadot/types";
-
-type ConcreteJson = {
-  readonly [index: string]: AnyJson;
-};
 
 type NftInfo = {
   readonly [index: string]: string;
@@ -35,13 +30,15 @@ type EasyAddr = string | LookupSource | Address;
 
 type BasePolkadot = BalanceCheck<string, BigNumber>;
 
+type EventIdent = BigNumber;
+
 export type PolkadotHelper = BasePolkadot &
-  TransferForeign<Signer, string, EasyBalance, Hash> &
-  UnfreezeForeign<Signer, string, EasyBalance, Hash>;
+  TransferForeign<Signer, string, EasyBalance, Hash, EventIdent> &
+  UnfreezeForeign<Signer, string, EasyBalance, Hash, EventIdent>;
 
 export type PolkadotPalletHelper = PolkadotHelper &
-  TransferNftForeign<Signer, string, H256, Hash> &
-  UnfreezeForeignNft<Signer, string, H256, Hash> &
+  TransferNftForeign<Signer, string, H256, Hash, EventIdent> &
+  UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> &
   MintNft<Signer, Uint8Array, void> &
   ListNft<EasyAddr, string, string> &
   GetLockedNft<H256, Uint8Array>;
@@ -85,6 +82,36 @@ function hasAddrField(ob: any): ob is { address: string } {
   return ob.hasOwnField('address') && typeof ob.address == "string";
 }
 
+async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableExtrinsic<'promise', R>, filter: string, signer: AddressOrPair, options?: Partial<SignerOptions>): Promise<[Hash, EventIdent]> {
+  let call: (cb: Callback<R>) => Promise<() => void>;
+  if (options) {
+    call = async (cb: Callback<R>) => await ext.signAndSend(signer, options, cb);
+  } else {
+    call = async (cb: Callback<R>) => await ext.signAndSend(signer, cb);
+  }
+
+  const evP: Promise<[Hash, EventIdent]> = new Promise((res, rej) => {
+    call(({ events, status }) => {
+      if (!status.isInBlock) {
+        return;
+      }
+
+      const ev = events.find(e => e.event.method == filter);
+      if (ev === undefined) {
+        rej();
+        return;
+      }
+
+      const action_id = new BigNumber(ev.event.data[0].toString());
+      const hash = status.asInBlock;
+
+      res([hash, action_id]);
+    })
+  });
+
+  return await evP;
+}
+
 export const polkadotPalletHelperFactory: (
   node_uri: string
 ) => Promise<PolkadotPalletHelper> = async (node_uri: string) => {
@@ -98,33 +125,45 @@ export const polkadotPalletHelperFactory: (
       sender: Signer,
       to: string,
       value: EasyBalance
-    ): Promise<Hash> {
-      return await api.tx.freezer
-        .send(to, value.toString())
-        .signAndSend(sender.sender, sender.options);;
+    ): Promise<[Hash, EventIdent]> {
+      return await resolve_event_id(
+        api.tx.freezer.send(to, value.toString()),
+        "TransferFrozen",
+        sender.sender, sender.options
+      );
     },
     async unfreezeWrapped(
       sender: Signer,
       to: string,
       value: EasyBalance
-    ): Promise<Hash> {
-      return await api.tx.freezer
-        .withdrawWrapped(to, value.toString())
-        .signAndSend(sender.sender, sender.options);
+    ): Promise<[Hash, EventIdent]> {
+      return await resolve_event_id(
+          api.tx.freezer.withdrawWrapped(to, value.toString()),
+          "UnfreezeWrapped",
+          sender.sender, sender.options
+      );
     },
     async transferNftToForeign(
       sender: Signer,
       to: string,
       nft_id: H256
-    ): Promise<Hash> {
-      return await api.tx.freezer.sendNft(to, nft_id).signAndSend(sender.sender, sender.options);
+    ): Promise<[Hash, EventIdent]> {
+      return await resolve_event_id(
+        api.tx.freezer.sendNft(to, nft_id),
+        "TransferUniqueFrozen",
+        sender.sender, sender.options
+      );
     },
     async unfreezeWrappedNft(
       sender: Signer,
       to: string,
       nft_id: H256
-    ): Promise<Hash> {
-      return await api.tx.freezer.withdrawWrappedNft(to, nft_id).signAndSend(sender.sender, sender.options);
+    ): Promise<[Hash, EventIdent]> {
+      return await resolve_event_id(
+        api.tx.freezer.withdrawWrappedNft(to, nft_id),
+        "UnfreezeUniqueWrapped",
+        sender.sender, sender.options
+      );
     },
     async mintNft(
       owner: Signer,

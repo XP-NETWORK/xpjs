@@ -110,11 +110,13 @@ export interface SetESDTRoles {
 	): Promise<void>;
 }
 
+type EventIdent = number;
+
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ISigner, string, EasyBalance, Transaction> &
-  UnfreezeForeign<ISigner, string, EasyBalance, Transaction> &
-  TransferNftForeign<ISigner, string, NftInfo, Transaction> &
-  UnfreezeForeignNft<ISigner, string, number, Transaction> &
+  TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
+  UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
+  TransferNftForeign<ISigner, string, NftInfo, Transaction, EventIdent> &
+  UnfreezeForeignNft<ISigner, string, number, Transaction, EventIdent> &
   IssueESDTNFT &
   MintNft<ISigner, NftIssueArgs, void> &
   ListNft<string, string, EsdtNftInfo>  &
@@ -124,8 +126,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     unsignedTransferNftTxn(address: Address, to: string, info: NftInfo): Transaction;
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
-    handleTxnEvent(tx_hash: TransactionHash): Promise<void>;
-	rawTxnResult(tx_hash: TransactionHash): Promise<Object>; // TODO: Typed transaction result
+    handleTxnEvent(tx_hash: TransactionHash): Promise<EventIdent>;
+	  rawTxnResult(tx_hash: TransactionHash): Promise<Object>; // TODO: Typed transaction result
   };
 
 
@@ -164,6 +166,8 @@ export const elrondHelperFactory: (
     const id = filterEventId(res);
 
     await emitEvent(eventMiddleware, id.toString());
+
+    return id;
   };
 
   const syncAccount = async (signer: ISigner) => {
@@ -400,49 +404,49 @@ export const elrondHelperFactory: (
       sender: ISigner,
       to: string,
       value: EasyBalance
-    ): Promise<Transaction> {
+    ): Promise<[Transaction, EventIdent]> {
       const txu = unsignedTransferTxn(to, value)
       const tx = await signAndSend(sender, txu);
 
-      await handleEvent(tx.getHash());
+      const id = await handleEvent(tx.getHash());
 
-      return tx;
+      return [tx, id];
     },
     async unfreezeWrapped(
       sender: ISigner,
       to: string,
       value: EasyBalance
-    ): Promise<Transaction> {
+    ): Promise<[Transaction, EventIdent]> {
       const txu = unsignedUnfreezeTxn(to, value);
       const tx = await signAndSend(sender, txu);
 
-      await handleEvent(tx.getHash());
+      const id = await handleEvent(tx.getHash());
 
-      return tx;
+      return [tx, id];
     },
     async transferNftToForeign(
       sender: ISigner,
       to: string,
       info: NftInfo
-    ): Promise<Transaction> {
+    ): Promise<[Transaction, EventIdent]> {
       const txu = unsignedTransferNftTxn(sender.getAddress(), to, info);
       const tx = await signAndSend(sender, txu);
 
-      await handleEvent(tx.getHash());
+      const id = await handleEvent(tx.getHash());
 
-      return tx;
+      return [tx, id];
     },
     async unfreezeWrappedNft(
       sender: ISigner,
       to: string,
-      id: number
-    ): Promise<Transaction> {
-      const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, id);
+      nonce: number
+    ): Promise<[Transaction, EventIdent]> {
+      const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, nonce);
       const tx = await signAndSend(sender, txu);
 
-      await handleEvent(tx.getHash());
+      const eid = await handleEvent(tx.getHash());
 
-      return tx;
+      return [tx, eid];
     },
     unsignedIssueESDTNft,
     async issueESDTNft(
