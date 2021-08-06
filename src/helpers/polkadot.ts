@@ -81,41 +81,6 @@ async function basePolkadotHelper(
     return [base, api]
 }
 
-export const polkadotHelperFactory: (
-  node_uri: string,
-  freezer_addr: string,
-  abi: ConcreteJson
-) => Promise<PolkadotHelper> = async (
-  node_uri: string,
-  freezer_addr: string,
-  abi: ConcreteJson
-) => {
-  const [base, api] = await basePolkadotHelper(node_uri);
-  const freezer = new ContractPromise(api, abi, freezer_addr);
-
-  return {
-    ...base,
-    async transferNativeToForeign(
-      sender: Signer,
-      to: string,
-      value: EasyBalance
-    ): Promise<Hash> {
-      return await freezer.tx
-        .send({ value: value.toString(), gasLimit: -1 }, to)
-        .signAndSend(sender.sender, sender.options);
-    },
-    async unfreezeWrapped(
-      sender: Signer,
-      to: string,
-      value: EasyBalance
-    ): Promise<Hash> {
-      return await freezer.tx
-        .withdrawWrapper({ value: 0, gasLimit: -1 }, to, value.toString())
-        .signAndSend(sender.sender, sender.options);
-    },
-  };
-};
-
 function hasAddrField(ob: any): ob is { address: string } {
   return ob.hasOwnField('address') && typeof ob.address == "string";
 }
