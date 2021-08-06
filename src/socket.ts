@@ -6,7 +6,7 @@ type Awaiters = {
     [index: string]: (hash: string) => void;
 };
 
-type TxnSocketHelper = {
+export type TxnSocketHelper = {
     waitTxHashPolkadot(id: string): Promise<string>;
     waitTxHashElrond(id: string): Promise<string>;
 }
