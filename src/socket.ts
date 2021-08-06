@@ -1,5 +1,4 @@
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
-import { TransferUniqueEvent, UnfreezeUniqueEvent } from "validator";
 
 
 type Awaiters = {
@@ -46,14 +45,14 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
 
     socket.on(
         "transfer_nft_event",
-        (chain: string, event: TransferUniqueEvent, hash: string) => {
-            add_event(chain, event.action_id.toString(), hash);
+        (chain: string, action_id: string, hash: string) => {
+            add_event(chain, action_id, hash);
     });
 
     socket.on(
         "unfreeze_nft_event",
-        (chain: string, event: UnfreezeUniqueEvent, hash: string) => {
-            add_event(chain, event.id.toString(), hash);
+        (chain: string, action_id: string, hash: string) => {
+            add_event(chain, action_id, hash);
         }
     );
 
