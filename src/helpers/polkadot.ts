@@ -128,7 +128,7 @@ export const polkadotPalletHelperFactory: (
       value: EasyBalance
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-        api.tx.freezer.send(to, chain_nonce, value.toString()),
+        api.tx.freezer.send(chain_nonce, to, value.toString()),
         "TransferFrozen",
         sender.sender, sender.options
       );
@@ -140,7 +140,7 @@ export const polkadotPalletHelperFactory: (
       value: EasyBalance
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-          api.tx.freezer.withdrawWrapped(to, chain_nonce, value.toString()),
+          api.tx.freezer.withdrawWrapped(chain_nonce, to, value.toString()),
           "UnfreezeWrapped",
           sender.sender, sender.options
       );
@@ -152,7 +152,7 @@ export const polkadotPalletHelperFactory: (
       nft_id: H256
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-        api.tx.freezer.sendNft(to, chain_nonce, nft_id),
+        api.tx.freezer.sendNft(chain_nonce, to, nft_id),
         "TransferUniqueFrozen",
         sender.sender, sender.options
       );
