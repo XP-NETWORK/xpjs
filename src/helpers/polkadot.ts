@@ -212,12 +212,12 @@ export const polkadotPalletHelperFactory: (
 
 const runtimeTypes: RegistryTypes = {
   ActionId: "u128",
-  TokenId: "u128",
+  TokenId: "u64",
   CommodityId: "H256",
   CommodityInfo: "Vec<u8>",
   NftId: "H256",
   NftInfo: "Vec<u8>",
-  EgldBalance: "Balance",
+  Erc1155Balance: "Balance",
   Commodity: "(H256, Vec<u8>)",
   LocalAction: {
     _enum: {
