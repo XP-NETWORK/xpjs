@@ -18,10 +18,10 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
     const polkadot_event_buf = new Map<string, string>();
     const elrond_event_buf = new Map<string, string>();
 
-    function add_event(chain: string, id: string, hash: string) {
+    function add_event(chain: number, id: string, hash: string) {
         let resolver;
         switch (chain) {
-            case "POLKADOT": {
+            case 0x1: {
                 resolver = polkadot_awaiters['id'];
                 if (resolver === undefined) {
                     polkadot_event_buf.set(id, hash);
@@ -29,7 +29,7 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
                 }
                 break;
             }
-            case "ELROND": {
+            case 0x2: {
                 resolver = elrond_awaiters['id'];
                 if (resolver === undefined) {
                     elrond_event_buf.set(id, hash);
@@ -45,13 +45,13 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
 
     socket.on(
         "transfer_nft_event",
-        (chain: string, action_id: string, hash: string) => {
+        (chain: number, action_id: string, hash: string) => {
             add_event(chain, action_id, hash);
     });
 
     socket.on(
         "unfreeze_nft_event",
-        (chain: string, action_id: string, hash: string) => {
+        (chain: number, action_id: string, hash: string) => {
             add_event(chain, action_id, hash);
         }
     );
