@@ -122,7 +122,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ListNft<string, string, EsdtNftInfo>  &
   GetLockedNft<NftInfo, EsdtNftInfo> & {
     unsignedTransferTxn(chain_nonce: number, to: string, value: EasyBalance): Transaction;
-    unsignedUnfreezeTxn(chain_nonce: number, to: string, value: EasyBalance): Transaction;
+    unsignedUnfreezeTxn(chain_nonce: number, address: Address, to: string, value: EasyBalance): Transaction;
     unsignedTransferNftTxn(chain_nonce: number, address: Address, to: string, info: NftInfo): Transaction;
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
@@ -305,17 +305,19 @@ export const elrondHelperFactory: (
 
   const unsignedUnfreezeTxn = (
     chain_nonce: number,
+	address: Address,
     to: string,
     value: EasyBalance
   ) => {
     return new Transaction({
-      receiver: mintContract,
+      receiver: address,
       gasLimit: new GasLimit(50000000),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("ESDTNFTTransfer"))
         .addArg(new TokenIdentifierValue(esdtHex))
         .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BigUIntValue(new BigNumber(value)))
+		.addArg(new AddressValue(mintContract))
         .addArg(new BytesValue(Buffer.from("withdraw", "ascii")))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
         .build(),
@@ -425,7 +427,7 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
-      const txu = unsignedUnfreezeTxn(chain_nonce, to, value);
+      const txu = unsignedUnfreezeTxn(chain_nonce, sender.getAddress(), to, value);
       const tx = await signAndSend(sender, txu);
 
       const id = await handleEvent(tx.getHash());
