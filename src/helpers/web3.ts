@@ -33,13 +33,13 @@ export async function web3HelperFactory(
             // ethers BigNumber is not compatible with our bignumber
             return new BigNumber(bal.toString());
         },
-        async transferNativeToForeign(sender: Signer, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
+        async transferNativeToForeign(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
             return [await signedMinter(sender)
-                .freeze(to, { value }), undefined];
+                .freeze(chain_nonce, to, { value }), undefined];
         },
-        async unfreezeWrapped(sender: Signer, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
+        async unfreezeWrapped(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
             return [await signedMinter(sender)
-                .withdraw(to, value), undefined];
+                .withdraw(chain_nonce, to, value), undefined];
         }
     }
 }

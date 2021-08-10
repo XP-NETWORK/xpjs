@@ -123,33 +123,36 @@ export const polkadotPalletHelperFactory: (
     ...base,
     async transferNativeToForeign(
       sender: Signer,
+      chain_nonce: number,
       to: string,
       value: EasyBalance
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-        api.tx.freezer.send(to, value.toString()),
+        api.tx.freezer.send(to, chain_nonce, value.toString()),
         "TransferFrozen",
         sender.sender, sender.options
       );
     },
     async unfreezeWrapped(
       sender: Signer,
+      chain_nonce: number,
       to: string,
       value: EasyBalance
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-          api.tx.freezer.withdrawWrapped(to, value.toString()),
+          api.tx.freezer.withdrawWrapped(to, chain_nonce, value.toString()),
           "UnfreezeWrapped",
           sender.sender, sender.options
       );
     },
     async transferNftToForeign(
       sender: Signer,
+      chain_nonce: number,
       to: string,
       nft_id: H256
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-        api.tx.freezer.sendNft(to, nft_id),
+        api.tx.freezer.sendNft(to, chain_nonce, nft_id),
         "TransferUniqueFrozen",
         sender.sender, sender.options
       );

@@ -1,11 +1,11 @@
 export interface TransferForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
-    transferNativeToForeign(sender: Signer, to: ForeignAddr, value: Balance): Promise<[Tx, EventIdent]>;
+    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance): Promise<[Tx, EventIdent]>;
 }
 export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
-    unfreezeWrapped(sender: Signer, to: ForeignAddr, value: Balance): Promise<[Tx, EventIdent]>;
+    unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance): Promise<[Tx, EventIdent]>;
 }
 export interface TransferNftForeign<Signer, ForeignAddr, NftIdent, Tx, EventIdent> {
-    transferNftToForeign(sender: Signer, to: ForeignAddr, id: NftIdent): Promise<[Tx, EventIdent]>;
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftIdent): Promise<[Tx, EventIdent]>;
 }
 export interface UnfreezeForeignNft<Signer, ForeignAddr, NftIdent, Tx, EventIdent> {
     unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftIdent): Promise<[Tx, EventIdent]>;

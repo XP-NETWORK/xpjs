@@ -121,9 +121,9 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   MintNft<ISigner, NftIssueArgs, void> &
   ListNft<string, string, EsdtNftInfo>  &
   GetLockedNft<NftInfo, EsdtNftInfo> & {
-    unsignedTransferTxn(to: string, value: EasyBalance): Transaction;
-    unsignedUnfreezeTxn(to: string, value: EasyBalance): Transaction;
-    unsignedTransferNftTxn(address: Address, to: string, info: NftInfo): Transaction;
+    unsignedTransferTxn(chain_nonce: number, to: string, value: EasyBalance): Transaction;
+    unsignedUnfreezeTxn(chain_nonce: number, to: string, value: EasyBalance): Transaction;
+    unsignedTransferNftTxn(chain_nonce: number, address: Address, to: string, info: NftInfo): Transaction;
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     handleTxnEvent(tx_hash: TransactionHash): Promise<EventIdent>;
@@ -212,6 +212,7 @@ export const elrondHelperFactory: (
   }
 
   const unsignedTransferTxn = (
+    chain_nonce: number,
     to: string,
     value: EasyBalance
   ) => {
@@ -222,6 +223,7 @@ export const elrondHelperFactory: (
       value: new Balance(value.toString()),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("freezeSend"))
+        .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
         .build(),
     });
@@ -260,6 +262,7 @@ export const elrondHelperFactory: (
   }
 
   const unsignedTransferNftTxn = (
+    chain_nonce: number,
     address: Address,
     to: string,
     { token, nonce }: NftInfo
@@ -274,6 +277,7 @@ export const elrondHelperFactory: (
         .addArg(new BigUIntValue(new BigNumber(1)))
         .addArg(new AddressValue(mintContract))
         .addArg(new BytesValue(Buffer.from("freezeSendNft", "ascii")))
+        .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
         .build(),
     });
@@ -300,6 +304,7 @@ export const elrondHelperFactory: (
   }
 
   const unsignedUnfreezeTxn = (
+    chain_nonce: number,
     to: string,
     value: EasyBalance
   ) => {
@@ -307,8 +312,9 @@ export const elrondHelperFactory: (
       receiver: mintContract,
       gasLimit: new GasLimit(50000000),
       data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("ESDTTransfer"))
+        .setFunction(new ContractFunction("ESDTNFTTransfer"))
         .addArg(new TokenIdentifierValue(esdtHex))
+        .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BigUIntValue(new BigNumber(value)))
         .addArg(new BytesValue(Buffer.from("withdraw", "ascii")))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
@@ -390,7 +396,7 @@ export const elrondHelperFactory: (
     unsignedTransferNftTxn,
     unsignedUnfreezeNftTxn,
     unsignedMintNftTxn,
-	unsignedSetESDTRoles,
+  	unsignedSetESDTRoles,
     async balance(
       address: string | Address
     ): Promise<BigNumber> {
@@ -402,10 +408,11 @@ export const elrondHelperFactory: (
     },
     async transferNativeToForeign(
       sender: ISigner,
+      chain_nonce: number,
       to: string,
       value: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
-      const txu = unsignedTransferTxn(to, value)
+      const txu = unsignedTransferTxn(chain_nonce, to, value)
       const tx = await signAndSend(sender, txu);
 
       const id = await handleEvent(tx.getHash());
@@ -414,10 +421,11 @@ export const elrondHelperFactory: (
     },
     async unfreezeWrapped(
       sender: ISigner,
+      chain_nonce: number,
       to: string,
       value: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
-      const txu = unsignedUnfreezeTxn(to, value);
+      const txu = unsignedUnfreezeTxn(chain_nonce, to, value);
       const tx = await signAndSend(sender, txu);
 
       const id = await handleEvent(tx.getHash());
@@ -426,10 +434,11 @@ export const elrondHelperFactory: (
     },
     async transferNftToForeign(
       sender: ISigner,
+      chain_nonce: number,
       to: string,
       info: NftInfo
     ): Promise<[Transaction, EventIdent]> {
-      const txu = unsignedTransferNftTxn(sender.getAddress(), to, info);
+      const txu = unsignedTransferNftTxn(chain_nonce, sender.getAddress(), to, info);
       const tx = await signAndSend(sender, txu);
 
       const id = await handleEvent(tx.getHash());
