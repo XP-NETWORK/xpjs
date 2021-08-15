@@ -50,8 +50,8 @@ export async function web3HelperFactory(
 		async transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: EthNftInfo): Promise<[TransactionResponse, undefined]> {
 			let txr;
 			const calldata = Buffer.concat([
-				new Uint8Array((new Int32Array(0)).buffer), // 4 padding bytes
-				new Uint8Array((new Int32Array(chain_nonce)).reverse().buffer), // BE, gotta reverse
+				Buffer.from((new Int32Array(0)).buffer), // 4 padding bytes
+				Buffer.from((new Int32Array(chain_nonce)).reverse().buffer), // BE, gotta reverse
 				Buffer.from(to, "utf-8")
 			]);
 
