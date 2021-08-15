@@ -1,16 +1,26 @@
 // TODO: Catch Event IDs
 
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, BalanceCheck } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign } from "./chain";
 import { Contract, Signer } from 'ethers';
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
+import * as ERC721_abi from "../fakeERC721.json";
+import { abi as ERC1155_abi } from "../fakeERC1155.json";
 
 type EasyBalance = string | number | BigNumber;
+export type EthNftInfo = {
+	contract_type: "ERC721" | "ERC1155"
+	contract: string,
+	token: BigNumber
+}
 
+// TODO: Get action id properly
 export type Web3Helper = BalanceCheck<string, BigNumber> &
     TransferForeign<Signer, string, EasyBalance, TransactionResponse, undefined> &
-    UnfreezeForeign<Signer, string, EasyBalance, TransactionResponse, undefined>;
+	TransferNftForeign<Signer, string, EthNftInfo, TransactionResponse, undefined> &
+    UnfreezeForeign<Signer, string, EasyBalance, TransactionResponse, undefined> &
+	UnfreezeForeignNft<Signer, string, BigNumber, TransactionResponse, undefined>; 
 
 
 export async function web3HelperFactory(
@@ -37,9 +47,31 @@ export async function web3HelperFactory(
             return [await signedMinter(sender)
                 .freeze(chain_nonce, to, { value }), undefined];
         },
+		async transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: EthNftInfo): Promise<[TransactionResponse, undefined]> {
+			let txr;
+			const calldata = Buffer.concat([
+				new Uint8Array((new Int32Array(0)).buffer), // 4 padding bytes
+				new Uint8Array((new Int32Array(chain_nonce)).reverse().buffer), // BE, gotta reverse
+				Buffer.from(to, "utf-8")
+			]);
+
+			if (id.contract_type == "ERC721") {
+				const erc = new Contract(id.contract, ERC721_abi, w3);
+				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, calldata);
+			} else {
+				const erc = new Contract(id.contract, ERC1155_abi, w3);
+				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, new BigNumber(1), calldata);
+			}
+			
+			return [txr, undefined]
+		},
         async unfreezeWrapped(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
             return [await signedMinter(sender)
                 .withdraw(chain_nonce, to, value), undefined];
-        }
+        },
+		async unfreezeWrappedNft(sender: Signer, to: string, id: BigNumber): Promise<[TransactionResponse, undefined]> {
+			return [await signedMinter(sender)
+				.withdraw_nft(to, id), undefined];
+		}
     }
 }
