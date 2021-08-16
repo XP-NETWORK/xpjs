@@ -5,7 +5,7 @@ import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, Tra
 import { Contract, Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionReceipt, TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
-import * as ERC721_abi from "../fakeERC721.json";
+import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
 
 type EasyBalance = string | number | EthBN;
@@ -69,7 +69,7 @@ export async function web3HelperFactory(
 
 			if (id.contract_type == "ERC721") {
 				const erc = new Contract(id.contract, ERC721_abi, w3);
-				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, calldata);
+				txr = await erc.connect(sender)['safeTransferFrom(address,address,uint256,bytes)'](await sender.getAddress(), minter_addr, id.token, calldata);
 			} else {
 				const erc = new Contract(id.contract, ERC1155_abi, w3);
 				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, EthBN.from(1), calldata);
