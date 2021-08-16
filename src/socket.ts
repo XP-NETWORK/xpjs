@@ -1,46 +1,31 @@
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
 
+type ChainAwaiter = {
+	[action_id: string]: {
+		resolve?: (hash: string) => void;
+		event_res?: string;
+	}
+};
 
-type Awaiters = {
-    [index: string]: (hash: string) => void;
+type TxResBuf = {
+	[chain: number]: ChainAwaiter
 };
 
 export type TxnSocketHelper = {
-    waitTxHashPolkadot(id: string): Promise<string>;
-    waitTxHashElrond(id: string): Promise<string>;
+    waitTxHash(chain: number, action_id: string): Promise<string>;
 }
 
 export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper {
     const socket = io(uri, options);
-
-    const polkadot_awaiters: Awaiters = {};
-    const elrond_awaiters: Awaiters = {};
-    const polkadot_event_buf = new Map<string, string>();
-    const elrond_event_buf = new Map<string, string>();
+	const buf: TxResBuf = {};
 
     function add_event(chain: number, id: string, hash: string) {
-        let resolver;
-        switch (chain) {
-            case 0x1: {
-                resolver = polkadot_awaiters['id'];
-                if (resolver === undefined) {
-                    polkadot_event_buf.set(id, hash);
-                    return;
-                }
-                break;
-            }
-            case 0x2: {
-                resolver = elrond_awaiters['id'];
-                if (resolver === undefined) {
-                    elrond_event_buf.set(id, hash);
-                    return;
-                }
-                break;
-            }
-            default: throw Error(`Unhandled chain ${chain}`);
-        }
-
-        resolver(hash);
+		const resolve = buf[chain][id].resolve;
+		if (resolve === undefined) {
+			buf[chain][id].event_res = hash;
+			return;
+		}
+		resolve(hash);
     }
 
     socket.on(
@@ -58,31 +43,18 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
 
 
     return {
-        async waitTxHashPolkadot(id: string): Promise<string> {
-            const hash = polkadot_event_buf.get(id);
-            if (hash !== undefined) {
-                polkadot_event_buf.delete(id);
-                return hash;
-            }
+		async waitTxHash(chain: number, action_id: string): Promise<string> {
+			const hash = buf[chain][action_id].event_res;
+			if (hash !== undefined) {
+				buf[chain][action_id].event_res = undefined;
+				return hash;
+			}
 
-            const hashP: Promise<string> = new Promise(r => {
-                polkadot_awaiters['id'] = r;
-            });
+			const hashP: Promise<string> = new Promise(r => {
+				buf[chain][action_id].resolve = r;
+			});
 
-            return await hashP;
-        },
-        async waitTxHashElrond(id: string): Promise<string> {
-            const hash = elrond_event_buf.get(id);
-            if (hash !== undefined) {
-                elrond_event_buf.delete(id);
-                return hash;
-            }
-
-            const hashP: Promise<string> = new Promise(r => {
-                elrond_awaiters['id'] = r;
-            });
-
-            return await hashP;
-        }
-    }
+			return await hashP;
+		}
+     }
 }
