@@ -3,24 +3,24 @@
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign } from "./chain";
 import { Contract, Signer, BigNumber as EthBN } from 'ethers';
-import { TransactionResponse, Provider } from "@ethersproject/providers";
+import { TransactionReceipt, TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 import * as ERC721_abi from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
 
-type EasyBalance = string | number | BigNumber;
+type EasyBalance = string | number | EthBN;
 export type EthNftInfo = {
 	contract_type: "ERC721" | "ERC1155"
 	contract: string,
-	token: BigNumber
+	token: EthBN
 }
 
 // TODO: Get action id properly
 export type Web3Helper = BalanceCheck<string, BigNumber> &
-    TransferForeign<Signer, string, EasyBalance, TransactionResponse, undefined> &
-	TransferNftForeign<Signer, string, EthNftInfo, TransactionResponse, undefined> &
-    UnfreezeForeign<Signer, string, EasyBalance, TransactionResponse, undefined> &
-	UnfreezeForeignNft<Signer, string, BigNumber, TransactionResponse, undefined>; 
+    TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
+	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
+    UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
+	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string>; 
 
 
 export async function web3HelperFactory(
@@ -36,6 +36,17 @@ export async function web3HelperFactory(
         return minter.connect(signer);
     }
 
+	async function extractTxn(txr: TransactionResponse): Promise<[TransactionReceipt, string]> {
+		const receipt = await txr.wait();
+		const log = receipt.logs.find((log) => log.address === minter.address);
+		if (log === undefined) {
+			throw Error("Couldn't extract action_id");
+		}
+
+		const evdat = minter.interface.parseLog(log);
+		return evdat.args[0].toString();
+	}
+
     return {
         async balance(address: string): Promise<BigNumber> {
             const bal = await w3.getBalance(address);
@@ -43,11 +54,12 @@ export async function web3HelperFactory(
             // ethers BigNumber is not compatible with our bignumber
             return new BigNumber(bal.toString());
         },
-        async transferNativeToForeign(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
-            return [await signedMinter(sender)
-                .freeze(chain_nonce, to, { value }), undefined];
+        async transferNativeToForeign(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionReceipt, string]> {
+			const res = await signedMinter(sender)
+				.freeze(chain_nonce, to, { value });
+			return await extractTxn(res);
         },
-		async transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: EthNftInfo): Promise<[TransactionResponse, undefined]> {
+		async transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: EthNftInfo): Promise<[TransactionReceipt, string]> {
 			let txr;
 			const calldata = Buffer.concat([
 				Buffer.from((new Int32Array([0])).buffer), // 4 bytes padidng
@@ -63,15 +75,19 @@ export async function web3HelperFactory(
 				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, EthBN.from(1), calldata);
 			}
 			
-			return [txr, undefined]
+			return await extractTxn(txr);
 		},
-        async unfreezeWrapped(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionResponse, undefined]> {
-            return [await signedMinter(sender)
-                .withdraw(chain_nonce, to, value), undefined];
+        async unfreezeWrapped(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionReceipt, string]> {
+            const res = await signedMinter(sender)
+                .withdraw(chain_nonce, to, value);
+
+			return await extractTxn(res);
         },
-		async unfreezeWrappedNft(sender: Signer, to: string, id: BigNumber): Promise<[TransactionResponse, undefined]> {
-			return [await signedMinter(sender)
-				.withdraw_nft(to, id), undefined];
+		async unfreezeWrappedNft(sender: Signer, to: string, id: BigNumber): Promise<[TransactionReceipt, string]> {
+			const res = await signedMinter(sender)
+				.withdraw_nft(to, id);
+
+			return await extractTxn(res);
 		}
     }
 }
