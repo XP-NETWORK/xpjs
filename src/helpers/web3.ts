@@ -2,7 +2,7 @@
 
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign } from "./chain";
-import { Contract, Signer } from 'ethers';
+import { Contract, Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 import * as ERC721_abi from "../fakeERC721.json";
@@ -60,7 +60,7 @@ export async function web3HelperFactory(
 				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, calldata);
 			} else {
 				const erc = new Contract(id.contract, ERC1155_abi, w3);
-				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, new BigNumber(1), calldata);
+				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, EthBN.from(1), calldata);
 			}
 			
 			return [txr, undefined]
