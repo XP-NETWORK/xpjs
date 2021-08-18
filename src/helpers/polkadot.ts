@@ -1,3 +1,7 @@
+/**
+ * Polkadot Implementation for cross chain traits
+ * @module
+ */
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { Callback, Codec, ISubmittableResult, RegistryTypes } from "@polkadot/types/types";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
@@ -20,7 +24,13 @@ type NftInfo = {
   readonly [index: string]: string;
 }
 
-type Signer = {
+/**
+ * Type of sender expected by this module
+ * 
+ * @param sender  Address of the sender, or a Keypair
+ * @param options  Options for sigining this transaction. Mandatory if sender is an address
+ */
+export type Signer = {
   sender: AddressOrPair,
   options?: Partial<SignerOptions>
 }
@@ -30,12 +40,18 @@ type EasyAddr = string | LookupSource | Address;
 
 type BasePolkadot = BalanceCheck<string, BigNumber>;
 
+/**
+ * identifier for tracking an action 
+ */
 type EventIdent = BigNumber;
 
 export type PolkadotHelper = BasePolkadot &
   TransferForeign<Signer, string, EasyBalance, Hash, EventIdent> &
   UnfreezeForeign<Signer, string, EasyBalance, Hash, EventIdent>;
 
+/**
+ * Traits implemented by this module
+ */
 export type PolkadotPalletHelper = PolkadotHelper &
   TransferNftForeign<Signer, string, H256, Hash, EventIdent> &
   UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> &
@@ -49,6 +65,9 @@ const LUT_HEX_8b = new Array(0x100);
 for (let n = 0; n < 0x100; n++) {
   LUT_HEX_8b[n] = `${LUT_HEX_4b[(n >>> 4) & 0xF]}${LUT_HEX_4b[n & 0xF]}`;
 }
+/**
+ * @internal
+ */
 // End Pre-Init
 export function toHex(buffer: Uint8Array) {
   let out = '';
@@ -112,6 +131,11 @@ async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableEx
   return await evP;
 }
 
+/**
+ * Create an object implementing Cross Chain utilities for Polkadot
+ * 
+ * @param node_uri URI of the polkadot node
+ */
 export const polkadotPalletHelperFactory: (
   node_uri: string
 ) => Promise<PolkadotPalletHelper> = async (node_uri: string) => {

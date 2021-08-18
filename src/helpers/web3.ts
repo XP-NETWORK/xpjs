@@ -1,5 +1,7 @@
-// TODO: Catch Event IDs
-
+/**
+ * Web3 Implementation for cross chain traits
+ * @module
+ */
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign } from "./chain";
 import { Contract, Signer, BigNumber as EthBN } from 'ethers';
@@ -9,6 +11,9 @@ import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
 
 type EasyBalance = string | number | EthBN;
+/**
+ * Information required to perform NFT transfers in this chain
+ */
 export type EthNftInfo = {
 	contract_type: "ERC721" | "ERC1155"
 	contract: string,
@@ -16,6 +21,11 @@ export type EthNftInfo = {
 }
 
 // TODO: Get action id properly
+/**
+ * Traits implemented by this module
+ * 
+ * WARN: Action identifier is broken for web3
+ */
 export type Web3Helper = BalanceCheck<string, BigNumber> &
     TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
 	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
@@ -23,6 +33,13 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
 	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string>; 
 
 
+/**
+ * Create an object implementing cross chain utilities for a web3 chain
+ * 
+ * @param provider  An ethers.js provider object
+ * @param minter_addr  Address of the minter smart contract
+ * @param minter_abi  ABI of the minter smart contract
+ */
 export async function web3HelperFactory(
 	provider: Provider,
     minter_addr: string,
