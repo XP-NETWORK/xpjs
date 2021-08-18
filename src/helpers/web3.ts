@@ -61,7 +61,8 @@ export async function web3HelperFactory(
 		}
 
 		const evdat = minter_abi.parseLog(log);
-		return evdat.args[0].toString();
+		const action_id: string = evdat.args[0].toString();
+		return [receipt, action_id];
 	}
 
     return {
