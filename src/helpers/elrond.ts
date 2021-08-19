@@ -57,7 +57,7 @@ type ContractRes = {
  * Information associated with an ESDT Token
  */
 export type EsdtTokenInfo = {
-  readonly balance: number;
+  readonly balance: string;
   readonly tokenIdentifier: string;
 }
 
@@ -77,7 +77,7 @@ type MaybeEsdtNftInfo = EsdtTokenInfo & (BEsdtNftInfo | undefined);
 export type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
 
 function isEsdtNftInfo(maybe: MaybeEsdtNftInfo): maybe is EsdtNftInfo {
-  return maybe.creator != undefined;
+  return maybe.creator != undefined && maybe.balance == "1";
 }
 
 /**
