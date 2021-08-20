@@ -50,13 +50,7 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
     }
 
     socket.on(
-        "transfer_nft_event",
-        (chain: number, action_id: string, hash: string) => {
-            add_event(chain, action_id, hash);
-    });
-
-    socket.on(
-        "unfreeze_nft_event",
+        "tx_executed_event",
         (chain: number, action_id: string, hash: string) => {
             add_event(chain, action_id, hash);
         }
