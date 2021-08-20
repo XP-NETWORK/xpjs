@@ -57,6 +57,24 @@ export interface BalanceCheck<Addr, Balance> {
     balance(address: Addr): Promise<Balance>;
 }
 /**
+ * Get the balance of a foreign token for an account in this chain
+ *
+ * @param address  Address of the user
+ * @param chain_nonce  nonce of the foreign chain
+ */
+export interface WrappedBalanceCheck<Addr, Balance> {
+    balanceWrapped(address: Addr, chain_nonce: number): Promise<Balance>;
+}
+/**
+ * Get the balance of multiple foreign tokens for an account in this chain
+ *
+ * @param chain_nonces  list of foreign tokens to fetch
+ * @returns Mapping of chain_nonce to balance
+ */
+export interface BatchWrappedBalanceCheck<Addr, Balance> {
+    balanceWrappedBatch(address: Addr, chain_nonces: number[]): Promise<Map<number, Balance>>;
+}
+/**
  * Create a new NFT on this chain
  *
  * @param options Arguments required to mint the nft

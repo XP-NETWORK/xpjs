@@ -27,6 +27,7 @@ import axios, { AxiosInstance } from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
+  BatchWrappedBalanceCheck,
   GetLockedNft,
   ListNft,
   MintNft,
@@ -174,6 +175,7 @@ type EventIdent = number;
  * Traits implemented by this module
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
+  BatchWrappedBalanceCheck<string | Address, BigNumber> &
   TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
   UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
   TransferNftForeign<ISigner, string, NftInfo, Transaction, EventIdent> &
@@ -417,10 +419,15 @@ export const elrondHelperFactory: (
     });
   }
 
+  const listEsdt = async (owner: string) => {
+	  const raw = await providerRest(`/address/${owner}/esdt`);
+	  const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
+
+	  return dat;
+  }
+
   const listNft = async (owner: string) => {
-      const raw = await providerRest(`/address/${owner}/esdt`);
-      const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
-      const ents: [string, MaybeEsdtNftInfo][] = Object.entries(dat);
+      const ents: [string, MaybeEsdtNftInfo][] = Object.entries(await listEsdt(owner));
 
       return new Map(
         ents.filter(([_ident, info]) => isEsdtNftInfo(info))
@@ -501,6 +508,20 @@ export const elrondHelperFactory: (
 
       return wallet.balance.valueOf();
     },
+	async balanceWrappedBatch(
+		address: string | Address,
+		chain_nonces: number[]
+	): Promise<Map<number, BigNumber>> {
+		const esdts = Object.values(await listEsdt(address.toString()));
+
+		const res = new Map(chain_nonces.map(v => [v, new BigNumber(0)]));
+
+		for (const esdt of esdts) {
+			esdt.nonce && esdt.tokenIdentifier.startsWith(esdt.tokenIdentifier) && res.set(esdt.nonce, new BigNumber(esdt.balance))
+		}
+
+		return res;	
+	},
     async transferNativeToForeign(
       sender: ISigner,
       chain_nonce: number,

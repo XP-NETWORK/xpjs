@@ -6,7 +6,7 @@
  */
 import { Address, ISigner, Transaction, TransactionHash } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { BalanceCheck, GetLockedNft, ListNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft } from "./chain";
+import { BalanceCheck, BatchWrappedBalanceCheck, GetLockedNft, ListNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft } from "./chain";
 declare type EasyBalance = string | number | BigNumber;
 /**
  * Information required to perform NFT transfers in this chain
@@ -19,7 +19,7 @@ export declare type NftInfo = {
  * Information associated with an ESDT Token
  */
 export declare type EsdtTokenInfo = {
-    readonly balance: number;
+    readonly balance: string;
     readonly tokenIdentifier: string;
 };
 declare type BEsdtNftInfo = {
@@ -98,7 +98,7 @@ declare type EventIdent = number;
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & {
     /**
      * Unsigned Transaction for [[TransferForeign]]
      */

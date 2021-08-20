@@ -3,7 +3,7 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck } from "./chain";
 import { Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
@@ -21,7 +21,7 @@ export declare type EthNftInfo = {
  *
  * WARN: Action identifier is broken for web3
  */
-export declare type Web3Helper = BalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string>;
+export declare type Web3Helper = BalanceCheck<string, BigNumber> & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string>;
 /**
  * Create an object implementing cross chain utilities for a web3 chain
  *
@@ -29,5 +29,5 @@ export declare type Web3Helper = BalanceCheck<string, BigNumber> & TransferForei
  * @param minter_addr  Address of the minter smart contract
  * @param minter_abi  ABI of the minter smart contract
  */
-export declare function web3HelperFactory(provider: Provider, minter_addr: string, minter_abi: Interface): Promise<Web3Helper>;
+export declare function web3HelperFactory(provider: Provider, minter_addr: string, minter_abi: Interface, erc1155_addr: string): Promise<Web3Helper>;
 export {};

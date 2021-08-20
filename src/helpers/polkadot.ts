@@ -14,7 +14,9 @@ import {
   BalanceCheck,
   MintNft,
   ListNft,
-  GetLockedNft
+  GetLockedNft,
+  WrappedBalanceCheck,
+  BatchWrappedBalanceCheck
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
@@ -53,6 +55,8 @@ export type PolkadotHelper = BasePolkadot &
  * Traits implemented by this module
  */
 export type PolkadotPalletHelper = PolkadotHelper &
+  WrappedBalanceCheck<EasyAddr, BigNumber> &
+  BatchWrappedBalanceCheck<EasyAddr, BigNumber> &
   TransferNftForeign<Signer, string, H256, Hash, EventIdent> &
   UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> &
   MintNft<Signer, Uint8Array, void> &
@@ -145,6 +149,23 @@ export const polkadotPalletHelperFactory: (
 
   return {
     ...base,
+	async balanceWrapped(
+		address: EasyAddr,
+		chain_nonce: number
+	): Promise<BigNumber> {
+		const res = await api.query.erc1155.balances(address, chain_nonce);
+		return new BigNumber(res.toString())
+	},
+	async balanceWrappedBatch(
+		address: EasyAddr,
+		chain_nonces: number[]
+	): Promise<Map<number, BigNumber>> {
+		// Multi query with address, chain_nonce
+		const res = await api.query.erc1155.balances.multi(chain_nonces.map(c => [address, c]));
+
+		// Convert list of balances to [chain_nonce, balance]
+		return new Map(res.map((b, i) => [chain_nonces[i], new BigNumber(b.toString())]))
+	},
     async transferNativeToForeign(
       sender: Signer,
       chain_nonce: number,

@@ -3,7 +3,7 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck } from "./chain";
 import { Contract, Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionReceipt, TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
@@ -27,6 +27,8 @@ export type EthNftInfo = {
  * WARN: Action identifier is broken for web3
  */
 export type Web3Helper = BalanceCheck<string, BigNumber> &
+	WrappedBalanceCheck<string, BigNumber> &
+	BatchWrappedBalanceCheck<string, BigNumber> &
     TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
 	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
     UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
@@ -43,11 +45,15 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
 export async function web3HelperFactory(
 	provider: Provider,
     minter_addr: string,
-    minter_abi: Interface
+    minter_abi: Interface,
+	erc1155_addr: string
 ): Promise<Web3Helper> {
     const w3 = provider;
 
     const minter = new Contract(minter_addr, minter_abi, w3);
+
+	const erc1155_abi = new Interface(ERC1155_abi);
+	const erc1155 = new Contract(erc1155_addr, erc1155_abi, w3);
 
     function signedMinter(signer: Signer): Contract {
         return minter.connect(signer);
@@ -65,6 +71,7 @@ export async function web3HelperFactory(
 		return [receipt, action_id];
 	}
 
+
     return {
         async balance(address: string): Promise<BigNumber> {
             const bal = await w3.getBalance(address);
@@ -72,6 +79,16 @@ export async function web3HelperFactory(
             // ethers BigNumber is not compatible with our bignumber
             return new BigNumber(bal.toString());
         },
+		async balanceWrapped(address: string, chain_nonce: number): Promise<BigNumber> {
+			const bal = await erc1155.balanceOf(address, chain_nonce);
+
+			return new BigNumber(bal.toString());
+		},
+		async balanceWrappedBatch(address: string, chain_nonces: number[]): Promise<Map<number, BigNumber>> {
+			const bals: EthBN[] = await erc1155.balanceOfBatch(Array(chain_nonces.length).fill(address), chain_nonces);
+
+			return new Map(bals.map((v, i) => [chain_nonces[i], new BigNumber(v.toString())]));
+		},
         async transferNativeToForeign(sender: Signer, chain_nonce: number, to: string, value: EasyBalance): Promise<[TransactionReceipt, string]> {
 			const res = await signedMinter(sender)
 				.freeze(chain_nonce, to, { value });
@@ -92,7 +109,7 @@ export async function web3HelperFactory(
 				txr = await erc.connect(sender)['safeTransferFrom(address,address,uint256,bytes)'](await sender.getAddress(), minter_addr, id.token, calldata);
 			} else {
 				ev = "TransferErc1155";
-				const erc = new Contract(id.contract, ERC1155_abi, w3);
+				const erc = new Contract(id.contract, erc1155_abi, w3);
 				txr = await erc.connect(sender).safeTransferFrom(await sender.getAddress(), minter_addr, id.token, EthBN.from(1), calldata);
 			}
 			

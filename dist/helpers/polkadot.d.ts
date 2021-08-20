@@ -1,6 +1,6 @@
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
-import { TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, MintNft, ListNft, GetLockedNft } from "./chain";
+import { TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, MintNft, ListNft, GetLockedNft, WrappedBalanceCheck, BatchWrappedBalanceCheck } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
 /**
@@ -24,7 +24,7 @@ export declare type PolkadotHelper = BasePolkadot & TransferForeign<Signer, stri
 /**
  * Traits implemented by this module
  */
-export declare type PolkadotPalletHelper = PolkadotHelper & TransferNftForeign<Signer, string, H256, Hash, EventIdent> & UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> & MintNft<Signer, Uint8Array, void> & ListNft<EasyAddr, string, string> & GetLockedNft<H256, Uint8Array>;
+export declare type PolkadotPalletHelper = PolkadotHelper & WrappedBalanceCheck<EasyAddr, BigNumber> & BatchWrappedBalanceCheck<EasyAddr, BigNumber> & TransferNftForeign<Signer, string, H256, Hash, EventIdent> & UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> & MintNft<Signer, Uint8Array, void> & ListNft<EasyAddr, string, string> & GetLockedNft<H256, Uint8Array>;
 /**
  * @internal
  */
