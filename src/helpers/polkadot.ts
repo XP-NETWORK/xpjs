@@ -161,10 +161,10 @@ export const polkadotPalletHelperFactory: (
 		chain_nonces: number[]
 	): Promise<Map<number, BigNumber>> {
 		// Multi query with address, chain_nonce
-		const res = await api.query.erc1155.balances.multi(chain_nonces.map(c => [address, c]));
+		const res: Option<any>[] = await api.query.erc1155.balances.multi(chain_nonces.map(c => [address, c]));
 
 		// Convert list of balances to [chain_nonce, balance]
-		return new Map(res.map((b, i) => [chain_nonces[i], new BigNumber(b.toString())]))
+		return new Map(res.map((b: Option<any>, i) => [chain_nonces[i], b.isSome ? new BigNumber(b.unwrap().toString()) : new BigNumber(0)]))
 	},
     async transferNativeToForeign(
       sender: Signer,
