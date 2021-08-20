@@ -3,7 +3,7 @@
  * @module
  */
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
-import { Callback, Codec, ISubmittableResult, RegistryTypes } from "@polkadot/types/types";
+import { Callback, ISubmittableResult, RegistryTypes } from "@polkadot/types/types";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
 import {
@@ -20,11 +20,7 @@ import {
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
-import {Option, Tuple} from "@polkadot/types";
-
-type NftInfo = {
-  readonly [index: string]: string;
-}
+import {BTreeMap, Bytes, Option, Tuple} from "@polkadot/types";
 
 /**
  * Type of sender expected by this module
@@ -60,7 +56,7 @@ export type PolkadotPalletHelper = PolkadotHelper &
   TransferNftForeign<Signer, string, H256, Hash, EventIdent> &
   UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> &
   MintNft<Signer, Uint8Array, void> &
-  ListNft<EasyAddr, string, string> &
+  ListNft<EasyAddr, string, Uint8Array> &
   GetLockedNft<H256, Uint8Array>;
 
 
@@ -146,6 +142,10 @@ export const polkadotPalletHelperFactory: (
   const [base, api] = await basePolkadotHelper(node_uri);
   const keyring = new Keyring();
   const sudoSigner = keyring.createFromUri("//Alice", undefined, "sr25519");
+
+  function nftListMapper([nft_id, data]: [H256, Bytes]): [string, Uint8Array] {
+	  return [nft_id.toString(), data];
+  }
 
   return {
     ...base,
@@ -233,13 +233,13 @@ export const polkadotPalletHelperFactory: (
     },
     async listNft(
       owner: EasyAddr
-    ): Promise<Map<string, string>> {
-      const com = await api.query.nft.commoditiesForAccount(owner.toString()) as Option<Codec>;
+    ): Promise<Map<string, Uint8Array>> {
+      const com = await api.query.nft.commoditiesForAccount(owner.toString()) as Option<BTreeMap<H256, Bytes>>;
 	  if (com.isNone) {
 		  return new Map();
 	  }
-      const c = com.toJSON() as NftInfo;
-      return new Map(Object.entries(c));
+      const c = Array.from(com.unwrap()).map(nftListMapper);
+      return new Map(c);
     },
 	async getLockedNft(
 		hash: H256
@@ -250,7 +250,7 @@ export const polkadotPalletHelperFactory: (
 		}
 
 		const [_owner, dat] = com.unwrap();
-		return dat.toU8a();
+		return dat as Bytes;
 	}
   };
 };
@@ -259,11 +259,11 @@ const runtimeTypes: RegistryTypes = {
   ActionId: "u128",
   TokenId: "u64",
   CommodityId: "H256",
-  CommodityInfo: "Vec<u8>",
+  CommodityInfo: "Bytes",
   NftId: "H256",
-  NftInfo: "Vec<u8>",
+  NftInfo: "Bytes",
   Erc1155Balance: "Balance",
-  Commodity: "(H256, Vec<u8>)",
+  Commodity: "(H256, Bytes)",
   LocalAction: {
     _enum: {
       //@ts-expect-error enum struct
@@ -274,7 +274,7 @@ const runtimeTypes: RegistryTypes = {
       //@ts-expect-error enum struct
       RpcCall: {
         contract: "AccountId",
-        call_data: "Vec<u8>",
+        call_data: "Bytes",
       },
       //@ts-expect-error enum struct
       TransferWrapped: {
