@@ -104,9 +104,10 @@ function hasAddrField(ob: any): ob is { address: string } {
 async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableExtrinsic<'promise', R>, filter: string, signer: AddressOrPair, options?: Partial<SignerOptions>): Promise<[Hash, EventIdent]> {
   let call: (cb: Callback<R>) => Promise<() => void>;
   if (options) {
+	options.nonce = -1;
     call = async (cb: Callback<R>) => await ext.signAndSend(signer, options, cb);
   } else {
-    call = async (cb: Callback<R>) => await ext.signAndSend(signer, cb);
+    call = async (cb: Callback<R>) => await ext.signAndSend(signer, { nonce: -1 }, cb);
   }
 
   const evP: Promise<[Hash, EventIdent]> = new Promise((res, rej) => {
@@ -229,7 +230,7 @@ export const polkadotPalletHelperFactory: (
 
         await api.tx.sudo.sudo(
           api.tx.nft.mint(addr, toHex(info))
-        ).signAndSend(sudoSigner);
+        ).signAndSend(sudoSigner, { nonce: -1 });
     },
     async listNft(
       owner: EasyAddr
