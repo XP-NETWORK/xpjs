@@ -94,3 +94,4 @@ export interface ListNft<Addr, K, V> {
 export interface GetLockedNft<Ident, Info> {
     getLockedNft(ident: Ident): Promise<Info | undefined>;
 }
+export declare function ConcurrentSendError(): Error;

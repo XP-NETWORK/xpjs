@@ -16,7 +16,8 @@ import {
   ListNft,
   GetLockedNft,
   WrappedBalanceCheck,
-  BatchWrappedBalanceCheck
+  BatchWrappedBalanceCheck,
+  ConcurrentSendError
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
@@ -129,7 +130,14 @@ async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableEx
     })
   });
 
-  return await evP;
+  try {
+  	return await evP;
+  } catch (e) {
+	  if (e.message.contains("Priority is too low")) {
+		  throw ConcurrentSendError();
+	  }
+	  throw e;
+  }
 }
 
 /**

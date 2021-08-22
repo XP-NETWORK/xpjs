@@ -28,6 +28,7 @@ import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
   BatchWrappedBalanceCheck,
+  ConcurrentSendError,
   GetLockedNft,
   ListNft,
   MintNft,
@@ -277,8 +278,16 @@ export const elrondHelperFactory: (
     
     tx.setNonce(acc.nonce);
     await signer.sign(tx);
-    await tx.send(provider);
 
+	try {
+    	await tx.send(provider);
+	} catch (e) {
+		if (e.message.includes("lowerNonceInTx")) {
+			throw ConcurrentSendError();
+		} else {
+			throw e;
+		}
+	}
     return tx;
   }
 
