@@ -17,11 +17,15 @@ import {
   GetLockedNft,
   WrappedBalanceCheck,
   BatchWrappedBalanceCheck,
-  ConcurrentSendError
+  ConcurrentSendError,
+  DecodeWrappedNft,
+  WrappedNft,
+  DecodeRawNft
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
 import {BTreeMap, Bytes, Option, Tuple} from "@polkadot/types";
+import { NftPacked } from "validator/dist/encoding"
 
 /**
  * Type of sender expected by this module
@@ -58,7 +62,9 @@ export type PolkadotPalletHelper = PolkadotHelper &
   UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> &
   MintNft<Signer, Uint8Array, void> &
   ListNft<EasyAddr, string, Uint8Array> &
-  GetLockedNft<H256, Uint8Array>;
+  GetLockedNft<H256, Uint8Array> &
+  DecodeWrappedNft<Uint8Array> &
+  DecodeRawNft<Uint8Array>;
 
 
 const LUT_HEX_4b = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
@@ -260,6 +266,21 @@ export const polkadotPalletHelperFactory: (
 
 		const [_owner, dat] = com.unwrap();
 		return dat as Bytes;
+	},
+	decodeWrappedNft(
+		raw_data: Uint8Array
+	): WrappedNft {
+		const packed = NftPacked.deserializeBinary(Uint8Array.from(raw_data));
+
+		return {
+			chain_nonce: packed.getChainNonce(),
+			data: packed.getData_asU8()
+		}
+	},
+	decodeRawNft(
+		data: Uint8Array
+	): Promise<Uint8Array> {
+		return Promise.resolve(data.slice(-24));
 	}
   };
 };

@@ -3,7 +3,7 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft } from "./chain";
 import { Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
@@ -21,7 +21,12 @@ export declare type EthNftInfo = {
  *
  * WARN: Action identifier is broken for web3
  */
-export declare type Web3Helper = BalanceCheck<string, BigNumber> & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string>;
+export declare type Web3Helper = BalanceCheck<string, BigNumber> & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & {
+    /**
+    * Get the uri of an nft given nft info
+    */
+    nftUri(info: EthNftInfo): Promise<string>;
+};
 /**
  * Create an object implementing cross chain utilities for a web3 chain
  *

@@ -3,13 +3,14 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, WrappedNft } from "./chain";
 import { Contract, Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionReceipt, TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
-
+import {NftPacked} from "validator/dist/encoding";
+import { Base64 } from "js-base64";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -32,7 +33,13 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
     TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
 	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
     UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
-	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string>; 
+	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> &
+	DecodeWrappedNft<string>  & {
+		/**
+		* Get the uri of an nft given nft info
+		*/
+		nftUri(info: EthNftInfo): Promise<string>;
+	}; 
 
 
 /**
@@ -70,7 +77,6 @@ export async function web3HelperFactory(
 		const action_id: string = evdat.args[0].toString();
 		return [receipt, action_id];
 	}
-
 
     return {
         async balance(address: string): Promise<BigNumber> {
@@ -126,6 +132,29 @@ export async function web3HelperFactory(
 				.withdraw_nft(to, id);
 
 			return await extractTxn(res, 'UnfreezeNft');
+		},
+		async nftUri(
+			info: EthNftInfo
+		): Promise<string> {
+			if (info.contract_type == "ERC721") {
+				const erc = new Contract(info.contract, ERC721_abi, w3);
+				return await erc.tokenURI(info.token);
+			} else {
+				const erc = new Contract(info.contract, erc1155_abi, w3);
+				return await erc.uri(info.token)
+			}
+		},
+		decodeWrappedNft(
+			raw_data: string
+		): WrappedNft {
+			const u8D = Base64.toUint8Array(raw_data);
+			const packed = NftPacked.deserializeBinary(u8D);
+
+
+			return {
+				chain_nonce: packed.getChainNonce(),
+				data: packed.getData_asU8()
+			}
 		}
     }
 }

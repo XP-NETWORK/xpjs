@@ -94,4 +94,14 @@ export interface ListNft<Addr, K, V> {
 export interface GetLockedNft<Ident, Info> {
     getLockedNft(ident: Ident): Promise<Info | undefined>;
 }
+export declare type WrappedNft = {
+    chain_nonce: number;
+    data: Uint8Array;
+};
+export interface DecodeWrappedNft<Data> {
+    decodeWrappedNft(raw_data: Data): WrappedNft;
+}
+export interface DecodeRawNft<Nft> {
+    decodeRawNft(data: Uint8Array): Promise<Nft>;
+}
 export declare function ConcurrentSendError(): Error;
