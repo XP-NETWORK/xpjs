@@ -24,7 +24,7 @@ import {
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
-import {BTreeMap, Bytes, Option, Tuple} from "@polkadot/types";
+import {BTreeMap, Bytes, Option, Tuple, U8aFixed} from "@polkadot/types";
 import { NftPacked } from "validator/dist/encoding"
 
 /**
@@ -283,7 +283,7 @@ export const polkadotPalletHelperFactory: (
 	async decodeUrlFromRaw(
 		data: Uint8Array
 	): Promise<string> {
-		const locked = await getLockedNft(data as H256);
+		const locked = await getLockedNft(new U8aFixed(api.registry, data, 256));
 		if (locked === undefined) {
 			throw Error("not a locked nft");
 		}
