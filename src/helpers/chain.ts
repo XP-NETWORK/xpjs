@@ -140,8 +140,8 @@ export interface DecodeWrappedNft<Data> {
 	decodeWrappedNft(raw_data: Data): WrappedNft;
 }
 
-export interface DecodeRawNft<Nft> {
-	decodeRawNft(data: Uint8Array): Promise<Nft>;
+export interface DecodeRawNft {
+	decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
 
 

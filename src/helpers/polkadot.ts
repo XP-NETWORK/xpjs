@@ -64,7 +64,7 @@ export type PolkadotPalletHelper = PolkadotHelper &
   ListNft<EasyAddr, string, Uint8Array> &
   GetLockedNft<H256, Uint8Array> &
   DecodeWrappedNft<Uint8Array> &
-  DecodeRawNft<Uint8Array>;
+  DecodeRawNft;
 
 
 const LUT_HEX_4b = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
@@ -157,9 +157,22 @@ export const polkadotPalletHelperFactory: (
   const [base, api] = await basePolkadotHelper(node_uri);
   const keyring = new Keyring();
   const sudoSigner = keyring.createFromUri("//Alice", undefined, "sr25519");
+  const decoder = new TextDecoder();
 
   function nftListMapper([nft_id, data]: [H256, Bytes]): [string, Uint8Array] {
 	  return [nft_id.toString(), data];
+  }
+
+  async function getLockedNft(
+	hash: H256
+  ): Promise<Uint8Array | undefined> {
+	const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
+	if (com.isNone) {
+		return undefined;
+	}
+
+	const [_owner, dat] = com.unwrap();
+	return dat as Bytes;
   }
 
   return {
@@ -256,17 +269,7 @@ export const polkadotPalletHelperFactory: (
       const c = Array.from(com.unwrap()).map(nftListMapper);
       return new Map(c);
     },
-	async getLockedNft(
-		hash: H256
-	): Promise<Uint8Array | undefined> {
-		const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
-		if (com.isNone) {
-			return undefined;
-		}
-
-		const [_owner, dat] = com.unwrap();
-		return dat as Bytes;
-	},
+	getLockedNft,
 	decodeWrappedNft(
 		raw_data: Uint8Array
 	): WrappedNft {
@@ -277,10 +280,15 @@ export const polkadotPalletHelperFactory: (
 			data: packed.getData_asU8()
 		}
 	},
-	decodeRawNft(
+	async decodeUrlFromRaw(
 		data: Uint8Array
-	): Promise<Uint8Array> {
-		return Promise.resolve(data.slice(-24));
+	): Promise<string> {
+		const locked = await getLockedNft(data as H256);
+		if (locked === undefined) {
+			throw Error("not a locked nft");
+		}
+
+		return decoder.decode(locked.slice(-24));
 	}
   };
 };

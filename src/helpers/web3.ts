@@ -3,13 +3,13 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, WrappedNft } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, WrappedNft, DecodeRawNft } from "./chain";
 import { Contract, Signer, BigNumber as EthBN } from 'ethers';
 import { TransactionReceipt, TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
-import {NftPacked} from "validator/dist/encoding";
+import {NftEthNative, NftPacked} from "validator/dist/encoding";
 import { Base64 } from "js-base64";
 type EasyBalance = string | number | EthBN;
 /**
@@ -34,12 +34,17 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
 	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
     UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
 	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> &
-	DecodeWrappedNft<string>  & {
+	DecodeWrappedNft<string>  &
+	DecodeRawNft & {
 		/**
 		* Get the uri of an nft given nft info
 		*/
 		nftUri(info: EthNftInfo): Promise<string>;
 	}; 
+
+function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
+	return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155"
+}
 
 
 /**
@@ -76,6 +81,18 @@ export async function web3HelperFactory(
 		const evdat = minter_abi.parseLog(log);
 		const action_id: string = evdat.args[0].toString();
 		return [receipt, action_id];
+	}
+
+	async function nftUri(
+		info: EthNftInfo
+	): Promise<string> {
+		if (info.contract_type == "ERC721") {
+			const erc = new Contract(info.contract, ERC721_abi, w3);
+			return await erc.tokenURI(info.token);
+		} else {
+			const erc = new Contract(info.contract, erc1155_abi, w3);
+			return await erc.uri(info.token)
+		}
 	}
 
     return {
@@ -133,17 +150,7 @@ export async function web3HelperFactory(
 
 			return await extractTxn(res, 'UnfreezeNft');
 		},
-		async nftUri(
-			info: EthNftInfo
-		): Promise<string> {
-			if (info.contract_type == "ERC721") {
-				const erc = new Contract(info.contract, ERC721_abi, w3);
-				return await erc.tokenURI(info.token);
-			} else {
-				const erc = new Contract(info.contract, erc1155_abi, w3);
-				return await erc.uri(info.token)
-			}
-		},
+		nftUri,	
 		decodeWrappedNft(
 			raw_data: string
 		): WrappedNft {
@@ -155,6 +162,19 @@ export async function web3HelperFactory(
 				chain_nonce: packed.getChainNonce(),
 				data: packed.getData_asU8()
 			}
+		},
+		async decodeUrlFromRaw(
+			data: Uint8Array
+		): Promise<string> {
+			const packed = NftEthNative.deserializeBinary(data);
+			const nft_info = {
+				contract_type: contractTypeFromNftKind(packed.getNftKind()),
+				contract: packed.getContractAddr(),
+				token: EthBN.from(packed.getId())
+			}
+
+
+			return await nftUri(nft_info);
 		}
     }
 }

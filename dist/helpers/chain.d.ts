@@ -101,7 +101,7 @@ export declare type WrappedNft = {
 export interface DecodeWrappedNft<Data> {
     decodeWrappedNft(raw_data: Data): WrappedNft;
 }
-export interface DecodeRawNft<Nft> {
-    decodeRawNft(data: Uint8Array): Promise<Nft>;
+export interface DecodeRawNft {
+    decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
 export declare function ConcurrentSendError(): Error;

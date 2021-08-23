@@ -191,7 +191,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ListNft<string, string, EsdtNftInfo>  &
   GetLockedNft<NftInfo, EsdtNftInfo> &
   DecodeWrappedNft<EsdtNftInfo> & 
-  DecodeRawNft<EsdtNftInfo> & {
+  DecodeRawNft & {
     /**
      * Unsigned Transaction for [[TransferForeign]]
      */
@@ -659,18 +659,17 @@ export const elrondHelperFactory: (
 			data: Base64.toUint8Array(raw_data.uris[0])
 		}
 	},
-	async decodeRawNft(
+	async decodeUrlFromRaw(
 		data: Uint8Array
-	): Promise<EsdtNftInfo> {
+	): Promise<string> {
 		const nft_info = rawNftDecoder(data);
-		const locked = getLockedNft(nft_info);
+		const locked = await getLockedNft(nft_info);
 
 		if (locked === undefined) {
 			throw Error("Not a wrapped nft");
 		}
 
-		//@ts-expect-error null checked
-		return locked;
+		return Base64.atob(locked!.uris[0]);
 	}
   };
 };
