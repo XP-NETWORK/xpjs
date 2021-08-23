@@ -24,7 +24,7 @@ import {
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
-import {BTreeMap, Bytes, Option, Tuple, U8aFixed} from "@polkadot/types";
+import {BTreeMap, Bytes, Option, Tuple} from "@polkadot/types";
 import { NftPacked } from "validator/dist/encoding"
 
 /**
@@ -62,7 +62,7 @@ export type PolkadotPalletHelper = PolkadotHelper &
   UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> &
   MintNft<Signer, Uint8Array, void> &
   ListNft<EasyAddr, string, Uint8Array> &
-  GetLockedNft<H256, Uint8Array> &
+  GetLockedNft<Uint8Array, Uint8Array> &
   DecodeWrappedNft<Uint8Array> &
   DecodeRawNft;
 
@@ -164,9 +164,9 @@ export const polkadotPalletHelperFactory: (
   }
 
   async function getLockedNft(
-	hash: H256
+	hash: Uint8Array
   ): Promise<Uint8Array | undefined> {
-	const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
+	const com = await api.query.nft.lockedCommodities(toHex(hash)) as Option<Tuple>;
 	if (com.isNone) {
 		return undefined;
 	}
@@ -283,7 +283,7 @@ export const polkadotPalletHelperFactory: (
 	async decodeUrlFromRaw(
 		data: Uint8Array
 	): Promise<string> {
-		const locked = await getLockedNft(new U8aFixed(api.registry, data, 256));
+		const locked = await getLockedNft(data);
 		if (locked === undefined) {
 			throw Error("not a locked nft");
 		}
