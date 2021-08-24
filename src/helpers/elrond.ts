@@ -252,6 +252,9 @@ export const elrondHelperFactory: (
   const mintContract = new Address(minter_address);
   const eventMiddleware = axios.create({
     baseURL: middleware_uri,
+	headers: {
+		"Content-Type": "application/json"
+	}
   });
   const providerRest = axios.create({
     baseURL: node_uri
@@ -262,14 +265,13 @@ export const elrondHelperFactory: (
 
 
   const handleEvent = async (tx_hash: TransactionHash) => {
-	  await new Promise(r => setTimeout(r, 3000));
+	await emitTx(eventMiddleware, tx_hash.toString())
+    await new Promise(r => setTimeout(r, 3000));
     const watcher = new TransactionWatcher(tx_hash, provider);
-    await watcher.awaitNotarized();
+    await watcher.awaitExecuted();
     const res: Array<ContractRes> = (await transactionResult(tx_hash))["smartContractResults"];
 
     const id = filterEventId(res);
-
-    await emitEvent(eventMiddleware, id.toString());
 
     return id;
   };
@@ -694,6 +696,6 @@ function filterEventId(results: Array<ContractRes>): number {
   throw Error(`invalid result: ${results.toString()}`);
 }
 
-async function emitEvent(middleware: AxiosInstance, id: string): Promise<void> {
-  await middleware.post("/event/transfer", undefined, { headers: { id } });
+async function emitTx(middleware: AxiosInstance, tx_hash: string): Promise<void> {
+  await middleware.post("/tx/transfer", { tx_hash });
 }
