@@ -3,12 +3,13 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, WrappedNft, DecodeRawNft } from "./chain";
-import { Contract, Signer, BigNumber as EthBN } from 'ethers';
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, WrappedNft, DecodeRawNft, MintNft } from "./chain";
+import { Contract, Signer, BigNumber as EthBN, ContractFactory } from 'ethers';
 import { TransactionReceipt, TransactionResponse, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
+import * as ERC1155_contract from "../XPNet.json";
 import {NftEthNative, NftPacked} from "validator/dist/encoding";
 import { Base64 } from "js-base64";
 type EasyBalance = string | number | EthBN;
@@ -21,11 +22,24 @@ export type EthNftInfo = {
 	token: EthBN
 }
 
-// TODO: Get action id properly
+/**
+ * Arguments required for minting a new nft
+ *
+ * contract: address of the sc  
+ * token: token ID of the newly minted nft  
+ * owner: Owner of the newly minted nft
+ * uri: uri of the nft
+ */
+export type MintArgs = {
+	contract: string,
+	token: EasyBalance,
+	owner: string,
+	uri: string
+};
+
 /**
  * Traits implemented by this module
  * 
- * WARN: Action identifier is broken for web3
  */
 export type Web3Helper = BalanceCheck<string, BigNumber> &
 	WrappedBalanceCheck<string, BigNumber> &
@@ -35,11 +49,26 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
     UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
 	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> &
 	DecodeWrappedNft<string>  &
-	DecodeRawNft & {
+	DecodeRawNft & 
+	/**
+	 * Mint an nft in the given ERC1155 smart contract
+	 *
+	 * @argument signer  owner of the smart contract
+	 * @argument args  See [[MintArgs]]
+	 */
+	MintNft<Signer, MintArgs, void> & {
 		/**
 		* Get the uri of an nft given nft info
 		*/
 		nftUri(info: EthNftInfo): Promise<string>;
+		/**
+		 * 
+		 * Deploy an ERC1155 smart contract
+		 *
+		 * @argument owner  Owner of this smart contract
+		 * @returns Address of the deployed smart contract
+		 */
+		deployErc1155(owner: Signer): Promise<string>;
 	}; 
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
@@ -175,6 +204,27 @@ export async function web3HelperFactory(
 
 
 			return await nftUri(nft_info);
+		},
+		async deployErc1155(
+			owner: Signer
+		): Promise<string> {
+			const factory = ContractFactory.fromSolidity(ERC1155_contract, owner);
+			const contract = await factory.deploy();
+
+			return contract.address;
+		},
+		async mintNft(
+			 contract_owner: Signer,
+			{
+				contract,
+				token,
+				owner,
+				uri
+			}: MintArgs
+		): Promise<void> {
+			const erc1155 = new Contract(contract, erc1155_abi, contract_owner);
+			await erc1155.mint(owner, EthBN.from(token.toString()), 1);
+			await erc1155.setURI(token, uri);
 		}
     }
 }
