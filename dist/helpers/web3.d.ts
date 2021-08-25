@@ -31,10 +31,9 @@ export declare type MintArgs = {
     uri: string;
 };
 /**
- * Traits implemented by this module
- *
+ * Base util traits
  */
-export declare type Web3Helper = BalanceCheck<string, BigNumber> & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & 
+export declare type BaseWeb3Helper = BalanceCheck<string, BigNumber> & 
 /**
  * Mint an nft in the given ERC1155 smart contract
  *
@@ -42,10 +41,6 @@ export declare type Web3Helper = BalanceCheck<string, BigNumber> & WrappedBalanc
  * @argument args  See [[MintArgs]]
  */
 MintNft<Signer, MintArgs, void> & {
-    /**
-    * Get the uri of an nft given nft info
-    */
-    nftUri(info: EthNftInfo): Promise<string>;
     /**
      *
      * Deploy an ERC1155 smart contract
@@ -55,6 +50,21 @@ MintNft<Signer, MintArgs, void> & {
      */
     deployErc1155(owner: Signer): Promise<string>;
 };
+/**
+ * Traits implemented by this module
+ */
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & {
+    /**
+    * Get the uri of an nft given nft info
+    */
+    nftUri(info: EthNftInfo): Promise<string>;
+};
+/**
+ * Create an object implementing minimal utilities for a web3 chain
+ *
+ * @param provider An ethers.js provider object
+ */
+export declare function baseWeb3HelperFactory(provider: Provider): Promise<BaseWeb3Helper>;
 /**
  * Create an object implementing cross chain utilities for a web3 chain
  *

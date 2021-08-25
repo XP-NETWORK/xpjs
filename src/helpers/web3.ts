@@ -38,18 +38,9 @@ export type MintArgs = {
 };
 
 /**
- * Traits implemented by this module
- * 
+ * Base util traits
  */
-export type Web3Helper = BalanceCheck<string, BigNumber> &
-	WrappedBalanceCheck<string, BigNumber> &
-	BatchWrappedBalanceCheck<string, BigNumber> &
-    TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
-	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
-    UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
-	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> &
-	DecodeWrappedNft<string>  &
-	DecodeRawNft & 
+export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 	/**
 	 * Mint an nft in the given ERC1155 smart contract
 	 *
@@ -58,10 +49,6 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
 	 */
 	MintNft<Signer, MintArgs, void> & {
 		/**
-		* Get the uri of an nft given nft info
-		*/
-		nftUri(info: EthNftInfo): Promise<string>;
-		/**
 		 * 
 		 * Deploy an ERC1155 smart contract
 		 *
@@ -69,12 +56,71 @@ export type Web3Helper = BalanceCheck<string, BigNumber> &
 		 * @returns Address of the deployed smart contract
 		 */
 		deployErc1155(owner: Signer): Promise<string>;
+	}
+
+/**
+ * Traits implemented by this module
+ */
+export type Web3Helper = BaseWeb3Helper &
+	WrappedBalanceCheck<string, BigNumber> &
+	BatchWrappedBalanceCheck<string, BigNumber> &
+    TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
+	TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
+    UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
+	UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> &
+	DecodeWrappedNft<string>  &
+	DecodeRawNft & {
+		/**
+		* Get the uri of an nft given nft info
+		*/
+		nftUri(info: EthNftInfo): Promise<string>;
 	}; 
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
 	return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155"
 }
 
+/**
+ * Create an object implementing minimal utilities for a web3 chain
+ * 
+ * @param provider An ethers.js provider object
+ */
+export async function baseWeb3HelperFactory(
+	provider: Provider
+): Promise<BaseWeb3Helper> {
+	const w3 = provider;
+	const erc1155_abi = new Interface(ERC1155_abi);
+
+	return {
+        async balance(address: string): Promise<BigNumber> {
+            const bal = await w3.getBalance(address);
+
+            // ethers BigNumber is not compatible with our bignumber
+            return new BigNumber(bal.toString());
+        },
+		async deployErc1155(
+			owner: Signer
+		): Promise<string> {
+			const factory = ContractFactory.fromSolidity(ERC1155_contract, owner);
+			const contract = await factory.deploy();
+
+			return contract.address;
+		},
+		async mintNft(
+			 contract_owner: Signer,
+			{
+				contract,
+				token,
+				owner,
+				uri
+			}: MintArgs
+		): Promise<void> {
+			const erc1155 = new Contract(contract, erc1155_abi, contract_owner);
+			await erc1155.mint(owner, EthBN.from(token.toString()), 1);
+			await erc1155.setURI(token, uri);
+		}
+	}
+}
 
 /**
  * Create an object implementing cross chain utilities for a web3 chain
@@ -124,13 +170,10 @@ export async function web3HelperFactory(
 		}
 	}
 
-    return {
-        async balance(address: string): Promise<BigNumber> {
-            const bal = await w3.getBalance(address);
+	const base = await baseWeb3HelperFactory(provider);
 
-            // ethers BigNumber is not compatible with our bignumber
-            return new BigNumber(bal.toString());
-        },
+    return {
+		...base,
 		async balanceWrapped(address: string, chain_nonce: number): Promise<BigNumber> {
 			const bal = await erc1155.balanceOf(address, chain_nonce);
 
@@ -205,26 +248,5 @@ export async function web3HelperFactory(
 
 			return await nftUri(nft_info);
 		},
-		async deployErc1155(
-			owner: Signer
-		): Promise<string> {
-			const factory = ContractFactory.fromSolidity(ERC1155_contract, owner);
-			const contract = await factory.deploy();
-
-			return contract.address;
-		},
-		async mintNft(
-			 contract_owner: Signer,
-			{
-				contract,
-				token,
-				owner,
-				uri
-			}: MintArgs
-		): Promise<void> {
-			const erc1155 = new Contract(contract, erc1155_abi, contract_owner);
-			await erc1155.mint(owner, EthBN.from(token.toString()), 1);
-			await erc1155.setURI(token, uri);
-		}
     }
 }
