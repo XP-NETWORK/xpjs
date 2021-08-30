@@ -16,7 +16,6 @@ import {
   ISigner,
   NetworkConfig,
   ProxyProvider,
-  SmartContractResultItem,
   TokenIdentifierValue,
   Transaction,
   TransactionHash,
@@ -55,9 +54,9 @@ export type NftInfo = {
   nonce: EasyBalance;
 };
 
-/*type ContractRes = {
+type ContractRes = {
   readonly [idx: string]: number | string;
-}*/
+}
 
 /**
  * Information associated with an ESDT Token
@@ -508,33 +507,13 @@ export const elrondHelperFactory: (
 
   async function extractId(tx: Transaction): Promise<[Transaction, EventIdent]> {
 	  await tx.awaitNotarized(provider);
-	  const res = await tx.getAsOnNetwork(provider);
-	  const scr = res.getSmartContractResults();
+	  const txr = await transactionResult(tx.getHash());
 
-	  const immediate = scr.getImmediate();
-	  let id = getResItem(immediate);
-	  if (id) {
-		  return [tx, id];
-	  }
-
-	  const rest = scr.getResultingCalls();
-	  id = rest.map(getResItem).find(v => v !== undefined);
-	  if (id === undefined) {
-		  throw Error("couldn't find action id?!");
-	  }
+	  const id = filterEventId(txr["smartContractResults"]);
 
 	  return [tx, id];
   }
   
-  const getResItem = (item: SmartContractResultItem) => {
-	  const tokens = item.getDataTokens();
-	  if (tokens[0][0] == 0x6f && tokens[0][1] == 0x6b) {
-		  return (new Uint32Array(tokens[1]))[0];
-	  }
-	  return undefined;
-  }
-
-
   return {
     rawTxnResult: transactionResult,
     unsignedTransferTxn,
@@ -669,7 +648,7 @@ export const elrondHelperFactory: (
   };
 };
 
-/*function filterEventId(results: Array<ContractRes>): number {
+function filterEventId(results: Array<ContractRes>): number {
   for (const res of results) {
     if (res["nonce"] === 0) {
       continue;
@@ -688,7 +667,3 @@ export const elrondHelperFactory: (
 
   throw Error(`invalid result: ${results.toString()}`);
 }
-
-async function emitTx(middleware: AxiosInstance, tx_hash: string): Promise<void> {
-  await middleware.post("/tx/transfer", { tx_hash });
-}*/
