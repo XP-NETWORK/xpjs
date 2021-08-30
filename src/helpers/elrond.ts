@@ -16,14 +16,14 @@ import {
   ISigner,
   NetworkConfig,
   ProxyProvider,
+  SmartContractResultItem,
   TokenIdentifierValue,
   Transaction,
   TransactionHash,
   TransactionPayload,
   U64Value,
 } from "@elrondnetwork/erdjs";
-import  { TransactionWatcher } from "@elrondnetwork/erdjs/out/transactionWatcher";
-import axios, { AxiosInstance } from "axios";
+import axios from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
@@ -55,9 +55,9 @@ export type NftInfo = {
   nonce: EasyBalance;
 };
 
-type ContractRes = {
+/*type ContractRes = {
   readonly [idx: string]: number | string;
-}
+}*/
 
 /**
  * Information associated with an ESDT Token
@@ -213,11 +213,6 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
      */
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     /**
-     * Handle a cross chain action, required to be called after sending an unsigned transaction
-     * @param tx_hash Hash of the transaction to be handled
-     */
-    handleTxnEvent(tx_hash: TransactionHash): Promise<EventIdent>;
-    /**
      * Raw result of a transaction
      * 
      * @param tx_hash  Hash of the transaction
@@ -237,44 +232,23 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
 export const elrondHelperFactory: (
   node_uri: string,
   minter_address: string,
-  middleware_uri: string,
   esdt: string,
   esdt_nft: string
 ) => Promise<ElrondHelper> = async (
   node_uri: string,
   minter_address: string,
-  middleware_uri: string,
   esdt: string,
   esdt_nft: string
 ) => {
   const provider = new ProxyProvider(node_uri);
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(minter_address);
-  const eventMiddleware = axios.create({
-    baseURL: middleware_uri,
-	headers: {
-		"Content-Type": "application/json"
-	}
-  });
   const providerRest = axios.create({
     baseURL: node_uri
   });
   const esdtHex = Buffer.from(esdt, "utf-8");
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
   const decoder = new TextDecoder();
-
-
-  const handleEvent = async (tx_hash: TransactionHash) => {
-	await emitTx(eventMiddleware, tx_hash.toString())
-    await new Promise(r => setTimeout(r, 3000));
-    const watcher = new TransactionWatcher(tx_hash, provider);
-    await watcher.awaitExecuted();
-    const res: Array<ContractRes> = (await transactionResult(tx_hash))["smartContractResults"];
-
-    const id = filterEventId(res);
-
-    return id;
-  };
 
   const syncAccount = async (signer: ISigner) => {
     const account = new Account(signer.getAddress());
@@ -532,10 +506,36 @@ export const elrondHelperFactory: (
         return { token, nonce };
   }
 
+  async function extractId(tx: Transaction): Promise<[Transaction, EventIdent]> {
+	  const res = await tx.getAsOnNetwork(provider);
+	  const scr = res.getSmartContractResults();
+
+	  const immediate = scr.getImmediate();
+	  let id = getResItem(immediate);
+	  if (id) {
+		  return [tx, id];
+	  }
+
+	  const rest = scr.getResultingCalls();
+	  id = rest.map(getResItem).find(v => v !== undefined);
+	  if (id === undefined) {
+		  throw Error("couldn't find action id?!");
+	  }
+
+	  return [tx, id];
+  }
+  
+  const getResItem = (item: SmartContractResultItem) => {
+	  const tokens = item.getDataTokens();
+	  if (tokens[0][0] == 0x6f && tokens[0][1] == 0x6b) {
+		  return (new Uint32Array(tokens[1]))[0];
+	  }
+	  return undefined;
+  }
+
 
   return {
     rawTxnResult: transactionResult,
-    handleTxnEvent: handleEvent,
     unsignedTransferTxn,
     unsignedUnfreezeTxn,
     unsignedTransferNftTxn,
@@ -574,9 +574,7 @@ export const elrondHelperFactory: (
       const txu = unsignedTransferTxn(chain_nonce, to, value)
       const tx = await signAndSend(sender, txu);
 
-      const id = await handleEvent(tx.getHash());
-
-      return [tx, id];
+	  return await extractId(tx);
     },
     async unfreezeWrapped(
       sender: ISigner,
@@ -587,9 +585,7 @@ export const elrondHelperFactory: (
       const txu = unsignedUnfreezeTxn(chain_nonce, sender.getAddress(), to, value);
       const tx = await signAndSend(sender, txu);
 
-      const id = await handleEvent(tx.getHash());
-
-      return [tx, id];
+      return await extractId(tx);
     },
     async transferNftToForeign(
       sender: ISigner,
@@ -600,9 +596,7 @@ export const elrondHelperFactory: (
       const txu = unsignedTransferNftTxn(chain_nonce, sender.getAddress(), to, info);
       const tx = await signAndSend(sender, txu);
 
-      const id = await handleEvent(tx.getHash());
-
-      return [tx, id];
+      return await extractId(tx);
     },
     async unfreezeWrappedNft(
       sender: ISigner,
@@ -612,9 +606,7 @@ export const elrondHelperFactory: (
       const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, nonce);
       const tx = await signAndSend(sender, txu);
 
-      const eid = await handleEvent(tx.getHash());
-
-      return [tx, eid];
+      return await extractId(tx);
     },
     unsignedIssueESDTNft,
     async issueESDTNft(
@@ -676,7 +668,7 @@ export const elrondHelperFactory: (
   };
 };
 
-function filterEventId(results: Array<ContractRes>): number {
+/*function filterEventId(results: Array<ContractRes>): number {
   for (const res of results) {
     if (res["nonce"] === 0) {
       continue;
@@ -698,4 +690,4 @@ function filterEventId(results: Array<ContractRes>): number {
 
 async function emitTx(middleware: AxiosInstance, tx_hash: string): Promise<void> {
   await middleware.post("/tx/transfer", { tx_hash });
-}
+}*/

@@ -121,11 +121,6 @@ export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & B
      */
     unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
     /**
-     * Handle a cross chain action, required to be called after sending an unsigned transaction
-     * @param tx_hash Hash of the transaction to be handled
-     */
-    handleTxnEvent(tx_hash: TransactionHash): Promise<EventIdent>;
-    /**
      * Raw result of a transaction
      *
      * @param tx_hash  Hash of the transaction
@@ -141,5 +136,5 @@ export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & B
  * @param esdt  Identifier of the ESDT Wrapper
  * @param esdt_nft  Identifier of the ESDT NFT Wrapper
  */
-export declare const elrondHelperFactory: (node_uri: string, minter_address: string, middleware_uri: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;
+export declare const elrondHelperFactory: (node_uri: string, minter_address: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;
 export {};
