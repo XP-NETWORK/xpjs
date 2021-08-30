@@ -506,7 +506,7 @@ export const elrondHelperFactory: (
   }
 
   async function extractId(tx: Transaction): Promise<[Transaction, EventIdent]> {
-	  await tx.awaitNotarized(provider);
+	  await tx.awaitExecuted(provider);
 	  const txr = await transactionResult(tx.getHash());
 
 	  const id = filterEventId(txr["smartContractResults"]);
