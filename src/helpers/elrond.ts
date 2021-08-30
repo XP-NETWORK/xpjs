@@ -276,10 +276,17 @@ export const elrondHelperFactory: (
 
   const transactionResult = async (tx_hash: TransactionHash) => {
     const uri = `/transaction/${tx_hash.toString()}?withResults=true`;
+	let tries = 0;
 
-    while (true) {
+    while (tries < 10) {
+	  tries += 1;
+	  let err;
 	  // TODO: type safety
-      const res = await providerRest.get(uri);
+      const res = await providerRest.get(uri).catch(e => err = e);
+	  if (err) {
+		  await new Promise(r => setTimeout(r, 3000))
+		  continue;
+	  }
       const data = res.data;
       if (data["code"] != "successful") {
         throw Error("failed to execute txn")
@@ -296,6 +303,8 @@ export const elrondHelperFactory: (
 
       return tx_info;
     }
+
+	throw Error(`failed to query transaction exceeded 10 retries ${tx_hash}`);
   }
 
   const unsignedTransferTxn = (
@@ -506,7 +515,13 @@ export const elrondHelperFactory: (
   }
 
   async function extractId(tx: Transaction): Promise<[Transaction, EventIdent]> {
-	  await tx.awaitExecuted(provider);
+	  let err;
+	  await tx.awaitExecuted(provider).catch(e => err = e);
+	  if (err) {
+		  await new Promise(r => setTimeout(r, 3000));
+		  return extractId(tx);
+	  }
+
 	  const txr = await transactionResult(tx.getHash());
 
 	  const id = filterEventId(txr["smartContractResults"]);
