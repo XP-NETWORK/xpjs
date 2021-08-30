@@ -427,13 +427,22 @@ export const elrondHelperFactory: (
 	  return dat;
   }
 
-  const listNft = async (owner: string) => {
-      const ents: [string, MaybeEsdtNftInfo][] = Object.entries(await listEsdt(owner));
+  async function listNft(owner: string): Promise<Map<string, EsdtNftInfo>> {
+	const ents: [string, MaybeEsdtNftInfo][] = Object.entries(await listEsdt(owner));
 
-      return new Map(
-        ents.filter(([_ident, info]) => isEsdtNftInfo(info))
-      );
-  };
+	const fmapCb: (tok: [string, MaybeEsdtNftInfo]) => [] | [[string, EsdtNftInfo]] = ([tok, info]) => {
+		if (!isEsdtNftInfo(info)) {
+				return [];
+		}
+
+		let sp = tok.split("-");
+		let nonce = sp.pop() ?? "";
+		return [[`${sp.join("-")}-${parseInt(nonce, 16).toString()}`, info]]
+	}
+
+		return new Map(ents.flatMap(fmapCb));
+  }
+
 
   const unsignedIssueESDTNft  = (
       name: string,
@@ -492,7 +501,7 @@ export const elrondHelperFactory: (
 
 	async function getLockedNft({token, nonce}: NftInfo): Promise<EsdtNftInfo | undefined> {
 	  const nfts = await listNft(minter_address);
-	  return nfts.get(`${token}-0${nonce.toString(16)}`);
+	  return nfts.get(`${token}-${nonce.toString()}`);
 	}
 
    const rawNftDecoder = (nftDat: Uint8Array) => {
