@@ -507,6 +507,7 @@ export const elrondHelperFactory: (
   }
 
   async function extractId(tx: Transaction): Promise<[Transaction, EventIdent]> {
+	  await tx.awaitNotarized(provider);
 	  const res = await tx.getAsOnNetwork(provider);
 	  const scr = res.getSmartContractResults();
 
