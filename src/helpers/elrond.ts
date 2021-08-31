@@ -518,7 +518,7 @@ export const elrondHelperFactory: (
         const token = decoder.decode(nftDat.slice(4, 4+tokenLen));
         // TODO: Consider LO
         // tfw js can't convert be bytes to u64
-        const nonce = (new Uint32Array(nftDat.slice(4+tokenLen, 12 + tokenLen).reverse()))[0].toString(16);
+        const nonce = (new Uint32Array(nftDat.slice(4+tokenLen, 12 + tokenLen).reverse()))[0];
 
         return { token, nonce };
   }
