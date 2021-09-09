@@ -1,14 +1,12 @@
 {
-  "abi": [
-    {
+  "abi": [{
       "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
     {
       "anonymous": false,
-      "inputs": [
-        {
+      "inputs": [{
           "indexed": true,
           "internalType": "address",
           "name": "account",
@@ -32,8 +30,7 @@
     },
     {
       "anonymous": false,
-      "inputs": [
-        {
+      "inputs": [{
           "indexed": true,
           "internalType": "address",
           "name": "previousOwner",
@@ -51,8 +48,7 @@
     },
     {
       "anonymous": false,
-      "inputs": [
-        {
+      "inputs": [{
           "indexed": true,
           "internalType": "address",
           "name": "operator",
@@ -88,8 +84,7 @@
     },
     {
       "anonymous": false,
-      "inputs": [
-        {
+      "inputs": [{
           "indexed": true,
           "internalType": "address",
           "name": "operator",
@@ -125,8 +120,7 @@
     },
     {
       "anonymous": false,
-      "inputs": [
-        {
+      "inputs": [{
           "indexed": false,
           "internalType": "string",
           "name": "value",
@@ -143,8 +137,7 @@
       "type": "event"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "account",
           "type": "address"
@@ -156,19 +149,16 @@
         }
       ],
       "name": "balanceOf",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
+      "outputs": [{
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address[]",
           "name": "accounts",
           "type": "address[]"
@@ -180,19 +170,16 @@
         }
       ],
       "name": "balanceOfBatch",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
+      "outputs": [{
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "from",
           "type": "address"
@@ -214,8 +201,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "account",
           "type": "address"
@@ -227,19 +213,16 @@
         }
       ],
       "name": "isApprovedForAll",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "to",
           "type": "address"
@@ -263,13 +246,11 @@
     {
       "inputs": [],
       "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }],
       "stateMutability": "view",
       "type": "function"
     },
@@ -281,8 +262,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "from",
           "type": "address"
@@ -314,8 +294,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "from",
           "type": "address"
@@ -347,8 +326,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "address",
           "name": "operator",
           "type": "address"
@@ -365,8 +343,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
+      "inputs": [{
           "internalType": "uint256",
           "name": "id",
           "type": "uint256"
@@ -383,53 +360,43 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "bytes4",
-          "name": "interfaceId",
-          "type": "bytes4"
-        }
-      ],
+      "inputs": [{
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }],
       "name": "supportsInterface",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
+      "inputs": [{
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }],
       "name": "transferOwnership",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [{
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }],
       "name": "uri",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
+      "outputs": [{
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }],
       "stateMutability": "view",
       "type": "function"
     }

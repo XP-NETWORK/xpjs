@@ -24,7 +24,7 @@ import {
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
 import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
-import {BTreeMap, Bytes, Option, Tuple, U8aFixed} from "@polkadot/types";
+import { BTreeMap, Bytes, Option, Tuple, U8aFixed } from "@polkadot/types";
 import { NftPacked } from "validator/dist/encoding"
 
 /**
@@ -86,22 +86,22 @@ export function toHex(buffer: Uint8Array) {
 
 async function basePolkadotHelper(
   node_uri: string
-  ): Promise<[BasePolkadot, ApiPromise]> {
-    const provider = new WsProvider(node_uri);
-    const api = await ApiPromise.create({ provider, types: runtimeTypes });
-  
-    const base = {
-      async balance(
-        address: EasyAddr
-      ): Promise<BigNumber> {
+): Promise<[BasePolkadot, ApiPromise]> {
+  const provider = new WsProvider(node_uri);
+  const api = await ApiPromise.create({ provider, types: runtimeTypes });
 
-        const res: any = await api.query.system.account(address);
-        
-        return new BigNumber(res['data']['free'].toString());
-      }
+  const base = {
+    async balance(
+      address: EasyAddr
+    ): Promise<BigNumber> {
+
+      const res: any = await api.query.system.account(address);
+
+      return new BigNumber(res['data']['free'].toString());
     }
+  }
 
-    return [base, api]
+  return [base, api]
 }
 
 function hasAddrField(ob: any): ob is { address: string } {
@@ -111,7 +111,7 @@ function hasAddrField(ob: any): ob is { address: string } {
 async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableExtrinsic<'promise', R>, filter: string, signer: AddressOrPair, options?: Partial<SignerOptions>): Promise<[Hash, EventIdent]> {
   let call: (cb: Callback<R>) => Promise<() => void>;
   if (options) {
-	options.nonce = -1;
+    options.nonce = -1;
     call = async (cb: Callback<R>) => await ext.signAndSend(signer, options, cb);
   } else {
     call = async (cb: Callback<R>) => await ext.signAndSend(signer, { nonce: -1 }, cb);
@@ -137,12 +137,12 @@ async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableEx
   });
 
   try {
-  	return await evP;
+    return await evP;
   } catch (e) {
-	  if (e.message.contains("Priority is too low")) {
-		  throw ConcurrentSendError();
-	  }
-	  throw e;
+    if (e.message.contains("Priority is too low")) {
+      throw ConcurrentSendError();
+    }
+    throw e;
   }
 }
 
@@ -160,40 +160,40 @@ export const polkadotPalletHelperFactory: (
   const decoder = new TextDecoder();
 
   function nftListMapper([nft_id, data]: [H256, Bytes]): [string, Uint8Array] {
-	  return [nft_id.toString(), data];
+    return [nft_id.toString(), data];
   }
 
   async function getLockedNft(
-	hash: H256
+    hash: H256
   ): Promise<Uint8Array | undefined> {
-	const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
-	if (com.isNone) {
-		return undefined;
-	}
+    const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
+    if (com.isNone) {
+      return undefined;
+    }
 
-	const [_owner, dat] = com.unwrap();
-	return dat as Bytes;
+    const [_owner, dat] = com.unwrap();
+    return dat as Bytes;
   }
 
   return {
     ...base,
-	async balanceWrapped(
-		address: EasyAddr,
-		chain_nonce: number
-	): Promise<BigNumber> {
-		const res = await api.query.erc1155.balances(address, chain_nonce);
-		return new BigNumber(res.toString())
-	},
-	async balanceWrappedBatch(
-		address: EasyAddr,
-		chain_nonces: number[]
-	): Promise<Map<number, BigNumber>> {
-		// Multi query with address, chain_nonce
-		const res: Option<any>[] = await api.query.erc1155.balances.multi(chain_nonces.map(c => [address, c]));
+    async balanceWrapped(
+      address: EasyAddr,
+      chain_nonce: number
+    ): Promise<BigNumber> {
+      const res = await api.query.erc1155.balances(address, chain_nonce);
+      return new BigNumber(res.toString())
+    },
+    async balanceWrappedBatch(
+      address: EasyAddr,
+      chain_nonces: number[]
+    ): Promise<Map<number, BigNumber>> {
+      // Multi query with address, chain_nonce
+      const res: Option<any>[] = await api.query.erc1155.balances.multi(chain_nonces.map(c => [address, c]));
 
-		// Convert list of balances to [chain_nonce, balance]
-		return new Map(res.map((b: Option<any>, i) => [chain_nonces[i], b.isSome ? new BigNumber(b.unwrap().toString()) : new BigNumber(0)]))
-	},
+      // Convert list of balances to [chain_nonce, balance]
+      return new Map(res.map((b: Option<any>, i) => [chain_nonces[i], b.isSome ? new BigNumber(b.unwrap().toString()) : new BigNumber(0)]))
+    },
     async transferNativeToForeign(
       sender: Signer,
       chain_nonce: number,
@@ -213,9 +213,9 @@ export const polkadotPalletHelperFactory: (
       value: EasyBalance
     ): Promise<[Hash, EventIdent]> {
       return await resolve_event_id(
-          api.tx.freezer.withdrawWrapped(chain_nonce, to, value.toString()),
-          "UnfreezeWrapped",
-          sender.sender, sender.options
+        api.tx.freezer.withdrawWrapped(chain_nonce, to, value.toString()),
+        "UnfreezeWrapped",
+        sender.sender, sender.options
       );
     },
     async transferNftToForeign(
@@ -245,51 +245,51 @@ export const polkadotPalletHelperFactory: (
       owner: Signer,
       info: Uint8Array
     ): Promise<void> {
-        let addr;
-        // "static typing :|"
-        if (typeof owner.sender == "string") {
-          addr = owner.sender;
-        } else if (hasAddrField(owner.sender)) {
-          addr = owner.sender.address;
-        } else {
-          addr = owner.sender.toString();
-        }
+      let addr;
+      // "static typing :|"
+      if (typeof owner.sender == "string") {
+        addr = owner.sender;
+      } else if (hasAddrField(owner.sender)) {
+        addr = owner.sender.address;
+      } else {
+        addr = owner.sender.toString();
+      }
 
-        await api.tx.sudo.sudo(
-          api.tx.nft.mint(addr, toHex(info))
-        ).signAndSend(sudoSigner, { nonce: -1 });
+      await api.tx.sudo.sudo(
+        api.tx.nft.mint(addr, toHex(info))
+      ).signAndSend(sudoSigner, { nonce: -1 });
     },
     async listNft(
       owner: EasyAddr
     ): Promise<Map<string, Uint8Array>> {
       const com = await api.query.nft.commoditiesForAccount(owner.toString()) as Option<BTreeMap<H256, Bytes>>;
-	  if (com.isNone) {
-		  return new Map();
-	  }
+      if (com.isNone) {
+        return new Map();
+      }
       const c = Array.from(com.unwrap()).map(nftListMapper);
       return new Map(c);
     },
-	getLockedNft,
-	decodeWrappedNft(
-		raw_data: Uint8Array
-	): WrappedNft {
-		const packed = NftPacked.deserializeBinary(Uint8Array.from(raw_data));
+    getLockedNft,
+    decodeWrappedNft(
+      raw_data: Uint8Array
+    ): WrappedNft {
+      const packed = NftPacked.deserializeBinary(Uint8Array.from(raw_data));
 
-		return {
-			chain_nonce: packed.getChainNonce(),
-			data: packed.getData_asU8()
-		}
-	},
-	async decodeUrlFromRaw(
-		data: Uint8Array
-	): Promise<string> {
-		const locked = await getLockedNft(new U8aFixed(api.registry, data, 256));
-		if (locked === undefined) {
-			throw Error("not a locked nft");
-		}
+      return {
+        chain_nonce: packed.getChainNonce(),
+        data: packed.getData_asU8()
+      }
+    },
+    async decodeUrlFromRaw(
+      data: Uint8Array
+    ): Promise<string> {
+      const locked = await getLockedNft(new U8aFixed(api.registry, data, 256));
+      if (locked === undefined) {
+        throw Error("not a locked nft");
+      }
 
-		return decoder.decode(locked.slice(-24));
-	}
+      return decoder.decode(locked.slice(-24));
+    }
   };
 };
 
