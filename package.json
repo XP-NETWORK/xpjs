@@ -30,6 +30,7 @@
     "ethers": "^5.4.1",
     "js-base64": "^3.6.1",
     "socket.io-client": "^4.1.3",
+    "tronweb": "^4.0.0",
     "validator": "git+https://github.com/xp-network/migration-validator#master"
   }
 }
