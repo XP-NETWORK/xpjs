@@ -84,10 +84,10 @@ export interface BalanceCheck<Addr, Balance> {
  * @param chain_nonce  nonce of the foreign chain
  */
 export interface WrappedBalanceCheck<Addr, Balance> {
-	balanceWrapped(
-		address: Addr,
-		chain_nonce: number
-	): Promise<Balance>;
+  balanceWrapped(
+    address: Addr,
+    chain_nonce: number
+  ): Promise<Balance>;
 }
 
 /**
@@ -97,10 +97,10 @@ export interface WrappedBalanceCheck<Addr, Balance> {
  * @returns Mapping of chain_nonce to balance
  */
 export interface BatchWrappedBalanceCheck<Addr, Balance> {
-	balanceWrappedBatch(
-		address: Addr,
-		chain_nonces: number[]
-	): Promise<Map<number, Balance>>;
+  balanceWrappedBatch(
+    address: Addr,
+    chain_nonces: number[]
+  ): Promise<Map<number, Balance>>;
 }
 
 /**
@@ -128,23 +128,23 @@ export interface ListNft<Addr, K, V> {
  * Get the original data of a locked NFT (uri, name, etc)
  */
 export interface GetLockedNft<Ident, Info> {
-	getLockedNft(ident: Ident): Promise<Info | undefined>;
+  getLockedNft(ident: Ident): Promise<Info | undefined>;
 }
 
 export type WrappedNft = {
-	chain_nonce: number,
-	data: Uint8Array
+  chain_nonce: number,
+  data: Uint8Array
 }
 
 export interface DecodeWrappedNft<Data> {
-	decodeWrappedNft(raw_data: Data): WrappedNft;
+  decodeWrappedNft(raw_data: Data): WrappedNft;
 }
 
 export interface DecodeRawNft {
-	decodeUrlFromRaw(data: Uint8Array): Promise<string>;
+  decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
 
 
 export function ConcurrentSendError(): Error {
-	return new Error("concurrent_send")
+  return new Error("concurrent_send")
 }
