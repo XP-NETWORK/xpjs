@@ -1,19 +1,28 @@
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
 
 type ChainAwaiter = {
-  [action_id: string]: {
-    resolve?: (hash: string) => void;
-    event_res?: string;
-  } | undefined;
+  [action_id: string]:
+    | {
+        resolve?: (hash: string) => void;
+        event_res?: string;
+      }
+    | undefined;
 };
 
 type TxResInnerBuf = {
   [chain: number]: ChainAwaiter;
-}
+};
 
 type TxResBuf = {
-  getResolver(chain_id: number, action_id: string): ((hash: string) => void) | undefined;
-  setResolver(chain_id: number, action_id: string, resolver: (hash: string) => void): void;
+  getResolver(
+    chain_id: number,
+    action_id: string
+  ): ((hash: string) => void) | undefined;
+  setResolver(
+    chain_id: number,
+    action_id: string,
+    resolver: (hash: string) => void
+  ): void;
   getEventRes(chain_id: number, action_id: string): string | undefined;
   setEventRes(chain_id: number, action_id: string, res: string): void;
   unsetAction(chain_id: number, action_id: string): void;
@@ -24,13 +33,13 @@ type TxResBuf = {
  */
 export type TxnSocketHelper = {
   /**
-   * 
+   *
    * @param chain  Nonce of the target chain
    * @param action_id  Identifier for tracking a cross chain transaction
    * @returns  transaction hash on the foreign chain
    */
   waitTxHash(chain: number, action_id: string): Promise<string>;
-}
+};
 
 function txResBuf(): TxResBuf {
   const inner: TxResInnerBuf = {};
@@ -39,15 +48,22 @@ function txResBuf(): TxResBuf {
     if (inner[chain_id] === undefined) {
       inner[chain_id] = {};
     }
-  }
+  };
 
   return {
-    getResolver(chain_id: number, action_id: string): ((hash: string) => void) | undefined {
+    getResolver(
+      chain_id: number,
+      action_id: string
+    ): ((hash: string) => void) | undefined {
       requireChain(chain_id);
 
       return inner[chain_id][action_id]?.resolve;
     },
-    setResolver(chain_id: number, action_id: string, resolver: (hash: string) => void): void {
+    setResolver(
+      chain_id: number,
+      action_id: string,
+      resolver: (hash: string) => void
+    ): void {
       requireChain(chain_id);
 
       inner[chain_id][action_id] = { resolve: resolver };
@@ -66,17 +82,20 @@ function txResBuf(): TxResBuf {
       requireChain(chain_id);
 
       inner[chain_id][action_id] = undefined;
-    }
-  }
+    },
+  };
 }
 
 /**
  * Create a [[TxnSocketHelper]]
- * 
+ *
  * @param uri  URI of the Migration-Validator socket api
  * @param options  socket.io options
  */
-export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper {
+export function txnSocketHelper(
+  uri: string,
+  options?: Partial<SocketOptions & ManagerOptions>
+): TxnSocketHelper {
   const socket = io(uri, options);
   const buf: TxResBuf = txResBuf();
 
@@ -96,7 +115,6 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
     }
   );
 
-
   return {
     async waitTxHash(chain: number, action_id: string): Promise<string> {
       const hash = buf.getEventRes(chain, action_id);
@@ -105,11 +123,11 @@ export function txnSocketHelper(uri: string, options?: Partial<SocketOptions & M
         return hash;
       }
 
-      const hashP: Promise<string> = new Promise(r => {
+      const hashP: Promise<string> = new Promise((r) => {
         buf.setResolver(chain, action_id, r);
       });
 
       return await hashP;
-    }
-  }
+    },
+  };
 }

@@ -4,7 +4,7 @@
  */
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft } from "./chain";
-import { Signer, BigNumber as EthBN } from 'ethers';
+import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
 declare type EasyBalance = string | number | EthBN;
@@ -55,8 +55,8 @@ MintNft<Signer, MintArgs, void> & {
  */
 export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & {
     /**
-    * Get the uri of an nft given nft info
-    */
+     * Get the uri of an nft given nft info
+     */
     nftUri(info: EthNftInfo): Promise<string>;
 };
 /**

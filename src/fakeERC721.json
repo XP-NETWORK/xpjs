@@ -1,12 +1,14 @@
 {
-  "abi": [{
+  "abi": [
+    {
       "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
     {
       "anonymous": false,
-      "inputs": [{
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "_owner",
@@ -30,7 +32,8 @@
     },
     {
       "anonymous": false,
-      "inputs": [{
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "_owner",
@@ -54,7 +57,8 @@
     },
     {
       "anonymous": false,
-      "inputs": [{
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "previousOwner",
@@ -72,7 +76,8 @@
     },
     {
       "anonymous": false,
-      "inputs": [{
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "_from",
@@ -97,27 +102,32 @@
     {
       "inputs": [],
       "name": "CANNOT_TRANSFER_TO_ZERO_ADDRESS",
-      "outputs": [{
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }],
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [],
       "name": "NOT_CURRENT_OWNER",
-      "outputs": [{
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }],
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_approved",
           "type": "address"
@@ -134,37 +144,46 @@
       "type": "function"
     },
     {
-      "inputs": [{
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      }],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
       "name": "balanceOf",
-      "outputs": [{
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }],
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_tokenId",
+          "type": "uint256"
+        }
+      ],
       "name": "getApproved",
-      "outputs": [{
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_owner",
           "type": "address"
@@ -176,42 +195,51 @@
         }
       ],
       "name": "isApprovedForAll",
-      "outputs": [{
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }],
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [],
       "name": "owner",
-      "outputs": [{
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }],
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_tokenId",
+          "type": "uint256"
+        }
+      ],
       "name": "ownerOf",
-      "outputs": [{
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      }],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_from",
           "type": "address"
@@ -233,7 +261,8 @@
       "type": "function"
     },
     {
-      "inputs": [{
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_from",
           "type": "address"
@@ -260,7 +289,8 @@
       "type": "function"
     },
     {
-      "inputs": [{
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_operator",
           "type": "address"
@@ -277,22 +307,27 @@
       "type": "function"
     },
     {
-      "inputs": [{
-        "internalType": "bytes4",
-        "name": "_interfaceID",
-        "type": "bytes4"
-      }],
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_interfaceID",
+          "type": "bytes4"
+        }
+      ],
       "name": "supportsInterface",
-      "outputs": [{
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }],
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_from",
           "type": "address"
@@ -314,11 +349,13 @@
       "type": "function"
     },
     {
-      "inputs": [{
-        "internalType": "address",
-        "name": "_newOwner",
-        "type": "address"
-      }],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
       "name": "transferOwnership",
       "outputs": [],
       "stateMutability": "nonpayable",

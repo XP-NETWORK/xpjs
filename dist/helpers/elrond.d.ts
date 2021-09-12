@@ -114,7 +114,7 @@ export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & B
     unsignedTransferNftTxn(chain_nonce: number, address: Address, to: string, info: NftInfo): Transaction;
     /**
      * Unsigned Transaction for [[UnfreezeForeignNft]]
-    */
+     */
     unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
     /**
      * Unsigned transaction for Minting an NFT
