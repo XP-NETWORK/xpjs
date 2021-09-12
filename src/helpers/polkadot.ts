@@ -3,7 +3,11 @@
  * @module
  */
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
-import { Callback, ISubmittableResult, RegistryTypes } from "@polkadot/types/types";
+import {
+  Callback,
+  ISubmittableResult,
+  RegistryTypes,
+} from "@polkadot/types/types";
 import { Address, H256, Hash, LookupSource } from "@polkadot/types/interfaces";
 import BigNumber from "bignumber.js";
 import {
@@ -20,23 +24,26 @@ import {
   ConcurrentSendError,
   DecodeWrappedNft,
   WrappedNft,
-  DecodeRawNft
+  DecodeRawNft,
 } from "./chain";
 import { AddressOrPair } from "@polkadot/api/types";
-import { SignerOptions, SubmittableExtrinsic } from "@polkadot/api/submittable/types";
+import {
+  SignerOptions,
+  SubmittableExtrinsic,
+} from "@polkadot/api/submittable/types";
 import { BTreeMap, Bytes, Option, Tuple, U8aFixed } from "@polkadot/types";
-import { NftPacked } from "validator/dist/encoding"
+import { NftPacked } from "validator/dist/encoding";
 
 /**
  * Type of sender expected by this module
- * 
+ *
  * @param sender  Address of the sender, or a Keypair
  * @param options  Options for sigining this transaction. Mandatory if sender is an address
  */
 export type Signer = {
-  sender: AddressOrPair,
-  options?: Partial<SignerOptions>
-}
+  sender: AddressOrPair;
+  options?: Partial<SignerOptions>;
+};
 
 type EasyBalance = string | number | BigNumber;
 type EasyAddr = string | LookupSource | Address;
@@ -44,7 +51,7 @@ type EasyAddr = string | LookupSource | Address;
 type BasePolkadot = BalanceCheck<string, BigNumber>;
 
 /**
- * identifier for tracking an action 
+ * identifier for tracking an action
  */
 type EventIdent = BigNumber;
 
@@ -66,18 +73,34 @@ export type PolkadotPalletHelper = PolkadotHelper &
   DecodeWrappedNft<Uint8Array> &
   DecodeRawNft;
 
-
-const LUT_HEX_4b = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+const LUT_HEX_4b = [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+];
 const LUT_HEX_8b = new Array(0x100);
 for (let n = 0; n < 0x100; n++) {
-  LUT_HEX_8b[n] = `${LUT_HEX_4b[(n >>> 4) & 0xF]}${LUT_HEX_4b[n & 0xF]}`;
+  LUT_HEX_8b[n] = `${LUT_HEX_4b[(n >>> 4) & 0xf]}${LUT_HEX_4b[n & 0xf]}`;
 }
 /**
  * @internal
  */
 // End Pre-Init
 export function toHex(buffer: Uint8Array) {
-  let out = '';
+  let out = "";
   for (let idx = 0, edx = buffer.length; idx < edx; idx++) {
     out += LUT_HEX_8b[buffer[idx]];
   }
@@ -91,30 +114,34 @@ async function basePolkadotHelper(
   const api = await ApiPromise.create({ provider, types: runtimeTypes });
 
   const base = {
-    async balance(
-      address: EasyAddr
-    ): Promise<BigNumber> {
-
+    async balance(address: EasyAddr): Promise<BigNumber> {
       const res: any = await api.query.system.account(address);
 
-      return new BigNumber(res['data']['free'].toString());
-    }
-  }
+      return new BigNumber(res["data"]["free"].toString());
+    },
+  };
 
-  return [base, api]
+  return [base, api];
 }
 
 function hasAddrField(ob: any): ob is { address: string } {
-  return ob.hasOwnField('address') && typeof ob.address == "string";
+  return ob.hasOwnField("address") && typeof ob.address == "string";
 }
 
-async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableExtrinsic<'promise', R>, filter: string, signer: AddressOrPair, options?: Partial<SignerOptions>): Promise<[Hash, EventIdent]> {
+async function resolve_event_id<R extends ISubmittableResult>(
+  ext: SubmittableExtrinsic<"promise", R>,
+  filter: string,
+  signer: AddressOrPair,
+  options?: Partial<SignerOptions>
+): Promise<[Hash, EventIdent]> {
   let call: (cb: Callback<R>) => Promise<() => void>;
   if (options) {
     options.nonce = -1;
-    call = async (cb: Callback<R>) => await ext.signAndSend(signer, options, cb);
+    call = async (cb: Callback<R>) =>
+      await ext.signAndSend(signer, options, cb);
   } else {
-    call = async (cb: Callback<R>) => await ext.signAndSend(signer, { nonce: -1 }, cb);
+    call = async (cb: Callback<R>) =>
+      await ext.signAndSend(signer, { nonce: -1 }, cb);
   }
 
   const evP: Promise<[Hash, EventIdent]> = new Promise((res, rej) => {
@@ -123,7 +150,7 @@ async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableEx
         return;
       }
 
-      const ev = events.find(e => e.event.method == filter);
+      const ev = events.find((e) => e.event.method == filter);
       if (ev === undefined) {
         rej();
         return;
@@ -133,7 +160,7 @@ async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableEx
       const hash = status.asInBlock;
 
       res([hash, action_id]);
-    })
+    });
   });
 
   try {
@@ -148,7 +175,7 @@ async function resolve_event_id<R extends ISubmittableResult>(ext: SubmittableEx
 
 /**
  * Create an object implementing Cross Chain utilities for Polkadot
- * 
+ *
  * @param node_uri URI of the polkadot node
  */
 export const polkadotPalletHelperFactory: (
@@ -163,10 +190,8 @@ export const polkadotPalletHelperFactory: (
     return [nft_id.toString(), data];
   }
 
-  async function getLockedNft(
-    hash: H256
-  ): Promise<Uint8Array | undefined> {
-    const com = await api.query.nft.lockedCommodities(hash) as Option<Tuple>;
+  async function getLockedNft(hash: H256): Promise<Uint8Array | undefined> {
+    const com = (await api.query.nft.lockedCommodities(hash)) as Option<Tuple>;
     if (com.isNone) {
       return undefined;
     }
@@ -182,17 +207,24 @@ export const polkadotPalletHelperFactory: (
       chain_nonce: number
     ): Promise<BigNumber> {
       const res = await api.query.erc1155.balances(address, chain_nonce);
-      return new BigNumber(res.toString())
+      return new BigNumber(res.toString());
     },
     async balanceWrappedBatch(
       address: EasyAddr,
       chain_nonces: number[]
     ): Promise<Map<number, BigNumber>> {
       // Multi query with address, chain_nonce
-      const res: Option<any>[] = await api.query.erc1155.balances.multi(chain_nonces.map(c => [address, c]));
+      const res: Option<any>[] = await api.query.erc1155.balances.multi(
+        chain_nonces.map((c) => [address, c])
+      );
 
       // Convert list of balances to [chain_nonce, balance]
-      return new Map(res.map((b: Option<any>, i) => [chain_nonces[i], b.isSome ? new BigNumber(b.unwrap().toString()) : new BigNumber(0)]))
+      return new Map(
+        res.map((b: Option<any>, i) => [
+          chain_nonces[i],
+          b.isSome ? new BigNumber(b.unwrap().toString()) : new BigNumber(0),
+        ])
+      );
     },
     async transferNativeToForeign(
       sender: Signer,
@@ -203,7 +235,8 @@ export const polkadotPalletHelperFactory: (
       return await resolve_event_id(
         api.tx.freezer.send(chain_nonce, to, value.toString()),
         "TransferFrozen",
-        sender.sender, sender.options
+        sender.sender,
+        sender.options
       );
     },
     async unfreezeWrapped(
@@ -215,7 +248,8 @@ export const polkadotPalletHelperFactory: (
       return await resolve_event_id(
         api.tx.freezer.withdrawWrapped(chain_nonce, to, value.toString()),
         "UnfreezeWrapped",
-        sender.sender, sender.options
+        sender.sender,
+        sender.options
       );
     },
     async transferNftToForeign(
@@ -227,7 +261,8 @@ export const polkadotPalletHelperFactory: (
       return await resolve_event_id(
         api.tx.freezer.sendNft(chain_nonce, to, nft_id),
         "TransferUniqueFrozen",
-        sender.sender, sender.options
+        sender.sender,
+        sender.options
       );
     },
     async unfreezeWrappedNft(
@@ -238,13 +273,11 @@ export const polkadotPalletHelperFactory: (
       return await resolve_event_id(
         api.tx.freezer.withdrawWrappedNft(to, nft_id),
         "UnfreezeUniqueWrapped",
-        sender.sender, sender.options
+        sender.sender,
+        sender.options
       );
     },
-    async mintNft(
-      owner: Signer,
-      info: Uint8Array
-    ): Promise<void> {
+    async mintNft(owner: Signer, info: Uint8Array): Promise<void> {
       let addr;
       // "static typing :|"
       if (typeof owner.sender == "string") {
@@ -255,14 +288,14 @@ export const polkadotPalletHelperFactory: (
         addr = owner.sender.toString();
       }
 
-      await api.tx.sudo.sudo(
-        api.tx.nft.mint(addr, toHex(info))
-      ).signAndSend(sudoSigner, { nonce: -1 });
+      await api.tx.sudo
+        .sudo(api.tx.nft.mint(addr, toHex(info)))
+        .signAndSend(sudoSigner, { nonce: -1 });
     },
-    async listNft(
-      owner: EasyAddr
-    ): Promise<Map<string, Uint8Array>> {
-      const com = await api.query.nft.commoditiesForAccount(owner.toString()) as Option<BTreeMap<H256, Bytes>>;
+    async listNft(owner: EasyAddr): Promise<Map<string, Uint8Array>> {
+      const com = (await api.query.nft.commoditiesForAccount(
+        owner.toString()
+      )) as Option<BTreeMap<H256, Bytes>>;
       if (com.isNone) {
         return new Map();
       }
@@ -270,26 +303,22 @@ export const polkadotPalletHelperFactory: (
       return new Map(c);
     },
     getLockedNft,
-    decodeWrappedNft(
-      raw_data: Uint8Array
-    ): WrappedNft {
+    decodeWrappedNft(raw_data: Uint8Array): WrappedNft {
       const packed = NftPacked.deserializeBinary(Uint8Array.from(raw_data));
 
       return {
         chain_nonce: packed.getChainNonce(),
-        data: packed.getData_asU8()
-      }
+        data: packed.getData_asU8(),
+      };
     },
-    async decodeUrlFromRaw(
-      data: Uint8Array
-    ): Promise<string> {
+    async decodeUrlFromRaw(data: Uint8Array): Promise<string> {
       const locked = await getLockedNft(new U8aFixed(api.registry, data, 256));
       if (locked === undefined) {
         throw Error("not a locked nft");
       }
 
       return decoder.decode(locked.slice(-24));
-    }
+    },
   };
 };
 
