@@ -98,17 +98,17 @@ async function tronHelperFactory(provider, erc1155_addr, minter_addr, minter_abi
         }, nftUri: nftUri, async transferNativeToForeign(sender, chain_nonce, to, value) {
             setSigner(sender);
             let res = await minter.freeze(chain_nonce, to).send({ callValue: value });
-            return await extractTxn(res.hash);
+            return await extractTxn(res.txID);
         },
         async unfreezeWrapped(sender, chain_nonce, to, value) {
             setSigner(sender);
             const res = await minter.withdraw(chain_nonce, to, value).send();
-            return await extractTxn(res.hash);
+            return await extractTxn(res.txID);
         },
         async unfreezeWrappedNft(sender, to, id) {
             setSigner(sender);
             const res = await minter.withdraw_nft(to, id).send();
-            return await extractTxn(res.hash);
+            return await extractTxn(res.txID);
         },
         async transferNftToForeign(sender, chain_nonce, to, id) {
             let txr;
@@ -134,7 +134,7 @@ async function tronHelperFactory(provider, erc1155_addr, minter_addr, minter_abi
                     .send();
             }
             ev.toString();
-            return await extractTxn(txr.hash);
+            return await extractTxn(txr.txID);
         },
         async balanceWrappedBatch(address, chain_nonces) {
             const res = new Map();
