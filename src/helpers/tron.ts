@@ -73,6 +73,7 @@ export async function baseTronHelperFactory(
       const contract = await provider.contract().new({
         abi: ERC1155_abi,
         bytecode: ERC1155_contract.bytecode,
+		feeLimit: 3000000000
       });
 
       return contract.address;
