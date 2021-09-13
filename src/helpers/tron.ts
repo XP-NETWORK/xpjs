@@ -57,10 +57,10 @@ export async function baseTronHelperFactory(
   };
 
   return {
-    async mintNft(owner: string, options: MintArgs): Promise<void> {
-      setSigner(owner);
+    async mintNft(contract_owner: string, options: MintArgs): Promise<void> {
+      setSigner(contract_owner);
       const erc = await provider.contract(ERC1155_abi, options.contract);
-      await erc.mint(owner, EthBN.from(options.token.toString()), 1).send();
+      await erc.mint(options.owner, EthBN.from(options.token.toString()), 1).send();
       await erc.setURI(options.token, options.uri).send();
     },
     async balance(address: string): Promise<BigNumber> {
