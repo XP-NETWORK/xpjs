@@ -136,7 +136,7 @@ export async function tronHelperFactory(
     };
 
     const evs = await getEv();
-    const ev = evs.find((e: any) => e?.contract_address == minter_addr);
+    const ev = evs.find((e: any) => e?.contract == minter_addr);
     const action_id: string = ev.result["action_id"].toString();
     return [hash, action_id];
   }
