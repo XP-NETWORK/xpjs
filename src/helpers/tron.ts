@@ -223,14 +223,14 @@ export async function tronHelperFactory(
         ev = "TransferErc721";
         const erc = await provider.contract(ERC721_abi, id.contract);
         await erc
-          .safeTransferFrom(sender, minter_addr, id.token, call_data)
+          .safeTransferFrom(provider.defaultAddress.base58, minter_addr, id.token, call_data)
           .send();
       } else {
         ev = "TransferErc1155";
         const erc = await provider.contract(ERC1155_abi, id.contract);
         txr = await erc
           .safeTransferFrom(
-            sender,
+            provider.defaultAddress.base58,
             minter_addr,
             id.token,
             EthBN.from(1),
