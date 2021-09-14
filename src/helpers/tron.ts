@@ -19,11 +19,11 @@ import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
-import { Interface } from "ethers/lib/utils";
 import { abi as ERC721_abi } from "../fakeERC721.json";
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import * as ERC1155_contract from "../XPNet.json";
+import * as Minter_contract from "../Minter.json";
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
   MintNft<string, MintArgs, void> & {
@@ -35,6 +35,16 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
      * @returns Address of the deployed smart contract
      */
     deployErc1155(owner: string): Promise<string>;
+	/**
+	 * Deploy Minter Smart Contract
+	 *
+	 * @argument deployer  deployer of the smart contract
+	 * @argument validators  address of validators of the smart contract
+	 * @argument threshold  threshold for executing an action
+	 *
+	 * @returns minter address, wrapper token address
+	 */
+	deployMinter(deployer: string, validators: string[], threshold: number): Promise<[string, string]>;
   };
 
 export type TronHelper = BaseTronHelper &
@@ -56,6 +66,18 @@ export async function baseTronHelperFactory(
     return provider.setPrivateKey(signer);
   };
 
+  const deployErc1155_i = async (owner: string) => {
+	  setSigner(owner);
+
+	  const contract = await provider.contract().new({
+		  abi: ERC1155_abi,
+		  bytecode: ERC1155_contract.bytecode,
+		  feeLimit: 3000000000
+	  })
+
+	  return contract;
+  }
+
   return {
     async mintNft(contract_owner: string, options: MintArgs): Promise<void> {
       setSigner(contract_owner);
@@ -67,17 +89,22 @@ export async function baseTronHelperFactory(
       const balance = await provider.trx.getBalance(address);
       return new BigNumber(balance);
     },
-    async deployErc1155(owner: string): Promise<string> {
-      setSigner(owner);
+    deployErc1155: async (owner) => await deployErc1155_i(owner).then((c) => c.address),
+	async deployMinter(deployer: string, validators: string[], threshold: number): Promise<[string, string]> {
+		setSigner(deployer); // deployErc1155 sets this anyways but we don't wanna depend on side effects
+		const xpnet = await deployErc1155_i(deployer);
 
-      const contract = await provider.contract().new({
-        abi: ERC1155_abi,
-        bytecode: ERC1155_contract.bytecode,
-		feeLimit: 3000000000
-      });
+		const minter = await provider.contract().new({
+			abi: Minter_contract.abi,
+			bytecode: Minter_contract.bytecode,
+			feeLimit: 3000000000,
+			paramters: [...validators, threshold]
+		});
 
-      return contract.address;
-    },
+		await xpnet.transferOwnership(minter.address).send();
+
+		return [minter.address, xpnet.address];
+	}
   };
 }
 
@@ -85,7 +112,7 @@ export async function tronHelperFactory(
   provider: TronWeb,
   erc1155_addr: string,
   minter_addr: string,
-  minter_abi: Interface
+  minter_abi: JSON
 ): Promise<TronHelper> {
   const base = await baseTronHelperFactory(provider);
   const erc1155 = await provider.contract(ERC1155_abi, erc1155_addr);
