@@ -98,7 +98,7 @@ export async function baseTronHelperFactory(
 			abi: Minter_contract.abi,
 			bytecode: Minter_contract.bytecode,
 			feeLimit: 3000000000,
-			paramters: [...validators, threshold]
+			parameters: [validators, threshold, xpnet.address]
 		});
 
 		await xpnet.transferOwnership(minter.address).send();
@@ -123,7 +123,19 @@ export async function tronHelperFactory(
   };
 
   async function extractTxn(hash: string): Promise<[string, string]> {
-    const evs = await provider.getEventByTransactionID(hash);
+    await new Promise(r => setTimeout(r, 6000));
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getEv: () => Promise<any> = async () => {
+        const res = await provider.getEventByTransactionID(hash);
+        if (res.length !== 0) {
+            return res;
+        }
+        await new Promise(r => setTimeout(r, 3000));
+        return getEv();
+    };
+
+    const evs = await getEv();
     const ev = evs.find((e: any) => e?.contract_address == minter_addr);
     const action_id: string = ev.result["action_id"].toString();
     return [hash, action_id];
