@@ -184,7 +184,7 @@ export async function tronHelperFactory(
     ): Promise<[string, string]> {
       setSigner(sender);
       let res = await minter.freeze(chain_nonce, to).send({ callValue: value });
-      return await extractTxn(res.txID);
+      return await extractTxn(res);
     },
     async unfreezeWrapped(
       sender: string,
@@ -194,7 +194,7 @@ export async function tronHelperFactory(
     ): Promise<[string, string]> {
       setSigner(sender);
       const res = await minter.withdraw(chain_nonce, to, value).send();
-      return await extractTxn(res.txID);
+      return await extractTxn(res);
     },
     async unfreezeWrappedNft(
       sender: string,
@@ -203,7 +203,7 @@ export async function tronHelperFactory(
     ): Promise<[string, string]> {
       setSigner(sender);
       const res = await minter.withdraw_nft(to, id).send();
-      return await extractTxn(res.txID);
+      return await extractTxn(res);
     },
     async transferNftToForeign(
       sender: string,
@@ -239,7 +239,7 @@ export async function tronHelperFactory(
           .send();
       }
       ev.toString();
-      return await extractTxn(txr.txID);
+      return await extractTxn(txr);
     },
     async balanceWrappedBatch(
       address: string,
