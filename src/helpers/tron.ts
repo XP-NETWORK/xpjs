@@ -24,6 +24,7 @@ import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import * as ERC1155_contract from "../XPNet.json";
 import * as Minter_contract from "../Minter.json";
+import axios from "axios";
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
   MintNft<string, MintArgs, void> & {
@@ -110,6 +111,7 @@ export async function baseTronHelperFactory(
 
 export async function tronHelperFactory(
   provider: TronWeb,
+  middleware_uri: string,
   erc1155_addr: string,
   minter_addr: string,
   minter_abi: JSON
@@ -117,12 +119,19 @@ export async function tronHelperFactory(
   const base = await baseTronHelperFactory(provider);
   const erc1155 = await provider.contract(ERC1155_abi, erc1155_addr);
   const minter = await provider.contract(minter_abi, minter_addr);
+  const event_middleware = axios.create({
+    baseURL: middleware_uri,
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
 
   const setSigner = (signer: string) => {
     return provider.setPrivateKey(signer);
   };
 
   async function extractTxn(hash: string): Promise<[string, string]> {
+    await event_middleware.post("/tx/tron", { tx_hash: hash });
     await new Promise(r => setTimeout(r, 6000));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
