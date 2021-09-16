@@ -135,13 +135,16 @@ export async function tronHelperFactory(
     await new Promise(r => setTimeout(r, 6000));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const getEv: () => Promise<any> = async () => {
+    const getEv: (retries?: number) => Promise<any> = async (retries = 0) => {
         const res = await provider.getEventByTransactionID(hash);
         if (res.length !== 0) {
             return res;
         }
+		if (retries > 15) {
+			throw Error("Couldn't fetch transaction after more than 15 retries!");
+		}
         await new Promise(r => setTimeout(r, 3000));
-        return getEv();
+        return getEv(retries+1);
     };
 
     const evs = await getEv();
