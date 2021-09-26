@@ -25,7 +25,7 @@ import {
 import { Interface } from "ethers/lib/utils";
 import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
-import * as ERC1155_contract from "../XPNet.json";
+import * as ERC721_contract from "../XPNft.json";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import { Base64 } from "js-base64";
 type EasyBalance = string | number | EthBN;
@@ -66,12 +66,12 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
   MintNft<Signer, MintArgs, void> & {
     /**
      *
-     * Deploy an ERC1155 smart contract
+     * Deploy an ERC721 smart contract
      *
      * @argument owner  Owner of this smart contract
      * @returns Address of the deployed smart contract
      */
-    deployErc1155(owner: Signer): Promise<string>;
+    deployErc721(owner: Signer): Promise<string>;
   };
 
 /**
@@ -105,7 +105,7 @@ export async function baseWeb3HelperFactory(
   provider: Provider
 ): Promise<BaseWeb3Helper> {
   const w3 = provider;
-  const erc1155_abi = new Interface(ERC1155_abi);
+  const erc721_abi = new Interface(ERC721_abi);
 
   return {
     async balance(address: string): Promise<BigNumber> {
@@ -114,8 +114,8 @@ export async function baseWeb3HelperFactory(
       // ethers BigNumber is not compatible with our bignumber
       return new BigNumber(bal.toString());
     },
-    async deployErc1155(owner: Signer): Promise<string> {
-      const factory = ContractFactory.fromSolidity(ERC1155_contract, owner);
+    async deployErc721(owner: Signer): Promise<string> {
+      const factory = ContractFactory.fromSolidity(ERC721_contract, owner);
       const contract = await factory.deploy();
 
       return contract.address;
@@ -124,9 +124,9 @@ export async function baseWeb3HelperFactory(
       contract_owner: Signer,
       { contract, token, owner, uri }: MintArgs
     ): Promise<void> {
-      const erc1155 = new Contract(contract, erc1155_abi, contract_owner);
-      await erc1155.mint(owner, EthBN.from(token.toString()), 1);
-      await erc1155.setURI(token, uri);
+      const erc721 = new Contract(contract, erc721_abi, contract_owner);
+      await erc721.mint(owner, EthBN.from(token.toString()));
+      await erc721.setURI(token, uri);
     },
   };
 }

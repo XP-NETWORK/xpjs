@@ -43,12 +43,12 @@ export declare type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 MintNft<Signer, MintArgs, void> & {
     /**
      *
-     * Deploy an ERC1155 smart contract
+     * Deploy an ERC721 smart contract
      *
      * @argument owner  Owner of this smart contract
      * @returns Address of the deployed smart contract
      */
-    deployErc1155(owner: Signer): Promise<string>;
+    deployErc721(owner: Signer): Promise<string>;
 };
 /**
  * Traits implemented by this module
