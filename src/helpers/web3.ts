@@ -124,9 +124,10 @@ export async function baseWeb3HelperFactory(
       contract_owner: Signer,
       { contract, token, owner, uri }: MintArgs
     ): Promise<void> {
+      const tok = EthBN.from(token.toString());
       const erc721 = new Contract(contract, erc721_abi, contract_owner);
-      await erc721.mint(owner, EthBN.from(token.toString()));
-      await erc721.setURI(token, uri);
+      await erc721.mint(owner, tok);
+      await erc721.setURI(tok, uri);
     },
   };
 }
