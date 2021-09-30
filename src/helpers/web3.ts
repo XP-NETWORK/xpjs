@@ -126,8 +126,12 @@ export async function baseWeb3HelperFactory(
     ): Promise<void> {
       const tok = EthBN.from(token.toString());
       const erc721 = new Contract(contract, erc721_abi, contract_owner);
-      await erc721.mint(owner, tok);
-      await erc721.setURI(tok, uri);
+
+      const txm = await erc721.mint(owner, tok);
+      await txm.wait();
+
+      const txt = await erc721.setURI(tok, uri);
+      await txt.wait();
     },
   };
 }
