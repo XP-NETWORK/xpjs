@@ -52,9 +52,11 @@ export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<string, string, string, string, string> &
-  TransferNftForeign<string, string, EthNftInfo, string, string> &
+  // TODO: Use TX Fees
+  TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> &
+  // TODO: Use TX Fees
   UnfreezeForeign<string, string, string, string, string> &
-  UnfreezeForeignNft<string, string, BigNumber, string, string> &
+  UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> &
   DecodeWrappedNft<string> &
   DecodeRawNft & {
     nftUri(info: EthNftInfo): Promise<string>;

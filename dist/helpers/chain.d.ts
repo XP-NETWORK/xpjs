@@ -9,7 +9,7 @@
  * @returns Transaction and the Identifier of this action to track the status
  */
 export interface TransferForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
-    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance): Promise<[Tx, EventIdent]>;
+    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<[Tx, EventIdent]>;
 }
 /**
  * Unfreeze native liquidity existing on a foreign chain(Send back Liquidity)
@@ -22,7 +22,7 @@ export interface TransferForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
  * @returns Transaction and the Identifier of this action to track the status
  */
 export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
-    unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance): Promise<[Tx, EventIdent]>;
+    unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<[Tx, EventIdent]>;
 }
 /**
  * Transfer NFT to a foreign chain, freezing the original one
@@ -34,8 +34,8 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<Signer, ForeignAddr, NftIdent, Tx, EventIdent> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftIdent): Promise<[Tx, EventIdent]>;
+export interface TransferNftForeign<Signer, ForeignAddr, Balance, NftIdent, Tx, EventIdent> {
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftIdent, txFees: Balance): Promise<[Tx, EventIdent]>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
@@ -47,8 +47,8 @@ export interface TransferNftForeign<Signer, ForeignAddr, NftIdent, Tx, EventIden
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<Signer, ForeignAddr, NftIdent, Tx, EventIdent> {
-    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftIdent): Promise<[Tx, EventIdent]>;
+export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, NftIdent, Tx, EventIdent> {
+    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftIdent, txFees: Balance): Promise<[Tx, EventIdent]>;
 }
 /**
  * Get the balance of an address on the chain

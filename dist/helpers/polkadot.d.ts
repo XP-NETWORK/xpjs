@@ -24,7 +24,7 @@ export declare type PolkadotHelper = BasePolkadot & TransferForeign<Signer, stri
 /**
  * Traits implemented by this module
  */
-export declare type PolkadotPalletHelper = PolkadotHelper & WrappedBalanceCheck<EasyAddr, BigNumber> & BatchWrappedBalanceCheck<EasyAddr, BigNumber> & TransferNftForeign<Signer, string, H256, Hash, EventIdent> & UnfreezeForeignNft<Signer, string, H256, Hash, EventIdent> & MintNft<Signer, Uint8Array, void> & ListNft<EasyAddr, string, Uint8Array> & GetLockedNft<H256, Uint8Array> & DecodeWrappedNft<Uint8Array> & DecodeRawNft;
+export declare type PolkadotPalletHelper = PolkadotHelper & WrappedBalanceCheck<EasyAddr, BigNumber> & BatchWrappedBalanceCheck<EasyAddr, BigNumber> & TransferNftForeign<Signer, string, EasyBalance, H256, Hash, EventIdent> & UnfreezeForeignNft<Signer, string, EasyBalance, H256, Hash, EventIdent> & MintNft<Signer, Uint8Array, void> & ListNft<EasyAddr, string, Uint8Array> & GetLockedNft<H256, Uint8Array> & DecodeWrappedNft<Uint8Array> & DecodeRawNft;
 /**
  * @internal
  */

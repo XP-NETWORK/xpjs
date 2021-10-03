@@ -13,7 +13,8 @@ export interface TransferForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
-    value: Balance
+    value: Balance,
+    txFees: Balance
   ): Promise<[Tx, EventIdent]>;
 }
 
@@ -32,7 +33,8 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
-    value: Balance
+    value: Balance,
+    txFees: Balance
   ): Promise<[Tx, EventIdent]>;
 }
 
@@ -49,6 +51,7 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
 export interface TransferNftForeign<
   Signer,
   ForeignAddr,
+  Balance,
   NftIdent,
   Tx,
   EventIdent
@@ -57,7 +60,8 @@ export interface TransferNftForeign<
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
-    id: NftIdent
+    id: NftIdent,
+    txFees: Balance
   ): Promise<[Tx, EventIdent]>;
 }
 
@@ -74,6 +78,7 @@ export interface TransferNftForeign<
 export interface UnfreezeForeignNft<
   Signer,
   ForeignAddr,
+  Balance,
   NftIdent,
   Tx,
   EventIdent
@@ -81,7 +86,8 @@ export interface UnfreezeForeignNft<
   unfreezeWrappedNft(
     sender: Signer,
     to: ForeignAddr,
-    id: NftIdent
+    id: NftIdent,
+    txFees: Balance
   ): Promise<[Tx, EventIdent]>;
 }
 
