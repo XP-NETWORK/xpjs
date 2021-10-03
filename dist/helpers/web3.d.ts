@@ -3,7 +3,7 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, WrappedNft, DecodeRawNft, MintNft } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft } from "./chain";
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
@@ -58,7 +58,7 @@ export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, Bi
      */
     nftUri(info: EthNftInfo): Promise<string>;
     estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
-    estimateValidateUnfreezeNft(validators: string[], to: string, nft: WrappedNft): Promise<BigNumber>;
+    estimateValidateUnfreezeNft(validators: string[], to: string, nft: Uint8Array): Promise<BigNumber>;
 };
 /**
  * Create an object implementing minimal utilities for a web3 chain

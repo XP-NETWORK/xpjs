@@ -90,7 +90,7 @@ export type Web3Helper = BaseWeb3Helper &
      */
     nftUri(info: EthNftInfo): Promise<string>;
     estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
-    estimateValidateUnfreezeNft(validators: string[], to: string, nft: WrappedNft): Promise<BigNumber>;
+    estimateValidateUnfreezeNft(validators: string[], to: string, nft: Uint8Array): Promise<BigNumber>;
   };
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
@@ -322,8 +322,8 @@ export async function web3HelperFactory(
 
       return await estimateGas(validators, utx);
     },
-    async estimateValidateUnfreezeNft(validators: string[], to: string, nft: WrappedNft): Promise<BigNumber> {
-      const nft_dat = NftEthNative.deserializeBinary(nft.data);
+    async estimateValidateUnfreezeNft(validators: string[], to: string, nft_data: Uint8Array): Promise<BigNumber> {
+      const nft_dat = NftEthNative.deserializeBinary(nft_data);
       const utx = await minter.populateTransaction.validate_unfreeze_nft(
         randomAction(),
         to,
