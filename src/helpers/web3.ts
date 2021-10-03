@@ -16,7 +16,7 @@ import {
   DecodeRawNft,
   MintNft,
 } from "./chain";
-import { Contract, Signer, BigNumber as EthBN, ContractFactory } from "ethers";
+import { Contract, Signer, BigNumber as EthBN, ContractFactory, PopulatedTransaction } from "ethers";
 import {
   TransactionReceipt,
   TransactionResponse,
@@ -89,6 +89,8 @@ export type Web3Helper = BaseWeb3Helper &
      * Get the uri of an nft given nft info
      */
     nftUri(info: EthNftInfo): Promise<string>;
+    estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
+    estimateValidateUnfreezeNft(validators: string[], to: string, nft: WrappedNft): Promise<BigNumber>;
   };
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
@@ -179,6 +181,21 @@ export async function web3HelperFactory(
       const erc = new Contract(info.contract, erc1155_abi, w3);
       return await erc.uri(info.token);
     }
+  }
+
+  const randomAction = () => EthBN.from(Math.floor(Math.random() * (999) + (Number.MAX_SAFE_INTEGER - 1000)));
+
+  async function estimateGas(addrs: string[], utx: PopulatedTransaction): Promise<BigNumber> {
+    let fee = EthBN.from(0);
+
+    for (const [i, addr] of addrs.entries()) {
+      utx.from = addr;
+      let tf = await w3.estimateGas(utx);
+      if (i == addrs.length - 1) tf = tf.mul(1.1);
+      fee = fee.add(tf);
+    }
+
+    return new BigNumber(fee.toString());
   }
 
   const base = await baseWeb3HelperFactory(provider);
@@ -295,5 +312,35 @@ export async function web3HelperFactory(
 
       return await nftUri(nft_info);
     },
+    async estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber> {
+      // Protobuf is not deterministic, though perhaps we can approximate this statically
+      const tokdat = new NftEthNative();
+      tokdat.setId(nft.token.toString());
+      tokdat.setNftKind(1);
+      tokdat.setContractAddr(nft.contract);
+
+      const encoded = new NftPacked();
+      encoded.setChainNonce(0x1351);
+      encoded.setData(tokdat.serializeBinary());
+
+      const utx = await minter.populateTransaction.validate_transfer_nft(
+        randomAction(),
+        to,
+        Buffer.from(encoded.serializeBinary()).toString("base64")
+      )
+
+      return await estimateGas(validators, utx);
+    },
+    async estimateValidateUnfreezeNft(validators: string[], to: string, nft: WrappedNft): Promise<BigNumber> {
+      const nft_dat = NftEthNative.deserializeBinary(nft.data);
+      const utx = await minter.populateTransaction.validate_unfreeze_nft(
+        randomAction(),
+        to,
+        EthBN.from(nft_dat.getId().toString()),
+        nft_dat.getContractAddr()
+      )
+
+      return await estimateGas(validators, utx);
+    }
   };
 }
