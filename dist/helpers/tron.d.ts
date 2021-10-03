@@ -22,7 +22,7 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<s
      */
     deployMinter(deployer: string, validators: string[], threshold: number): Promise<[string, string]>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, string, string, string> & TransferNftForeign<string, string, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & {
+export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, string, string, string> & TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & {
     nftUri(info: EthNftInfo): Promise<string>;
 };
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;

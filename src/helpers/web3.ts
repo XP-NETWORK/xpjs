@@ -80,9 +80,9 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
-  TransferNftForeign<Signer, string, EthNftInfo, TransactionReceipt, string> &
+  TransferNftForeign<Signer, string, EasyBalance, EthNftInfo, TransactionReceipt, string> &
   UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
-  UnfreezeForeignNft<Signer, string, BigNumber, TransactionReceipt, string> &
+  UnfreezeForeignNft<Signer, string, EasyBalance, BigNumber, TransactionReceipt, string> &
   DecodeWrappedNft<string> &
   DecodeRawNft & {
     /**
@@ -227,68 +227,59 @@ export async function web3HelperFactory(
       sender: Signer,
       chain_nonce: number,
       to: string,
-      value: EasyBalance
+      value: EasyBalance,
+      txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const res = await signedMinter(sender).freeze(chain_nonce, to, { value });
+      const totalVal = EthBN.from(value.toString()).add(EthBN.from(txFees.toString()));
+      const res = await signedMinter(sender).freeze(chain_nonce, to, { value: totalVal });
       return await extractTxn(res, "Transfer");
     },
     async transferNftToForeign(
       sender: Signer,
       chain_nonce: number,
       to: string,
-      id: EthNftInfo
+      id: EthNftInfo,
+      txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      let txr;
-      let ev;
-      const calldata = Buffer.concat([
-        Buffer.from(new Int32Array([0]).buffer), // 4 bytes padidng
-        Buffer.from(new Int32Array([chain_nonce]).buffer).reverse(), // BE, gotta reverse
-        Buffer.from(to, "utf-8"),
-      ]);
+      const erc = new Contract(id.contract, ERC721_abi, w3);
+      const ta = await erc
+        .connect(sender)
+        .approve(
+          await sender.getAddress(),
+          id.token,
+        );
 
-      if (id.contract_type == "ERC721") {
-        ev = "TransferErc721";
-        const erc = new Contract(id.contract, ERC721_abi, w3);
-        txr = await erc
-          .connect(sender)
-          ["safeTransferFrom(address,address,uint256,bytes)"](
-            await sender.getAddress(),
-            minter_addr,
-            id.token,
-            calldata
-          );
-      } else {
-        ev = "TransferErc1155";
-        const erc = new Contract(id.contract, erc1155_abi, w3);
-        txr = await erc
-          .connect(sender)
-          .safeTransferFrom(
-            await sender.getAddress(),
-            minter_addr,
-            id.token,
-            EthBN.from(1),
-            calldata
-          );
-      }
+        await ta.wait();
 
-      return await extractTxn(txr, ev);
+        const txr = await minter.connect(sender)
+          .freeze_erc721(
+            id.contract,
+            id.token,
+            chain_nonce,
+            to,
+            { value: EthBN.from(txFees.toString()) }
+          );
+
+      return await extractTxn(txr, "TransferErc721");
     },
     async unfreezeWrapped(
       sender: Signer,
       chain_nonce: number,
       to: string,
-      value: EasyBalance
+      value: EasyBalance,
+      txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const res = await signedMinter(sender).withdraw(chain_nonce, to, value);
+      const res = await signedMinter(sender).withdraw(chain_nonce, to, value, { value: EthBN.from(txFees.toString()) });
 
       return await extractTxn(res, "Unfreeze");
     },
     async unfreezeWrappedNft(
       sender: Signer,
       to: string,
-      id: BigNumber
+      id: BigNumber,
+      txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const res = await signedMinter(sender).withdraw_nft(to, id);
+      const res = await signedMinter(sender).withdraw_nft(to, id, { value: EthBN.from(txFees.toString()) });
 
       return await extractTxn(res, "UnfreezeNft");
     },
