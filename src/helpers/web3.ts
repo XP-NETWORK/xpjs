@@ -192,8 +192,7 @@ export async function web3HelperFactory(
       if (i == addrs.length - 1 && addrs.length != 1) tf = tf.mul(2);
       fee = fee.add(tf);
     }
-    // convert gwei to wei then multiply by gas price
-    fee = fee.mul(1e9).mul(await w3.getGasPrice())
+    fee = fee.mul(await w3.getGasPrice())
 
     return new BigNumber(fee.toString());
   }
