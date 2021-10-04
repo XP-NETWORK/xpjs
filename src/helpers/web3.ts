@@ -189,7 +189,7 @@ export async function web3HelperFactory(
     for (const [i, addr] of addrs.entries()) {
       utx.from = addr;
       let tf = await w3.estimateGas(utx);
-      if (i == addrs.length - 1) tf = tf.mul(1.1);
+      if (i == addrs.length - 1) tf = tf.mul(2);
       fee = fee.add(tf);
     }
 
