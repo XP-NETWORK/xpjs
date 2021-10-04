@@ -48,7 +48,6 @@ export type EthNftInfo = {
  */
 export type MintArgs = {
   contract: string;
-  token: EasyBalance;
   uri: string;
 };
 
@@ -123,12 +122,11 @@ export async function baseWeb3HelperFactory(
     },
     async mintNft(
       owner: Signer,
-      { contract, token, uri }: MintArgs
+      { contract, uri }: MintArgs
     ): Promise<void> {
-      const tok = EthBN.from(token.toString());
       const erc721 = new Contract(contract, erc721_abi, owner);
 
-      const txm = await erc721.mint(tok, uri);
+      const txm = await erc721.mint(uri);
       await txm.wait();
     },
   };

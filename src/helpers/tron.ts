@@ -85,7 +85,7 @@ export async function baseTronHelperFactory(
     async mintNft(owner: string, options: MintArgs): Promise<void> {
       setSigner(owner);
       const erc = await provider.contract(ERC721_abi, options.contract);
-      await erc.mint(EthBN.from(options.token.toString()), options.uri).send();
+      await erc.mint(options.uri).send();
     },
     async balance(address: string): Promise<BigNumber> {
       const balance = await provider.trx.getBalance(address);

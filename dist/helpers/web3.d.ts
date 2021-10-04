@@ -26,7 +26,6 @@ export declare type EthNftInfo = {
  */
 export declare type MintArgs = {
     contract: string;
-    token: EasyBalance;
     uri: string;
 };
 /**
