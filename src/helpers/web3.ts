@@ -243,7 +243,7 @@ export async function web3HelperFactory(
       const ta = await erc
         .connect(sender)
         .approve(
-          await sender.getAddress(),
+          minter.address,
           id.token,
         );
 
