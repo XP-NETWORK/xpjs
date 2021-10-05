@@ -10,20 +10,12 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<s
      * @argument owner  Owner of this smart contract
      * @returns Address of the deployed smart contract
      */
-    deployErc1155(owner: string): Promise<string>;
-    /**
-     * Deploy Minter Smart Contract
-     *
-     * @argument deployer  deployer of the smart contract
-     * @argument validators  address of validators of the smart contract
-     * @argument threshold  threshold for executing an action
-     *
-     * @returns minter address, wrapper token address
-     */
-    deployMinter(deployer: string, validators: string[], threshold: number): Promise<[string, string]>;
+    deployErc721(owner: string): Promise<string>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, string, string, string> & TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & {
+export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, string, string, string> & TransferNftForeign<string, string, string, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, string, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & {
     nftUri(info: EthNftInfo): Promise<string>;
+    estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
+    estimateValidateUnfreezeNft(validators: string[], to: string, nft: Uint8Array): Promise<BigNumber>;
 };
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export declare function tronHelperFactory(provider: TronWeb, middleware_uri: string, erc1155_addr: string, minter_addr: string, minter_abi: JSON): Promise<TronHelper>;
