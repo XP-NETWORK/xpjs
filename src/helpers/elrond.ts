@@ -186,8 +186,22 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
   // TODO: Use TX Fees
   UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
-  TransferNftForeign<ISigner, string, EasyBalance, NftInfo, Transaction, EventIdent> &
-  UnfreezeForeignNft<ISigner, string, EasyBalance, number, Transaction, EventIdent> &
+  TransferNftForeign<
+    ISigner,
+    string,
+    EasyBalance,
+    NftInfo,
+    Transaction,
+    EventIdent
+  > &
+  UnfreezeForeignNft<
+    ISigner,
+    string,
+    EasyBalance,
+    number,
+    Transaction,
+    EventIdent
+  > &
   IssueESDTNFT &
   MintNft<ISigner, NftIssueArgs, void> &
   ListNft<string, string, EsdtNftInfo> &
