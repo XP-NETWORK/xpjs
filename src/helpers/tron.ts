@@ -19,11 +19,9 @@ import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
-import { abi as ERC721_abi } from "../fakeERC721.json";
+import { abi as ERC721_abi, bytecode as ERC721_bytecode } from "../fakeERC721.json";
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
-import * as ERC1155_contract from "../XPNet.json";
-import * as Minter_contract from "../Minter.json";
 import axios from "axios";
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
@@ -35,17 +33,7 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
      * @argument owner  Owner of this smart contract
      * @returns Address of the deployed smart contract
      */
-    deployErc1155(owner: string): Promise<string>;
-	/**
-	 * Deploy Minter Smart Contract
-	 *
-	 * @argument deployer  deployer of the smart contract
-	 * @argument validators  address of validators of the smart contract
-	 * @argument threshold  threshold for executing an action
-	 *
-	 * @returns minter address, wrapper token address
-	 */
-	deployMinter(deployer: string, validators: string[], threshold: number): Promise<[string, string]>;
+    deployErc721(owner: string): Promise<string>;
   };
 
 export type TronHelper = BaseTronHelper &
@@ -53,13 +41,15 @@ export type TronHelper = BaseTronHelper &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<string, string, string, string, string> &
   // TODO: Use TX Fees
-  TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> &
+  TransferNftForeign<string, string, string, EthNftInfo, string, string> &
   // TODO: Use TX Fees
   UnfreezeForeign<string, string, string, string, string> &
-  UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> &
+  UnfreezeForeignNft<string, string, string, BigNumber, string, string> &
   DecodeWrappedNft<string> &
   DecodeRawNft & {
     nftUri(info: EthNftInfo): Promise<string>;
+    estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
+    estimateValidateUnfreezeNft(validators: string[], to: string, nft: Uint8Array): Promise<BigNumber>;
   };
 
 export async function baseTronHelperFactory(
@@ -69,12 +59,12 @@ export async function baseTronHelperFactory(
     return provider.setPrivateKey(signer);
   };
 
-  const deployErc1155_i = async (owner: string) => {
+  const deployErc721_i = async (owner: string) => {
 	  setSigner(owner);
 
 	  const contract = await provider.contract().new({
-		  abi: ERC1155_abi,
-		  bytecode: ERC1155_contract.bytecode,
+		  abi: ERC721_abi,
+		  bytecode: ERC721_bytecode,
 		  feeLimit: 3000000000
 	  })
 
@@ -91,22 +81,7 @@ export async function baseTronHelperFactory(
       const balance = await provider.trx.getBalance(address);
       return new BigNumber(balance);
     },
-    deployErc1155: async (owner) => await deployErc1155_i(owner).then((c) => c.address),
-	async deployMinter(deployer: string, validators: string[], threshold: number): Promise<[string, string]> {
-		setSigner(deployer); // deployErc1155 sets this anyways but we don't wanna depend on side effects
-		const xpnet = await deployErc1155_i(deployer);
-
-		const minter = await provider.contract().new({
-			abi: Minter_contract.abi,
-			bytecode: Minter_contract.bytecode,
-			feeLimit: 3000000000,
-			parameters: [validators, threshold, xpnet.address]
-		});
-
-		await xpnet.transferOwnership(minter.address).send();
-
-		return [minter.address, xpnet.address];
-	}
+    deployErc721: async (owner) => await deployErc721_i(owner).then((c) => c.address),
   };
 }
 
@@ -168,6 +143,22 @@ export async function tronHelperFactory(
     return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155";
   }
 
+  const randomAction = () => EthBN.from(Math.floor(Math.random() * (999) + (Number.MAX_SAFE_INTEGER - 1000)));
+
+  async function estimateGas(addrs: string[], utx: any): Promise<BigNumber> {
+    let fee = EthBN.from(0);
+
+    for (const [i, addr] of addrs.entries()) {
+      utx.from = addr;
+      let tf = EthBN.from(400000); // TODO: Proper estimate
+      if (i == addrs.length - 1 && addrs.length != 1) tf = tf.mul(2);
+      fee = fee.add(tf);
+    }
+    fee = fee.mul(1.41e14) // TODO: proper gas price estimate
+
+    return new BigNumber(fee.toString());
+  }
+
   return {
     ...base,
     async decodeUrlFromRaw(data: Uint8Array): Promise<string> {
@@ -193,65 +184,61 @@ export async function tronHelperFactory(
       sender: string,
       chain_nonce: number,
       to: string,
-      value: string
+      value: string,
+      txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-      let res = await minter.freeze(chain_nonce, to).send({ callValue: value });
+  
+      const totalVal = EthBN.from(value.toString()).add(EthBN.from(txFees.toString()));
+      let res = await minter.freeze(chain_nonce, to).send({ callValue: totalVal });
       return await extractTxn(res);
     },
     async unfreezeWrapped(
       sender: string,
       chain_nonce: number,
       to: string,
-      value: string
+      value: string,
+      txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-      const res = await minter.withdraw(chain_nonce, to, value).send();
+      const res = await minter.withdraw(chain_nonce, to, value).send(
+        { callValue: EthBN.from(txFees.toString()) }
+      );
       return await extractTxn(res);
     },
     async unfreezeWrappedNft(
       sender: string,
       to: string,
-      id: BigNumber
+      id: BigNumber,
+      txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-      const res = await minter.withdraw_nft(to, id).send();
+      const res = await minter.withdraw_nft(to, id).send(
+        { callValue: EthBN.from(txFees.toString()) }
+      );
       return await extractTxn(res);
     },
     async transferNftToForeign(
       sender: string,
       chain_nonce: number,
       to: string,
-      id: EthNftInfo
+      id: EthNftInfo,
+      txFees: string
     ): Promise<[string, string]> {
-      let txr;
-      let ev;
-      const call_data = Buffer.concat([
-        Buffer.from(new Int32Array([0]).buffer), // 4 bytes padding
-        Buffer.from(new Int32Array([chain_nonce]).buffer).reverse(), // BE, gotta reverse
-        Buffer.from(to, "utf-8"),
-      ]);
       setSigner(sender);
-      if (id.contract_type == "ERC721") {
-        ev = "TransferErc721";
-        const erc = await provider.contract(ERC721_abi, id.contract);
-        await erc
-          .safeTransferFrom(provider.defaultAddress.base58, minter_addr, id.token, call_data)
-          .send();
-      } else {
-        ev = "TransferErc1155";
-        const erc = await provider.contract(ERC1155_abi, id.contract);
-        txr = await erc
-          .safeTransferFrom(
-            provider.defaultAddress.base58,
-            minter_addr,
-            id.token,
-            EthBN.from(1),
-            call_data
-          )
-          .send();
-      }
-      ev.toString();
+      const erc = await provider.contract(ERC721_abi, id.contract);
+      await erc.approve(
+          minter.address,
+          id.token,
+      ).send();
+
+      const txr = await minter.freeze_erc721(
+          id.contract,
+          id.token,
+          chain_nonce,
+          to
+        ).send({ callValue: EthBN.from(txFees.toString()) });
+
       return await extractTxn(txr);
     },
     async balanceWrappedBatch(
@@ -274,5 +261,35 @@ export async function tronHelperFactory(
       const bal = await erc1155.balanceOf(address, chain_nonce).call();
       return new BigNumber(bal.toString());
     },
+    async estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber> {
+      // Protobuf is not deterministic, though perhaps we can approximate this statically
+      const tokdat = new NftEthNative();
+      tokdat.setId(nft.token.toString());
+      tokdat.setNftKind(1);
+      tokdat.setContractAddr(nft.contract);
+
+      const encoded = new NftPacked();
+      encoded.setChainNonce(0x1351);
+      encoded.setData(tokdat.serializeBinary());
+
+      const utx = minter.validate_transfer_nft(
+        randomAction(),
+        to,
+        Buffer.from(encoded.serializeBinary()).toString("base64")
+      )
+
+      return await estimateGas(validators, utx);
+    },
+    async estimateValidateUnfreezeNft(validators: string[], to: string, nft_data: Uint8Array): Promise<BigNumber> {
+      const nft_dat = NftEthNative.deserializeBinary(nft_data);
+      const utx = minter.validate_unfreeze_nft(
+        randomAction(),
+        to,
+        EthBN.from(nft_dat.getId().toString()),
+        nft_dat.getContractAddr()
+      )
+
+      return await estimateGas(validators, utx);
+    }
   };
 }
