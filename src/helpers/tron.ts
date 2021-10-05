@@ -19,7 +19,10 @@ import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
-import { abi as ERC721_abi, bytecode as ERC721_bytecode } from "../fakeERC721.json";
+import {
+  abi as ERC721_abi,
+  bytecode as ERC721_bytecode,
+} from "../fakeERC721.json";
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import axios from "axios";
@@ -48,8 +51,16 @@ export type TronHelper = BaseTronHelper &
   DecodeWrappedNft<string> &
   DecodeRawNft & {
     nftUri(info: EthNftInfo): Promise<string>;
-    estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
-    estimateValidateUnfreezeNft(validators: string[], to: string, nft: Uint8Array): Promise<BigNumber>;
+    estimateValidateTransferNft(
+      validators: string[],
+      to: string,
+      nft: EthNftInfo
+    ): Promise<BigNumber>;
+    estimateValidateUnfreezeNft(
+      validators: string[],
+      to: string,
+      nft: Uint8Array
+    ): Promise<BigNumber>;
   };
 
 export async function baseTronHelperFactory(
@@ -60,16 +71,16 @@ export async function baseTronHelperFactory(
   };
 
   const deployErc721_i = async (owner: string) => {
-	  setSigner(owner);
+    setSigner(owner);
 
-	  const contract = await provider.contract().new({
-		  abi: ERC721_abi,
-		  bytecode: ERC721_bytecode,
-		  feeLimit: 3000000000
-	  })
+    const contract = await provider.contract().new({
+      abi: ERC721_abi,
+      bytecode: ERC721_bytecode,
+      feeLimit: 3000000000,
+    });
 
-	  return contract;
-  }
+    return contract;
+  };
 
   return {
     async mintNft(owner: string, options: MintArgs): Promise<void> {
@@ -81,7 +92,8 @@ export async function baseTronHelperFactory(
       const balance = await provider.trx.getBalance(address);
       return new BigNumber(balance);
     },
-    deployErc721: async (owner) => await deployErc721_i(owner).then((c) => c.address),
+    deployErc721: async (owner) =>
+      await deployErc721_i(owner).then((c) => c.address),
   };
 }
 
@@ -98,8 +110,8 @@ export async function tronHelperFactory(
   const event_middleware = axios.create({
     baseURL: middleware_uri,
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   const setSigner = (signer: string) => {
@@ -108,19 +120,19 @@ export async function tronHelperFactory(
 
   async function extractTxn(hash: string): Promise<[string, string]> {
     await event_middleware.post("/tx/tron", { tx_hash: hash });
-    await new Promise(r => setTimeout(r, 6000));
+    await new Promise((r) => setTimeout(r, 6000));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getEv: (retries?: number) => Promise<any> = async (retries = 0) => {
-        const res = await provider.getEventByTransactionID(hash);
-        if (res.length !== 0) {
-            return res;
-        }
-		if (retries > 15) {
-			throw Error("Couldn't fetch transaction after more than 15 retries!");
-		}
-        await new Promise(r => setTimeout(r, 3000));
-        return getEv(retries+1);
+      const res = await provider.getEventByTransactionID(hash);
+      if (res.length !== 0) {
+        return res;
+      }
+      if (retries > 15) {
+        throw Error("Couldn't fetch transaction after more than 15 retries!");
+      }
+      await new Promise((r) => setTimeout(r, 3000));
+      return getEv(retries + 1);
     };
 
     const evs = await getEv();
@@ -143,7 +155,10 @@ export async function tronHelperFactory(
     return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155";
   }
 
-  const randomAction = () => EthBN.from(Math.floor(Math.random() * (999) + (Number.MAX_SAFE_INTEGER - 1000)));
+  const randomAction = () =>
+    EthBN.from(
+      Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000))
+    );
 
   async function estimateGas(addrs: string[], utx: any): Promise<BigNumber> {
     let fee = EthBN.from(0);
@@ -154,7 +169,7 @@ export async function tronHelperFactory(
       if (i == addrs.length - 1 && addrs.length != 1) tf = tf.mul(2);
       fee = fee.add(tf);
     }
-    fee = fee.mul(1.41e14) // TODO: proper gas price estimate
+    fee = fee.mul(1.41e14); // TODO: proper gas price estimate
 
     return new BigNumber(fee.toString());
   }
@@ -188,9 +203,13 @@ export async function tronHelperFactory(
       txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-  
-      const totalVal = EthBN.from(value.toString()).add(EthBN.from(txFees.toString()));
-      let res = await minter.freeze(chain_nonce, to).send({ callValue: totalVal });
+
+      const totalVal = EthBN.from(value.toString()).add(
+        EthBN.from(txFees.toString())
+      );
+      let res = await minter
+        .freeze(chain_nonce, to)
+        .send({ callValue: totalVal });
       return await extractTxn(res);
     },
     async unfreezeWrapped(
@@ -201,9 +220,9 @@ export async function tronHelperFactory(
       txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-      const res = await minter.withdraw(chain_nonce, to, value).send(
-        { callValue: EthBN.from(txFees.toString()) }
-      );
+      const res = await minter
+        .withdraw(chain_nonce, to, value)
+        .send({ callValue: EthBN.from(txFees.toString()) });
       return await extractTxn(res);
     },
     async unfreezeWrappedNft(
@@ -213,9 +232,9 @@ export async function tronHelperFactory(
       txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-      const res = await minter.withdraw_nft(to, id).send(
-        { callValue: EthBN.from(txFees.toString()) }
-      );
+      const res = await minter
+        .withdraw_nft(to, id)
+        .send({ callValue: EthBN.from(txFees.toString()) });
       return await extractTxn(res);
     },
     async transferNftToForeign(
@@ -227,17 +246,11 @@ export async function tronHelperFactory(
     ): Promise<[string, string]> {
       setSigner(sender);
       const erc = await provider.contract(ERC721_abi, id.contract);
-      await erc.approve(
-          minter.address,
-          id.token,
-      ).send();
+      await erc.approve(minter.address, id.token).send();
 
-      const txr = await minter.freeze_erc721(
-          id.contract,
-          id.token,
-          chain_nonce,
-          to
-        ).send({ callValue: EthBN.from(txFees.toString()) });
+      const txr = await minter
+        .freeze_erc721(id.contract, id.token, chain_nonce, to)
+        .send({ callValue: EthBN.from(txFees.toString()) });
 
       return await extractTxn(txr);
     },
@@ -261,7 +274,11 @@ export async function tronHelperFactory(
       const bal = await erc1155.balanceOf(address, chain_nonce).call();
       return new BigNumber(bal.toString());
     },
-    async estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber> {
+    async estimateValidateTransferNft(
+      validators: string[],
+      to: string,
+      nft: EthNftInfo
+    ): Promise<BigNumber> {
       // Protobuf is not deterministic, though perhaps we can approximate this statically
       const tokdat = new NftEthNative();
       tokdat.setId(nft.token.toString());
@@ -276,20 +293,24 @@ export async function tronHelperFactory(
         randomAction(),
         to,
         Buffer.from(encoded.serializeBinary()).toString("base64")
-      )
+      );
 
       return await estimateGas(validators, utx);
     },
-    async estimateValidateUnfreezeNft(validators: string[], to: string, nft_data: Uint8Array): Promise<BigNumber> {
+    async estimateValidateUnfreezeNft(
+      validators: string[],
+      to: string,
+      nft_data: Uint8Array
+    ): Promise<BigNumber> {
       const nft_dat = NftEthNative.deserializeBinary(nft_data);
       const utx = minter.validate_unfreeze_nft(
         randomAction(),
         to,
         EthBN.from(nft_dat.getId().toString()),
         nft_dat.getContractAddr()
-      )
+      );
 
       return await estimateGas(validators, utx);
-    }
+    },
   };
 }
