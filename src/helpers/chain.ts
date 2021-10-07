@@ -157,6 +157,19 @@ export interface DecodeRawNft {
   decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
 
+export interface EstimateTxFees<Address, NftId, WrappedNftData, Balance> {
+  estimateValidateTransferNft(
+    validators: Address[],
+    to: Address,
+    nft: NftId
+  ): Promise<Balance>;
+  estimateValidateUnfreezeNft(
+    validators: Address[],
+    to: Address,
+    nft: WrappedNftData
+  ): Promise<Balance>;
+}
+
 export function ConcurrentSendError(): Error {
   return new Error("concurrent_send");
 }

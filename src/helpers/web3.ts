@@ -34,6 +34,7 @@ import { abi as ERC1155_abi } from "../fakeERC1155.json";
 import * as ERC721_contract from "../XPNft.json";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import { Base64 } from "js-base64";
+import { EstimateTxFees } from "..";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -103,21 +104,11 @@ export type Web3Helper = BaseWeb3Helper &
     string
   > &
   DecodeWrappedNft<string> &
-  DecodeRawNft & {
+  DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
     /**
      * Get the uri of an nft given nft info
      */
     nftUri(info: EthNftInfo): Promise<string>;
-    estimateValidateTransferNft(
-      validators: string[],
-      to: string,
-      nft: EthNftInfo
-    ): Promise<BigNumber>;
-    estimateValidateUnfreezeNft(
-      validators: string[],
-      to: string,
-      nft: Uint8Array
-    ): Promise<BigNumber>;
   };
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {

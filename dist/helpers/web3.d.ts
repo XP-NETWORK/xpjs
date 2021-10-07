@@ -7,6 +7,7 @@ import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, Tra
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
 import { Interface } from "ethers/lib/utils";
+import { EstimateTxFees } from "..";
 declare type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -51,13 +52,11 @@ MintNft<Signer, MintArgs, void> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EasyBalance, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, EasyBalance, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & {
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EasyBalance, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, EasyBalance, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
     /**
      * Get the uri of an nft given nft info
      */
     nftUri(info: EthNftInfo): Promise<string>;
-    estimateValidateTransferNft(validators: string[], to: string, nft: EthNftInfo): Promise<BigNumber>;
-    estimateValidateUnfreezeNft(validators: string[], to: string, nft: Uint8Array): Promise<BigNumber>;
 };
 /**
  * Create an object implementing minimal utilities for a web3 chain
