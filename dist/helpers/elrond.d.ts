@@ -4,7 +4,7 @@
  * Note that Unsigned Transactions need to be manually handled after they have been added to the block
  * @module
  */
-import { Address, ISigner, Transaction, TransactionHash } from "@elrondnetwork/erdjs";
+import { Address, ISigner, Transaction } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft, GetLockedNft, ListNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft } from "./chain";
 declare type EasyBalance = string | number | BigNumber;
@@ -99,34 +99,7 @@ declare type EventIdent = number;
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, EasyBalance, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, EasyBalance, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft & {
-    /**
-     * Unsigned Transaction for [[TransferForeign]]
-     */
-    unsignedTransferTxn(chain_nonce: number, to: string, value: EasyBalance): Transaction;
-    /**
-     * Unsigned Transaction for [[UnfreezeForeign]]
-     */
-    unsignedUnfreezeTxn(chain_nonce: number, address: Address, to: string, value: EasyBalance): Transaction;
-    /**
-     * Unsigned Transaction for [[TransferNftForeign]]
-     */
-    unsignedTransferNftTxn(chain_nonce: number, address: Address, to: string, info: NftInfo): Transaction;
-    /**
-     * Unsigned Transaction for [[UnfreezeForeignNft]]
-     */
-    unsignedUnfreezeNftTxn(address: Address, to: string, id: number): Transaction;
-    /**
-     * Unsigned transaction for Minting an NFT
-     */
-    unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
-    /**
-     * Raw result of a transaction
-     *
-     * @param tx_hash  Hash of the transaction
-     */
-    rawTxnResult(tx_hash: TransactionHash): Promise<Object>;
-};
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, EasyBalance, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, EasyBalance, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftIssueArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft;
 /**
  * Create an object implementing cross chain utilities for elrond
  *
