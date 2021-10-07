@@ -20,7 +20,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@elrondnetwork/erdjs": "^6.2.0",
+    "@elrondnetwork/erdjs": "^8.0.1-alpha.5",
     "@polkadot/api": "^5.2.1",
     "@polkadot/api-contract": "^5.2.1",
     "@polkadot/keyring": "^7.0.3",

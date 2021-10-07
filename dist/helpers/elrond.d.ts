@@ -109,5 +109,5 @@ export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & B
  * @param esdt  Identifier of the ESDT Wrapper
  * @param esdt_nft  Identifier of the ESDT NFT Wrapper
  */
-export declare const elrondHelperFactory: (node_uri: string, minter_address: string, esdt: string, esdt_nft: string) => Promise<ElrondHelper>;
+export declare const elrondHelperFactory: (node_uri: string, minter_address: string, esdt_swap_address: string, esdt: string, esdt_nft: string, esdt_swap: string) => Promise<ElrondHelper>;
 export {};
