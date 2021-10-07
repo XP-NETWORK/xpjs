@@ -207,52 +207,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ListNft<string, string, EsdtNftInfo> &
   GetLockedNft<NftInfo, EsdtNftInfo> &
   DecodeWrappedNft<EsdtNftInfo> &
-  DecodeRawNft & {
-    /**
-     * Unsigned Transaction for [[TransferForeign]]
-     */
-    unsignedTransferTxn(
-      chain_nonce: number,
-      to: string,
-      value: EasyBalance
-    ): Transaction;
-    /**
-     * Unsigned Transaction for [[UnfreezeForeign]]
-     */
-    unsignedUnfreezeTxn(
-      chain_nonce: number,
-      address: Address,
-      to: string,
-      value: EasyBalance
-    ): Transaction;
-    /**
-     * Unsigned Transaction for [[TransferNftForeign]]
-     */
-    unsignedTransferNftTxn(
-      chain_nonce: number,
-      address: Address,
-      to: string,
-      info: NftInfo
-    ): Transaction;
-    /**
-     * Unsigned Transaction for [[UnfreezeForeignNft]]
-     */
-    unsignedUnfreezeNftTxn(
-      address: Address,
-      to: string,
-      id: number
-    ): Transaction;
-    /**
-     * Unsigned transaction for Minting an NFT
-     */
-    unsignedMintNftTxn(owner: Address, args: NftIssueArgs): Transaction;
-    /**
-     * Raw result of a transaction
-     *
-     * @param tx_hash  Hash of the transaction
-     */
-    rawTxnResult(tx_hash: TransactionHash): Promise<Object>; // TODO: Typed transaction result
-  };
+  DecodeRawNft;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -299,7 +254,7 @@ export const elrondHelperFactory: (
 
     try {
       await tx.send(provider);
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes("lowerNonceInTx")) {
         throw ConcurrentSendError();
       } else {
@@ -587,13 +542,6 @@ export const elrondHelperFactory: (
   }
 
   return {
-    rawTxnResult: transactionResult,
-    unsignedTransferTxn,
-    unsignedUnfreezeTxn,
-    unsignedTransferNftTxn,
-    unsignedUnfreezeNftTxn,
-    unsignedMintNftTxn,
-    unsignedSetESDTRoles,
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
 
