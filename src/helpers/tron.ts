@@ -26,6 +26,7 @@ import {
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import axios from "axios";
+import { EstimateTxFees } from "..";
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
   MintNft<string, MintArgs, void> & {
@@ -49,18 +50,8 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeign<string, string, string, string, string> &
   UnfreezeForeignNft<string, string, string, BigNumber, string, string> &
   DecodeWrappedNft<string> &
-  DecodeRawNft & {
+  DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
-    estimateValidateTransferNft(
-      validators: string[],
-      to: string,
-      nft: EthNftInfo
-    ): Promise<BigNumber>;
-    estimateValidateUnfreezeNft(
-      validators: string[],
-      to: string,
-      nft: Uint8Array
-    ): Promise<BigNumber>;
   };
 
 export async function baseTronHelperFactory(
