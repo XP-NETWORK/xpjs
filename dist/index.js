@@ -11,9 +11,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./helpers/chain"), exports);
-__exportStar(require("./helpers/polkadot"), exports);
 __exportStar(require("./helpers/elrond"), exports);
 __exportStar(require("./helpers/web3"), exports);
 __exportStar(require("./helpers/tron"), exports);
 __exportStar(require("./socket"), exports);
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBQUEsa0RBQWdDO0FBQ2hDLHFEQUFtQztBQUNuQyxtREFBaUM7QUFDakMsaURBQStCO0FBQy9CLGlEQUErQjtBQUMvQiwyQ0FBeUIifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBQUEsa0RBQWdDO0FBQ2hDLG1EQUFpQztBQUNqQyxpREFBK0I7QUFDL0IsaURBQStCO0FBQy9CLDJDQUF5QiJ9
