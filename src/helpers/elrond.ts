@@ -221,22 +221,28 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
 export const elrondHelperFactory: (
   node_uri: string,
   minter_address: string,
+  esdt_swap_address: string,
   esdt: string,
-  esdt_nft: string
+  esdt_nft: string,
+  esdt_swap: string
 ) => Promise<ElrondHelper> = async (
   node_uri: string,
   minter_address: string,
+  esdt_swap_address: string,
   esdt: string,
-  esdt_nft: string
+  esdt_nft: string,
+  //esdt_swap: string
 ) => {
   const provider = new ProxyProvider(node_uri);
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(minter_address);
+  const swapContract = new Address(esdt_swap_address);
   const providerRest = axios.create({
     baseURL: node_uri,
   });
   const esdtHex = Buffer.from(esdt, "utf-8");
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
+  //const esdtSwaphex = Buffer.from(esdt_swap, "utf-8");
   const decoder = new TextDecoder();
 
   const syncAccount = async (signer: ISigner) => {
@@ -297,6 +303,22 @@ export const elrondHelperFactory: (
     throw Error(`failed to query transaction exceeded 10 retries ${tx_hash}`);
   };
 
+  const doEgldSwap = (
+    sender: ISigner,
+    value: EasyBalance
+  ) => {
+    const utx = new Transaction({
+      receiver: swapContract,
+      gasLimit: new GasLimit(50000000),
+      value: Balance.egld(value.toString()),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("wrapEgld"))
+        .build()
+    })
+
+    return signAndSend(sender, utx)
+  }
+
   const unsignedTransferTxn = (
     chain_nonce: number,
     to: string,
@@ -305,7 +327,7 @@ export const elrondHelperFactory: (
     return new Transaction({
       receiver: mintContract,
       gasLimit: new GasLimit(50000000),
-      value: new Balance(value.toString()),
+      value: Balance.egld(value.toString()),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("freezeSend"))
         .addArg(new U64Value(new BigNumber(chain_nonce)))
@@ -468,7 +490,7 @@ export const elrondHelperFactory: (
 
     return new Transaction({
       receiver: ESDT_ISSUE_ADDR,
-      value: new Balance(ESDT_ISSUE_COST),
+      value: Balance.egld(ESDT_ISSUE_COST),
       gasLimit: new GasLimit(60000000),
       data: baseArgs.build(),
     });
@@ -569,9 +591,10 @@ export const elrondHelperFactory: (
       sender: ISigner,
       chain_nonce: number,
       to: string,
-      value: EasyBalance
+      value: EasyBalance,
+      txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
-      const txu = unsignedTransferTxn(chain_nonce, to, value);
+      const txu = unsignedTransferTxn(chain_nonce, to, new BigNumber(value.toString()).plus(txFees.toString()));
       const tx = await signAndSend(sender, txu);
 
       return await extractId(tx);
@@ -580,8 +603,10 @@ export const elrondHelperFactory: (
       sender: ISigner,
       chain_nonce: number,
       to: string,
-      value: EasyBalance
+      value: EasyBalance,
+      txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
+      await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeTxn(
         chain_nonce,
         sender.getAddress(),
@@ -596,8 +621,10 @@ export const elrondHelperFactory: (
       sender: ISigner,
       chain_nonce: number,
       to: string,
-      info: NftInfo
+      info: NftInfo,
+      txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
+      await doEgldSwap(sender, txFees);
       const txu = unsignedTransferNftTxn(
         chain_nonce,
         sender.getAddress(),
@@ -611,8 +638,10 @@ export const elrondHelperFactory: (
     async unfreezeWrappedNft(
       sender: ISigner,
       to: string,
-      nonce: number
+      nonce: number,
+      txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
+      await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, nonce);
       const tx = await signAndSend(sender, txu);
 
