@@ -12,6 +12,7 @@ import {
   BigUIntValue,
   BytesValue,
   ContractFunction,
+  Egld,
   GasLimit,
   ISigner,
   NetworkConfig,
@@ -312,7 +313,7 @@ export const elrondHelperFactory: (
     const utx = new Transaction({
       receiver: swapContract,
       gasLimit: new GasLimit(50000000),
-      value: Balance.egld(value.toString()),
+      value: new Balance(Egld.getToken(), Egld.getNonce(), new BigNumber(value.toString())),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("wrapEgld"))
         .build()
@@ -329,7 +330,7 @@ export const elrondHelperFactory: (
     return new Transaction({
       receiver: mintContract,
       gasLimit: new GasLimit(50000000),
-      value: Balance.egld(value.toString()),
+      value: new Balance(Egld.getToken(), Egld.getNonce(), new BigNumber(value.toString())),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("freezeSend"))
         .addArg(new U64Value(new BigNumber(chain_nonce)))
@@ -492,7 +493,7 @@ export const elrondHelperFactory: (
 
     return new Transaction({
       receiver: ESDT_ISSUE_ADDR,
-      value: Balance.egld(ESDT_ISSUE_COST),
+      value: new Balance(Egld.getToken(), Egld.getNonce(), new BigNumber(ESDT_ISSUE_COST.toString())),
       gasLimit: new GasLimit(60000000),
       data: baseArgs.build(),
     });
