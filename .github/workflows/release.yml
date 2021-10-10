@@ -2,6 +2,9 @@
 name: Generate a build and push to another branch
 
 on:
+  push:
+    branches:
+      - "*"
   workflow_dispatch:
     
 
@@ -19,11 +22,21 @@ jobs:
       - name: Build
         run: npm run build
     
-      - name: Push
+      - name: Prepare Master Release
         uses: s0/git-publish-subdir-action@develop
+        if: ${{ github.ref == 'refs/heads/master' }}
         env:
           REPO: self
-          BRANCH: dist 
+          BRANCH: master-dist 
+          FOLDER: dist 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "Build: ({sha}) {msg}"
+      - name: Prepare Branch Release
+        uses: s0/git-publish-subdir-action@develop
+        if: ${{ github.ref != 'refs/heads/master' }}
+        env:
+          REPO: self
+          BRANCH: bleeding-edge 
           FOLDER: dist 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
