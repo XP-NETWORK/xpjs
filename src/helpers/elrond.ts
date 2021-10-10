@@ -49,6 +49,9 @@ const ESDT_ISSUE_ADDR = new Address(
 );
 const ESDT_ISSUE_COST = "50000000000000000";
 
+const NFT_TRANSFER_COST = new BigNumber(40000000);
+const NFT_UNFREEZE_COST = new BigNumber(35000000);
+
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -234,7 +237,7 @@ export const elrondHelperFactory: (
   esdt_swap_address: string,
   esdt: string,
   esdt_nft: string,
-  //esdt_swap: string
+  esdt_swap: string
 ) => {
   const provider = new ProxyProvider(node_uri);
   await NetworkConfig.getDefault().sync(provider);
@@ -245,8 +248,10 @@ export const elrondHelperFactory: (
   });
   const esdtHex = Buffer.from(esdt, "utf-8");
   const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
-  //const esdtSwaphex = Buffer.from(esdt_swap, "utf-8");
+  const esdtSwaphex = Buffer.from(esdt_swap, "utf-8");
   const decoder = new TextDecoder();
+  const networkConfig = await provider.getNetworkConfig();
+  const gasPrice = networkConfig.MinGasPrice.valueOf();
 
   const syncAccount = async (signer: ISigner) => {
     const account = new Account(signer.getAddress());
@@ -371,17 +376,22 @@ export const elrondHelperFactory: (
     chain_nonce: number,
     address: Address,
     to: string,
-    { token, nonce }: NftInfo
+    { token, nonce }: NftInfo,
+    tx_fees: BigNumber
   ) => {
     return new Transaction({
       receiver: address,
       gasLimit: new GasLimit(70000000),
       data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("ESDTNFTTransfer"))
+        .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+        .addArg(new AddressValue(mintContract))
+        .addArg(new BigUIntValue(new BigNumber(2)))
         .addArg(new TokenIdentifierValue(Buffer.from(token, "utf-8")))
         .addArg(new U64Value(new BigNumber(nonce)))
         .addArg(new BigUIntValue(new BigNumber(1)))
-        .addArg(new AddressValue(mintContract))
+        .addArg(new TokenIdentifierValue(esdtSwaphex))
+        .addArg(new U64Value(new BigNumber(0x0)))
+        .addArg(new BigUIntValue(tx_fees))
         .addArg(new BytesValue(Buffer.from("freezeSendNft", "ascii")))
         .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
@@ -389,16 +399,20 @@ export const elrondHelperFactory: (
     });
   };
 
-  const unsignedUnfreezeNftTxn = (address: Address, to: string, id: number) => {
+  const unsignedUnfreezeNftTxn = (address: Address, to: string, id: number, tx_fees: BigNumber) => {
     return new Transaction({
       receiver: address,
       gasLimit: new GasLimit(70000000),
       data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("ESDTNFTTransfer"))
+        .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+        .addArg(new AddressValue(mintContract))
+        .addArg(new BigUIntValue(new BigNumber(2)))
         .addArg(new TokenIdentifierValue(esdtNftHex))
         .addArg(new U64Value(new BigNumber(id)))
         .addArg(new BigUIntValue(new BigNumber(1)))
-        .addArg(new AddressValue(mintContract))
+        .addArg(new TokenIdentifierValue(esdtSwaphex))
+        .addArg(new U64Value(new BigNumber(0x0)))
+        .addArg(new BigUIntValue(tx_fees))
         .addArg(new BytesValue(Buffer.from("withdrawNft", "ascii")))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
         .build(),
@@ -566,6 +580,13 @@ export const elrondHelperFactory: (
     return [tx, id];
   }
 
+  function estimateGas(
+    base_fees: BigNumber,
+    cnt: number
+  ) {
+    return base_fees.times((cnt+1)*gasPrice); // assume execution takes about twice as much gas fees
+  }
+
   return {
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
@@ -614,7 +635,7 @@ export const elrondHelperFactory: (
         chain_nonce,
         sender.getAddress(),
         to,
-        value
+        value,
       );
       const tx = await signAndSend(sender, txu);
 
@@ -632,7 +653,8 @@ export const elrondHelperFactory: (
         chain_nonce,
         sender.getAddress(),
         to,
-        info
+        info,
+        new BigNumber(txFees.toString())
       );
       const tx = await signAndSend(sender, txu);
 
@@ -645,7 +667,7 @@ export const elrondHelperFactory: (
       txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
       await doEgldSwap(sender, txFees);
-      const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, nonce);
+      const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, nonce, new BigNumber(txFees.toString()));
       const tx = await signAndSend(sender, txu);
 
       return await extractId(tx);
@@ -709,6 +731,12 @@ export const elrondHelperFactory: (
 
       return Base64.atob(locked!.uris[0]);
     },
+    async estimateValidateTransferNft(validators: string[]) {
+      return estimateGas(NFT_TRANSFER_COST, validators.length) // TODO: properly estimate NFT_TRANSFER_COST
+    },
+    async estimateValidateUnfreezeNft(validators: string[]) {
+      return estimateGas(NFT_UNFREEZE_COST, validators.length) // TODO: properly estimate NFT_UNFREEZE_COST
+    }
   };
 };
 
