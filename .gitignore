@@ -6,4 +6,4 @@ src/**.js
 coverage
 *.log
 tsconfig.tsbuildinfo
-dist/docs
+dist
