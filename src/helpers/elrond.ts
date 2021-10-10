@@ -125,6 +125,8 @@ export interface IssueESDTNFT {
    * @param canFreeze  Wheteher this ESDT can be frozen
    * @param canWipe  Whether this ESDT can be wiped
    * @param canTransferNFTCreateRole  Whether the NFT Creation role can be transferred
+   * 
+   * @returns ticker of the esdt
    */
   issueESDTNft(
     sender: ISigner,
@@ -133,7 +135,7 @@ export interface IssueESDTNFT {
     canFreeze: boolean | undefined,
     canWipe: boolean | undefined,
     canTransferNFTCreateRole: boolean | undefined
-  ): Promise<void>;
+  ): Promise<string>;
 }
 
 /**
@@ -655,7 +657,7 @@ export const elrondHelperFactory: (
       canFreeze: boolean = false,
       canWipe: boolean = false,
       canTransferNFTCreateRole: boolean = false
-    ): Promise<void> {
+    ): Promise<string> {
       const txu = unsignedIssueESDTNft(
         name,
         ticker,
@@ -664,7 +666,10 @@ export const elrondHelperFactory: (
         canTransferNFTCreateRole
       );
 
-      await signAndSend(sender, txu);
+      const tx = await signAndSend(sender, txu);
+      const res = await transactionResult(tx.getHash());
+      const tickerh: string = res["smartContractResults"][0].split("@")[2];
+      return Buffer.from(tickerh, "hex").toString("utf-8")
     },
     async mintNft(owner: ISigner, args: NftIssueArgs): Promise<void> {
       const txu = unsignedMintNftTxn(owner.getAddress(), args);

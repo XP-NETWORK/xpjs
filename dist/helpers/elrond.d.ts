@@ -63,8 +63,10 @@ export interface IssueESDTNFT {
      * @param canFreeze  Wheteher this ESDT can be frozen
      * @param canWipe  Whether this ESDT can be wiped
      * @param canTransferNFTCreateRole  Whether the NFT Creation role can be transferred
+     *
+     * @returns ticker of the esdt
      */
-    issueESDTNft(sender: ISigner, name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Promise<void>;
+    issueESDTNft(sender: ISigner, name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Promise<string>;
 }
 /**
  * Possible roles for an ESDT
