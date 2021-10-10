@@ -669,7 +669,7 @@ export const elrondHelperFactory: (
 
       const tx = await signAndSend(sender, txu);
       const res = await transactionResult(tx.getHash());
-      const tickerh: string = res["smartContractResults"][0].split("@")[2];
+      const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8")
     },
     async mintNft(owner: ISigner, args: NftIssueArgs): Promise<void> {
