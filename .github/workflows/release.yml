@@ -28,6 +28,9 @@ jobs:
 
       - name: build
         run: yarn build
+      
+      - name: prepare package
+        run: mkdir out && mv package.json out && mv dist out
     
       - name: Prepare Master Release
         uses: s0/git-publish-subdir-action@develop
@@ -35,7 +38,7 @@ jobs:
         env:
           REPO: self
           BRANCH: master-dist 
-          FOLDER: dist 
+          FOLDER: out 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
       - name: Prepare Branch Release
@@ -44,6 +47,6 @@ jobs:
         env:
           REPO: self
           BRANCH: bleeding-edge 
-          FOLDER: dist 
+          FOLDER: out 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
