@@ -49,8 +49,8 @@ const ESDT_ISSUE_ADDR = new Address(
 );
 const ESDT_ISSUE_COST = "50000000000000000";
 
-const NFT_TRANSFER_COST = new BigNumber(30000000);
-const NFT_UNFREEZE_COST = new BigNumber(25000000);
+const NFT_TRANSFER_COST = new BigNumber(45000000);
+const NFT_UNFREEZE_COST = new BigNumber(45000000);
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -251,7 +251,7 @@ export const elrondHelperFactory: (
   const esdtSwaphex = Buffer.from(esdt_swap, "utf-8");
   const decoder = new TextDecoder();
   const networkConfig = await provider.getNetworkConfig();
-  const gasPrice = networkConfig.MinGasPrice.valueOf();
+  const gasPriceModif = networkConfig.MinGasPrice.valueOf() * networkConfig.GasPriceModifier.valueOf();
 
   const syncAccount = async (signer: ISigner) => {
     const account = new Account(signer.getAddress());
@@ -584,7 +584,7 @@ export const elrondHelperFactory: (
     base_fees: BigNumber,
     cnt: number
   ) {
-    return base_fees.times((cnt+1)*gasPrice); // assume execution takes about twice as much gas fees
+    return base_fees.times((cnt+1)*gasPriceModif); // assume execution takes about twice as much gas fees
   }
 
   return {
