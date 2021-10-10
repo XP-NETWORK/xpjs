@@ -49,8 +49,8 @@ const ESDT_ISSUE_ADDR = new Address(
 );
 const ESDT_ISSUE_COST = "50000000000000000";
 
-const NFT_TRANSFER_COST = new BigNumber(40000000);
-const NFT_UNFREEZE_COST = new BigNumber(35000000);
+const NFT_TRANSFER_COST = new BigNumber(30000000);
+const NFT_UNFREEZE_COST = new BigNumber(25000000);
 
 /**
  * Information required to perform NFT transfers in this chain
