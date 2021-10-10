@@ -16,11 +16,18 @@ jobs:
       - name: git-checkout
         uses: actions/checkout@v2
 
-      - name: Install all dependencies
-        run: npm install
+      - name: setup node.js
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: 14.x
+          cache: yarn
+          cache-dependency-path: yarn.lock
 
-      - name: Build
-        run: npm run build
+      - name: dep
+        run: yarn
+
+      - name: build
+        run: yarn build
     
       - name: Prepare Master Release
         uses: s0/git-publish-subdir-action@develop
