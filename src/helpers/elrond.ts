@@ -311,7 +311,7 @@ export const elrondHelperFactory: (
     throw Error(`failed to query transaction exceeded 10 retries ${tx_hash}`);
   };
 
-  const doEgldSwap = (
+  const doEgldSwap = async (
     sender: ISigner,
     value: EasyBalance
   ) => {
@@ -324,7 +324,10 @@ export const elrondHelperFactory: (
         .build()
     })
 
-    return signAndSend(sender, utx)
+    const tx = await signAndSend(sender, utx);
+    await transactionResult(tx.getHash());
+
+    return tx;
   }
 
   const unsignedTransferTxn = (
