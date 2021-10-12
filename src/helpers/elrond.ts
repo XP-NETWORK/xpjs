@@ -188,9 +188,7 @@ type EventIdent = number;
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  // TODO: Use TX Fees
   TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
-  // TODO: Use TX Fees
   UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
   TransferNftForeign<
     ISigner,
@@ -213,7 +211,9 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ListNft<string, string, EsdtNftInfo> &
   GetLockedNft<NftInfo, EsdtNftInfo> &
   DecodeWrappedNft<EsdtNftInfo> &
-  DecodeRawNft;
+  DecodeRawNft & {
+    mintableEsdts(address: Address): Promise<string[]>
+  };
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -701,6 +701,13 @@ export const elrondHelperFactory: (
       const txu = unsignedMintNftTxn(owner.getAddress(), args);
 
       await signAndSend(owner, txu);
+    },
+    async mintableEsdts(address: Address): Promise<string[]> {
+      const res = await providerRest.get(
+        `/address/${address.toString()}/esdts-with-role/ESDTRoleNFTCreate`
+      );
+
+      return res.data["data"]["tokens"];
     },
     listNft,
     getLockedNft,
