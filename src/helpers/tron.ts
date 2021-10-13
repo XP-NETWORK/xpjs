@@ -4,6 +4,7 @@ import {
   BatchWrappedBalanceCheck,
   DecodeRawNft,
   DecodeWrappedNft,
+  EstimateTxFees,
   MintNft,
   TransferForeign,
   TransferNftForeign,
@@ -13,31 +14,68 @@ import {
   WrappedNft,
 } from "./chain";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
-
-// @ts-ignore
-import { TronWeb } from "tronweb";
-import { EthNftInfo, MintArgs } from "./web3";
-
-import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
 import {
   abi as ERC721_abi,
   bytecode as ERC721_bytecode,
 } from "../fakeERC721.json";
+import {
+  abi as XPNFT_abi,
+  bytecode as XPNFT_bytecode,
+} from "../XPNft.json";
+import {
+  abi as XPNET_abi,
+  bytecode as XPNET_bytecode,
+} from "../XPNet.json";
+import {
+  abi as Minter_abi,
+  bytecode as Minter_bytecode
+} from "../Minter.json";
+
+import axios from "axios";
+// @ts-expect-error no types cope
+import { TronWeb } from "tronweb";
+// @ts-expect-error no types cope
+import TronStation from 'tronstation';
+import { EthNftInfo, MintArgs } from "./web3";
+import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
-import axios from "axios";
-import { EstimateTxFees } from "..";
+
+export type MinterRes = {
+  // Minter smart contract
+  minter: string,
+  // XPNFT (Wrapper for foreign NFTs) contracte
+  xpnft: string,
+  // XPNET (Wrapper for foregin fungible tokens) contract
+  xpnet: string,
+  // Whitelisted Native NFT contracts
+  whitelist: string[]
+}
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
   MintNft<string, MintArgs, void> & {
     /**
      *
-     * Deploy an ERC1155 smart contract
+     * Deploy an ERC721 user minter smart contract
      *
-     * @argument owner  Owner of this smart contract
+     * @argument deployer  deployer of this smart contract
      * @returns Address of the deployed smart contract
      */
-    deployErc721(owner: string): Promise<string>;
+    deployErc721(deployer: string): Promise<string>;
+    /**
+     * Deploy Minter Smart Contract
+     *
+     * @argument deployer  deployer of the smart contract
+     * @argument validators  address of validators of the smart contract
+     * @argument threshold  threshold for executing an action
+     * @argument whitelist  optional whitelisted nfts contract (deploys one if empty/undefined)
+     */
+    deployMinter(
+      deployer: string,
+      validators: string[],
+      threshold: number,
+      whitelist: string[] | undefined,
+    ): Promise<MinterRes>;
   };
 
 export type TronHelper = BaseTronHelper &
@@ -61,8 +99,8 @@ export async function baseTronHelperFactory(
     return provider.setPrivateKey(signer);
   };
 
-  const deployErc721_i = async (owner: string) => {
-    setSigner(owner);
+  const deployErc721_i = async (deployer: string) => {
+    setSigner(deployer);
 
     const contract = await provider.contract().new({
       abi: ERC721_abi,
@@ -72,6 +110,30 @@ export async function baseTronHelperFactory(
 
     return contract;
   };
+
+  const deployErc1155_i = async (owner: string) => {
+    setSigner(owner);
+
+    const contract = await provider.contract().new({
+      abi: XPNET_abi,
+      bytecode: XPNET_bytecode,
+      feeLimit: 3000000000
+    });
+
+    return contract;
+  }
+
+  const deployXpNft = async (deployer: string) => {
+    setSigner(deployer);
+
+    const contract = await provider.contract().new({
+      abi: XPNFT_abi,
+      bytecode: XPNFT_bytecode,
+      feeLimit: 3000000000
+    });
+
+    return contract;
+  }
 
   return {
     async mintNft(owner: string, options: MintArgs): Promise<void> {
@@ -85,6 +147,36 @@ export async function baseTronHelperFactory(
     },
     deployErc721: async (owner) =>
       await deployErc721_i(owner).then((c) => c.address),
+    async deployMinter(
+      deployer: string,
+      validators: string[],
+      threshold: number,
+      whitelist: string[] = []
+    ): Promise<MinterRes> {
+      if (whitelist.length == 0) {
+        const unft = await deployErc721_i(deployer);
+        whitelist.push(unft.address);
+      }
+
+      const nft_token = await deployXpNft(deployer);
+      const token = await deployErc1155_i(deployer);
+      const minter = await provider.contract().new({
+        abi: Minter_abi,
+        bytecode: Minter_bytecode,
+        feeLimit: 3000000000,
+        parameters: [validators, whitelist, threshold, nft_token.address, token.address]
+      });
+
+      await nft_token.transferOwnership(minter.address).send();
+      await token.transferOwnership(minter.address).send();
+
+      return {
+        minter: minter.address,
+        xpnft: nft_token.address,
+        xpnet: token.address,
+        whitelist
+      }
+    }
   };
 }
 
@@ -95,6 +187,7 @@ export async function tronHelperFactory(
   minter_addr: string,
   minter_abi: JSON
 ): Promise<TronHelper> {
+  const station = new TronStation(provider)
   const base = await baseTronHelperFactory(provider);
   const erc1155 = await provider.contract(ERC1155_abi, erc1155_addr);
   const minter = await provider.contract(minter_abi, minter_addr);
@@ -147,22 +240,34 @@ export async function tronHelperFactory(
   }
 
   const randomAction = () =>
-    EthBN.from(
-      Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000))
-    );
+    (Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000)))
+      .toString();
 
-  async function estimateGas(addrs: string[], utx: any): Promise<BigNumber> {
-    let fee = EthBN.from(0);
+  async function estimateGas(addrs: string[], func_sig: string, params: { type: string, value: any }[]): Promise<BigNumber> {
+    let energy = 0;
+    let bandwidth = 0;
+    const nrgSun = await station.energy.burnedEnergy2Trx(1, { unit: 'sun' });
+    const bandSun = 10;
 
     for (const [i, addr] of addrs.entries()) {
-      utx.from = addr;
-      let tf = EthBN.from(400000); // TODO: Proper estimate
-      if (i == addrs.length - 1 && addrs.length != 1) tf = tf.mul(2);
-      fee = fee.add(tf);
+      const res = await provider.transactionBuilder.triggerConstantContract(
+        minter.address,
+        func_sig,
+        {},
+        params,
+        provider.address.toHex(addr)
+      );
+      let nrg: number = res["energy_used"]
+      if (i == addrs.length - 1 && addrs.length != 1) nrg *= 2;
+      energy += nrg;
+      const tx_raw: string = res["transaction"]["raw_data_hex"];
+      bandwidth += tx_raw.length;
     }
-    fee = fee.mul(1.41e14); // TODO: proper gas price estimate
+    // Fee = energy * (sun per energy) + bandwidth * (sun per bandwidth)
+    // bandwidth = raw tx byte length
+    const fee = new BigNumber(energy).times(nrgSun).plus(bandwidth*bandSun);
 
-    return new BigNumber(fee.toString());
+    return fee;
   }
 
   return {
@@ -280,13 +385,15 @@ export async function tronHelperFactory(
       encoded.setChainNonce(0x1351);
       encoded.setData(tokdat.serializeBinary());
 
-      const utx = minter.validate_transfer_nft(
-        randomAction(),
-        to,
-        Buffer.from(encoded.serializeBinary()).toString("base64")
+      return await estimateGas(
+        validators,
+        "validate_transfer_nft(uint128,address,string)",
+        [
+          { type: "uint128", value: randomAction() },
+          { type: "address", value: to },
+          { type: "string", value: Buffer.from(encoded.serializeBinary()).toString("base64") }
+        ]
       );
-
-      return await estimateGas(validators, utx);
     },
     async estimateValidateUnfreezeNft(
       validators: string[],
@@ -294,14 +401,17 @@ export async function tronHelperFactory(
       nft_data: Uint8Array
     ): Promise<BigNumber> {
       const nft_dat = NftEthNative.deserializeBinary(nft_data);
-      const utx = minter.validate_unfreeze_nft(
-        randomAction(),
-        to,
-        EthBN.from(nft_dat.getId().toString()),
-        nft_dat.getContractAddr()
-      );
 
-      return await estimateGas(validators, utx);
+      return await estimateGas(
+        validators,
+        "validate_unfreeze_nft(uint128,address,uint256,address)",
+        [
+          { type: "uint128", value: randomAction() },
+          { type: "address", value: to },
+          { type: "uint256", value: nft_dat.getId().toString() },
+          { type: "address", value: nft_dat.getContractAddr() }
+        ]
+      );
     },
   };
 }
