@@ -162,6 +162,7 @@ export interface Web3Params {
   minter_addr: string;
   minter_abi: Interface;
   erc1155_addr: string;
+  erc721_addr: string;
 }
 
 export async function web3HelperFactory(
@@ -238,7 +239,7 @@ export async function web3HelperFactory(
       return new BigNumber(bal.toString());
     },
     isWrappedNft(nft) {
-      return nft.contract === params.erc1155_addr;
+      return nft.contract === params.erc721_addr;
     },
     async balanceWrappedBatch(
       address: string,
