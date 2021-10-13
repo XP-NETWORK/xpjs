@@ -38,7 +38,8 @@ interface ChainData {
   constructor: (
     params: Web3Params | TronParams | ElrondParams
   ) => Promise<CrossChainHelper>;
-  [key: string]: unknown;
+  blockExplorerUrl: string;
+  chainId?: number;
 }
 
 interface ChainInfo {
@@ -49,16 +50,16 @@ export const CHAIN_INFO: ChainInfo = {
   2: {
     name: "Elrond",
     nonce: 2,
-    native: "EGLD",
     decimals: 1e18,
     constructor: (p) => elrondHelperFactory(p as ElrondParams),
+    blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
   },
   3: {
     name: "Heco",
     nonce: 3,
     chainId: 256,
     decimals: 1e18,
-    blockExplorerUrls: "https://testnet.hecoinfo.com/tx",
+    blockExplorerUrl: "https://testnet.hecoinfo.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
   4: {
@@ -66,7 +67,7 @@ export const CHAIN_INFO: ChainInfo = {
     nonce: 4,
     chainId: 97,
     decimals: 1e18,
-    blockExplorerUrls: "https://testnet.bscscan.com/tx",
+    blockExplorerUrl: "https://testnet.bscscan.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
   6: {
@@ -74,7 +75,7 @@ export const CHAIN_INFO: ChainInfo = {
     nonce: 6,
     chainId: 43113,
     decimals: 1e18,
-    blockExplorerUrls: "https://cchain.explorer.avax-test.network/tx",
+    blockExplorerUrl: "https://cchain.explorer.avax-test.network/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
   7: {
@@ -82,7 +83,7 @@ export const CHAIN_INFO: ChainInfo = {
     nonce: 0x7,
     chainId: 80001,
     decimals: 1e18,
-    blockExplorerUrls: "https://mumbai.polygonscan.com/tx",
+    blockExplorerUrl: "https://mumbai.polygonscan.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
   8: {
@@ -90,14 +91,14 @@ export const CHAIN_INFO: ChainInfo = {
     nonce: 0x8,
     decimals: 1e18,
     chainId: 4002,
-    blockExplorerUrls: "https://explorer.testnet.fantom.network/transactions",
+    blockExplorerUrl: "https://explorer.testnet.fantom.network/transactions",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
   9: {
     name: "Tron",
     nonce: 0x9,
     decimals: 1e6,
-    blockExplorerUrls: "https://shasta.tronscan.org/#/transaction",
+    blockExplorerUrl: "https://shasta.tronscan.org/#/transaction",
     constructor: (p) => tronHelperFactory(p as TronParams),
   },
   11: {
@@ -105,7 +106,7 @@ export const CHAIN_INFO: ChainInfo = {
     nonce: 0xb,
     decimals: 1e18,
     chainId: 44787,
-    blockExplorerUrls: "https://alfajores-blockscout.celo-testnet.org/tx",
+    blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
   12: {
@@ -113,7 +114,7 @@ export const CHAIN_INFO: ChainInfo = {
     nonce: 0xc,
     decimals: 1e18,
     chainId: 1666700000,
-    blockExplorerUrls: "https://explorer.pops.one/tx",
+    blockExplorerUrl: "https://explorer.pops.one/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
   },
 };
