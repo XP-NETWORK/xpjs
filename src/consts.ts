@@ -2,6 +2,7 @@ import { CrossChainHelper } from "./factory/crossChainHelper";
 import { elrondHelperFactory, ElrondParams } from "./helpers/elrond";
 import { tronHelperFactory, TronParams } from "./helpers/tron";
 import { web3HelperFactory, Web3Params } from "./helpers/web3";
+import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 
 const HECO = "https://http-testnet.hecochain.com";
 
@@ -40,6 +41,7 @@ interface ChainData {
   ) => Promise<CrossChainHelper>;
   blockExplorerUrl: string;
   chainId?: number;
+  currency: SupportedCurrency;
 }
 
 interface ChainInfo {
@@ -53,6 +55,7 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e18,
     constructor: (p) => elrondHelperFactory(p as ElrondParams),
     blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
+    currency: SupportedCurrency.EGLD,
   },
   3: {
     name: "Heco",
@@ -61,6 +64,7 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e18,
     blockExplorerUrl: "https://testnet.hecoinfo.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.HT,
   },
   4: {
     name: "BSC",
@@ -69,6 +73,7 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e18,
     blockExplorerUrl: "https://testnet.bscscan.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.BNB,
   },
   6: {
     name: "Avalanche",
@@ -77,6 +82,7 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e18,
     blockExplorerUrl: "https://cchain.explorer.avax-test.network/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.AVAX,
   },
   7: {
     name: "Polygon",
@@ -85,6 +91,7 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e18,
     blockExplorerUrl: "https://mumbai.polygonscan.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.MATIC,
   },
   8: {
     name: "Fantom",
@@ -93,6 +100,7 @@ export const CHAIN_INFO: ChainInfo = {
     chainId: 4002,
     blockExplorerUrl: "https://explorer.testnet.fantom.network/transactions",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.FTM,
   },
   9: {
     name: "Tron",
@@ -100,6 +108,7 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e6,
     blockExplorerUrl: "https://shasta.tronscan.org/#/transaction",
     constructor: (p) => tronHelperFactory(p as TronParams),
+    currency: SupportedCurrency.TRX,
   },
   11: {
     name: "Celo",
@@ -108,6 +117,7 @@ export const CHAIN_INFO: ChainInfo = {
     chainId: 44787,
     blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.CELO,
   },
   12: {
     name: "Harmony",
@@ -116,5 +126,6 @@ export const CHAIN_INFO: ChainInfo = {
     chainId: 1666700000,
     blockExplorerUrl: "https://explorer.pops.one/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.CELO,
   },
 };
