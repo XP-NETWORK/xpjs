@@ -50,7 +50,8 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeign<string, string, string, string, string> &
   UnfreezeForeignNft<string, string, string, BigNumber, string, string> &
   DecodeWrappedNft<string> &
-  DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
+  DecodeRawNft &
+  EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
   };
 
@@ -88,18 +89,26 @@ export async function baseTronHelperFactory(
   };
 }
 
+export interface TronParams {
+  provider: TronWeb;
+  middleware_uri: string;
+  erc1155_addr: string;
+  minter_addr: string;
+  minter_abi: JSON;
+}
+
 export async function tronHelperFactory(
-  provider: TronWeb,
-  middleware_uri: string,
-  erc1155_addr: string,
-  minter_addr: string,
-  minter_abi: JSON
+  tronParams: TronParams
 ): Promise<TronHelper> {
-  const base = await baseTronHelperFactory(provider);
-  const erc1155 = await provider.contract(ERC1155_abi, erc1155_addr);
-  const minter = await provider.contract(minter_abi, minter_addr);
+  const { provider } = tronParams;
+  const base = await baseTronHelperFactory(tronParams.provider);
+  const erc1155 = await provider.contract(ERC1155_abi, tronParams.erc1155_addr);
+  const minter = await provider.contract(
+    tronParams.minter_abi,
+    tronParams.minter_addr
+  );
   const event_middleware = axios.create({
-    baseURL: middleware_uri,
+    baseURL: tronParams.middleware_uri,
     headers: {
       "Content-Type": "application/json",
     },
@@ -127,7 +136,7 @@ export async function tronHelperFactory(
     };
 
     const evs = await getEv();
-    const ev = evs.find((e: any) => e?.contract == minter_addr);
+    const ev = evs.find((e: any) => e?.contract == tronParams.minter_addr);
     const action_id: string = ev.result["action_id"].toString();
     return [hash, action_id];
   }

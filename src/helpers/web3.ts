@@ -104,7 +104,8 @@ export type Web3Helper = BaseWeb3Helper &
     string
   > &
   DecodeWrappedNft<string> &
-  DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
+  DecodeRawNft &
+  EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
     /**
      * Get the uri of an nft given nft info
      */
@@ -155,18 +156,22 @@ export async function baseWeb3HelperFactory(
  * @param minter_addr  Address of the minter smart contract
  * @param minter_abi  ABI of the minter smart contract
  */
-export async function web3HelperFactory(
-  provider: Provider,
-  minter_addr: string,
-  minter_abi: Interface,
-  erc1155_addr: string
-): Promise<Web3Helper> {
-  const w3 = provider;
+export interface Web3Params {
+  provider: Provider;
+  minter_addr: string;
+  minter_abi: Interface;
+  erc1155_addr: string;
+}
 
-  const minter = new Contract(minter_addr, minter_abi, w3);
+export async function web3HelperFactory(
+  params: Web3Params
+): Promise<Web3Helper> {
+  const w3 = params.provider;
+
+  const minter = new Contract(params.minter_addr, params.minter_abi, w3);
 
   const erc1155_abi = new Interface(ERC1155_abi);
-  const erc1155 = new Contract(erc1155_addr, erc1155_abi, w3);
+  const erc1155 = new Contract(params.erc1155_addr, erc1155_abi, w3);
 
   function signedMinter(signer: Signer): Contract {
     return minter.connect(signer);
@@ -182,7 +187,7 @@ export async function web3HelperFactory(
       throw Error("Couldn't extract action_id");
     }
 
-    const evdat = minter_abi.parseLog(log);
+    const evdat = params.minter_abi.parseLog(log);
     const action_id: string = evdat.args[0].toString();
     return [receipt, action_id];
   }
@@ -219,7 +224,7 @@ export async function web3HelperFactory(
     return new BigNumber(fee.toString());
   }
 
-  const base = await baseWeb3HelperFactory(provider);
+  const base = await baseWeb3HelperFactory(params.provider);
 
   return {
     ...base,
