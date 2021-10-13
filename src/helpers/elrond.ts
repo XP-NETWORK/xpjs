@@ -129,7 +129,7 @@ export interface IssueESDTNFT {
    * @param canFreeze  Wheteher this ESDT can be frozen
    * @param canWipe  Whether this ESDT can be wiped
    * @param canTransferNFTCreateRole  Whether the NFT Creation role can be transferred
-   * 
+   *
    * @returns ticker of the esdt
    */
   issueESDTNft(
@@ -212,7 +212,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   GetLockedNft<NftInfo, EsdtNftInfo> &
   DecodeWrappedNft<EsdtNftInfo> &
   DecodeRawNft & {
-    mintableEsdts(address: Address): Promise<string[]>
+    mintableEsdts(address: Address): Promise<string[]>;
   };
 
 /**
@@ -224,34 +224,33 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
  * @param esdt  Identifier of the ESDT Wrapper
  * @param esdt_nft  Identifier of the ESDT NFT Wrapper
  */
+export interface ElrondParams {
+  node_uri: string;
+  minter_address: string;
+  esdt_swap_address: string;
+  esdt: string;
+  esdt_nft: string;
+  esdt_swap: string;
+}
+
 export const elrondHelperFactory: (
-  node_uri: string,
-  minter_address: string,
-  esdt_swap_address: string,
-  esdt: string,
-  esdt_nft: string,
-  esdt_swap: string
-) => Promise<ElrondHelper> = async (
-  node_uri: string,
-  minter_address: string,
-  esdt_swap_address: string,
-  esdt: string,
-  esdt_nft: string,
-  esdt_swap: string
-) => {
-  const provider = new ProxyProvider(node_uri);
+  elrondParams: ElrondParams
+) => Promise<ElrondHelper> = async (elrondParams: ElrondParams) => {
+  const provider = new ProxyProvider(elrondParams.node_uri);
   await NetworkConfig.getDefault().sync(provider);
-  const mintContract = new Address(minter_address);
-  const swapContract = new Address(esdt_swap_address);
+  const mintContract = new Address(elrondParams.minter_address);
+  const swapContract = new Address(elrondParams.esdt_swap_address);
   const providerRest = axios.create({
-    baseURL: node_uri,
+    baseURL: elrondParams.node_uri,
   });
-  const esdtHex = Buffer.from(esdt, "utf-8");
-  const esdtNftHex = Buffer.from(esdt_nft, "utf-8");
-  const esdtSwaphex = Buffer.from(esdt_swap, "utf-8");
+  const esdtHex = Buffer.from(elrondParams.esdt, "utf-8");
+  const esdtNftHex = Buffer.from(elrondParams.esdt_nft, "utf-8");
+  const esdtSwaphex = Buffer.from(elrondParams.esdt_swap, "utf-8");
   const decoder = new TextDecoder();
   const networkConfig = await provider.getNetworkConfig();
-  const gasPriceModif = networkConfig.MinGasPrice.valueOf() * networkConfig.GasPriceModifier.valueOf();
+  const gasPriceModif =
+    networkConfig.MinGasPrice.valueOf() *
+    networkConfig.GasPriceModifier.valueOf();
 
   const syncAccount = async (signer: ISigner) => {
     const account = new Account(signer.getAddress());
@@ -311,24 +310,25 @@ export const elrondHelperFactory: (
     throw Error(`failed to query transaction exceeded 10 retries ${tx_hash}`);
   };
 
-  const doEgldSwap = async (
-    sender: ISigner,
-    value: EasyBalance
-  ) => {
+  const doEgldSwap = async (sender: ISigner, value: EasyBalance) => {
     const utx = new Transaction({
       receiver: swapContract,
       gasLimit: new GasLimit(50000000),
-      value: new Balance(Egld.getToken(), Egld.getNonce(), new BigNumber(value.toString())),
+      value: new Balance(
+        Egld.getToken(),
+        Egld.getNonce(),
+        new BigNumber(value.toString())
+      ),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("wrapEgld"))
-        .build()
-    })
+        .build(),
+    });
 
     const tx = await signAndSend(sender, utx);
     await transactionResult(tx.getHash());
 
     return tx;
-  }
+  };
 
   const unsignedTransferTxn = (
     chain_nonce: number,
@@ -338,7 +338,11 @@ export const elrondHelperFactory: (
     return new Transaction({
       receiver: mintContract,
       gasLimit: new GasLimit(50000000),
-      value: new Balance(Egld.getToken(), Egld.getNonce(), new BigNumber(value.toString())),
+      value: new Balance(
+        Egld.getToken(),
+        Egld.getNonce(),
+        new BigNumber(value.toString())
+      ),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("freezeSend"))
         .addArg(new U64Value(new BigNumber(chain_nonce)))
@@ -402,7 +406,12 @@ export const elrondHelperFactory: (
     });
   };
 
-  const unsignedUnfreezeNftTxn = (address: Address, to: string, id: number, tx_fees: BigNumber) => {
+  const unsignedUnfreezeNftTxn = (
+    address: Address,
+    to: string,
+    id: number,
+    tx_fees: BigNumber
+  ) => {
     return new Transaction({
       receiver: address,
       gasLimit: new GasLimit(70000000),
@@ -510,7 +519,11 @@ export const elrondHelperFactory: (
 
     return new Transaction({
       receiver: ESDT_ISSUE_ADDR,
-      value: new Balance(Egld.getToken(), Egld.getNonce(), new BigNumber(ESDT_ISSUE_COST.toString())),
+      value: new Balance(
+        Egld.getToken(),
+        Egld.getNonce(),
+        new BigNumber(ESDT_ISSUE_COST.toString())
+      ),
       gasLimit: new GasLimit(60000000),
       data: baseArgs.build(),
     });
@@ -541,7 +554,7 @@ export const elrondHelperFactory: (
     token,
     nonce,
   }: NftInfo): Promise<EsdtNftInfo | undefined> {
-    const nfts = await listNft(minter_address);
+    const nfts = await listNft(elrondParams.minter_address);
     return nfts.get(`${token}-${nonce.toString()}`);
   }
 
@@ -583,11 +596,8 @@ export const elrondHelperFactory: (
     return [tx, id];
   }
 
-  function estimateGas(
-    base_fees: BigNumber,
-    cnt: number
-  ) {
-    return base_fees.times((cnt+1)*gasPriceModif); // assume execution takes about twice as much gas fees
+  function estimateGas(base_fees: BigNumber, cnt: number) {
+    return base_fees.times((cnt + 1) * gasPriceModif); // assume execution takes about twice as much gas fees
   }
 
   return {
@@ -621,7 +631,11 @@ export const elrondHelperFactory: (
       value: EasyBalance,
       txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
-      const txu = unsignedTransferTxn(chain_nonce, to, new BigNumber(value.toString()).plus(txFees.toString()));
+      const txu = unsignedTransferTxn(
+        chain_nonce,
+        to,
+        new BigNumber(value.toString()).plus(txFees.toString())
+      );
       const tx = await signAndSend(sender, txu);
 
       return await extractId(tx);
@@ -638,7 +652,7 @@ export const elrondHelperFactory: (
         chain_nonce,
         sender.getAddress(),
         to,
-        value,
+        value
       );
       const tx = await signAndSend(sender, txu);
 
@@ -670,7 +684,12 @@ export const elrondHelperFactory: (
       txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
       await doEgldSwap(sender, txFees);
-      const txu = unsignedUnfreezeNftTxn(sender.getAddress(), to, nonce, new BigNumber(txFees.toString()));
+      const txu = unsignedUnfreezeNftTxn(
+        sender.getAddress(),
+        to,
+        nonce,
+        new BigNumber(txFees.toString())
+      );
       const tx = await signAndSend(sender, txu);
 
       return await extractId(tx);
@@ -695,7 +714,7 @@ export const elrondHelperFactory: (
       const tx = await signAndSend(sender, txu);
       const res = await transactionResult(tx.getHash());
       const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
-      return Buffer.from(tickerh, "hex").toString("utf-8")
+      return Buffer.from(tickerh, "hex").toString("utf-8");
     },
     async mintNft(owner: ISigner, args: NftIssueArgs): Promise<void> {
       const txu = unsignedMintNftTxn(owner.getAddress(), args);
@@ -742,11 +761,11 @@ export const elrondHelperFactory: (
       return Base64.atob(locked!.uris[0]);
     },
     async estimateValidateTransferNft(validators: string[]) {
-      return estimateGas(NFT_TRANSFER_COST, validators.length) // TODO: properly estimate NFT_TRANSFER_COST
+      return estimateGas(NFT_TRANSFER_COST, validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
     async estimateValidateUnfreezeNft(validators: string[]) {
-      return estimateGas(NFT_UNFREEZE_COST, validators.length) // TODO: properly estimate NFT_UNFREEZE_COST
-    }
+      return estimateGas(NFT_UNFREEZE_COST, validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
+    },
   };
 };
 
