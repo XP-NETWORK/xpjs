@@ -26,7 +26,7 @@ import {
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import axios from "axios";
-import { EstimateTxFees } from "..";
+import { EstimateTxFees, WrappedNftCheck } from "..";
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
   MintNft<string, MintArgs, void> & {
@@ -53,7 +53,7 @@ export type TronHelper = BaseTronHelper &
   DecodeRawNft &
   EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
-  };
+  } & WrappedNftCheck<MintArgs>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -185,6 +185,9 @@ export async function tronHelperFactory(
       };
 
       return await nftUri(nft_info);
+    },
+    isWrappedNft(nft) {
+      return nft.contract === tronParams.erc1155_addr;
     },
     decodeWrappedNft(raw_data: string): WrappedNft {
       const u8D = Base64.toUint8Array(raw_data);

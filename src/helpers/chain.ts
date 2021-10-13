@@ -148,6 +148,14 @@ export type WrappedNft = {
   chain_nonce: number;
   data: Uint8Array;
 };
+/**
+ * Whether the given NFT is from a foreign chain
+ * @param {NftIdent} nft NFT Identity
+ * @returns bool
+ */
+export interface WrappedNftCheck<NftIdent> {
+  isWrappedNft(nft: NftIdent): boolean;
+}
 
 export interface DecodeWrappedNft<Data> {
   decodeWrappedNft(raw_data: Data): WrappedNft;

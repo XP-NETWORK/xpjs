@@ -15,6 +15,7 @@ import {
   WrappedNft,
   DecodeRawNft,
   MintNft,
+  WrappedNftCheck,
 } from "./chain";
 import {
   Contract,
@@ -110,7 +111,7 @@ export type Web3Helper = BaseWeb3Helper &
      * Get the uri of an nft given nft info
      */
     nftUri(info: EthNftInfo): Promise<string>;
-  };
+  } & WrappedNftCheck<MintArgs>;
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
   return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155";
@@ -235,6 +236,9 @@ export async function web3HelperFactory(
       const bal = await erc1155.balanceOf(address, chain_nonce);
 
       return new BigNumber(bal.toString());
+    },
+    isWrappedNft(nft) {
+      return nft.contract === params.erc1155_addr;
     },
     async balanceWrappedBatch(
       address: string,

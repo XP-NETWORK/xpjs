@@ -39,6 +39,7 @@ import {
   UnfreezeForeign,
   UnfreezeForeignNft,
   WrappedNft,
+  WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
 
@@ -213,7 +214,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   DecodeWrappedNft<EsdtNftInfo> &
   DecodeRawNft & {
     mintableEsdts(address: Address): Promise<string[]>;
-  };
+  } & WrappedNftCheck<NftInfo>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -727,6 +728,9 @@ export const elrondHelperFactory: (
       );
 
       return res.data["data"]["tokens"];
+    },
+    isWrappedNft(nft) {
+      return nft.token === elrondParams.esdt_nft;
     },
     listNft,
     getLockedNft,
