@@ -100,7 +100,7 @@ export async function baseTronHelperFactory(
 
     const contract = await provider.contract().new({
       abi: XPNet__factory.abi,
-      bytecode: XPNet__factory.abi,
+      bytecode: XPNet__factory.bytecode,
       feeLimit: 3000000000
     });
 
@@ -112,7 +112,7 @@ export async function baseTronHelperFactory(
 
     const contract = await provider.contract().new({
       abi: XPNft__factory.abi,
-      bytecode: XPNft__factory.abi,
+      bytecode: XPNft__factory.bytecode,
       feeLimit: 3000000000
     });
 
