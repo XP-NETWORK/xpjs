@@ -17,10 +17,8 @@ import {
   MintNft,
 } from "./chain";
 import {
-  Contract,
   Signer,
   BigNumber as EthBN,
-  ContractFactory,
   PopulatedTransaction,
 } from "ethers";
 import {
@@ -28,11 +26,8 @@ import {
   TransactionResponse,
   Provider,
 } from "@ethersproject/providers";
-import { Interface } from "ethers/lib/utils";
-import { abi as ERC721_abi } from "../fakeERC721.json";
-import { abi as ERC1155_abi } from "../fakeERC1155.json";
-import * as ERC721_contract from "../XPNft.json";
 import { NftEthNative, NftPacked } from "validator";
+import { Minter__factory, UserNftMinter__factory, XPNet__factory } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
 import { EstimateTxFees } from "..";
 type EasyBalance = string | number | EthBN;
@@ -124,7 +119,6 @@ export async function baseWeb3HelperFactory(
   provider: Provider
 ): Promise<BaseWeb3Helper> {
   const w3 = provider;
-  const erc721_abi = new Interface(ERC721_abi);
 
   return {
     async balance(address: string): Promise<BigNumber> {
@@ -134,13 +128,13 @@ export async function baseWeb3HelperFactory(
       return new BigNumber(bal.toString());
     },
     async deployErc721(owner: Signer): Promise<string> {
-      const factory = ContractFactory.fromSolidity(ERC721_contract, owner);
+      const factory = new UserNftMinter__factory(owner);
       const contract = await factory.deploy();
 
       return contract.address;
     },
     async mintNft(owner: Signer, { contract, uri }: MintArgs): Promise<void> {
-      const erc721 = new Contract(contract, erc721_abi, owner);
+      const erc721 = UserNftMinter__factory.connect(contract, owner);
 
       const txm = await erc721.mint(uri);
       await txm.wait();
@@ -158,19 +152,12 @@ export async function baseWeb3HelperFactory(
 export async function web3HelperFactory(
   provider: Provider,
   minter_addr: string,
-  minter_abi: Interface,
   erc1155_addr: string
 ): Promise<Web3Helper> {
   const w3 = provider;
 
-  const minter = new Contract(minter_addr, minter_abi, w3);
-
-  const erc1155_abi = new Interface(ERC1155_abi);
-  const erc1155 = new Contract(erc1155_addr, erc1155_abi, w3);
-
-  function signedMinter(signer: Signer): Contract {
-    return minter.connect(signer);
-  }
+  const minter = Minter__factory.connect(minter_addr, provider);
+  const erc1155 = XPNet__factory.connect(erc1155_addr, provider);
 
   async function extractTxn(
     txr: TransactionResponse,
@@ -182,17 +169,17 @@ export async function web3HelperFactory(
       throw Error("Couldn't extract action_id");
     }
 
-    const evdat = minter_abi.parseLog(log);
+    const evdat = minter.interface.parseLog(log);
     const action_id: string = evdat.args[0].toString();
     return [receipt, action_id];
   }
 
   async function nftUri(info: EthNftInfo): Promise<string> {
     if (info.contract_type == "ERC721") {
-      const erc = new Contract(info.contract, ERC721_abi, w3);
+      const erc = UserNftMinter__factory.connect(info.contract, w3);
       return await erc.tokenURI(info.token);
     } else {
-      const erc = new Contract(info.contract, erc1155_abi, w3);
+      const erc = XPNet__factory.connect(info.contract, w3);
       return await erc.uri(info.token);
     }
   }
@@ -251,10 +238,11 @@ export async function web3HelperFactory(
       value: EasyBalance,
       txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const totalVal = EthBN.from(value.toString()).add(
+      const val = EthBN.from(value.toString());
+      const totalVal = val.add(
         EthBN.from(txFees.toString())
       );
-      const res = await signedMinter(sender).freeze(chain_nonce, to, {
+      const res = await minter.connect(sender).freeze(chain_nonce, to, val, {
         value: totalVal,
       });
       return await extractTxn(res, "Transfer");
@@ -266,14 +254,14 @@ export async function web3HelperFactory(
       id: EthNftInfo,
       txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const erc = new Contract(id.contract, ERC721_abi, w3);
-      const ta = await erc.connect(sender).approve(minter.address, id.token);
+      const erc = UserNftMinter__factory.connect(id.contract, sender);
+      const ta = await erc.approve(minter.address, id.token);
 
       await ta.wait();
 
       const txr = await minter
         .connect(sender)
-        .freeze_erc721(id.contract, id.token, chain_nonce, to, {
+        .freezeErc721(id.contract, id.token, chain_nonce, to, {
           value: EthBN.from(txFees.toString()),
         });
 
@@ -286,7 +274,7 @@ export async function web3HelperFactory(
       value: EasyBalance,
       txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const res = await signedMinter(sender).withdraw(chain_nonce, to, value, {
+      const res = await minter.connect(sender).withdraw(chain_nonce, to, value, {
         value: EthBN.from(txFees.toString()),
       });
 
@@ -298,7 +286,7 @@ export async function web3HelperFactory(
       id: BigNumber,
       txFees: EasyBalance
     ): Promise<[TransactionReceipt, string]> {
-      const res = await signedMinter(sender).withdraw_nft(to, id, {
+      const res = await minter.connect(sender).withdrawNft(to, id.toString(), {
         value: EthBN.from(txFees.toString()),
       });
 
@@ -339,7 +327,7 @@ export async function web3HelperFactory(
       encoded.setChainNonce(0x1351);
       encoded.setData(tokdat.serializeBinary());
 
-      const utx = await minter.populateTransaction.validate_transfer_nft(
+      const utx = await minter.populateTransaction.validateTransferNft(
         randomAction(),
         to,
         Buffer.from(encoded.serializeBinary()).toString("base64")
@@ -353,7 +341,7 @@ export async function web3HelperFactory(
       nft_data: Uint8Array
     ): Promise<BigNumber> {
       const nft_dat = NftEthNative.deserializeBinary(nft_data);
-      const utx = await minter.populateTransaction.validate_unfreeze_nft(
+      const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,
         EthBN.from(nft_dat.getId().toString()),

@@ -4901,9 +4901,9 @@ validator@^13.6.0:
   resolved "https://registry.yarnpkg.com/validator/-/validator-13.6.0.tgz#1e71899c14cdc7b2068463cb24c1cc16f6ec7059"
   integrity sha512-gVgKbdbHgtxpRyR8K0O6oFZPhhB5tT1jeEHZR0Znr9Svg03U0+r9DXWMrnRAB+HtCStDQKlaIZm42tVsVjqtjg==
 
-"validator@git+https://github.com/xp-network/migration-validator#web3-new":
+"validator@git+https://github.com/xp-network/Migration-validator#web3-new":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/migration-validator#4b89abfadc84183b5c12efbdd59757ee6fcf0925"
+  resolved "git+https://github.com/xp-network/Migration-validator#35804240f8b8864d92aa1c27490a107d49b2c6e8"
   dependencies:
     "@celo-tools/celo-ethers-wrapper" "^0.0.5"
     "@elrondnetwork/erdjs" "^8.0.1-alpha.5"
@@ -4929,6 +4929,7 @@ validator@^13.6.0:
     tronstation "^1.0.1"
     tronweb "^4.0.0"
     ws "^8.2.0"
+    xpnet-web3-contracts "git+https://github.com/xp-network/XP.network-HECO-Migration#dist"
 
 vary@^1:
   version "1.1.2"
@@ -5057,6 +5058,12 @@ xmlhttprequest-ssl@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-2.0.0.tgz#91360c86b914e67f44dce769180027c0da618c67"
   integrity sha512-QKxVRxiRACQcVuQEYFsI1hhkrMlrXHPegbbd1yn9UHOmRxY+si12nQYzri3vbzt8VdTTRviqcKxcyllFas5z2A==
+
+"xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#dist":
+  version "0.1.0"
+  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#80749689f97a08e5dca8efc2600b25c91cb906c8"
+  dependencies:
+    ethers "^5.4.1"
 
 xxhashjs@^0.2.2:
   version "0.2.2"
