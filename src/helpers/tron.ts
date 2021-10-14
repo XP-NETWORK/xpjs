@@ -13,23 +13,6 @@ import {
   WrappedBalanceCheck,
   WrappedNft,
 } from "./chain";
-import { abi as ERC1155_abi } from "../fakeERC1155.json";
-import {
-  abi as ERC721_abi,
-  bytecode as ERC721_bytecode,
-} from "../fakeERC721.json";
-import {
-  abi as XPNFT_abi,
-  bytecode as XPNFT_bytecode,
-} from "../XPNft.json";
-import {
-  abi as XPNET_abi,
-  bytecode as XPNET_bytecode,
-} from "../XPNet.json";
-import {
-  abi as Minter_abi,
-  bytecode as Minter_bytecode
-} from "../Minter.json";
 
 import axios from "axios";
 // @ts-expect-error no types cope
@@ -40,6 +23,7 @@ import { EthNftInfo, MintArgs } from "./web3";
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
 import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator";
+import { Minter__factory, UserNftMinter__factory, XPNet__factory, XPNft__factory } from "xpnet-web3-contracts";
 
 export type MinterRes = {
   // Minter smart contract
@@ -103,8 +87,8 @@ export async function baseTronHelperFactory(
     setSigner(deployer);
 
     const contract = await provider.contract().new({
-      abi: ERC721_abi,
-      bytecode: ERC721_bytecode,
+      abi: UserNftMinter__factory.abi,
+      bytecode: UserNftMinter__factory.bytecode,
       feeLimit: 3000000000,
     });
 
@@ -115,8 +99,8 @@ export async function baseTronHelperFactory(
     setSigner(owner);
 
     const contract = await provider.contract().new({
-      abi: XPNET_abi,
-      bytecode: XPNET_bytecode,
+      abi: XPNet__factory.abi,
+      bytecode: XPNet__factory.abi,
       feeLimit: 3000000000
     });
 
@@ -127,8 +111,8 @@ export async function baseTronHelperFactory(
     setSigner(deployer);
 
     const contract = await provider.contract().new({
-      abi: XPNFT_abi,
-      bytecode: XPNFT_bytecode,
+      abi: XPNft__factory.abi,
+      bytecode: XPNft__factory.abi,
       feeLimit: 3000000000
     });
 
@@ -138,7 +122,7 @@ export async function baseTronHelperFactory(
   return {
     async mintNft(owner: string, options: MintArgs): Promise<void> {
       setSigner(owner);
-      const erc = await provider.contract(ERC721_abi, options.contract);
+      const erc = await provider.contract(UserNftMinter__factory.abi, options.contract);
       await erc.mint(options.uri).send();
     },
     async balance(address: string): Promise<BigNumber> {
@@ -161,8 +145,8 @@ export async function baseTronHelperFactory(
       const nft_token = await deployXpNft(deployer);
       const token = await deployErc1155_i(deployer);
       const minter = await provider.contract().new({
-        abi: Minter_abi,
-        bytecode: Minter_bytecode,
+        abi: Minter__factory.abi,
+        bytecode: Minter__factory.bytecode,
         feeLimit: 3000000000,
         parameters: [validators, whitelist, threshold, nft_token.address, token.address]
       });
@@ -189,7 +173,7 @@ export async function tronHelperFactory(
 ): Promise<TronHelper> {
   const station = new TronStation(provider)
   const base = await baseTronHelperFactory(provider);
-  const erc1155 = await provider.contract(ERC1155_abi, erc1155_addr);
+  const erc1155 = await provider.contract(XPNet__factory.abi, erc1155_addr);
   const minter = await provider.contract(minter_abi, minter_addr);
   const event_middleware = axios.create({
     baseURL: middleware_uri,
@@ -227,10 +211,10 @@ export async function tronHelperFactory(
 
   const nftUri = async (info: EthNftInfo): Promise<string> => {
     if (info.contract_type == "ERC721") {
-      const erc = await provider.contract(ERC721_abi, info.contract);
+      const erc = await provider.contract(UserNftMinter__factory.abi, info.contract);
       return await erc.tokenURI(info.token).call();
     } else {
-      const erc = await provider.contract(ERC1155_abi, info.contract);
+      const erc = await provider.contract(XPNet__factory.abi, info.contract);
       return await erc.uri(info.token).call();
     }
   };
@@ -300,11 +284,12 @@ export async function tronHelperFactory(
     ): Promise<[string, string]> {
       setSigner(sender);
 
-      const totalVal = EthBN.from(value.toString()).add(
+      const val = EthBN.from(value.toString())
+      const totalVal = val.add(
         EthBN.from(txFees.toString())
       );
       let res = await minter
-        .freeze(chain_nonce, to)
+        .freeze(chain_nonce, to, val)
         .send({ callValue: totalVal });
       return await extractTxn(res);
     },
@@ -329,7 +314,7 @@ export async function tronHelperFactory(
     ): Promise<[string, string]> {
       setSigner(sender);
       const res = await minter
-        .withdraw_nft(to, id)
+        .withdrawNft(to, id.toString())
         .send({ callValue: EthBN.from(txFees.toString()) });
       return await extractTxn(res);
     },
@@ -341,11 +326,11 @@ export async function tronHelperFactory(
       txFees: string
     ): Promise<[string, string]> {
       setSigner(sender);
-      const erc = await provider.contract(ERC721_abi, id.contract);
+      const erc = await provider.contract(UserNftMinter__factory.abi, id.contract);
       await erc.approve(minter.address, id.token).send();
 
       const txr = await minter
-        .freeze_erc721(id.contract, id.token, chain_nonce, to)
+        .freezeErc721(id.contract, id.token, chain_nonce, to)
         .send({ callValue: EthBN.from(txFees.toString()) });
 
       return await extractTxn(txr);
@@ -387,7 +372,7 @@ export async function tronHelperFactory(
 
       return await estimateGas(
         validators,
-        "validate_transfer_nft(uint128,address,string)",
+        "validateTransferNft(uint128,address,string)",
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },
@@ -404,7 +389,7 @@ export async function tronHelperFactory(
 
       return await estimateGas(
         validators,
-        "validate_unfreeze_nft(uint128,address,uint256,address)",
+        "validateUnfreezeNft(uint128,address,uint256,address)",
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },

@@ -38,6 +38,7 @@
     "socket.io-client": "^4.1.3",
     "tronstation": "^1.0.1",
     "tronweb": "^4.0.0",
-    "validator": "git+https://github.com/xp-network/migration-validator#web3-new"
+    "validator": "git+https://github.com/xp-network/Migration-validator#web3-new",
+    "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#dist"
   }
 }
