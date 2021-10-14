@@ -169,12 +169,11 @@ export async function tronHelperFactory(
   middleware_uri: string,
   erc1155_addr: string,
   minter_addr: string,
-  minter_abi: JSON
 ): Promise<TronHelper> {
   const station = new TronStation(provider)
   const base = await baseTronHelperFactory(provider);
   const erc1155 = await provider.contract(XPNet__factory.abi, erc1155_addr);
-  const minter = await provider.contract(minter_abi, minter_addr);
+  const minter = await provider.contract(Minter__factory.abi, minter_addr);
   const event_middleware = axios.create({
     baseURL: middleware_uri,
     headers: {
