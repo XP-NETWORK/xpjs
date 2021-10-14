@@ -39,7 +39,7 @@ import TronStation from 'tronstation';
 import { EthNftInfo, MintArgs } from "./web3";
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
 import { Base64 } from "js-base64";
-import { NftEthNative, NftPacked } from "validator/dist/encoding";
+import { NftEthNative, NftPacked } from "validator";
 
 export type MinterRes = {
   // Minter smart contract

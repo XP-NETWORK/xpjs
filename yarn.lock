@@ -1217,6 +1217,11 @@
   resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.12.tgz#6b2c510a7ad7039e98e7b8d3d6598f4359e5c080"
   integrity sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==
 
+"@types/google-protobuf@^3.15.4":
+  version "3.15.5"
+  resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.5.tgz#644b2be0f5613b1f822c70c73c6b0e0b5b5fa2ad"
+  integrity sha512-6bgv24B+A2bo9AfzReeg5StdiijKzwwnRflA8RLd1V4Yv995LeTmo0z69/MPbBDFSiZWdZHQygLo/ccXhMEDgw==
+
 "@types/http-cache-semantics@*":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/http-cache-semantics/-/http-cache-semantics-4.0.1.tgz#0ea7b61496902b95890dc4c3a116b60cb8dae812"
@@ -1278,6 +1283,13 @@
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@types/websocket/-/websocket-1.0.3.tgz#49e09f939afd0ccdee4f7108d4712ec9feb0f153"
   integrity sha512-ZdoTSwmDsKR7l1I8fpfQtmTI/hUwlOvE3q0iyJsp4tXU0MkdrYowimDzwxjhQvxU4qjhHLd3a6ig0OXRbLgIdw==
+  dependencies:
+    "@types/node" "*"
+
+"@types/ws@^7.4.7":
+  version "7.4.7"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.7.tgz#f7c390a36f7a0679aa69de2d501319f4f8d9b702"
+  integrity sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==
   dependencies:
     "@types/node" "*"
 
@@ -2144,9 +2156,9 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
-"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master":
+"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#b691078648d93a01a6d6ed6dcaf248ef85a5fa62"
+  resolved "git+https://github.com/xp-network/exchange-rate#88beed89f97b1ddd957d4ec78bb5bbfbf350ce73"
   dependencies:
     axios "^0.21.1"
 
@@ -4891,7 +4903,7 @@ validator@^13.6.0:
 
 "validator@git+https://github.com/xp-network/migration-validator#web3-new":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/migration-validator#362020ae52ec40cc30c4a883de2316ca99ccefe7"
+  resolved "git+https://github.com/xp-network/migration-validator#4b89abfadc84183b5c12efbdd59757ee6fcf0925"
   dependencies:
     "@celo-tools/celo-ethers-wrapper" "^0.0.5"
     "@elrondnetwork/erdjs" "^8.0.1-alpha.5"
@@ -4903,9 +4915,11 @@ validator@^13.6.0:
     "@polkadot/util-crypto" "^7.1.1"
     "@polkadot/wasm-crypto" "^4.1.2"
     "@polkadot/x-randomvalues" "^7.1.1"
+    "@types/google-protobuf" "^3.15.4"
+    "@types/ws" "^7.4.7"
     axios "^0.21.1"
     bignumber.js "^9.0.1"
-    crypto-exchange-rate "git+https://github.com/xp-network/exchange-rate#master"
+    crypto-exchange-rate "git+https://github.com/xp-network/exchange-rate#master-dist"
     ethers "^5.4.2"
     google-protobuf "^3.17.3"
     js-base64 "^3.6.1"

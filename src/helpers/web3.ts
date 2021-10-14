@@ -32,7 +32,7 @@ import { Interface } from "ethers/lib/utils";
 import { abi as ERC721_abi } from "../fakeERC721.json";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
 import * as ERC721_contract from "../XPNft.json";
-import { NftEthNative, NftPacked } from "validator/dist/encoding";
+import { NftEthNative, NftPacked } from "validator";
 import { Base64 } from "js-base64";
 import { EstimateTxFees } from "..";
 type EasyBalance = string | number | EthBN;
