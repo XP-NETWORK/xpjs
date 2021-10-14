@@ -204,7 +204,7 @@ export async function tronHelperFactory(
 
     const evs = await getEv();
     const ev = evs.find((e: any) => e?.contract == minter_addr);
-    const action_id: string = ev.result["action_id"].toString();
+    const action_id: string = ev.result["actionId"].toString();
     return [hash, action_id];
   }
 
