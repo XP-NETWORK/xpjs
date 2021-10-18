@@ -16,6 +16,17 @@ export enum RpcUri {
   HARMONY = "https://api.s0.b.hmny.io",
 }
 
+export enum Chain {
+  HECO = 2,
+  BSC = 3,
+  AVALANCE = 4,
+  POLYGON = 6,
+  FANTOM = 8,
+  TRON = 9,
+  CELO = 11,
+  HARMONY = 12,
+}
+
 interface ChainData {
   name: string;
   nonce: number;
