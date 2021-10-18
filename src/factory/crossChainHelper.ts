@@ -1,12 +1,25 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { CHAIN_INFO } from "../consts";
+import { Chain, CHAIN_INFO } from "../consts";
+import { NftInfo } from "testsuite-ts";
+import { BigNumber } from "bignumber.js";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
 type ChainFactory = {
   inner(chainNonce: number): Promise<CrossChainHelper>;
+  // IMO This should Return a transaction, which can be signed later by a wallet interface.
+  transferNft(
+    fromChain: Chain,
+    toChain: Chain,
+    nft: NftInfo,
+    sender: any,
+    receiver: any,
+    validators: any[]
+  ): Promise<void>;
+  // The function that calls the different wallet methods.
+  signTransaction(txn: any): Promise<any>;
 };
 
 export interface ChainParams {
@@ -53,6 +66,44 @@ export function chainFactory(chainParams: ChainParams): ChainFactory {
         );
       }
       return helper!;
+    },
+    // TODO: Find some way to make this more generic, return a txn receipt, throw an exception, etc.
+    transferNft: async (
+      fromChain: Chain,
+      toChain: Chain,
+      nft: NftInfo,
+      sender: any,
+      receiver: any,
+      validators: any[]
+    ): Promise<void> => {
+      const fromHelper = map.get(fromChain)!;
+      const estimate = await fromHelper.estimateValidateTransferNft(
+        validators,
+        receiver,
+        nft as any
+      );
+
+      if (nft.chain === fromChain) {
+        await fromHelper.transferNativeToForeign(
+          sender,
+          toChain,
+          receiver,
+          nft as any,
+          estimate as string | (string & BigNumber) | (BigNumber & string)
+        );
+      } else {
+        fromHelper.transferNftToForeign(
+          sender,
+          fromChain,
+          receiver,
+          nft as any,
+          estimate as string | (string & BigNumber) | (BigNumber & string)
+        );
+      }
+    },
+    signTransaction: async (_txn: any): Promise<any> => {
+      // TODO
+      return true;
     },
   };
 }
