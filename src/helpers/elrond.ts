@@ -42,6 +42,7 @@ import {
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
+import { EstimateTxFees } from "..";
 
 type EasyBalance = string | number | BigNumber;
 
@@ -214,7 +215,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   DecodeWrappedNft<EsdtNftInfo> &
   DecodeRawNft & {
     mintableEsdts(address: Address): Promise<string[]>;
-  } & WrappedNftCheck<NftInfo>;
+  } & WrappedNftCheck<NftInfo> &
+  EstimateTxFees<Address, NftInfo, WrappedNft, BigNumber>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -764,10 +766,14 @@ export const elrondHelperFactory: (
 
       return Base64.atob(locked!.uris[0]);
     },
-    async estimateValidateTransferNft(validators: string[]) {
+    async estimateValidateTransferNft(
+      validators: Address[],
+      _toAddress: Address,
+      _nftInfo: NftInfo
+    ) {
       return estimateGas(NFT_TRANSFER_COST, validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
-    async estimateValidateUnfreezeNft(validators: string[]) {
+    async estimateValidateUnfreezeNft(validators: Address[]) {
       return estimateGas(NFT_UNFREEZE_COST, validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
     },
   };
