@@ -13,6 +13,7 @@ import {
   BytesValue,
   ContractFunction,
   Egld,
+  ExtensionProvider,
   GasLimit,
   ISigner,
   NetworkConfig,
@@ -256,21 +257,26 @@ export const elrondHelperFactory: (
     networkConfig.MinGasPrice.valueOf() *
     networkConfig.GasPriceModifier.valueOf();
 
-  const syncAccount = async (signer: ISigner) => {
-    const account = new Account(signer.getAddress());
+  const syncAccount = async (signer: ISigner| ExtensionProvider) => {
+    const account = new Account(new Address(await signer.getAddress()));
     await account.sync(provider);
 
     return account;
   };
 
-  const signAndSend = async (signer: ISigner, tx: Transaction) => {
+  const signAndSend = async (signer: ISigner | ExtensionProvider, tx: Transaction) => {
+    
     const acc = await syncAccount(signer);
-
-    tx.setNonce(acc.nonce);
-    await signer.sign(tx);
+    let stx: Transaction;
+     if (signer instanceof ExtensionProvider) {
+       stx = await signer.signTransaction(tx);
+    } else {
+      await (signer as ISigner).sign(tx)
+      stx = tx
+    }
 
     try {
-      await tx.send(provider);
+      await stx.send(provider);
     } catch (e: any) {
       if (e.message.includes("lowerNonceInTx")) {
         throw ConcurrentSendError();
