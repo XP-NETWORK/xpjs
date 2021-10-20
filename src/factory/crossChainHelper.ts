@@ -20,8 +20,6 @@ type ChainFactory = {
     receiver: any,
     validators: any[]
   ): Promise<void>;
-  // The function that calls the different wallet methods.
-  signTransaction(txn: any): Promise<any>;
   // The function that should be used to mint an nft.
   mint(
     chain: MintNft<Signer, NftMintArgs, any>,
@@ -111,10 +109,6 @@ export function chainFactory(chainParams: ChainParams): ChainFactory {
         );
       }
     },
-    signTransaction: async (_txn: any): Promise<any> => {
-      // TODO
-      return true;
-    },
     mint: async (
       chain: MintNft<Signer, NftMintArgs, any>,
       owner: Signer,
@@ -131,12 +125,11 @@ export function chainFactory(chainParams: ChainParams): ChainFactory {
 
 interface NftMintArgs {
   readonly contract?: string;
-  readonly uri: string;
+  readonly uri: string | string[];
   readonly identifier?: string;
   readonly quantity?: number | undefined;
   readonly name?: string;
   readonly royalties?: number | undefined;
   readonly hash?: string | undefined;
   readonly attrs?: string | undefined;
-  readonly uris?: string[];
 }
