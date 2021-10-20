@@ -27,9 +27,10 @@ import { Base64 } from "js-base64";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import axios from "axios";
 import { EstimateTxFees, WrappedNftCheck } from "..";
+import { NftMintArgs } from "../factory/crossChainHelper";
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
-  MintNft<string, MintArgs, void> & {
+  MintNft<string, NftMintArgs, void> & {
     /**
      *
      * Deploy an ERC1155 smart contract
@@ -75,10 +76,10 @@ export async function baseTronHelperFactory(
   };
 
   return {
-    async mintNft(owner: string, options: MintArgs): Promise<void> {
+    async mintNft(owner: string, options: NftMintArgs): Promise<void> {
       setSigner(owner);
       const erc = await provider.contract(ERC721_abi, options.contract);
-      await erc.mint(options.uri).send();
+      await erc.mint(options.uris[0]).send();
     },
     async balance(address: string): Promise<BigNumber> {
       const balance = await provider.trx.getBalance(address);

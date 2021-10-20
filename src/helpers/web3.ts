@@ -36,6 +36,7 @@ import * as ERC721_contract from "../XPNft.json";
 import { NftEthNative, NftPacked } from "validator/dist/encoding";
 import { Base64 } from "js-base64";
 import { EstimateTxFees } from "..";
+import { NftMintArgs } from "../factory/crossChainHelper";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -69,7 +70,7 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
    * @argument signer  owner of the smart contract
    * @argument args  See [[MintArgs]]
    */
-  MintNft<Signer, MintArgs, void> & {
+  MintNft<Signer, NftMintArgs, void> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -141,10 +142,13 @@ export async function baseWeb3HelperFactory(
 
       return contract.address;
     },
-    async mintNft(owner: Signer, { contract, uri }: MintArgs): Promise<void> {
-      const erc721 = new Contract(contract, erc721_abi, owner);
+    async mintNft(
+      owner: Signer,
+      { contract, uris }: NftMintArgs
+    ): Promise<void> {
+      const erc721 = new Contract(contract!, erc721_abi, owner);
 
-      const txm = await erc721.mint(uri);
+      const txm = await erc721.mint(uris[0]);
       await txm.wait();
     },
   };
