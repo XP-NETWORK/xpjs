@@ -1,9 +1,11 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
-import { Web3Helper, Web3Params } from "../helpers/web3";
+import {  Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, CHAIN_INFO } from "../consts";
 import { NftInfo } from "testsuite-ts";
 import { BigNumber } from "bignumber.js";
+import { Signer } from "validator/node_modules/ethers";
+import { MintNft } from "..";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -20,6 +22,13 @@ type ChainFactory = {
   ): Promise<void>;
   // The function that calls the different wallet methods.
   signTransaction(txn: any): Promise<any>;
+  // The function that should be used to mint an nft.
+  mint(
+    chain: MintNft<Signer, NftMintArgs, any>,
+    owner: Signer,
+    uri: string,
+    contract: string
+  ): Promise<void>;
 };
 
 export interface ChainParams {
@@ -57,16 +66,17 @@ function mapNonceToParams(
 export function chainFactory(chainParams: ChainParams): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
+
+  const inner = async (chainNonce: number): Promise<CrossChainHelper> => {
+    let helper = map.get(chainNonce);
+    if (helper === undefined) {
+      helper = await CHAIN_INFO[chainNonce].constructor(cToP.get(chainNonce)!);
+    }
+    return helper!;
+  };
+
   return {
-    inner: async (chainNonce: number): Promise<CrossChainHelper> => {
-      let helper = map.get(chainNonce);
-      if (helper === undefined) {
-        helper = await CHAIN_INFO[chainNonce].constructor(
-          cToP.get(chainNonce)!
-        );
-      }
-      return helper!;
-    },
+    inner,
     // TODO: Find some way to make this more generic, return a txn receipt, throw an exception, etc.
     transferNft: async (
       fromChain: Chain,
@@ -76,7 +86,7 @@ export function chainFactory(chainParams: ChainParams): ChainFactory {
       receiver: any,
       validators: any[]
     ): Promise<void> => {
-      const fromHelper = map.get(fromChain)!;
+      const fromHelper = await inner(fromChain);
       const estimate = await fromHelper.estimateValidateTransferNft(
         validators,
         receiver,
@@ -105,5 +115,28 @@ export function chainFactory(chainParams: ChainParams): ChainFactory {
       // TODO
       return true;
     },
+    mint: async (
+      chain: MintNft<Signer, NftMintArgs, any>,
+      owner: Signer,
+      uri: string,
+      contract: string
+    ): Promise<void> => {
+      chain.mintNft(owner, {
+        uri,
+        contract,
+      });
+    },
   };
+}
+
+interface NftMintArgs {
+  readonly contract?: string;
+  readonly uri: string;
+  readonly identifier?: string;
+  readonly quantity?: number | undefined;
+  readonly name?: string;
+  readonly royalties?: number | undefined;
+  readonly hash?: string | undefined;
+  readonly attrs?: string | undefined;
+  readonly uris?: string[];
 }
