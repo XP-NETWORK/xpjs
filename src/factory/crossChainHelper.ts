@@ -1,10 +1,10 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
-import {  Web3Helper, Web3Params } from "../helpers/web3";
+import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, CHAIN_INFO } from "../consts";
 import { NftInfo } from "testsuite-ts";
 import { BigNumber } from "bignumber.js";
-import { Signer } from "validator/node_modules/ethers";
+
 import { MintNft } from "..";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
@@ -21,11 +21,10 @@ type ChainFactory = {
     validators: any[]
   ): Promise<void>;
   // The function that should be used to mint an nft.
-  mint(
-    chain: MintNft<Signer, NftMintArgs, any>,
+  mint<Signer, Response>(
+    chain: MintNft<Signer, NftMintArgs, Response>,
     owner: Signer,
-    uri: string,
-    contract: string
+    args: NftMintArgs
   ): Promise<void>;
 };
 
@@ -61,7 +60,7 @@ function mapNonceToParams(
   return cToP;
 }
 
-export function chainFactory(chainParams: ChainParams): ChainFactory {
+export function ChainFactory(chainParams: ChainParams): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
 
@@ -109,27 +108,26 @@ export function chainFactory(chainParams: ChainParams): ChainFactory {
         );
       }
     },
-    mint: async (
-      chain: MintNft<Signer, NftMintArgs, any>,
+    mint: async <Signer, Response>(
+      chain: MintNft<Signer, NftMintArgs, Response>,
       owner: Signer,
-      uri: string,
-      contract: string
+      args: NftMintArgs
     ): Promise<void> => {
-      chain.mintNft(owner, {
-        uri,
-        contract,
-      });
+      chain.mintNft(owner, args);
     },
   };
 }
-
-interface NftMintArgs {
+/*
+ * contract is mandatory for a web3 chains & tron.
+ * identifier is mandatory for a elrond chain.
+*/
+export interface NftMintArgs {
   readonly contract?: string;
-  readonly uri: string | string[];
+  readonly uris: string[];
   readonly identifier?: string;
   readonly quantity?: number | undefined;
   readonly name?: string;
   readonly royalties?: number | undefined;
   readonly hash?: string | undefined;
-  readonly attrs?: string | undefined;
+  readonly attrs: string | undefined;
 }

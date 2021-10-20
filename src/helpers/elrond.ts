@@ -43,6 +43,7 @@ import {
 } from "./chain";
 import { Base64 } from "js-base64";
 import { EstimateTxFees } from "..";
+import { NftMintArgs } from "../factory/crossChainHelper";
 
 type EasyBalance = string | number | BigNumber;
 
@@ -209,7 +210,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EventIdent
   > &
   IssueESDTNFT &
-  MintNft<ISigner, NftIssueArgs, void> &
+  MintNft<ISigner, NftMintArgs, void> &
   ListNft<string, string, EsdtNftInfo> &
   GetLockedNft<NftInfo, EsdtNftInfo> &
   DecodeWrappedNft<EsdtNftInfo> &
@@ -719,8 +720,8 @@ export const elrondHelperFactory: (
       const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8");
     },
-    async mintNft(owner: ISigner, args: NftIssueArgs): Promise<void> {
-      const txu = unsignedMintNftTxn(owner.getAddress(), args);
+    async mintNft(owner: ISigner, args: NftMintArgs): Promise<void> {
+      const txu = unsignedMintNftTxn(owner.getAddress(), args as NftIssueArgs);
 
       await signAndSend(owner, txu);
     },
