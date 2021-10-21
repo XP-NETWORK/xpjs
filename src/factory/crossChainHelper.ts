@@ -32,11 +32,11 @@ type ChainFactory = {
    * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft.
    */
-  mint<Signer, Response>(
-    chain: MintNft<Signer, NftMintArgs, Response>,
+  mint<Signer>(
+    chain: MintNft<Signer, NftMintArgs, any>,
     owner: Signer,
     args: NftMintArgs
-  ): Promise<void>;
+  ): Promise<any>;
 };
 
 /**
@@ -128,12 +128,12 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
         );
       }
     },
-    mint: async <Signer, Response>(
-      chain: MintNft<Signer, NftMintArgs, Response>,
+    mint: async <Signer>(
+      chain: MintNft<Signer, NftMintArgs, any>,
       owner: Signer,
       args: NftMintArgs
-    ): Promise<void> => {
-      chain.mintNft(owner, args);
+    ): Promise<any> => {
+      return chain.mintNft(owner, args);
     },
   };
 }

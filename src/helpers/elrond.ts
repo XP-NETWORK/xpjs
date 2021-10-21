@@ -211,7 +211,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EventIdent
   > &
   IssueESDTNFT &
-  MintNft<ISigner, NftMintArgs, void> &
+  MintNft<ISigner, NftMintArgs, Transaction> &
   ListNft<string, string, EsdtNftInfo> &
   GetLockedNft<NftInfo, EsdtNftInfo> &
   DecodeWrappedNft<EsdtNftInfo> &
@@ -725,10 +725,10 @@ export const elrondHelperFactory: (
       const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8");
     },
-    async mintNft(owner: ISigner, args: NftMintArgs): Promise<void> {
+    async mintNft(owner: ISigner, args: NftMintArgs): Promise<Transaction> {
       const txu = unsignedMintNftTxn(owner.getAddress(), args as NftIssueArgs);
 
-      await signAndSend(owner, txu);
+      return await signAndSend(owner, txu);
     },
     async mintableEsdts(address: Address): Promise<string[]> {
       const res = await providerRest.get(
