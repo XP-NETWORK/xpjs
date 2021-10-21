@@ -6,6 +6,7 @@ import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 
 // All the supported testnet uri's are here.
 export enum RpcUri {
+  ELROND = "https://devnet-api.elrond.com",
   HECO = "https://http-testnet.hecochain.com",
   BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
   AVALANCE = "https://api.avax-test.network/ext/bc/C/rpc",
@@ -17,6 +18,7 @@ export enum RpcUri {
 }
 
 export enum Chain {
+  ELROND = 2,
   HECO = 3,
   BSC = 4,
   AVALANCE = 6,
