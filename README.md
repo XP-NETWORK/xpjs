@@ -3,14 +3,14 @@
 ### Work In Progress / Alpha Stage Library
 
 Features Available :-
-- [X] Minting NFTs
+
+- [x] Minting NFTs
 - [ ] Bridge
 - [ ] ... and More
 
 ## To Mint an NFT, Follow the steps as specified -
 
 - First make sure nodejs is installed in your machine.
-
 
 - Import xp.network package with the command
 
