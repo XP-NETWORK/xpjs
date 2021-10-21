@@ -6,7 +6,6 @@ on:
     branches:
       - "*"
   workflow_dispatch:
-    
 
 jobs:
   build:
@@ -28,17 +27,17 @@ jobs:
 
       - name: build
         run: yarn build
-      
+
       - name: prepare package
         run: mkdir out && mv package.json out && mv dist out && mv README.md out && mv LICENSE out
-    
+
       - name: Prepare Master Release
         uses: s0/git-publish-subdir-action@develop
         if: ${{ github.ref == 'refs/heads/master' }}
         env:
           REPO: self
-          BRANCH: master-dist 
-          FOLDER: out 
+          BRANCH: master-dist
+          FOLDER: out
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
       - name: Prepare Branch Release
@@ -46,7 +45,7 @@ jobs:
         if: ${{ github.ref != 'refs/heads/master' }}
         env:
           REPO: self
-          BRANCH: bleeding-edge 
-          FOLDER: out 
+          BRANCH: bleeding-edge
+          FOLDER: out
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"

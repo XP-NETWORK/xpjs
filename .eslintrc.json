@@ -24,10 +24,7 @@
       { "allowWholeFile": true }
     ],
     "eslint-comments/no-unused-disable": "error",
-    "import/order": [
-      "error",
-      { "alphabetize": { "order": "asc" } }
-    ],
+    "import/order": ["error", { "alphabetize": { "order": "asc" } }],
     "sort-imports": [
       "error",
       { "ignoreDeclarationSort": true, "ignoreCase": true }
