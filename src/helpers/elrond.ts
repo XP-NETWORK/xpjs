@@ -265,8 +265,9 @@ export const elrondHelperFactory: (
   };
 
   const signAndSend = async (signer: ISigner | ExtensionProvider, tx: Transaction) => {
-    
     const acc = await syncAccount(signer);
+    tx.setNonce(acc.nonce)
+    console.log(tx)
     let stx: Transaction;
      if (signer instanceof ExtensionProvider) {
        stx = await signer.signTransaction(tx);
@@ -274,7 +275,7 @@ export const elrondHelperFactory: (
       await (signer as ISigner).sign(tx)
       stx = tx
     }
-    stx.setNonce(acc.nonce)
+    console.log("STX", stx)
     try {
       await stx.send(provider);
     } catch (e: any) {
