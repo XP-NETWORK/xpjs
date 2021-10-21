@@ -30,7 +30,7 @@ jobs:
         run: yarn build
       
       - name: prepare package
-        run: mkdir out && mv package.json out && mv dist out
+        run: mkdir out && mv package.json out && mv dist out && mv README.md out && mv LICENSE out
     
       - name: Prepare Master Release
         uses: s0/git-publish-subdir-action@develop
