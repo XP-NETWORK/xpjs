@@ -70,7 +70,7 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
    * @argument signer  owner of the smart contract
    * @argument args  See [[MintArgs]]
    */
-  MintNft<Signer, NftMintArgs, void> & {
+  MintNft<Signer, NftMintArgs, any> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -145,11 +145,11 @@ export async function baseWeb3HelperFactory(
     async mintNft(
       owner: Signer,
       { contract, uris }: NftMintArgs
-    ): Promise<void> {
+    ): Promise<any> {
       const erc721 = new Contract(contract!, erc721_abi, owner);
 
       const txm = await erc721.mint(uris[0]);
-      await txm.wait();
+      return await txm.wait();
     },
   };
 }
