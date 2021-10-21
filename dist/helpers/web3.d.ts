@@ -40,7 +40,7 @@ export declare type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
  * @argument signer  owner of the smart contract
  * @argument args  See [[MintArgs]]
  */
-MintNft<Signer, NftMintArgs, void> & {
+MintNft<Signer, NftMintArgs, any> & {
     /**
      *
      * Deploy an ERC721 smart contract

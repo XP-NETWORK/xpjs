@@ -103,7 +103,7 @@ declare type EventIdent = number;
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, EasyBalance, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, EasyBalance, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftMintArgs, void> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> & TransferNftForeign<ISigner, string, EasyBalance, NftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, EasyBalance, number, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftMintArgs, Transaction> & ListNft<string, string, EsdtNftInfo> & GetLockedNft<NftInfo, EsdtNftInfo> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft & {
     mintableEsdts(address: Address): Promise<string[]>;
 } & WrappedNftCheck<NftInfo> & EstimateTxFees<Address, NftInfo, WrappedNft, BigNumber>;
 /**

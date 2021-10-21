@@ -4,7 +4,7 @@ import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 import { EstimateTxFees, WrappedNftCheck } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
-export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<string, NftMintArgs, void> & {
+export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<string, NftMintArgs, any> & {
     /**
      *
      * Deploy an ERC1155 smart contract
