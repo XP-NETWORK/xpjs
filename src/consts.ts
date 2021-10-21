@@ -17,10 +17,10 @@ export enum RpcUri {
 }
 
 export enum Chain {
-  HECO = 2,
-  BSC = 3,
-  AVALANCE = 4,
-  POLYGON = 6,
+  HECO = 3,
+  BSC = 4,
+  AVALANCE = 6,
+  POLYGON = 7,
   FANTOM = 8,
   TRON = 9,
   CELO = 11,
