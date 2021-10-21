@@ -14,7 +14,7 @@ import {
 } from "./chain";
 import { abi as ERC1155_abi } from "../fakeERC1155.json";
 
-// @ts-ignore
+//@ts-ignore
 import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 
