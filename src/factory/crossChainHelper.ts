@@ -53,6 +53,7 @@ export interface ChainParams {
   tronParams: TronParams;
   celoParams: Web3Params;
   harmonyParams: Web3Params;
+  ontologyParams: Web3Params;
 }
 
 function mapNonceToParams(
@@ -71,6 +72,7 @@ function mapNonceToParams(
 
   cToP.set(11, chainParams.celoParams);
   cToP.set(12, chainParams.harmonyParams);
+  cToP.set(13, chainParams.ontologyParams);
   return cToP;
 }
 /**
