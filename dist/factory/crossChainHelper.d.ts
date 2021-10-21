@@ -39,16 +39,16 @@ export interface ChainParams {
     ontologyParams: Web3Params;
 }
 /**
-* This function is the basic entry point to use this package as a library.
-* @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
-* @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
-*/
+ * This function is the basic entry point to use this package as a library.
+ * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
+ * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
+ */
 export declare function ChainFactory(chainParams: ChainParams): ChainFactory;
 /**
  * The interface that defines the arguments to mint an NFT.
  * @property contract is the address of the smart contract that will mint the NFT and it is mandatory for WEB3 and Tron Chains.
  * @property identifier is the identifier of the NFT to mint and it is mandatory for Elrond Chain.
-*/
+ */
 export interface NftMintArgs {
     readonly contract?: string;
     readonly uris: string[];

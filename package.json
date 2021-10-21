@@ -1,6 +1,6 @@
 {
-  "name": "testsuite-ts",
-  "version": "2.0.0",
+  "name": "xp.network",
+  "version": "0.0.1",
   "author": "rupansh <rupanshsekar@hotmail.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
