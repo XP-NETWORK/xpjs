@@ -274,7 +274,7 @@ export const elrondHelperFactory: (
       await (signer as ISigner).sign(tx)
       stx = tx
     }
-
+    stx.setNonce(acc.nonce)
     try {
       await stx.send(provider);
     } catch (e: any) {
