@@ -8,8 +8,16 @@ import { MintNft } from "..";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
+/**
+ * A type representing a chain factory.
+ * 
+ */
 type ChainFactory = {
-  inner(chainNonce: number): Promise<CrossChainHelper>;
+  /**
+   * Create a cross chain helper object
+   * @param chain: {@link Chain} to create the helper for
+   */
+  inner(chain: Chain): Promise<CrossChainHelper>;
   // IMO This should Return a transaction, which can be signed later by a wallet interface.
   transferNft(
     fromChain: Chain,
@@ -19,7 +27,11 @@ type ChainFactory = {
     receiver: any,
     validators: any[]
   ): Promise<void>;
-  // The function that should be used to mint an nft.
+  /**
+   * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
+   * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
+   * @param args: {@link NftMintArgs} Arguments to mint the nft.
+   */
   mint<Signer, Response>(
     chain: MintNft<Signer, NftMintArgs, Response>,
     owner: Signer,
@@ -27,6 +39,9 @@ type ChainFactory = {
   ): Promise<void>;
 };
 
+/**
+ * A type representing all the supported chain params.
+ */
 export interface ChainParams {
   elrondParams: ElrondParams;
   hecoParams: Web3Params;
@@ -58,15 +73,19 @@ function mapNonceToParams(
   cToP.set(12, chainParams.harmonyParams);
   return cToP;
 }
-
+/**
+* This function is the basic entry point to use this package as a library.
+* @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
+* @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
+*/
 export function ChainFactory(chainParams: ChainParams): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
 
-  const inner = async (chainNonce: number): Promise<CrossChainHelper> => {
-    let helper = map.get(chainNonce);
+  const inner = async (chain: Chain): Promise<CrossChainHelper> => {
+    let helper = map.get(chain);
     if (helper === undefined) {
-      helper = await CHAIN_INFO[chainNonce].constructor(cToP.get(chainNonce)!);
+      helper = await CHAIN_INFO[chain].constructor(cToP.get(chain)!);
     }
     return helper!;
   };
@@ -116,9 +135,10 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
     },
   };
 }
-/*
- * contract is mandatory for a web3 chains & tron.
- * identifier is mandatory for a elrond chain.
+/**
+ * The interface that defines the arguments to mint an NFT.
+ * @property contract is the address of the smart contract that will mint the NFT and it is mandatory for WEB3 and Tron Chains.
+ * @property identifier is the identifier of the NFT to mint and it is mandatory for Elrond Chain.
 */
 export interface NftMintArgs {
   readonly contract?: string;

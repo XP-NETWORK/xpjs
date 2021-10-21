@@ -16,7 +16,10 @@ export enum RpcUri {
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
 }
-
+/**
+ * An enum which represents the supported chains
+ * Each field in the enum equals to the nonce of the chain.
+ */
 export enum Chain {
   ELROND = 2,
   HECO = 3,
