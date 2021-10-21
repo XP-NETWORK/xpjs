@@ -2,7 +2,6 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, CHAIN_INFO } from "../consts";
-import { NftInfo } from "testsuite-ts";
 import { BigNumber } from "bignumber.js";
 
 import { MintNft } from "..";
@@ -15,7 +14,7 @@ type ChainFactory = {
   transferNft(
     fromChain: Chain,
     toChain: Chain,
-    nft: NftInfo,
+    nft: any,
     sender: any,
     receiver: any,
     validators: any[]
@@ -78,7 +77,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
     transferNft: async (
       fromChain: Chain,
       toChain: Chain,
-      nft: NftInfo,
+      nft: any,
       sender: any,
       receiver: any,
       validators: any[]
