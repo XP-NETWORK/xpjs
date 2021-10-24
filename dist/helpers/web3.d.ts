@@ -6,7 +6,6 @@ import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft, WrappedNftCheck } from "./chain";
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
-import { Interface } from "ethers/lib/utils";
 import { EstimateTxFees } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 declare type EasyBalance = string | number | EthBN;
@@ -75,9 +74,7 @@ export declare function baseWeb3HelperFactory(provider: Provider): Promise<BaseW
 export interface Web3Params {
     provider: Provider;
     minter_addr: string;
-    minter_abi: Interface;
     erc1155_addr: string;
-    erc721_addr: string;
     validators: string[];
 }
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
