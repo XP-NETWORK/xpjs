@@ -5,7 +5,7 @@ import { Chain, CHAIN_INFO } from "../consts";
 
 import { MintNft } from "..";
 import { Address, ISigner } from "@elrondnetwork/erdjs/out";
-import { Signer } from "validator/node_modules/ethers";
+import { Signer } from "ethers";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
