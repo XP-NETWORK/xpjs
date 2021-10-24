@@ -136,11 +136,14 @@ export async function baseWeb3HelperFactory(
 
       return contract.address;
     },
-    async mintNft(owner: Signer, { contract, uri }: MintArgs): Promise<void> {
-      const erc721 = UserNftMinter__factory.connect(contract, owner);
+    async mintNft(
+      owner: Signer,
+      { contract, uris }: NftMintArgs
+    ): Promise<any> {
+      const erc721 = UserNftMinter__factory.connect(contract!, owner);
 
-      const txm = await erc721.mint(uri);
-      await txm.wait();
+      const txm = await erc721.mint(uris[0]);
+      return await txm.wait();
     },
   };
 }
@@ -155,19 +158,15 @@ export async function baseWeb3HelperFactory(
 export interface Web3Params {
   provider: Provider;
   minter_addr: string;
-  minter_abi: Interface;
   erc1155_addr: string;
-  erc721_addr: string;
   validators: string[];
 }
 
 export async function web3HelperFactory(
-  provider: Provider,
-  minter_addr: string,
-  erc1155_addr: string
+  params: Web3Params
 ): Promise<Web3Helper> {
   const w3 = params.provider;
-
+  const { minter_addr, provider, erc1155_addr } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
   const erc1155 = XPNet__factory.connect(erc1155_addr, provider);
 
@@ -231,7 +230,7 @@ export async function web3HelperFactory(
       return new BigNumber(bal.toString());
     },
     isWrappedNft(nft) {
-      return nft.contract === params.erc721_addr;
+      return nft.contract === params.erc1155_addr;
     },
     async balanceWrappedBatch(
       address: string,

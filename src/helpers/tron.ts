@@ -12,6 +12,7 @@ import {
   UnfreezeForeignNft,
   WrappedBalanceCheck,
   WrappedNft,
+  WrappedNftCheck,
 } from "./chain";
 
 import axios from "axios";
@@ -29,6 +30,8 @@ import {
   XPNet__factory,
   XPNft__factory,
 } from "xpnet-web3-contracts";
+import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftEthNative, NftPacked } from "validator";
 
 export type MinterRes = {
   // Minter smart contract
@@ -132,7 +135,7 @@ export async function baseTronHelperFactory(
         UserNftMinter__factory.abi,
         options.contract
       );
-      await erc.mint(options.uri).send();
+      await erc.mint(options.uris[0]).send();
     },
     async balance(address: string): Promise<BigNumber> {
       const balance = await provider.trx.getBalance(address);
@@ -184,17 +187,13 @@ export interface TronParams {
   middleware_uri: string;
   erc1155_addr: string;
   minter_addr: string;
-  minter_abi: JSON;
-  erc721_addr: string;
   validators: string[];
 }
 
 export async function tronHelperFactory(
-  provider: TronWeb,
-  middleware_uri: string,
-  erc1155_addr: string,
-  minter_addr: string
+  tronParams: TronParams
 ): Promise<TronHelper> {
+  const { provider, erc1155_addr, minter_addr } = tronParams;
   const station = new TronStation(provider);
   const base = await baseTronHelperFactory(provider);
   const erc1155 = await provider.contract(XPNet__factory.abi, erc1155_addr);
@@ -299,7 +298,7 @@ export async function tronHelperFactory(
       return await nftUri(nft_info);
     },
     isWrappedNft(nft) {
-      return nft.contract === tronParams.erc721_addr;
+      return nft.contract === tronParams.erc1155_addr;
     },
     decodeWrappedNft(raw_data: string): WrappedNft {
       const u8D = Base64.toUint8Array(raw_data);
@@ -406,7 +405,7 @@ export async function tronHelperFactory(
       encoded.setData(tokdat.serializeBinary());
 
       return await estimateGas(
-        validators,
+        tronParams.validators,
         "validateTransferNft(uint128,address,string)",
         [
           { type: "uint128", value: randomAction() },
@@ -425,7 +424,7 @@ export async function tronHelperFactory(
       const nft_dat = NftEthNative.deserializeBinary(nft_data);
 
       return await estimateGas(
-        validators,
+        tronParams.validators,
         "validateUnfreezeNft(uint128,address,uint256,address)",
         [
           { type: "uint128", value: randomAction() },
