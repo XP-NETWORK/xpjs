@@ -112,8 +112,8 @@ export interface DecodeWrappedNft<Data> {
 export interface DecodeRawNft {
     decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
-export interface EstimateTxFees<Address, NftId, WrappedNftData, Balance> {
-    estimateValidateTransferNft(validators: Address[], to: Address, nft: NftId): Promise<Balance>;
-    estimateValidateUnfreezeNft(validators: Address[], to: Address, nft: WrappedNftData): Promise<Balance>;
+export interface EstimateTxFees<NftId, WrappedNftData, Balance> {
+    estimateValidateTransferNft(to: string, nft: NftId): Promise<Balance>;
+    estimateValidateUnfreezeNft(to: string, nft: WrappedNftData): Promise<Balance>;
 }
 export declare function ConcurrentSendError(): Error;

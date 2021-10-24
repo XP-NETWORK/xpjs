@@ -14,7 +14,7 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<s
      */
     deployErc721(owner: string): Promise<string>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, string, string, string> & TransferNftForeign<string, string, string, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, string, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
+export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, BigNumber, string, string> & TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
 } & WrappedNftCheck<MintArgs>;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
@@ -25,5 +25,6 @@ export interface TronParams {
     minter_addr: string;
     minter_abi: JSON;
     erc721_addr: string;
+    validators: string[];
 }
 export declare function tronHelperFactory(tronParams: TronParams): Promise<TronHelper>;

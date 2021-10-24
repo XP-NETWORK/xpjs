@@ -14,7 +14,7 @@ declare type ChainFactory = {
      * @param chain: {@link Chain} to create the helper for
      */
     inner(chain: Chain): Promise<CrossChainHelper>;
-    transferNft(fromChain: Chain, toChain: Chain, nft: any, sender: any, receiver: any, validators: any[]): Promise<void>;
+    transferNft(fromChain: Chain, toChain: Chain, nft: any, sender: any, receiver: any): Promise<any>;
     /**
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
      * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.

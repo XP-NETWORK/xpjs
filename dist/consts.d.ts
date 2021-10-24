@@ -39,6 +39,7 @@ interface ChainData {
     blockExplorerUrl: string;
     chainId?: number;
     currency: SupportedCurrency;
+    validators: string[];
 }
 interface ChainInfo {
     [nonce: number]: ChainData;

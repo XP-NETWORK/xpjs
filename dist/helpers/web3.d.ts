@@ -53,7 +53,7 @@ MintNft<Signer, NftMintArgs, any> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> & TransferNftForeign<Signer, string, EasyBalance, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, EasyBalance, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, TransactionReceipt, string> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
     /**
      * Get the uri of an nft given nft info
      */
@@ -78,6 +78,7 @@ export interface Web3Params {
     minter_abi: Interface;
     erc1155_addr: string;
     erc721_addr: string;
+    validators: string[];
 }
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
 export {};
