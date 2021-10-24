@@ -2,9 +2,10 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, CHAIN_INFO } from "../consts";
-import { BigNumber } from "bignumber.js";
 
 import { MintNft } from "..";
+import { Address, ISigner } from "@elrondnetwork/erdjs/out";
+import { Signer } from "validator/node_modules/ethers";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -26,7 +27,7 @@ type ChainFactory = {
     sender: any,
     receiver: any,
     validators: any[]
-  ): Promise<void>;
+  ): Promise<any>;
   /**
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
    * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
@@ -99,33 +100,46 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
       fromChain: Chain,
       toChain: Chain,
       nft: any,
-      sender: any,
-      receiver: any,
+      sender: ISigner & Signer & string,
+      receiver: Address & string,
       validators: any[]
-    ): Promise<void> => {
+    ): Promise<any> => {
       const fromHelper = await inner(fromChain);
       const estimate = await fromHelper.estimateValidateTransferNft(
         validators,
         receiver,
-        nft as any
+        nft
       );
-
       if (nft.chain === fromChain) {
-        await fromHelper.transferNativeToForeign(
+        const transfer = await fromHelper.transferNativeToForeign(
           sender,
           toChain,
           receiver,
-          nft as any,
-          estimate as string | (string & BigNumber) | (BigNumber & string)
+          nft,
+          estimate
         );
+        return transfer;
       } else {
-        fromHelper.transferNftToForeign(
-          sender,
-          fromChain,
-          receiver,
-          nft as any,
-          estimate as string | (string & BigNumber) | (BigNumber & string)
-        );
+        if (fromHelper.isWrappedNft(nft)) {
+          await fromHelper.unfreezeWrappedNft(
+            sender,
+            receiver,
+            nft.id,
+            estimate
+          );
+          if (fromChain == toChain) {
+            return;
+          } else {
+            const receipt = await fromHelper.transferNftToForeign(
+              sender,
+              fromChain,
+              receiver,
+              nft,
+              estimate
+            );
+            return receipt;
+          }
+        }
       }
     },
     mint: async <Signer>(
