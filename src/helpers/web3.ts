@@ -107,7 +107,7 @@ export type Web3Helper = BaseWeb3Helper &
   > &
   DecodeWrappedNft<string> &
   DecodeRawNft &
-  EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
+  EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
     /**
      * Get the uri of an nft given nft info
      */
@@ -167,6 +167,7 @@ export interface Web3Params {
   minter_abi: Interface;
   erc1155_addr: string;
   erc721_addr: string;
+  validators: string[];
 }
 
 export async function web3HelperFactory(
@@ -339,7 +340,6 @@ export async function web3HelperFactory(
       return await nftUri(nft_info);
     },
     async estimateValidateTransferNft(
-      validators: string[],
       to: string,
       nft: EthNftInfo
     ): Promise<BigNumber> {
@@ -359,10 +359,9 @@ export async function web3HelperFactory(
         Buffer.from(encoded.serializeBinary()).toString("base64")
       );
 
-      return await estimateGas(validators, utx);
+      return await estimateGas(params.validators, utx);
     },
     async estimateValidateUnfreezeNft(
-      validators: string[],
       to: string,
       nft_data: Uint8Array
     ): Promise<BigNumber> {
@@ -374,7 +373,7 @@ export async function web3HelperFactory(
         nft_dat.getContractAddr()
       );
 
-      return await estimateGas(validators, utx);
+      return await estimateGas(params.validators, utx);
     },
   };
 }

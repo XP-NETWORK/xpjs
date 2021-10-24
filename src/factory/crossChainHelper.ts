@@ -25,8 +25,7 @@ type ChainFactory = {
     toChain: Chain,
     nft: any,
     sender: any,
-    receiver: any,
-    validators: any[]
+    receiver: any
   ): Promise<any>;
   /**
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
@@ -101,12 +100,10 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
       toChain: Chain,
       nft: any,
       sender: ISigner & Signer & string,
-      receiver: Address & string,
-      validators: any[]
+      receiver: Address & string
     ): Promise<any> => {
       const fromHelper = await inner(fromChain);
       const estimate = await fromHelper.estimateValidateTransferNft(
-        validators,
         receiver,
         nft
       );

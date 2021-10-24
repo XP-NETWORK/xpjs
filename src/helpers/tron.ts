@@ -52,7 +52,7 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> &
   DecodeWrappedNft<string> &
   DecodeRawNft &
-  EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
+  EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
   } & WrappedNftCheck<MintArgs>;
 
@@ -97,6 +97,7 @@ export interface TronParams {
   minter_addr: string;
   minter_abi: JSON;
   erc721_addr: string;
+  validators: string[];
 }
 
 export async function tronHelperFactory(
@@ -278,7 +279,6 @@ export async function tronHelperFactory(
       return new BigNumber(bal.toString());
     },
     async estimateValidateTransferNft(
-      validators: string[],
       to: string,
       nft: EthNftInfo
     ): Promise<BigNumber> {
@@ -298,10 +298,9 @@ export async function tronHelperFactory(
         Buffer.from(encoded.serializeBinary()).toString("base64")
       );
 
-      return await estimateGas(validators, utx);
+      return await estimateGas(tronParams.validators, utx);
     },
     async estimateValidateUnfreezeNft(
-      validators: string[],
       to: string,
       nft_data: Uint8Array
     ): Promise<BigNumber> {
@@ -313,7 +312,7 @@ export async function tronHelperFactory(
         nft_dat.getContractAddr()
       );
 
-      return await estimateGas(validators, utx);
+      return await estimateGas(tronParams.validators, utx);
     },
   };
 }

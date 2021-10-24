@@ -165,15 +165,10 @@ export interface DecodeRawNft {
   decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
 
-export interface EstimateTxFees<Address, NftId, WrappedNftData, Balance> {
-  estimateValidateTransferNft(
-    validators: Address[],
-    to: Address,
-    nft: NftId
-  ): Promise<Balance>;
+export interface EstimateTxFees<NftId, WrappedNftData, Balance> {
+  estimateValidateTransferNft(to: string, nft: NftId): Promise<Balance>;
   estimateValidateUnfreezeNft(
-    validators: Address[],
-    to: Address,
+    to: string,
     nft: WrappedNftData
   ): Promise<Balance>;
 }
