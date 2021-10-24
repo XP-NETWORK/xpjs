@@ -87,11 +87,11 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<Signer, string, EasyBalance, TransactionReceipt, string> &
+  TransferForeign<Signer, string, BigNumber, TransactionReceipt, string> &
   TransferNftForeign<
     Signer,
     string,
-    EasyBalance,
+    BigNumber,
     EthNftInfo,
     TransactionReceipt,
     string
@@ -100,7 +100,7 @@ export type Web3Helper = BaseWeb3Helper &
   UnfreezeForeignNft<
     Signer,
     string,
-    EasyBalance,
+    BigNumber,
     BigNumber,
     TransactionReceipt,
     string
@@ -262,8 +262,8 @@ export async function web3HelperFactory(
       sender: Signer,
       chain_nonce: number,
       to: string,
-      value: EasyBalance,
-      txFees: EasyBalance
+      value: BigNumber,
+      txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
       const totalVal = EthBN.from(value.toString()).add(
         EthBN.from(txFees.toString())
@@ -278,7 +278,7 @@ export async function web3HelperFactory(
       chain_nonce: number,
       to: string,
       id: EthNftInfo,
-      txFees: EasyBalance
+      txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
       const erc = new Contract(id.contract, ERC721_abi, w3);
       const ta = await erc.connect(sender).approve(minter.address, id.token);
@@ -288,7 +288,7 @@ export async function web3HelperFactory(
       const txr = await minter
         .connect(sender)
         .freeze_erc721(id.contract, id.token, chain_nonce, to, {
-          value: EthBN.from(txFees.toString()),
+          value: txFees,
         });
 
       return await extractTxn(txr, "TransferErc721");
@@ -310,10 +310,10 @@ export async function web3HelperFactory(
       sender: Signer,
       to: string,
       id: BigNumber,
-      txFees: EasyBalance
+      txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
       const res = await signedMinter(sender).withdraw_nft(to, id, {
-        value: EthBN.from(txFees.toString()),
+        value: txFees,
       });
 
       return await extractTxn(res, "UnfreezeNft");

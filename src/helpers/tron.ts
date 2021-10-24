@@ -44,12 +44,12 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
 export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<string, string, string, string, string> &
+  TransferForeign<string, string, BigNumber, string, string> &
   // TODO: Use TX Fees
-  TransferNftForeign<string, string, string, EthNftInfo, string, string> &
+  TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> &
   // TODO: Use TX Fees
   UnfreezeForeign<string, string, string, string, string> &
-  UnfreezeForeignNft<string, string, string, BigNumber, string, string> &
+  UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> &
   DecodeWrappedNft<string> &
   DecodeRawNft &
   EstimateTxFees<string, EthNftInfo, Uint8Array, BigNumber> & {
@@ -204,8 +204,8 @@ export async function tronHelperFactory(
       sender: string,
       chain_nonce: number,
       to: string,
-      value: string,
-      txFees: string
+      value: BigNumber,
+      txFees: BigNumber
     ): Promise<[string, string]> {
       setSigner(sender);
 
@@ -234,12 +234,10 @@ export async function tronHelperFactory(
       sender: string,
       to: string,
       id: BigNumber,
-      txFees: string
+      txFees: BigNumber
     ): Promise<[string, string]> {
       setSigner(sender);
-      const res = await minter
-        .withdraw_nft(to, id)
-        .send({ callValue: EthBN.from(txFees.toString()) });
+      const res = await minter.withdraw_nft(to, id).send({ callValue: txFees });
       return await extractTxn(res);
     },
     async transferNftToForeign(
@@ -247,7 +245,7 @@ export async function tronHelperFactory(
       chain_nonce: number,
       to: string,
       id: EthNftInfo,
-      txFees: string
+      txFees: BigNumber
     ): Promise<[string, string]> {
       setSigner(sender);
       const erc = await provider.contract(ERC721_abi, id.contract);
@@ -255,7 +253,7 @@ export async function tronHelperFactory(
 
       const txr = await minter
         .freeze_erc721(id.contract, id.token, chain_nonce, to)
-        .send({ callValue: EthBN.from(txFees.toString()) });
+        .send({ callValue: txFees });
 
       return await extractTxn(txr);
     },

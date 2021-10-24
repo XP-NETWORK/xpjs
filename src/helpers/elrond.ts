@@ -192,12 +192,12 @@ type EventIdent = number;
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
-  UnfreezeForeign<ISigner, string, EasyBalance, Transaction, EventIdent> &
+  TransferForeign<ISigner, string, BigNumber, Transaction, EventIdent> &
+  UnfreezeForeign<ISigner, string, BigNumber, Transaction, EventIdent> &
   TransferNftForeign<
     ISigner,
     string,
-    EasyBalance,
+    BigNumber,
     NftInfo,
     Transaction,
     EventIdent
@@ -205,7 +205,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   UnfreezeForeignNft<
     ISigner,
     string,
-    EasyBalance,
+    BigNumber,
     number,
     Transaction,
     EventIdent
