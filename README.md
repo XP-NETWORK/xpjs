@@ -27,7 +27,7 @@ Features Available :-
 - Import ChainFactory from the package and instantiate it with the params required i.e. for Avalanche
 
   ```javascript
-  const factory = LibChainFactory(
+  const factory = ChainFactory(
     {
     ...,
     avalancheParams: {
