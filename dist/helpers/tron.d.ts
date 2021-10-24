@@ -37,6 +37,7 @@ export interface TronParams {
     middleware_uri: string;
     erc1155_addr: string;
     minter_addr: string;
+    erc721_addr: string;
     validators: string[];
 }
 export declare function tronHelperFactory(tronParams: TronParams): Promise<TronHelper>;

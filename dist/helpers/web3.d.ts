@@ -75,6 +75,7 @@ export interface Web3Params {
     provider: Provider;
     minter_addr: string;
     erc1155_addr: string;
+    erc721_addr: string;
     validators: string[];
 }
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
