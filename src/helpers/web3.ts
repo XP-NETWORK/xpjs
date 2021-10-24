@@ -159,6 +159,7 @@ export interface Web3Params {
   provider: Provider;
   minter_addr: string;
   erc1155_addr: string;
+  erc721_addr: string;
   validators: string[];
 }
 
@@ -230,7 +231,7 @@ export async function web3HelperFactory(
       return new BigNumber(bal.toString());
     },
     isWrappedNft(nft) {
-      return nft.contract === params.erc1155_addr;
+      return nft.contract === params.erc721_addr;
     },
     async balanceWrappedBatch(
       address: string,

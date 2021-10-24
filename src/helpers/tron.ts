@@ -187,6 +187,7 @@ export interface TronParams {
   middleware_uri: string;
   erc1155_addr: string;
   minter_addr: string;
+  erc721_addr: string;
   validators: string[];
 }
 
@@ -298,7 +299,7 @@ export async function tronHelperFactory(
       return await nftUri(nft_info);
     },
     isWrappedNft(nft) {
-      return nft.contract === tronParams.erc1155_addr;
+      return nft.contract === tronParams.erc721_addr;
     },
     decodeWrappedNft(raw_data: string): WrappedNft {
       const u8D = Base64.toUint8Array(raw_data);
