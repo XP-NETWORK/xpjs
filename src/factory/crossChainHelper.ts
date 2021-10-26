@@ -120,7 +120,8 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
       receiver: Address & string
     ): Promise<any> => {
       const fromHelper = await inner(fromChain);
-      const estimate = await fromHelper.estimateValidateTransferNft(
+      const toHelper = await inner(toChain);
+      const estimate = await toHelper.estimateValidateTransferNft(
         receiver,
         nft
       );
@@ -131,7 +132,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
       );
       const conv = estimate
         .dividedBy(CHAIN_INFO[toChain].decimals)
-        .times(exrate * 0.05)
+        .times(exrate * 1.05)
         .times(CHAIN_INFO[fromChain].decimals)
         .integerValue(BigNumber.ROUND_CEIL);
       console.log("Converted Value: ", conv.toString());
