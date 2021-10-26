@@ -6,6 +6,12 @@ import { Chain, CHAIN_INFO } from "../consts";
 import { MintNft } from "..";
 import { Address, ISigner } from "@elrondnetwork/erdjs/out";
 import { Signer } from "ethers";
+import {
+  cachedExchangeRateRepo,
+  networkBatchExchangeRateRepo,
+  NetworkModel,
+} from "crypto-exchange-rate";
+import BigNumber from "bignumber.js";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -83,6 +89,17 @@ function mapNonceToParams(
 export function ChainFactory(chainParams: ChainParams): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
+  function configBatchExchangeService(): NetworkModel.BatchExchangeRateService {
+    return NetworkModel.batchExchangeRateService(
+      "https://testing-bridge.xp.network/exchange"
+    );
+  }
+  const remoteExchangeRate = cachedExchangeRateRepo(
+    networkBatchExchangeRateRepo(
+      configBatchExchangeService(),
+      NetworkModel.exchangeRateDtoMapper()
+    )
+  );
 
   const inner = async (chain: Chain): Promise<CrossChainHelper> => {
     let helper = map.get(chain);
@@ -107,23 +124,29 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
         receiver,
         nft
       );
+      console.log(`Estimate : ${estimate}`);
+      const exrate = await remoteExchangeRate.getExchangeRate(
+        CHAIN_INFO[toChain].currency,
+        CHAIN_INFO[fromChain].currency
+      );
+      const conv = estimate
+        .dividedBy(CHAIN_INFO[toChain].decimals)
+        .times(exrate * 0.05)
+        .times(CHAIN_INFO[fromChain].decimals)
+        .integerValue(BigNumber.ROUND_CEIL);
+      console.log("Converted Value: ", conv.toString());
       if (nft.chain === fromChain) {
         const transfer = await fromHelper.transferNativeToForeign(
           sender,
           toChain,
           receiver,
           nft,
-          estimate
+          conv
         );
         return transfer;
       } else {
         if (fromHelper.isWrappedNft(nft)) {
-          await fromHelper.unfreezeWrappedNft(
-            sender,
-            receiver,
-            nft.id,
-            estimate
-          );
+          await fromHelper.unfreezeWrappedNft(sender, receiver, nft.id, conv);
           if (fromChain == toChain) {
             return;
           } else {
@@ -132,7 +155,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
               fromChain,
               receiver,
               nft,
-              estimate
+              conv
             );
             return receipt;
           }
