@@ -123,7 +123,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
       const toHelper = await inner(toChain);
       const estimate = await toHelper.estimateValidateTransferNft(
         receiver,
-        nft
+        nft.hash
       );
       console.log(`Estimate : ${estimate}`);
       const exrate = await remoteExchangeRate.getExchangeRate(
