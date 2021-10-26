@@ -137,7 +137,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
         .integerValue(BigNumber.ROUND_CEIL);
       console.log("Converted Value: ", conv.toString());
       if (nft.chain === fromChain) {
-        const transfer = await fromHelper.transferNativeToForeign(
+        const transfer = await fromHelper.transferNftToForeign(
           sender,
           toChain,
           receiver,
@@ -147,6 +147,21 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
         return transfer;
       } else {
         if (fromHelper.isWrappedNft(nft)) {
+          const estimate = await toHelper.estimateValidateUnfreezeNft(
+            receiver,
+            nft.raw_data
+          );
+
+          const exrate = await remoteExchangeRate.getExchangeRate(
+            CHAIN_INFO[toChain].currency,
+            CHAIN_INFO[fromChain].currency
+          );
+
+          const conv = estimate
+            .dividedBy(CHAIN_INFO[toChain].decimals)
+            .times(exrate * 1.05)
+            .times(CHAIN_INFO[fromChain].decimals)
+            .integerValue(BigNumber.ROUND_CEIL);
           await fromHelper.unfreezeWrappedNft(sender, receiver, nft.id, conv);
           if (fromChain == toChain) {
             return;
