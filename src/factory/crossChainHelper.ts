@@ -141,7 +141,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
           sender,
           toChain,
           receiver,
-          nft,
+          nft.id,
           conv
         );
         return transfer;
@@ -155,7 +155,7 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
               sender,
               fromChain,
               receiver,
-              nft,
+              nft.id,
               conv
             );
             return receipt;
