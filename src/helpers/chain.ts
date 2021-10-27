@@ -176,3 +176,7 @@ export interface EstimateTxFees<NftId, WrappedNftData, Balance> {
 export function ConcurrentSendError(): Error {
   return new Error("concurrent_send");
 }
+
+export interface ChainNonce {
+  getNonce(): number;
+}
