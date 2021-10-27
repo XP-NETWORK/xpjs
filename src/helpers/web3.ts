@@ -30,7 +30,7 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import { EstimateTxFees } from "..";
+import { ChainNonce, EstimateTxFees } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 type EasyBalance = string | number | EthBN;
 /**
@@ -107,7 +107,8 @@ export type Web3Helper = BaseWeb3Helper &
      * Get the uri of an nft given nft info
      */
     nftUri(info: EthNftInfo): Promise<string>;
-  } & WrappedNftCheck<MintArgs>;
+  } & WrappedNftCheck<MintArgs> &
+  ChainNonce;
 
 function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
   return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155";
@@ -161,6 +162,7 @@ export interface Web3Params {
   erc1155_addr: string;
   erc721_addr: string;
   validators: string[];
+  nonce: number;
 }
 
 export async function web3HelperFactory(
@@ -222,6 +224,7 @@ export async function web3HelperFactory(
 
   return {
     ...base,
+    getNonce: () => params.nonce,
     async balanceWrapped(
       address: string,
       chain_nonce: number

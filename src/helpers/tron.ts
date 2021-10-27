@@ -32,6 +32,7 @@ import {
 } from "xpnet-web3-contracts";
 import { NftMintArgs } from "../factory/crossChainHelper";
 import { NftEthNative, NftPacked } from "validator";
+import { ChainNonce } from "..";
 
 export type MinterRes = {
   // Minter smart contract
@@ -83,7 +84,8 @@ export type TronHelper = BaseTronHelper &
   DecodeRawNft &
   EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
-  } & WrappedNftCheck<MintArgs>;
+  } & WrappedNftCheck<MintArgs> &
+  ChainNonce;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -189,6 +191,7 @@ export interface TronParams {
   minter_addr: string;
   erc721_addr: string;
   validators: string[];
+  nonce: number;
 }
 
 export async function tronHelperFactory(
@@ -350,6 +353,9 @@ export async function tronHelperFactory(
         .withdrawNft(to, id.toString())
         .send({ callValue: EthBN.from(txFees.toString()) });
       return await extractTxn(res);
+    },
+    getNonce() {
+      return tronParams.nonce;
     },
     async transferNftToForeign(
       sender: string,

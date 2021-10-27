@@ -43,7 +43,7 @@ import {
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
-import { EstimateTxFees } from "..";
+import { ChainNonce, EstimateTxFees } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 
 type EasyBalance = string | number | BigNumber;
@@ -218,7 +218,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   DecodeRawNft & {
     mintableEsdts(address: Address): Promise<string[]>;
   } & WrappedNftCheck<NftInfo> &
-  EstimateTxFees<NftInfo, WrappedNft, BigNumber>;
+  EstimateTxFees<NftInfo, WrappedNft, BigNumber> &
+  ChainNonce;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -237,6 +238,7 @@ export interface ElrondParams {
   esdt_nft: string;
   esdt_swap: string;
   validators: string[];
+  nonce: number;
 }
 
 export const elrondHelperFactory: (
@@ -755,6 +757,9 @@ export const elrondHelperFactory: (
       const txu = unsignedSetESDTRoles(token, target, roles);
 
       await signAndSend(manager, txu);
+    },
+    getNonce() {
+      return elrondParams.nonce;
     },
     decodeWrappedNft(raw_data: EsdtNftInfo): WrappedNft {
       if (!raw_data.attributes) {
