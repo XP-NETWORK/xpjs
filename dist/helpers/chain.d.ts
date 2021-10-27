@@ -117,3 +117,6 @@ export interface EstimateTxFees<NftId, WrappedNftData, Balance> {
     estimateValidateUnfreezeNft(to: string, nft: WrappedNftData): Promise<Balance>;
 }
 export declare function ConcurrentSendError(): Error;
+export interface ChainNonce {
+    getNonce(): number;
+}

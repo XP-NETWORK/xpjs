@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft, WrappedNftCheck } from "./chain";
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
-import { EstimateTxFees } from "..";
+import { ChainNonce, EstimateTxFees } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 declare type EasyBalance = string | number | EthBN;
 /**
@@ -57,7 +57,7 @@ export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, Bi
      * Get the uri of an nft given nft info
      */
     nftUri(info: EthNftInfo): Promise<string>;
-} & WrappedNftCheck<MintArgs>;
+} & WrappedNftCheck<MintArgs> & ChainNonce;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
@@ -77,6 +77,7 @@ export interface Web3Params {
     erc1155_addr: string;
     erc721_addr: string;
     validators: string[];
+    nonce: number;
 }
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
 export {};

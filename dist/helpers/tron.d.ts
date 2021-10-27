@@ -3,6 +3,7 @@ import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft,
 import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 import { NftMintArgs } from "../factory/crossChainHelper";
+import { ChainNonce } from "..";
 export declare type MinterRes = {
     minter: string;
     xpnft: string;
@@ -30,7 +31,7 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<s
 };
 export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, BigNumber, string, string> & TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
     nftUri(info: EthNftInfo): Promise<string>;
-} & WrappedNftCheck<MintArgs>;
+} & WrappedNftCheck<MintArgs> & ChainNonce;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
@@ -39,5 +40,6 @@ export interface TronParams {
     minter_addr: string;
     erc721_addr: string;
     validators: string[];
+    nonce: number;
 }
 export declare function tronHelperFactory(tronParams: TronParams): Promise<TronHelper>;
