@@ -1,4 +1,4 @@
-import { CrossChainHelper } from "./factory/crossChainHelper";
+import { CrossChainHelper } from ".";
 import { elrondHelperFactory, ElrondParams } from "./helpers/elrond";
 import { tronHelperFactory, TronParams } from "./helpers/tron";
 import { web3HelperFactory, Web3Params } from "./helpers/web3";

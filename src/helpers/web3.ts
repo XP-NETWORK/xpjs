@@ -38,7 +38,7 @@ import {
   PackNft,
   PopulateDecodedNft,
 } from "..";
-import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftMintArgs } from "..";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
