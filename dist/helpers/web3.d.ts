@@ -6,16 +6,18 @@ import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft, WrappedNftCheck } from "./chain";
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
-import { ChainNonce, EstimateTxFees } from "..";
+import { ChainNonceGet, EstimateTxFees, PackNft, PopulateDecodedNft } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 declare type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
  */
 export declare type EthNftInfo = {
-    contract_type: "ERC721" | "ERC1155";
+    chainId: string;
+    tokenId: string;
+    owner: string;
+    uri: string;
     contract: string;
-    token: EthBN;
 };
 /**
  * Arguments required for minting a new nft
@@ -52,12 +54,7 @@ MintNft<Signer, NftMintArgs, any> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, TransactionReceipt, string> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, BigNumber, TransactionReceipt, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
-    /**
-     * Get the uri of an nft given nft info
-     */
-    nftUri(info: EthNftInfo): Promise<string>;
-} & WrappedNftCheck<MintArgs> & ChainNonce;
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, TransactionReceipt, string> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionReceipt, string> & DecodeWrappedNft<EthNftInfo> & DecodeRawNft<EthNftInfo> & EstimateTxFees<EthNftInfo, BigNumber> & PackNft<EthNftInfo> & WrappedNftCheck<MintArgs> & ChainNonceGet & PopulateDecodedNft<EthNftInfo>;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *

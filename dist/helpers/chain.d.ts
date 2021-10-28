@@ -1,4 +1,13 @@
 /**
+ * Internal NFT Info
+ * WARN: should be used with care. URI might not be correct
+ * and must be manually resolved via cross chain helper
+ */
+export declare type NftInfo<Raw> = {
+    readonly uri: string;
+    readonly native: Raw;
+};
+/**
  * Transfer Liquidity to a foregin chain, freezing the original liquidity
  *
  * @param sender  Account which owns the liquidity on the native chain, able to sign transactions
@@ -34,8 +43,8 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<Signer, ForeignAddr, Balance, NftIdent, Tx, EventIdent> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftIdent, txFees: Balance): Promise<[Tx, EventIdent]>;
+export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft, Tx, EventIdent> {
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<[Tx, EventIdent]>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
@@ -47,8 +56,8 @@ export interface TransferNftForeign<Signer, ForeignAddr, Balance, NftIdent, Tx, 
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, NftIdent, Tx, EventIdent> {
-    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftIdent, txFees: Balance): Promise<[Tx, EventIdent]>;
+export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft, Tx, EventIdent> {
+    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<[Tx, EventIdent]>;
 }
 /**
  * Get the balance of an address on the chain
@@ -82,18 +91,6 @@ export interface BatchWrappedBalanceCheck<Addr, Balance> {
 export interface MintNft<Signer, Args, Identifier> {
     mintNft(owner: Signer, options: Args): Promise<Identifier>;
 }
-/**
- * Get the list of NFTs for a given account
- */
-export interface ListNft<Addr, K, V> {
-    listNft(owner: Addr): Promise<Map<K, V>>;
-}
-/**
- * Get the original data of a locked NFT (uri, name, etc)
- */
-export interface GetLockedNft<Ident, Info> {
-    getLockedNft(ident: Ident): Promise<Info | undefined>;
-}
 export declare type WrappedNft = {
     chain_nonce: number;
     data: Uint8Array;
@@ -103,20 +100,37 @@ export declare type WrappedNft = {
  * @param {NftIdent} nft NFT Identity
  * @returns bool
  */
-export interface WrappedNftCheck<NftIdent> {
-    isWrappedNft(nft: NftIdent): boolean;
+export interface WrappedNftCheck<RawNft> {
+    isWrappedNft(nft: NftInfo<RawNft>): boolean;
+}
+export interface PackNft<Raw> {
+    wrapNftForTransfer(nft: NftInfo<Raw>): Uint8Array;
 }
 export interface DecodeWrappedNft<Data> {
-    decodeWrappedNft(raw_data: Data): WrappedNft;
+    decodeWrappedNft(raw_data: NftInfo<Data>): WrappedNft;
 }
-export interface DecodeRawNft {
-    decodeUrlFromRaw(data: Uint8Array): Promise<string>;
+export interface DecodeRawNft<NativeRaw> {
+    /**
+     * convert raw nft to native one
+     * uri should be unset!
+     */
+    decodeNftFromRaw(data: Uint8Array): Promise<NftInfo<NativeRaw>>;
 }
-export interface EstimateTxFees<NftId, WrappedNftData, Balance> {
-    estimateValidateTransferNft(to: string, nft: NftId): Promise<Balance>;
-    estimateValidateUnfreezeNft(to: string, nft: WrappedNftData): Promise<Balance>;
+export declare type BareNft = {
+    chainId: string;
+    uri: string;
+};
+export interface PopulateDecodedNft<NativeRaw> {
+    /**
+     * Get uri for an nft from "decodeNftFromRaw"
+     */
+    populateNft(nft: NftInfo<NativeRaw>): Promise<BareNft>;
+}
+export interface EstimateTxFees<RawNft, Balance> {
+    estimateValidateTransferNft(to: string, nft: Uint8Array): Promise<Balance>;
+    estimateValidateUnfreezeNft(to: string, nft: NftInfo<RawNft>): Promise<Balance>;
 }
 export declare function ConcurrentSendError(): Error;
-export interface ChainNonce {
+export interface ChainNonceGet {
     getNonce(): number;
 }

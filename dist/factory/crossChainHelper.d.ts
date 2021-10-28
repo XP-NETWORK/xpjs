@@ -1,9 +1,12 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { Chain } from "../consts";
-import { MintNft } from "..";
+import { ChainNonce } from "../consts";
+import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, WrappedNftCheck } from "..";
+import BigNumber from "bignumber.js";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
+declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft> & DecodeWrappedNft<RawNft> & DecodeRawNft<RawNft> & PopulateDecodedNft<RawNft>;
+declare type FullChain<Signer, RawNft, Tx> = TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, string> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string> & EstimateTxFees<RawNft, BigNumber> & PackNft<RawNft> & NftUriChain<RawNft>;
 /**
  * A type representing a chain factory.
  *
@@ -13,14 +16,16 @@ declare type ChainFactory = {
      * Create a cross chain helper object
      * @param chain: {@link Chain} to create the helper for
      */
-    inner(chain: Chain): Promise<CrossChainHelper>;
-    transferNft(fromChain: Chain, toChain: Chain, nft: any, sender: any, receiver: any): Promise<any>;
+    inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
+    transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string): Promise<string>;
     /**
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
      * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
      * @param args: {@link NftMintArgs} Arguments to mint the nft.
      */
-    mint<Signer>(chain: MintNft<Signer, NftMintArgs, any>, owner: Signer, args: NftMintArgs): Promise<any>;
+    mint<Signer, R>(chain: MintNft<Signer, NftMintArgs, R>, owner: Signer, args: NftMintArgs): Promise<R>;
+    nftList<RawNft>(chain: NftUriChain<RawNft>, owner: string): Promise<NftInfo<RawNft>[]>;
+    nftUri<RawNft>(chain: NftUriChain<RawNft>, nft: NftInfo<RawNft>): Promise<BareNft>;
 };
 /**
  * A type representing all the supported chain params.

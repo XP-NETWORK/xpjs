@@ -3,7 +3,7 @@ import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft,
 import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 import { NftMintArgs } from "../factory/crossChainHelper";
-import { ChainNonce } from "..";
+import { ChainNonceGet, PackNft, PopulateDecodedNft } from "..";
 export declare type MinterRes = {
     minter: string;
     xpnft: string;
@@ -29,9 +29,7 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<s
      */
     deployMinter(deployer: string, validators: string[], threshold: number, whitelist: string[] | undefined): Promise<MinterRes>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, BigNumber, string, string> & TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> & DecodeWrappedNft<string> & DecodeRawNft & EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
-    nftUri(info: EthNftInfo): Promise<string>;
-} & WrappedNftCheck<MintArgs> & ChainNonce;
+export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<string, string, BigNumber, string, string> & TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> & UnfreezeForeign<string, string, string, string, string> & UnfreezeForeignNft<string, string, BigNumber, EthNftInfo, string, string> & DecodeWrappedNft<EthNftInfo> & DecodeRawNft<EthNftInfo> & EstimateTxFees<EthNftInfo, BigNumber> & WrappedNftCheck<MintArgs> & ChainNonceGet & PackNft<EthNftInfo> & PopulateDecodedNft<EthNftInfo>;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
