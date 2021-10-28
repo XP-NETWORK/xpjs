@@ -53,11 +53,20 @@ type FullChain<Signer, RawNft, Tx> = TransferNftForeign<
  */
 type ChainFactory = {
   /**
-   * Create a cross chain helper object
-   * @param chain: {@link Chain} to create the helper for
+   * Creates an helper factory for a given chain
+   * @type T: Either {@link ElrondHelper} | {@link Web3Helper} | {@link TronHelper} as required.
+   * @type P: Either {@link ElrondParams} | {@link Web3Params} | {@link TronParams} as required.
+   * @param chain: {@link Chain} to create the helper for.
    */
   inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
-  // IMO This should Return a transaction, which can be signed later by a wallet interface.
+  /**
+   * Transfers the NFT from one chain to other.
+   * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
+   * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
+   * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the nftList method of the factory.
+   * @param sender {@link Sender} The owner of the NFT. 
+   * @param receiver Address of the Receiver of the NFT.
+   */
   transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
     fromChain: FullChain<SignerF, RawNftF, TxF>,
     toChain: FullChain<SignerT, RawNftT, TxT>,
@@ -66,19 +75,30 @@ type ChainFactory = {
     receiver: string
   ): Promise<string>;
   /**
-   * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
-   * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
-   * @param args: {@link NftMintArgs} Arguments to mint the nft.
+   * Mints an NFT on the chain.
+   * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
+   * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
+   * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
    */
   mint<Signer, R>(
     chain: MintNft<Signer, NftMintArgs, R>,
     owner: Signer,
     args: NftMintArgs
   ): Promise<R>;
+  /**
+   * Lists all the NFTs on the chain owner by {@param owner}.
+   * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
+   * @param owner: Address of the owner of the NFT.
+   */
   nftList<RawNft>(
     chain: NftUriChain<RawNft>,
     owner: string
   ): Promise<NftInfo<RawNft>[]>;
+  /**
+   * Fetches the URI of the NFTs on the chain.
+   * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
+   * @param nft: {@link NftInfo<RawNft>} The NFT of which you want to fetch the URI. Usually comes from the `nftList` method.
+   */
   nftUri<RawNft>(
     chain: NftUriChain<RawNft>,
     nft: NftInfo<RawNft>

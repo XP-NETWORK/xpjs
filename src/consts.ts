@@ -3,7 +3,7 @@ import { elrondHelperFactory, ElrondParams } from "./helpers/elrond";
 import { tronHelperFactory, TronParams } from "./helpers/tron";
 import { web3HelperFactory, Web3Params } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { ElrondHelper, Web3Helper } from "validator";
+import { ElrondHelper, Web3Helper, TronHelper } from "validator";
 
 // All the supported testnet uri's are here.
 export enum RpcUri {
@@ -22,6 +22,7 @@ export enum RpcUri {
 export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
 export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
+export type TronNonce = ChainNonce<TronHelper, TronParams>;
 
 export namespace Chain {
   export const ELROND: ElrondNonce = 2;
@@ -31,7 +32,7 @@ export namespace Chain {
   export const AVALANCHE: Web3Nonce = 6;
   export const POLYGON: Web3Nonce = 7;
   export const FANTOM: Web3Nonce = 8;
-  export const TRON: Web3Nonce = 9;
+  export const TRON: TronNonce = 9;
   export const CELO: Web3Nonce = 0xb;
   export const HARMONY: Web3Nonce = 0xc;
 }
