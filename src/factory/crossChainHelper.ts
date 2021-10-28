@@ -3,7 +3,20 @@ import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
 
-import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, WrappedNftCheck } from "..";
+import {
+  BareNft,
+  ChainNonceGet,
+  DecodeRawNft,
+  DecodeWrappedNft,
+  EstimateTxFees,
+  MintNft,
+  NftInfo,
+  PackNft,
+  PopulateDecodedNft,
+  TransferNftForeign,
+  UnfreezeForeignNft,
+  WrappedNftCheck,
+} from "..";
 import {
   cachedExchangeRateRepo,
   networkBatchExchangeRateRepo,
@@ -15,17 +28,24 @@ import axios, { AxiosResponse } from "axios";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
-type NftUriChain<RawNft> = ChainNonceGet
-  & WrappedNftCheck<RawNft>
-  & DecodeWrappedNft<RawNft>
-  & DecodeRawNft<RawNft>
-  & PopulateDecodedNft<RawNft>;
+type NftUriChain<RawNft> = ChainNonceGet &
+  WrappedNftCheck<RawNft> &
+  DecodeWrappedNft<RawNft> &
+  DecodeRawNft<RawNft> &
+  PopulateDecodedNft<RawNft>;
 
-type FullChain<Signer, RawNft, Tx> = TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, string>
-  & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string>
-  & EstimateTxFees<RawNft, BigNumber>
-  & PackNft<RawNft>
-  & NftUriChain<RawNft>;
+type FullChain<Signer, RawNft, Tx> = TransferNftForeign<
+  Signer,
+  string,
+  BigNumber,
+  RawNft,
+  Tx,
+  string
+> &
+  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string> &
+  EstimateTxFees<RawNft, BigNumber> &
+  PackNft<RawNft> &
+  NftUriChain<RawNft>;
 
 /**
  * A type representing a chain factory.
@@ -38,14 +58,7 @@ type ChainFactory = {
    */
   inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
   // IMO This should Return a transaction, which can be signed later by a wallet interface.
-  transferNft<
-    SignerF,
-    RawNftF,
-    TxF,
-    SignerT,
-    RawNftT,
-    TxT
-  >(
+  transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
     fromChain: FullChain<SignerF, RawNftF, TxF>,
     toChain: FullChain<SignerT, RawNftT, TxT>,
     nft: NftInfo<RawNftF>,
@@ -92,7 +105,10 @@ export interface ChainParams {
 function mapNonceToParams(
   chainParams: Partial<ChainParams>
 ): Map<number, Web3Params | ElrondParams | TronParams | undefined> {
-  const cToP = new Map<number, Web3Params | ElrondParams | TronParams | undefined>();
+  const cToP = new Map<
+    number,
+    Web3Params | ElrondParams | TronParams | undefined
+  >();
 
   cToP.set(2, chainParams.elrondParams);
   cToP.set(3, chainParams.hecoParams);
@@ -128,7 +144,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
     )
   );
   const nftlistRest = axios.create({
-    baseURL: 'https://nft-list.herokuapp.com/'
+    baseURL: "https://nft-list.herokuapp.com/",
   });
 
   const inner = async <T, P>(chain: ChainNonce<T, P>): Promise<T> => {
@@ -139,7 +155,11 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
     return helper! as any as T;
   };
 
-  async function calcExchangeFees(fromChain: number, toChain: number, val: BigNumber): Promise<BigNumber> {
+  async function calcExchangeFees(
+    fromChain: number,
+    toChain: number,
+    val: BigNumber
+  ): Promise<BigNumber> {
     const exrate = await remoteExchangeRate.getExchangeRate(
       CHAIN_INFO[toChain].currency,
       CHAIN_INFO[fromChain].currency
@@ -154,10 +174,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
 
   return {
     inner,
-    async nftList<T>(
-      chain: NftUriChain<T>,
-      owner: string
-    ) {
+    async nftList<T>(chain: NftUriChain<T>, owner: string) {
       let endpoint;
       switch (chain.getNonce()) {
         case Chain.ELROND:
@@ -171,10 +188,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
 
       return res.data;
     },
-    async nftUri(
-      chain,
-      nft
-    ) {
+    async nftUri(chain, nft) {
       if (chain.isWrappedNft(nft)) {
         const decoded = chain.decodeWrappedNft(nft);
         const helper: CrossChainHelper = await inner(decoded.chain_nonce);
@@ -183,7 +197,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       }
       return {
         uri: nft.uri,
-        chainId: chain.getNonce().toString()
+        chainId: chain.getNonce().toString(),
       };
     },
     transferNft: async (
@@ -203,7 +217,11 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
           receiver,
           approxNft
         );
-        const conv = await calcExchangeFees(fromChain.getNonce(), toChain.getNonce(), estimate);
+        const conv = await calcExchangeFees(
+          fromChain.getNonce(),
+          toChain.getNonce(),
+          estimate
+        );
         const [, action] = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,
@@ -217,14 +235,18 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
           receiver,
           packed
         );
-        const conv = await calcExchangeFees(fromChain.getNonce(), toChain.getNonce(), estimate);
+        const conv = await calcExchangeFees(
+          fromChain.getNonce(),
+          toChain.getNonce(),
+          estimate
+        );
         const [, action] = await fromChain.transferNftToForeign(
           sender,
           toChain.getNonce(),
           receiver,
           nft,
           conv
-        )
+        );
         return action;
       }
     },

@@ -21,7 +21,7 @@ export enum RpcUri {
 
 export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
 export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
-export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>
+export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 
 export namespace Chain {
   export const ELROND: ElrondNonce = 2;

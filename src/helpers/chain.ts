@@ -6,7 +6,7 @@
 export type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
-}
+};
 
 /**
  * Transfer Liquidity to a foregin chain, freezing the original liquidity
@@ -171,16 +171,16 @@ export interface DecodeRawNft<NativeRaw> {
 }
 
 export type BareNft = {
-  chainId: string,
-  uri: string
-}
+  chainId: string;
+  uri: string;
+};
 
 // @internal
 export interface PopulateDecodedNft<NativeRaw> {
   /**
    * Get uri for an nft from "decodeNftFromRaw"
    */
-  populateNft(nft: NftInfo<NativeRaw>): Promise<BareNft>
+  populateNft(nft: NftInfo<NativeRaw>): Promise<BareNft>;
 }
 
 export interface EstimateTxFees<RawNft, Balance> {

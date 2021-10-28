@@ -32,7 +32,13 @@ import {
 } from "xpnet-web3-contracts";
 import { NftMintArgs } from "../factory/crossChainHelper";
 import { NftEthNative, NftPacked } from "validator";
-import { BareNft, ChainNonceGet, NftInfo, PackNft, PopulateDecodedNft } from "..";
+import {
+  BareNft,
+  ChainNonceGet,
+  NftInfo,
+  PackNft,
+  PopulateDecodedNft,
+} from "..";
 
 export type MinterRes = {
   // Minter smart contract
@@ -82,11 +88,11 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeignNft<string, string, BigNumber, EthNftInfo, string, string> &
   DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft<EthNftInfo> &
-  EstimateTxFees<EthNftInfo, BigNumber>
-  & WrappedNftCheck<MintArgs> &
-  ChainNonceGet
-  & PackNft<EthNftInfo>
-  & PopulateDecodedNft<EthNftInfo>;
+  EstimateTxFees<EthNftInfo, BigNumber> &
+  WrappedNftCheck<MintArgs> &
+  ChainNonceGet &
+  PackNft<EthNftInfo> &
+  PopulateDecodedNft<EthNftInfo>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -237,14 +243,14 @@ export async function tronHelperFactory(
     return [hash, action_id];
   }
 
-  const nftUri = async (contract: string, tokenId: string): Promise<BareNft> => {
-    const erc = await provider.contract(
-      UserNftMinter__factory.abi,
-      contract
-    );
+  const nftUri = async (
+    contract: string,
+    tokenId: string
+  ): Promise<BareNft> => {
+    const erc = await provider.contract(UserNftMinter__factory.abi, contract);
     return {
       uri: await erc.tokenURI(tokenId).call(),
-      chainId: tronParams.nonce.toString()
+      chainId: tronParams.nonce.toString(),
     };
   };
 
@@ -293,15 +299,15 @@ export async function tronHelperFactory(
       const packed = NftEthNative.deserializeBinary(data);
 
       return {
-        uri: '',
+        uri: "",
         native: {
-          uri: '',
+          uri: "",
           contract: packed.getContractAddr(),
           tokenId: packed.getId(),
           owner: minter_addr,
-          chainId: tronParams.nonce.toString()
-        }
-      }
+          chainId: tronParams.nonce.toString(),
+        },
+      };
     },
     isWrappedNft(nft) {
       return nft.native.contract === tronParams.erc721_addr;
@@ -423,7 +429,7 @@ export async function tronHelperFactory(
       to: string,
       nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
-      const data = Base64.toUint8Array(nft.native.uri)
+      const data = Base64.toUint8Array(nft.native.uri);
       const nft_dat = NftEthNative.deserializeBinary(data);
 
       return await estimateGas(
@@ -443,7 +449,7 @@ export async function tronHelperFactory(
       tokdat.setId(nft.native.tokenId);
       tokdat.setNftKind(1);
       tokdat.setContractAddr(nft.native.contract);
-      return tokdat.serializeBinary()
-    }
+      return tokdat.serializeBinary();
+    },
   };
 }
