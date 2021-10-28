@@ -3,7 +3,7 @@ import { ElrondParams } from "./helpers/elrond";
 import { TronParams } from "./helpers/tron";
 import { Web3Params } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { ElrondHelper, Web3Helper } from "validator";
+import { ElrondHelper, Web3Helper, TronHelper } from "validator";
 export declare enum RpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -19,6 +19,7 @@ export declare enum RpcUri {
 export declare type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
+export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
 export declare namespace Chain {
     const ELROND: ElrondNonce;
     const HECO: Web3Nonce;
@@ -27,7 +28,7 @@ export declare namespace Chain {
     const AVALANCHE: Web3Nonce;
     const POLYGON: Web3Nonce;
     const FANTOM: Web3Nonce;
-    const TRON: Web3Nonce;
+    const TRON: TronNonce;
     const CELO: Web3Nonce;
     const HARMONY: Web3Nonce;
 }
