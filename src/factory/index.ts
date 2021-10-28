@@ -23,7 +23,7 @@ import {
   NetworkModel,
 } from "crypto-exchange-rate";
 import BigNumber from "bignumber.js";
-import { Transaction } from "ethers";
+
 import axios, { AxiosResponse } from "axios";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
