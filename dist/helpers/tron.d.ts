@@ -2,7 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedBalanceCheck, WrappedNftCheck } from "./chain";
 import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
-import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftMintArgs } from "..";
 import { ChainNonceGet, PackNft, PopulateDecodedNft } from "..";
 export declare type MinterRes = {
     minter: string;

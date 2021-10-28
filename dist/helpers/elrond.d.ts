@@ -8,7 +8,7 @@ import { Address, ISigner, Transaction } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
 import { ChainNonceGet, EstimateTxFees, PackNft, PopulateDecodedNft } from "..";
-import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftMintArgs } from "..";
 /**
  * Information associated with an ESDT Token
  */

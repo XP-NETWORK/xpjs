@@ -5,7 +5,7 @@
 Features Available :-
 
 - [x] Minting NFTs
-- [ ] Bridge
+- [x] Bridge
 - [ ] ... and More
 
 ## To Mint an NFT, Follow the steps as specified -

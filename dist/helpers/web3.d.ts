@@ -7,7 +7,7 @@ import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, Tra
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
 import { ChainNonceGet, EstimateTxFees, PackNft, PopulateDecodedNft } from "..";
-import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftMintArgs } from "..";
 declare type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
