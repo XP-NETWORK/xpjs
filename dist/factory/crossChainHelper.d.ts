@@ -48,7 +48,7 @@ export interface ChainParams {
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
-export declare function ChainFactory(chainParams: ChainParams): ChainFactory;
+export declare function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory;
 /**
  * The interface that defines the arguments to mint an NFT.
  * @property contract is the address of the smart contract that will mint the NFT and it is mandatory for WEB3 and Tron Chains.
