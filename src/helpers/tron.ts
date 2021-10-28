@@ -30,7 +30,7 @@ import {
   XPNet__factory,
   XPNft__factory,
 } from "xpnet-web3-contracts";
-import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftMintArgs } from "..";
 import { NftEthNative, NftPacked } from "validator";
 import {
   BareNft,

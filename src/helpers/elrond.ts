@@ -49,7 +49,7 @@ import {
   PackNft,
   PopulateDecodedNft,
 } from "..";
-import { NftMintArgs } from "../factory/crossChainHelper";
+import { NftMintArgs } from "..";
 
 type EasyBalance = string | number | BigNumber;
 
