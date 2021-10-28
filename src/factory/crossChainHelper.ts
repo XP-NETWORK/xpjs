@@ -90,9 +90,9 @@ export interface ChainParams {
 }
 
 function mapNonceToParams(
-  chainParams: ChainParams
-): Map<number, Web3Params | ElrondParams | TronParams> {
-  const cToP = new Map<number, Web3Params | ElrondParams | TronParams>();
+  chainParams: Partial<ChainParams>
+): Map<number, Web3Params | ElrondParams | TronParams | undefined> {
+  const cToP = new Map<number, Web3Params | ElrondParams | TronParams | undefined>();
 
   cToP.set(2, chainParams.elrondParams);
   cToP.set(3, chainParams.hecoParams);
@@ -113,7 +113,7 @@ function mapNonceToParams(
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
-export function ChainFactory(chainParams: ChainParams): ChainFactory {
+export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
   function configBatchExchangeService(): NetworkModel.BatchExchangeRateService {
