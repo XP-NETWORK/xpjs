@@ -175,7 +175,7 @@ export interface SetESDTRoles {
 /**
  * Identifier for tracking a given action
  */
-type EventIdent = number;
+type EventIdent = string;
 
 /**
  * Traits implemented by this module
@@ -600,7 +600,7 @@ export const elrondHelperFactory: (
 
     const id = filterEventId(txr["smartContractResults"]);
 
-    return [tx, id];
+    return [tx, id.toString()];
   }
 
   function estimateGas(base_fees: BigNumber, cnt: number) {

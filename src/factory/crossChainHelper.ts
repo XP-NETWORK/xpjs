@@ -14,8 +14,8 @@ import BigNumber from "bignumber.js";
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
 type TransferChain<Signer, RawNft, Tx> = ChainNonceGet
-  & TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, number>
-  & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, number>
+  & TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, string>
+  & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string>
   & EstimateTxFees<RawNft, BigNumber>
   & PackNft<RawNft>
   & WrappedNftCheck<RawNft>
@@ -46,7 +46,7 @@ type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string
-  ): Promise<number>;
+  ): Promise<string>;
   /**
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
    * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
@@ -138,14 +138,13 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
 
   return {
     inner,
-    // TODO: Find some way to make this more generic, return a txn receipt, throw an exception, etc.
     transferNft: async (
       fromChain,
       toChain,
       nft,
       sender,
       receiver
-    ): Promise<number> => {
+    ): Promise<string> => {
       if (fromChain.isWrappedNft(nft)) {
         const decoded = fromChain.decodeWrappedNft(nft);
         if (decoded.chain_nonce != toChain.getNonce()) {
