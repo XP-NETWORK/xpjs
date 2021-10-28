@@ -32,7 +32,7 @@ import {
 } from "xpnet-web3-contracts";
 import { NftMintArgs } from "../factory/crossChainHelper";
 import { NftEthNative, NftPacked } from "validator";
-import { ChainNonceGet, NftInfo, PackNft } from "..";
+import { BareNft, ChainNonceGet, NftInfo, PackNft, PopulateDecodedNft } from "..";
 
 export type MinterRes = {
   // Minter smart contract
@@ -85,7 +85,8 @@ export type TronHelper = BaseTronHelper &
   EstimateTxFees<EthNftInfo, BigNumber>
   & WrappedNftCheck<MintArgs> &
   ChainNonceGet
-  & PackNft<EthNftInfo>;
+  & PackNft<EthNftInfo>
+  & PopulateDecodedNft<EthNftInfo>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -236,12 +237,15 @@ export async function tronHelperFactory(
     return [hash, action_id];
   }
 
-  const nftUri = async (contract: string, tokenId: string): Promise<string> => {
+  const nftUri = async (contract: string, tokenId: string): Promise<BareNft> => {
     const erc = await provider.contract(
       UserNftMinter__factory.abi,
       contract
     );
-    return await erc.tokenURI(tokenId).call();
+    return {
+      uri: await erc.tokenURI(tokenId).call(),
+      chainId: tronParams.nonce.toString()
+    };
   };
 
   const randomAction = () =>
@@ -282,6 +286,9 @@ export async function tronHelperFactory(
 
   return {
     ...base,
+    async populateNft(nft) {
+      return await nftUri(nft.native.contract, nft.native.tokenId);
+    },
     async decodeNftFromRaw(data: Uint8Array) {
       const packed = NftEthNative.deserializeBinary(data);
 
