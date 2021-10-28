@@ -1,26 +1,31 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { ChainNonce, CHAIN_INFO } from "../consts";
+import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
 
-import { ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, TransferNftForeign, UnfreezeForeignNft, WrappedNftCheck } from "..";
+import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, WrappedNftCheck } from "..";
 import {
   cachedExchangeRateRepo,
   networkBatchExchangeRateRepo,
   NetworkModel,
 } from "crypto-exchange-rate";
 import BigNumber from "bignumber.js";
+import { Transaction } from "ethers";
+import axios, { AxiosResponse } from "axios";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
-type TransferChain<Signer, RawNft, Tx> = ChainNonceGet
-  & TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, string>
+type NftUriChain<RawNft> = ChainNonceGet
+  & WrappedNftCheck<RawNft>
+  & DecodeWrappedNft<RawNft>
+  & DecodeRawNft<RawNft>
+  & PopulateDecodedNft<RawNft>;
+
+type FullChain<Signer, RawNft, Tx> = TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, string>
   & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string>
   & EstimateTxFees<RawNft, BigNumber>
   & PackNft<RawNft>
-  & WrappedNftCheck<RawNft>
-  & DecodeWrappedNft<RawNft>
-  & DecodeRawNft<RawNft>;
+  & NftUriChain<RawNft>;
 
 /**
  * A type representing a chain factory.
@@ -41,8 +46,8 @@ type ChainFactory = {
     RawNftT,
     TxT
   >(
-    fromChain: TransferChain<SignerF, RawNftF, TxF>,
-    toChain: TransferChain<SignerT, RawNftT, TxT>,
+    fromChain: FullChain<SignerF, RawNftF, TxF>,
+    toChain: FullChain<SignerT, RawNftT, TxT>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string
@@ -57,6 +62,14 @@ type ChainFactory = {
     owner: Signer,
     args: NftMintArgs
   ): Promise<R>;
+  nftList<RawNft>(
+    chain: NftUriChain<RawNft>,
+    owner: string
+  ): Promise<NftInfo<RawNft>[]>;
+  nftUri<RawNft>(
+    chain: NftUriChain<RawNft>,
+    nft: NftInfo<RawNft>
+  ): Promise<BareNft>;
 };
 
 /**
@@ -114,6 +127,9 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
       NetworkModel.exchangeRateDtoMapper()
     )
   );
+  const nftlistRest = axios.create({
+    baseURL: 'https://nft-list.herokuapp.com/'
+  });
 
   const inner = async <T, P>(chain: ChainNonce<T, P>): Promise<T> => {
     let helper = map.get(chain);
@@ -138,6 +154,38 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
 
   return {
     inner,
+    async nftList<T>(
+      chain: NftUriChain<T>,
+      owner: string
+    ) {
+      let endpoint;
+      switch (chain.getNonce()) {
+        case Chain.ELROND:
+          endpoint = `/elrond/${owner}`;
+          break;
+        default:
+          endpoint = `/web3/${chain.getNonce()}/${owner}`;
+          break;
+      }
+      const res: AxiosResponse<NftInfo<T>[]> = await nftlistRest.get(endpoint);
+
+      return res.data;
+    },
+    async nftUri(
+      chain,
+      nft
+    ) {
+      if (chain.isWrappedNft(nft)) {
+        const decoded = chain.decodeWrappedNft(nft);
+        const helper: CrossChainHelper = await inner(decoded.chain_nonce);
+        const native = await helper.decodeNftFromRaw(decoded.data);
+        return await helper.populateNft(native as any);
+      }
+      return {
+        uri: nft.uri,
+        chainId: chain.getNonce().toString()
+      };
+    },
     transferNft: async (
       fromChain,
       toChain,

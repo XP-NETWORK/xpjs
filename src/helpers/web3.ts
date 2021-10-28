@@ -30,7 +30,7 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft } from "..";
+import { BareNft, ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 type EasyBalance = string | number | EthBN;
 /**
@@ -107,7 +107,8 @@ export type Web3Helper = BaseWeb3Helper &
   EstimateTxFees<EthNftInfo, BigNumber> 
   & PackNft<EthNftInfo>
   & WrappedNftCheck<MintArgs>
-  & ChainNonceGet;
+  & ChainNonceGet
+  & PopulateDecodedNft<EthNftInfo>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -183,9 +184,12 @@ export async function web3HelperFactory(
     return [receipt, action_id];
   }
 
-  async function nftUri(contract: string, tokenId: EthBN): Promise<string> {
+  async function nftUri(contract: string, tokenId: EthBN): Promise<BareNft> {
     const erc = UserNftMinter__factory.connect(contract, w3);
-    return await erc.tokenURI(tokenId);
+    return {
+      uri: await erc.tokenURI(tokenId),
+      chainId: params.nonce.toString()
+    };
   }
 
   const randomAction = () =>
@@ -214,6 +218,9 @@ export async function web3HelperFactory(
 
   return {
     ...base,
+    async populateNft(nft) {
+      return await nftUri(nft.native.contract, EthBN.from(nft.native.tokenId));
+    },
     getNonce: () => params.nonce,
     async balanceWrapped(
       address: string,

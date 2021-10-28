@@ -170,12 +170,17 @@ export interface DecodeRawNft<NativeRaw> {
   decodeNftFromRaw(data: Uint8Array): Promise<NftInfo<NativeRaw>>;
 }
 
+export type BareNft = {
+  chainId: string,
+  uri: string
+}
+
 // @internal
-export interface FetchUri<NativeRaw> {
+export interface PopulateDecodedNft<NativeRaw> {
   /**
    * Get uri for an nft from "decodeNftFromRaw"
    */
-  nftUri(nft: NativeRaw): Promise<string>
+  populateNft(nft: NftInfo<NativeRaw>): Promise<BareNft>
 }
 
 export interface EstimateTxFees<RawNft, Balance> {

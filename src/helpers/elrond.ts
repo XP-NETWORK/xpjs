@@ -41,7 +41,7 @@ import {
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
-import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft } from "..";
+import { BareNft, ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 
 type EasyBalance = string | number | BigNumber;
@@ -208,7 +208,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   } & WrappedNftCheck<EsdtNftInfo> &
   EstimateTxFees<EsdtNftInfo, BigNumber> &
   PackNft<EsdtNftInfo>
-  & ChainNonceGet;
+  & ChainNonceGet
+  & PopulateDecodedNft<EsdtNftInfo>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -560,9 +561,13 @@ export const elrondHelperFactory: (
     });
   };
 
-  async function getLockedNft(token: string, nonce: number): Promise<EsdtNftInfo | undefined> {
+  async function getLockedNft(ident: string): Promise<BareNft | undefined> {
     const nfts = await listNft(elrondParams.minter_address);
-    return nfts.get(`${token}-${nonce.toString()}`);
+    const res = nfts.get(ident);
+    return res && {
+      uri: Base64.atob(res.uris[0]),
+      chainId: elrondParams.nonce.toString()
+    }
   }
 
   const rawNftDecoder = (nftDat: Uint8Array) => {
@@ -764,11 +769,6 @@ export const elrondHelperFactory: (
     },
     async decodeNftFromRaw(data: Uint8Array) {
       const nft_info = rawNftDecoder(data);
-      const locked = await getLockedNft(nft_info.token, nft_info.nonce);
-
-      if (locked === undefined) {
-        throw Error("Not a wrapped nft");
-      }
 
       return {uri: '',
       native: {
@@ -780,6 +780,14 @@ export const elrondHelperFactory: (
         royalties: '',
         uris: [],
       }};
+    },
+    async populateNft(nft: NftInfo<EsdtNftInfo>) {
+      const locked = await getLockedNft(nft.native.tokenIdentifier);
+
+      if (locked === undefined) {
+        throw Error("Not a wrapped nft");
+      }
+      return locked;
     },
     async estimateValidateTransferNft(_toAddress: string, _nftInfo: Uint8Array) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
