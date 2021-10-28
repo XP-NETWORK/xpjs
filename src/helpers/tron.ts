@@ -32,7 +32,7 @@ import {
 } from "xpnet-web3-contracts";
 import { NftMintArgs } from "../factory/crossChainHelper";
 import { NftEthNative, NftPacked } from "validator";
-import { ChainNonce } from "..";
+import { ChainNonce, NftInfo } from "..";
 
 export type MinterRes = {
   // Minter smart contract
@@ -79,12 +79,11 @@ export type TronHelper = BaseTronHelper &
   TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> &
   // TODO: Use TX Fees
   UnfreezeForeign<string, string, string, string, string> &
-  UnfreezeForeignNft<string, string, BigNumber, BigNumber, string, string> &
-  DecodeWrappedNft<string> &
+  UnfreezeForeignNft<string, string, BigNumber, EthNftInfo, string, string> &
+  DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft &
-  EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
-    nftUri(info: EthNftInfo): Promise<string>;
-  } & WrappedNftCheck<MintArgs> &
+  EstimateTxFees<EthNftInfo, BigNumber>
+  & WrappedNftCheck<MintArgs> &
   ChainNonce;
 
 export async function baseTronHelperFactory(
@@ -236,22 +235,13 @@ export async function tronHelperFactory(
     return [hash, action_id];
   }
 
-  const nftUri = async (info: EthNftInfo): Promise<string> => {
-    if (info.contract_type == "ERC721") {
-      const erc = await provider.contract(
-        UserNftMinter__factory.abi,
-        info.contract
-      );
-      return await erc.tokenURI(info.token).call();
-    } else {
-      const erc = await provider.contract(XPNet__factory.abi, info.contract);
-      return await erc.uri(info.token).call();
-    }
+  const nftUri = async (contract: string, tokenId: string): Promise<string> => {
+    const erc = await provider.contract(
+      UserNftMinter__factory.abi,
+      contract
+    );
+    return await erc.tokenURI(tokenId).call();
   };
-
-  function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
-    return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155";
-  }
 
   const randomAction = () =>
     Math.floor(
@@ -293,26 +283,20 @@ export async function tronHelperFactory(
     ...base,
     async decodeUrlFromRaw(data: Uint8Array): Promise<string> {
       const packed = NftEthNative.deserializeBinary(data);
-      const nft_info = {
-        contract_type: contractTypeFromNftKind(packed.getNftKind()),
-        contract: packed.getContractAddr(),
-        token: EthBN.from(packed.getId()),
-      };
 
-      return await nftUri(nft_info);
+      return await nftUri(packed.getContractAddr(), packed.getId());
     },
     isWrappedNft(nft) {
-      return nft.contract === tronParams.erc721_addr;
+      return nft.native.contract === tronParams.erc721_addr;
     },
-    decodeWrappedNft(raw_data: string): WrappedNft {
-      const u8D = Base64.toUint8Array(raw_data);
+    decodeWrappedNft(raw_data: NftInfo<EthNftInfo>): WrappedNft {
+      const u8D = Base64.toUint8Array(raw_data.native.uri);
       const packed = NftPacked.deserializeBinary(u8D);
       return {
         chain_nonce: packed.getChainNonce(),
         data: packed.getData_asU8(),
       };
     },
-    nftUri: nftUri,
     async transferNativeToForeign(
       sender: string,
       chain_nonce: number,
@@ -345,12 +329,12 @@ export async function tronHelperFactory(
     async unfreezeWrappedNft(
       sender: string,
       to: string,
-      id: BigNumber,
+      id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<[string, string]> {
       setSigner(sender);
       const res = await minter
-        .withdrawNft(to, id.toString())
+        .withdrawNft(to, id.native.tokenId)
         .send({ callValue: EthBN.from(txFees.toString()) });
       return await extractTxn(res);
     },
@@ -361,18 +345,18 @@ export async function tronHelperFactory(
       sender: string,
       chain_nonce: number,
       to: string,
-      id: EthNftInfo,
+      id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<[string, string]> {
       setSigner(sender);
       const erc = await provider.contract(
         UserNftMinter__factory.abi,
-        id.contract
+        id.native.contract
       );
-      await erc.approve(minter.address, id.token).send();
+      await erc.approve(minter.address, id.native.tokenId).send();
 
       const txr = await minter
-        .freezeErc721(id.contract, id.token, chain_nonce, to)
+        .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
         .send({ callValue: EthBN.from(txFees.toString()) });
 
       return await extractTxn(txr);
@@ -399,13 +383,13 @@ export async function tronHelperFactory(
     },
     async estimateValidateTransferNft(
       to: string,
-      nft: EthNftInfo
+      nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
       // Protobuf is not deterministic, though perhaps we can approximate this statically
       const tokdat = new NftEthNative();
-      tokdat.setId(nft.token.toString());
+      tokdat.setId(nft.native.tokenId);
       tokdat.setNftKind(1);
-      tokdat.setContractAddr(nft.contract);
+      tokdat.setContractAddr(nft.native.contract);
 
       const encoded = new NftPacked();
       encoded.setChainNonce(0x1351);
@@ -426,9 +410,10 @@ export async function tronHelperFactory(
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nft_data: Uint8Array
+      nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
-      const nft_dat = NftEthNative.deserializeBinary(nft_data);
+      const data = Base64.toUint8Array(nft.native.uri)
+      const nft_dat = NftEthNative.deserializeBinary(data);
 
       return await estimateGas(
         tronParams.validators,

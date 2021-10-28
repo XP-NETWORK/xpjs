@@ -30,16 +30,18 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import { ChainNonce, EstimateTxFees } from "..";
+import { ChainNonce, EstimateTxFees, NftInfo } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
  */
 export type EthNftInfo = {
-  contract_type: "ERC721" | "ERC1155";
+  chainId: string;
+  tokenId: string;
+  owner: string;
+  uri: string;
   contract: string;
-  token: EthBN;
 };
 
 /**
@@ -96,23 +98,15 @@ export type Web3Helper = BaseWeb3Helper &
     Signer,
     string,
     BigNumber,
-    BigNumber,
+    EthNftInfo,
     TransactionReceipt,
     string
   > &
-  DecodeWrappedNft<string> &
+  DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft &
-  EstimateTxFees<EthNftInfo, Uint8Array, BigNumber> & {
-    /**
-     * Get the uri of an nft given nft info
-     */
-    nftUri(info: EthNftInfo): Promise<string>;
-  } & WrappedNftCheck<MintArgs> &
-  ChainNonce;
-
-function contractTypeFromNftKind(kind: 0 | 1): "ERC721" | "ERC1155" {
-  return kind === NftEthNative.NftKind.ERC721 ? "ERC721" : "ERC1155";
-}
+  EstimateTxFees<EthNftInfo, BigNumber> 
+  & WrappedNftCheck<MintArgs>
+  & ChainNonce;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -188,14 +182,9 @@ export async function web3HelperFactory(
     return [receipt, action_id];
   }
 
-  async function nftUri(info: EthNftInfo): Promise<string> {
-    if (info.contract_type == "ERC721") {
-      const erc = UserNftMinter__factory.connect(info.contract, w3);
-      return await erc.tokenURI(info.token);
-    } else {
-      const erc = XPNet__factory.connect(info.contract, w3);
-      return await erc.uri(info.token);
-    }
+  async function nftUri(contract: string, tokenId: EthBN): Promise<string> {
+    const erc = UserNftMinter__factory.connect(contract, w3);
+    return await erc.tokenURI(tokenId);
   }
 
   const randomAction = () =>
@@ -234,7 +223,7 @@ export async function web3HelperFactory(
       return new BigNumber(bal.toString());
     },
     isWrappedNft(nft) {
-      return nft.contract === params.erc721_addr;
+      return nft.native.contract === params.erc721_addr;
     },
     async balanceWrappedBatch(
       address: string,
@@ -267,17 +256,17 @@ export async function web3HelperFactory(
       sender: Signer,
       chain_nonce: number,
       to: string,
-      id: EthNftInfo,
+      id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
-      const erc = UserNftMinter__factory.connect(id.contract, sender);
-      const ta = await erc.approve(minter.address, id.token);
+      const erc = UserNftMinter__factory.connect(id.native.contract, sender);
+      const ta = await erc.approve(minter.address, id.native.tokenId);
 
       await ta.wait();
 
       const txr = await minter
         .connect(sender)
-        .freezeErc721(id.contract, id.token, chain_nonce, to, {
+        .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to, {
           value: EthBN.from(txFees.toString()),
         });
 
@@ -301,18 +290,17 @@ export async function web3HelperFactory(
     async unfreezeWrappedNft(
       sender: Signer,
       to: string,
-      id: BigNumber,
+      id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
-      const res = await minter.connect(sender).withdrawNft(to, id.toString(), {
+      const res = await minter.connect(sender).withdrawNft(to, id.native.tokenId, {
         value: EthBN.from(txFees.toString()),
       });
 
       return await extractTxn(res, "UnfreezeNft");
     },
-    nftUri,
-    decodeWrappedNft(raw_data: string): WrappedNft {
-      const u8D = Base64.toUint8Array(raw_data);
+    decodeWrappedNft(nft: NftInfo<EthNftInfo>): WrappedNft {
+      const u8D = Base64.toUint8Array(nft.native.uri);
       const packed = NftPacked.deserializeBinary(u8D);
 
       return {
@@ -322,23 +310,18 @@ export async function web3HelperFactory(
     },
     async decodeUrlFromRaw(data: Uint8Array): Promise<string> {
       const packed = NftEthNative.deserializeBinary(data);
-      const nft_info = {
-        contract_type: contractTypeFromNftKind(packed.getNftKind()),
-        contract: packed.getContractAddr(),
-        token: EthBN.from(packed.getId()),
-      };
 
-      return await nftUri(nft_info);
+      return await nftUri(packed.getContractAddr(), EthBN.from(packed.getId()));
     },
     async estimateValidateTransferNft(
       to: string,
-      nft: EthNftInfo
+      nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
       // Protobuf is not deterministic, though perhaps we can approximate this statically
       const tokdat = new NftEthNative();
-      tokdat.setId(nft.token.toString());
+      tokdat.setId(nft.native.tokenId);
       tokdat.setNftKind(1);
-      tokdat.setContractAddr(nft.contract);
+      tokdat.setContractAddr(nft.native.contract);
 
       const encoded = new NftPacked();
       encoded.setChainNonce(0x1351);
@@ -354,9 +337,10 @@ export async function web3HelperFactory(
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nft_data: Uint8Array
+      nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
-      const nft_dat = NftEthNative.deserializeBinary(nft_data);
+      const raw = Base64.toUint8Array(nft.native.uri)
+      const nft_dat = NftEthNative.deserializeBinary(raw);
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,

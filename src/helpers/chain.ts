@@ -1,4 +1,14 @@
 /**
+ * Internal NFT Info
+ * WARN: should be used with care. URI might not be correct
+ * and must be manually resolved via cross chain helper
+ */
+export type NftInfo<Raw> = {
+  readonly uri: string;
+  readonly native: Raw;
+}
+
+/**
  * Transfer Liquidity to a foregin chain, freezing the original liquidity
  *
  * @param sender  Account which owns the liquidity on the native chain, able to sign transactions
@@ -52,7 +62,7 @@ export interface TransferNftForeign<
   Signer,
   ForeignAddr,
   Balance,
-  NftIdent,
+  RawNft,
   Tx,
   EventIdent
 > {
@@ -60,7 +70,7 @@ export interface TransferNftForeign<
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
-    id: NftIdent,
+    id: NftInfo<RawNft>,
     txFees: Balance
   ): Promise<[Tx, EventIdent]>;
 }
@@ -79,14 +89,14 @@ export interface UnfreezeForeignNft<
   Signer,
   ForeignAddr,
   Balance,
-  NftIdent,
+  RawNft,
   Tx,
   EventIdent
 > {
   unfreezeWrappedNft(
     sender: Signer,
     to: ForeignAddr,
-    id: NftIdent,
+    id: NftInfo<RawNft>,
     txFees: Balance
   ): Promise<[Tx, EventIdent]>;
 }
@@ -130,20 +140,6 @@ export interface MintNft<Signer, Args, Identifier> {
   mintNft(owner: Signer, options: Args): Promise<Identifier>;
 }
 
-/**
- * Get the list of NFTs for a given account
- */
-export interface ListNft<Addr, K, V> {
-  listNft(owner: Addr): Promise<Map<K, V>>;
-}
-
-/**
- * Get the original data of a locked NFT (uri, name, etc)
- */
-export interface GetLockedNft<Ident, Info> {
-  getLockedNft(ident: Ident): Promise<Info | undefined>;
-}
-
 export type WrappedNft = {
   chain_nonce: number;
   data: Uint8Array;
@@ -153,23 +149,23 @@ export type WrappedNft = {
  * @param {NftIdent} nft NFT Identity
  * @returns bool
  */
-export interface WrappedNftCheck<NftIdent> {
-  isWrappedNft(nft: NftIdent): boolean;
+export interface WrappedNftCheck<RawNft> {
+  isWrappedNft(nft: NftInfo<RawNft>): boolean;
 }
 
 export interface DecodeWrappedNft<Data> {
-  decodeWrappedNft(raw_data: Data): WrappedNft;
+  decodeWrappedNft(raw_data: NftInfo<Data>): WrappedNft;
 }
 
 export interface DecodeRawNft {
   decodeUrlFromRaw(data: Uint8Array): Promise<string>;
 }
 
-export interface EstimateTxFees<NftId, WrappedNftData, Balance> {
-  estimateValidateTransferNft(to: string, nft: NftId): Promise<Balance>;
+export interface EstimateTxFees<RawNft, Balance> {
+  estimateValidateTransferNft(to: string, nft: NftInfo<RawNft>): Promise<Balance>;
   estimateValidateUnfreezeNft(
     to: string,
-    nft: WrappedNftData
+    nft: NftInfo<RawNft>
   ): Promise<Balance>;
 }
 
