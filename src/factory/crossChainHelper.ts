@@ -1,11 +1,9 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { Chain, CHAIN_INFO } from "../consts";
+import { ChainNonce, CHAIN_INFO } from "../consts";
 
-import { MintNft } from "..";
-import { Address, ISigner } from "@elrondnetwork/erdjs/out";
-import { Signer } from "ethers";
+import { ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, TransferNftForeign, UnfreezeForeignNft, WrappedNftCheck } from "..";
 import {
   cachedExchangeRateRepo,
   networkBatchExchangeRateRepo,
@@ -14,6 +12,15 @@ import {
 import BigNumber from "bignumber.js";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
+
+type TransferChain<Signer, RawNft, Tx> = ChainNonceGet
+  & TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, number>
+  & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, number>
+  & EstimateTxFees<RawNft, BigNumber>
+  & PackNft<RawNft>
+  & WrappedNftCheck<RawNft>
+  & DecodeWrappedNft<RawNft>
+  & DecodeRawNft<RawNft>;
 
 /**
  * A type representing a chain factory.
@@ -24,25 +31,32 @@ type ChainFactory = {
    * Create a cross chain helper object
    * @param chain: {@link Chain} to create the helper for
    */
-  inner(chain: Chain): Promise<CrossChainHelper>;
+  inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
   // IMO This should Return a transaction, which can be signed later by a wallet interface.
-  transferNft(
-    fromChain: Chain,
-    toChain: Chain,
-    nft: any,
-    sender: any,
-    receiver: any
-  ): Promise<any>;
+  transferNft<
+    SignerF,
+    RawNftF,
+    TxF,
+    SignerT,
+    RawNftT,
+    TxT
+  >(
+    fromChain: TransferChain<SignerF, RawNftF, TxF>,
+    toChain: TransferChain<SignerT, RawNftT, TxT>,
+    nft: NftInfo<RawNftF>,
+    sender: SignerF,
+    receiver: string
+  ): Promise<number>;
   /**
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the {@link inner} method.
    * @param owner: {@link Signer} A signer to  sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft.
    */
-  mint<Signer>(
-    chain: MintNft<Signer, NftMintArgs, any>,
+  mint<Signer, R>(
+    chain: MintNft<Signer, NftMintArgs, R>,
     owner: Signer,
     args: NftMintArgs
-  ): Promise<any>;
+  ): Promise<R>;
 };
 
 /**
@@ -101,81 +115,70 @@ export function ChainFactory(chainParams: ChainParams): ChainFactory {
     )
   );
 
-  const inner = async (chain: Chain): Promise<CrossChainHelper> => {
+  const inner = async <T, P>(chain: ChainNonce<T, P>): Promise<T> => {
     let helper = map.get(chain);
     if (helper === undefined) {
       helper = await CHAIN_INFO[chain].constructor(cToP.get(chain)!);
     }
-    return helper!;
+    return helper! as any as T;
   };
+
+  async function calcExchangeFees(fromChain: number, toChain: number, val: BigNumber): Promise<BigNumber> {
+    const exrate = await remoteExchangeRate.getExchangeRate(
+      CHAIN_INFO[toChain].currency,
+      CHAIN_INFO[fromChain].currency
+    );
+
+    return val
+      .dividedBy(CHAIN_INFO[toChain].decimals)
+      .times(exrate * 1.05)
+      .times(CHAIN_INFO[fromChain].decimals)
+      .integerValue(BigNumber.ROUND_CEIL);
+  }
 
   return {
     inner,
     // TODO: Find some way to make this more generic, return a txn receipt, throw an exception, etc.
     transferNft: async (
-      fromChain: Chain,
-      toChain: Chain,
-      nft: any,
-      sender: ISigner & Signer & string,
-      receiver: Address & string
-    ): Promise<any> => {
-      const fromHelper = await inner(fromChain);
-      const toHelper = await inner(toChain);
-      const estimate = await toHelper.estimateValidateTransferNft(
-        receiver,
-        nft.hash
-      );
-      console.log(`Estimate : ${estimate}`);
-      const exrate = await remoteExchangeRate.getExchangeRate(
-        CHAIN_INFO[toChain].currency,
-        CHAIN_INFO[fromChain].currency
-      );
-      const conv = estimate
-        .dividedBy(CHAIN_INFO[toChain].decimals)
-        .times(exrate * 1.05)
-        .times(CHAIN_INFO[fromChain].decimals)
-        .integerValue(BigNumber.ROUND_CEIL);
-      console.log("Converted Value: ", conv.toString());
-      if (nft.chain === fromChain) {
-        const transfer = await fromHelper.transferNftToForeign(
-          sender,
-          toChain,
+      fromChain,
+      toChain,
+      nft,
+      sender,
+      receiver
+    ): Promise<number> => {
+      if (fromChain.isWrappedNft(nft)) {
+        const decoded = fromChain.decodeWrappedNft(nft);
+        if (decoded.chain_nonce != toChain.getNonce()) {
+          throw Error("trying to send wrapped nft to non-origin chain!!!");
+        }
+        const approxNft = await toChain.decodeNftFromRaw(decoded.data);
+        const estimate = await toChain.estimateValidateUnfreezeNft(
           receiver,
-          nft.id,
+          approxNft
+        );
+        const conv = await calcExchangeFees(fromChain.getNonce(), toChain.getNonce(), estimate);
+        const [, action] = await fromChain.unfreezeWrappedNft(
+          sender,
+          receiver,
+          nft,
           conv
         );
-        return transfer;
+        return action;
       } else {
-        if (fromHelper.isWrappedNft(nft)) {
-          const estimate = await toHelper.estimateValidateUnfreezeNft(
-            receiver,
-            nft.raw_data
-          );
-
-          const exrate = await remoteExchangeRate.getExchangeRate(
-            CHAIN_INFO[toChain].currency,
-            CHAIN_INFO[fromChain].currency
-          );
-
-          const conv = estimate
-            .dividedBy(CHAIN_INFO[toChain].decimals)
-            .times(exrate * 1.05)
-            .times(CHAIN_INFO[fromChain].decimals)
-            .integerValue(BigNumber.ROUND_CEIL);
-          await fromHelper.unfreezeWrappedNft(sender, receiver, nft.id, conv);
-          if (fromChain == toChain) {
-            return;
-          } else {
-            const receipt = await fromHelper.transferNftToForeign(
-              sender,
-              fromChain,
-              receiver,
-              nft.id,
-              conv
-            );
-            return receipt;
-          }
-        }
+        const packed = fromChain.wrapNftForTransfer(nft);
+        const estimate = await toChain.estimateValidateTransferNft(
+          receiver,
+          packed
+        );
+        const conv = await calcExchangeFees(fromChain.getNonce(), toChain.getNonce(), estimate);
+        const [, action] = await fromChain.transferNftToForeign(
+          sender,
+          toChain.getNonce(),
+          receiver,
+          nft,
+          conv
+        )
+        return action;
       }
     },
     mint: async <Signer>(
