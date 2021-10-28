@@ -133,7 +133,7 @@ function mapNonceToParams(
   cToP.set(2, chainParams.elrondParams);
   cToP.set(3, chainParams.hecoParams);
   cToP.set(4, chainParams.bscParams);
-
+  cToP.set(5, chainParams.ropstenParams);
   cToP.set(6, chainParams.avalancheParams);
   cToP.set(7, chainParams.polygonParams);
   cToP.set(8, chainParams.fantomParams);
