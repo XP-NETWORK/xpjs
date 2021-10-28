@@ -41,7 +41,7 @@ import {
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
-import { ChainNonce, EstimateTxFees, NftInfo } from "..";
+import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 
 type EasyBalance = string | number | BigNumber;
@@ -203,11 +203,12 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   IssueESDTNFT &
   MintNft<ISigner, NftMintArgs, Transaction> &
   DecodeWrappedNft<EsdtNftInfo> &
-  DecodeRawNft & {
+  DecodeRawNft<EsdtNftInfo> & {
     mintableEsdts(address: Address): Promise<string[]>;
   } & WrappedNftCheck<EsdtNftInfo> &
   EstimateTxFees<EsdtNftInfo, BigNumber> &
-  ChainNonce;
+  PackNft<EsdtNftInfo>
+  & ChainNonceGet;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -761,7 +762,7 @@ export const elrondHelperFactory: (
         data: Base64.toUint8Array(nft.native.uris[0]),
       };
     },
-    async decodeUrlFromRaw(data: Uint8Array): Promise<string> {
+    async decodeNftFromRaw(data: Uint8Array) {
       const nft_info = rawNftDecoder(data);
       const locked = await getLockedNft(nft_info.token, nft_info.nonce);
 
@@ -769,14 +770,28 @@ export const elrondHelperFactory: (
         throw Error("Not a wrapped nft");
       }
 
-      return Base64.atob(locked!.uris[0]);
+      return {uri: '',
+      native: {
+        balance: 1,
+        tokenIdentifier: `${nft_info.token}-${nft_info.nonce.toString(16)}`,
+        creator: '',
+        name: '',
+        nonce: nft_info.nonce,
+        royalties: '',
+        uris: [],
+      }};
     },
-    async estimateValidateTransferNft(_toAddress: string, _nftInfo: NftInfo<EsdtNftInfo>) {
+    async estimateValidateTransferNft(_toAddress: string, _nftInfo: Uint8Array) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
     async estimateValidateUnfreezeNft(_to: string, _nft: NftInfo<EsdtNftInfo>) {
       return estimateGas(NFT_UNFREEZE_COST, elrondParams.validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
     },
+    wrapNftForTransfer(nft: NftInfo<EsdtNftInfo>) {
+      // Approximation for wrapping this nft
+      const dataLen = 4 + tokenIdentReal(nft.native.tokenIdentifier).length + 4;
+      return new Uint8Array(dataLen);
+    }
   };
 };
 

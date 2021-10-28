@@ -153,16 +153,33 @@ export interface WrappedNftCheck<RawNft> {
   isWrappedNft(nft: NftInfo<RawNft>): boolean;
 }
 
+export interface PackNft<Raw> {
+  wrapNftForTransfer(nft: NftInfo<Raw>): Uint8Array;
+}
+
 export interface DecodeWrappedNft<Data> {
   decodeWrappedNft(raw_data: NftInfo<Data>): WrappedNft;
 }
 
-export interface DecodeRawNft {
-  decodeUrlFromRaw(data: Uint8Array): Promise<string>;
+// @internal
+export interface DecodeRawNft<NativeRaw> {
+  /**
+   * convert raw nft to native one
+   * uri should be unset!
+   */
+  decodeNftFromRaw(data: Uint8Array): Promise<NftInfo<NativeRaw>>;
+}
+
+// @internal
+export interface FetchUri<NativeRaw> {
+  /**
+   * Get uri for an nft from "decodeNftFromRaw"
+   */
+  nftUri(nft: NativeRaw): Promise<string>
 }
 
 export interface EstimateTxFees<RawNft, Balance> {
-  estimateValidateTransferNft(to: string, nft: NftInfo<RawNft>): Promise<Balance>;
+  estimateValidateTransferNft(to: string, nft: Uint8Array): Promise<Balance>;
   estimateValidateUnfreezeNft(
     to: string,
     nft: NftInfo<RawNft>
@@ -173,6 +190,6 @@ export function ConcurrentSendError(): Error {
   return new Error("concurrent_send");
 }
 
-export interface ChainNonce {
+export interface ChainNonceGet {
   getNonce(): number;
 }

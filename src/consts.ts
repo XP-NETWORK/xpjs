@@ -3,6 +3,7 @@ import { elrondHelperFactory, ElrondParams } from "./helpers/elrond";
 import { tronHelperFactory, TronParams } from "./helpers/tron";
 import { web3HelperFactory, Web3Params } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
+import { ElrondHelper, Web3Helper } from "validator";
 
 // All the supported testnet uri's are here.
 export enum RpcUri {
@@ -17,21 +18,22 @@ export enum RpcUri {
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
 }
-/**
- * An enum which represents the supported chains
- * Each field in the enum equals to the nonce of the chain.
- */
-export enum Chain {
-  ELROND = 2,
-  HECO = 3,
-  BSC = 4,
-  ROPSTEN = 5,
-  AVALANCE = 6,
-  POLYGON = 7,
-  FANTOM = 8,
-  TRON = 9,
-  CELO = 11,
-  HARMONY = 12,
+
+export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
+export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
+export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>
+
+export namespace Chain {
+  export const ELROND: ElrondNonce = 2;
+  export const HECO: Web3Nonce = 3;
+  export const BSC: Web3Nonce = 4;
+  export const ROPSTEN: Web3Nonce = 5;
+  export const AVALANCHE: Web3Nonce = 6;
+  export const POLYGON: Web3Nonce = 7;
+  export const FANTOM: Web3Nonce = 8;
+  export const TRON: Web3Nonce = 9;
+  export const CELO: Web3Nonce = 0xb;
+  export const HARMONY: Web3Nonce = 0xc;
 }
 
 interface ChainData {

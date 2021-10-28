@@ -30,7 +30,7 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import { ChainNonce, EstimateTxFees, NftInfo } from "..";
+import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft } from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 type EasyBalance = string | number | EthBN;
 /**
@@ -103,10 +103,11 @@ export type Web3Helper = BaseWeb3Helper &
     string
   > &
   DecodeWrappedNft<EthNftInfo> &
-  DecodeRawNft &
+  DecodeRawNft<EthNftInfo> &
   EstimateTxFees<EthNftInfo, BigNumber> 
+  & PackNft<EthNftInfo>
   & WrappedNftCheck<MintArgs>
-  & ChainNonce;
+  & ChainNonceGet;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -308,24 +309,27 @@ export async function web3HelperFactory(
         data: packed.getData_asU8(),
       };
     },
-    async decodeUrlFromRaw(data: Uint8Array): Promise<string> {
+    async decodeNftFromRaw(data: Uint8Array) {
       const packed = NftEthNative.deserializeBinary(data);
 
-      return await nftUri(packed.getContractAddr(), EthBN.from(packed.getId()));
+      return {
+        uri: '',
+        native: {
+          uri: '',
+          contract: packed.getContractAddr(),
+          tokenId: packed.getId(),
+          owner: minter_addr,
+          chainId: params.nonce.toString()
+        }
+      }
     },
     async estimateValidateTransferNft(
       to: string,
-      nft: NftInfo<EthNftInfo>
+      nft: Uint8Array
     ): Promise<BigNumber> {
-      // Protobuf is not deterministic, though perhaps we can approximate this statically
-      const tokdat = new NftEthNative();
-      tokdat.setId(nft.native.tokenId);
-      tokdat.setNftKind(1);
-      tokdat.setContractAddr(nft.native.contract);
-
       const encoded = new NftPacked();
       encoded.setChainNonce(0x1351);
-      encoded.setData(tokdat.serializeBinary());
+      encoded.setData(nft);
 
       const utx = await minter.populateTransaction.validateTransferNft(
         randomAction(),
@@ -339,16 +343,23 @@ export async function web3HelperFactory(
       to: string,
       nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
-      const raw = Base64.toUint8Array(nft.native.uri)
-      const nft_dat = NftEthNative.deserializeBinary(raw);
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,
-        EthBN.from(nft_dat.getId().toString()),
-        nft_dat.getContractAddr()
+        EthBN.from(nft.native.tokenId.toString),
+        nft.native.contract
       );
 
       return await estimateGas(params.validators, utx);
     },
+    wrapNftForTransfer(nft) {
+      // Protobuf is not deterministic, though perhaps we can approximate this statically
+      const tokdat = new NftEthNative();
+      tokdat.setId(nft.native.tokenId);
+      tokdat.setNftKind(1);
+      tokdat.setContractAddr(nft.native.contract);
+
+      return tokdat.serializeBinary();
+    }
   };
 }
