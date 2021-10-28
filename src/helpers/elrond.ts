@@ -41,7 +41,14 @@ import {
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
-import { BareNft, ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft } from "..";
+import {
+  BareNft,
+  ChainNonceGet,
+  EstimateTxFees,
+  NftInfo,
+  PackNft,
+  PopulateDecodedNft,
+} from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 
 type EasyBalance = string | number | BigNumber;
@@ -207,9 +214,9 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     mintableEsdts(address: Address): Promise<string[]>;
   } & WrappedNftCheck<EsdtNftInfo> &
   EstimateTxFees<EsdtNftInfo, BigNumber> &
-  PackNft<EsdtNftInfo>
-  & ChainNonceGet
-  & PopulateDecodedNft<EsdtNftInfo>;
+  PackNft<EsdtNftInfo> &
+  ChainNonceGet &
+  PopulateDecodedNft<EsdtNftInfo>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -385,7 +392,7 @@ export const elrondHelperFactory: (
   };
 
   function tokenIdentReal(tokenIdentifier: string): string {
-    const base = tokenIdentifier.split("-")
+    const base = tokenIdentifier.split("-");
     base.pop();
     return base.join("-");
   }
@@ -404,7 +411,11 @@ export const elrondHelperFactory: (
         .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
         .addArg(new AddressValue(mintContract))
         .addArg(new BigUIntValue(new BigNumber(2)))
-        .addArg(new TokenIdentifierValue(Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")))
+        .addArg(
+          new TokenIdentifierValue(
+            Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")
+          )
+        )
         .addArg(new U64Value(new BigNumber(nonce)))
         .addArg(new BigUIntValue(new BigNumber(1)))
         .addArg(new TokenIdentifierValue(esdtSwaphex))
@@ -564,10 +575,12 @@ export const elrondHelperFactory: (
   async function getLockedNft(ident: string): Promise<BareNft | undefined> {
     const nfts = await listNft(elrondParams.minter_address);
     const res = nfts.get(ident);
-    return res && {
-      uri: Base64.atob(res.uris[0]),
-      chainId: elrondParams.nonce.toString()
-    }
+    return (
+      res && {
+        uri: Base64.atob(res.uris[0]),
+        chainId: elrondParams.nonce.toString(),
+      }
+    );
   }
 
   const rawNftDecoder = (nftDat: Uint8Array) => {
@@ -741,7 +754,9 @@ export const elrondHelperFactory: (
       return res.data["data"]["tokens"];
     },
     isWrappedNft(nft) {
-      return tokenIdentReal(nft.native.tokenIdentifier) === elrondParams.esdt_nft;
+      return (
+        tokenIdentReal(nft.native.tokenIdentifier) === elrondParams.esdt_nft
+      );
     },
     listNft,
     async setESDTRole(
@@ -770,16 +785,18 @@ export const elrondHelperFactory: (
     async decodeNftFromRaw(data: Uint8Array) {
       const nft_info = rawNftDecoder(data);
 
-      return {uri: '',
-      native: {
-        balance: 1,
-        tokenIdentifier: `${nft_info.token}-${nft_info.nonce.toString(16)}`,
-        creator: '',
-        name: '',
-        nonce: nft_info.nonce,
-        royalties: '',
-        uris: [],
-      }};
+      return {
+        uri: "",
+        native: {
+          balance: 1,
+          tokenIdentifier: `${nft_info.token}-${nft_info.nonce.toString(16)}`,
+          creator: "",
+          name: "",
+          nonce: nft_info.nonce,
+          royalties: "",
+          uris: [],
+        },
+      };
     },
     async populateNft(nft: NftInfo<EsdtNftInfo>) {
       const locked = await getLockedNft(nft.native.tokenIdentifier);
@@ -789,7 +806,10 @@ export const elrondHelperFactory: (
       }
       return locked;
     },
-    async estimateValidateTransferNft(_toAddress: string, _nftInfo: Uint8Array) {
+    async estimateValidateTransferNft(
+      _toAddress: string,
+      _nftInfo: Uint8Array
+    ) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
     async estimateValidateUnfreezeNft(_to: string, _nft: NftInfo<EsdtNftInfo>) {
@@ -799,7 +819,7 @@ export const elrondHelperFactory: (
       // Approximation for wrapping this nft
       const dataLen = 4 + tokenIdentReal(nft.native.tokenIdentifier).length + 4;
       return new Uint8Array(dataLen);
-    }
+    },
   };
 };
 

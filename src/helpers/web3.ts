@@ -30,7 +30,14 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import { BareNft, ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft } from "..";
+import {
+  BareNft,
+  ChainNonceGet,
+  EstimateTxFees,
+  NftInfo,
+  PackNft,
+  PopulateDecodedNft,
+} from "..";
 import { NftMintArgs } from "../factory/crossChainHelper";
 type EasyBalance = string | number | EthBN;
 /**
@@ -104,11 +111,11 @@ export type Web3Helper = BaseWeb3Helper &
   > &
   DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft<EthNftInfo> &
-  EstimateTxFees<EthNftInfo, BigNumber> 
-  & PackNft<EthNftInfo>
-  & WrappedNftCheck<MintArgs>
-  & ChainNonceGet
-  & PopulateDecodedNft<EthNftInfo>;
+  EstimateTxFees<EthNftInfo, BigNumber> &
+  PackNft<EthNftInfo> &
+  WrappedNftCheck<MintArgs> &
+  ChainNonceGet &
+  PopulateDecodedNft<EthNftInfo>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -188,7 +195,7 @@ export async function web3HelperFactory(
     const erc = UserNftMinter__factory.connect(contract, w3);
     return {
       uri: await erc.tokenURI(tokenId),
-      chainId: params.nonce.toString()
+      chainId: params.nonce.toString(),
     };
   }
 
@@ -301,9 +308,11 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
-      const res = await minter.connect(sender).withdrawNft(to, id.native.tokenId, {
-        value: EthBN.from(txFees.toString()),
-      });
+      const res = await minter
+        .connect(sender)
+        .withdrawNft(to, id.native.tokenId, {
+          value: EthBN.from(txFees.toString()),
+        });
 
       return await extractTxn(res, "UnfreezeNft");
     },
@@ -320,15 +329,15 @@ export async function web3HelperFactory(
       const packed = NftEthNative.deserializeBinary(data);
 
       return {
-        uri: '',
+        uri: "",
         native: {
-          uri: '',
+          uri: "",
           contract: packed.getContractAddr(),
           tokenId: packed.getId(),
           owner: minter_addr,
-          chainId: params.nonce.toString()
-        }
-      }
+          chainId: params.nonce.toString(),
+        },
+      };
     },
     async estimateValidateTransferNft(
       to: string,
@@ -367,6 +376,6 @@ export async function web3HelperFactory(
       tokdat.setContractAddr(nft.native.contract);
 
       return tokdat.serializeBinary();
-    }
+    },
   };
 }
