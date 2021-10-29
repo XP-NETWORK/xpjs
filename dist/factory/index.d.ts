@@ -48,6 +48,7 @@ declare type ChainFactory = {
      */
     nftUri<RawNft>(chain: NftUriChain<RawNft>, nft: NftInfo<RawNft>): Promise<BareNft>;
     estimateFees<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
+    updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
 };
 /**
  * A type representing all the supported chain params.
