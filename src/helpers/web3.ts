@@ -416,7 +416,7 @@ export async function web3HelperFactory(
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,
-        EthBN.from(nft.native.tokenId.toString),
+        EthBN.from(nft.native.tokenId.toString()),
         nft.native.contract
       );
 
