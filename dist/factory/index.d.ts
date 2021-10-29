@@ -47,6 +47,7 @@ declare type ChainFactory = {
      * @param nft: {@link NftInfo<RawNft>} The NFT of which you want to fetch the URI. Usually comes from the `nftList` method.
      */
     nftUri<RawNft>(chain: NftUriChain<RawNft>, nft: NftInfo<RawNft>): Promise<BareNft>;
+    estimateFees<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
 };
 /**
  * A type representing all the supported chain params.
