@@ -64,7 +64,7 @@ type ChainFactory = {
    * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
    * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
    * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the nftList method of the factory.
-   * @param sender {@link Sender} The owner of the NFT. 
+   * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT.
    */
   transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
@@ -103,6 +103,12 @@ type ChainFactory = {
     chain: NftUriChain<RawNft>,
     nft: NftInfo<RawNft>
   ): Promise<BareNft>;
+  estimateFees<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
+    fromChain: FullChain<SignerF, RawNftF, TxF>,
+    toChain: FullChain<SignerT, RawNftT, TxT>,
+    nft: NftInfo<RawNftF>,
+    receiver: string
+  ): Promise<BigNumber>;
 };
 
 /**
@@ -193,6 +199,34 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
   }
 
   return {
+    async estimateFees(fromChain, toChain, nft, receiver) {
+      if (fromChain.isWrappedNft(nft)) {
+        const decoded = fromChain.decodeWrappedNft(nft);
+        const approxNft = await toChain.decodeNftFromRaw(decoded.data);
+        const estimate = await toChain.estimateValidateUnfreezeNft(
+          receiver,
+          approxNft
+        );
+        const conv = await calcExchangeFees(
+          fromChain.getNonce(),
+          toChain.getNonce(),
+          estimate
+        );
+        return conv;
+      } else {
+        const packed = fromChain.wrapNftForTransfer(nft);
+        const estimate = await toChain.estimateValidateTransferNft(
+          receiver,
+          packed
+        );
+        const conv = await calcExchangeFees(
+          fromChain.getNonce(),
+          toChain.getNonce(),
+          estimate
+        );
+        return conv;
+      }
+    },
     inner,
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
       let endpoint;
