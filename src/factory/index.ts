@@ -109,6 +109,11 @@ type ChainFactory = {
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
+  // Update parameters for a specific chain
+  updateParams<T, TP>(
+    nonce: ChainNonce<T, TP>,
+    params: TP
+  ): void;
 };
 
 /**
@@ -228,7 +233,17 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       }
     },
     inner,
-    async nftList<T>(chain: NftUriChain<T>, owner: string) {
+    updateParams<T, TP>(
+      chainNonce: ChainNonce<T, TP>,
+      params: TP
+    ) {
+      map.delete(chainNonce);
+      cToP.set(chainNonce, params as any);
+    },
+    async nftList<T>(
+      chain: NftUriChain<T>,
+      owner: string
+    ) {
       let endpoint;
       switch (chain.getNonce()) {
         case Chain.ELROND:
