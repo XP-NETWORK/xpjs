@@ -1,6 +1,3 @@
-import { Signer } from "ethers";
-import { UserNftMinter } from "xpnet-web3-contracts";
-
 /**
  * Internal NFT Info
  * WARN: should be used with care. URI might not be correct
