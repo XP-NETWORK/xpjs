@@ -17,7 +17,12 @@ import {
   MintNft,
   WrappedNftCheck,
 } from "./chain";
-import { Signer, BigNumber as EthBN, PopulatedTransaction } from "ethers";
+import {
+  Signer,
+  BigNumber as EthBN,
+  PopulatedTransaction,
+  Wallet,
+} from "ethers";
 import {
   TransactionReceipt,
   TransactionResponse,
@@ -26,6 +31,7 @@ import {
 import { NftEthNative, NftPacked } from "validator";
 import {
   Minter__factory,
+  UserNftMinter,
   UserNftMinter__factory,
   XPNet__factory,
 } from "xpnet-web3-contracts";
@@ -39,6 +45,7 @@ import {
   PopulateDecodedNft,
 } from "..";
 import { NftMintArgs } from "..";
+import { ApiProvider } from "@elrondnetwork/erdjs/out";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -63,6 +70,21 @@ export type MintArgs = {
   contract: string;
   uri: string;
 };
+
+export interface IsApproved {
+  isApprovedForMinter(
+    address: NftInfo<EthNftInfo>,
+    erc: UserNftMinter
+  ): Promise<boolean>;
+}
+
+export interface Approve {
+  approveForMinter(
+    address: NftInfo<EthNftInfo>,
+    sender: Signer,
+    erc: UserNftMinter
+  ): Promise<boolean>;
+}
 
 /**
  * Base util traits
@@ -115,7 +137,9 @@ export type Web3Helper = BaseWeb3Helper &
   PackNft<EthNftInfo> &
   WrappedNftCheck<MintArgs> &
   ChainNonceGet &
-  PopulateDecodedNft<EthNftInfo>;
+  PopulateDecodedNft<EthNftInfo> &
+  IsApproved &
+  Approve;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -221,10 +245,42 @@ export async function web3HelperFactory(
     return new BigNumber(fee.toString());
   }
 
+  const isApprovedForMinter = async (
+    id: NftInfo<EthNftInfo>,
+    erc: UserNftMinter
+  ) => {
+    const approvedAddress = await erc.getApproved(id.native.tokenId);
+    if (approvedAddress === id.native.contract) {
+      return true;
+    }
+    return false;
+  };
+
+  const approveForMinter = async (
+    id: NftInfo<EthNftInfo>,
+    sender: Signer,
+    erc: UserNftMinter
+  ) => {
+    const isApproved = await isApprovedForMinter(id, erc);
+
+    if (isApproved) {
+      return true;
+    }
+
+    const receipt = await erc.approve(
+      await sender.getAddress(),
+      id.native.tokenId
+    );
+    await receipt.wait();
+    return true;
+  };
+
   const base = await baseWeb3HelperFactory(params.provider);
 
   return {
     ...base,
+    approveForMinter,
+    isApprovedForMinter,
     async populateNft(nft) {
       return await nftUri(nft.native.contract, EthBN.from(nft.native.tokenId));
     },
@@ -275,9 +331,7 @@ export async function web3HelperFactory(
       txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
       const erc = UserNftMinter__factory.connect(id.native.contract, sender);
-      const ta = await erc.approve(minter.address, id.native.tokenId);
-
-      await ta.wait();
+      await approveForMinter(id, sender, erc);
 
       const txr = await minter
         .connect(sender)
