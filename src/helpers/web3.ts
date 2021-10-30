@@ -74,15 +74,14 @@ export type MintArgs = {
 export interface IsApproved {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
-    erc: UserNftMinter
+    sender: Signer
   ): Promise<boolean>;
 }
 
 export interface Approve {
   approveForMinter(
     address: NftInfo<EthNftInfo>,
-    sender: Signer,
-    erc: UserNftMinter
+    sender: Signer
   ): Promise<boolean>;
 }
 
@@ -247,8 +246,9 @@ export async function web3HelperFactory(
 
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
-    erc: UserNftMinter
+    signer: Signer
   ) => {
+    const erc = UserNftMinter__factory.connect(id.native.contract, signer)
     const approvedAddress = await erc.getApproved(id.native.tokenId);
     if (approvedAddress === id.native.contract) {
       return true;
@@ -258,11 +258,10 @@ export async function web3HelperFactory(
 
   const approveForMinter = async (
     id: NftInfo<EthNftInfo>,
-    sender: Signer,
-    erc: UserNftMinter
+    sender: Signer
   ) => {
-    const isApproved = await isApprovedForMinter(id, erc);
-
+    const isApproved = await isApprovedForMinter(id, sender);
+    const erc = UserNftMinter__factory.connect(id.native.contract, w3)
     if (isApproved) {
       return true;
     }
@@ -331,7 +330,7 @@ export async function web3HelperFactory(
       txFees: BigNumber
     ): Promise<[TransactionReceipt, string]> {
       const erc = UserNftMinter__factory.connect(id.native.contract, sender);
-      await approveForMinter(id, sender, erc);
+      await approveForMinter(id, sender);
 
       const txr = await minter
         .connect(sender)
