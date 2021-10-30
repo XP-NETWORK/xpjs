@@ -40,6 +40,9 @@ import {
   PopulateDecodedNft,
 } from "..";
 
+// Uses default private key in provider if sender is undefinedd
+type TronSender = string | undefined;
+
 export type MinterRes = {
   // Minter smart contract
   minter: string;
@@ -52,7 +55,7 @@ export type MinterRes = {
 };
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
-  MintNft<string, NftMintArgs, any> & {
+  MintNft<TronSender, NftMintArgs, any> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract
@@ -60,7 +63,7 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
      * @argument deployer  deployer of this smart contract
      * @returns Address of the deployed smart contract
      */
-    deployErc721(deployer: string): Promise<string>;
+    deployErc721(deployer: TronSender): Promise<string>;
     /**
      * Deploy Minter Smart Contract
      *
@@ -70,7 +73,7 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
      * @argument whitelist  optional whitelisted nfts contract (deploys one if empty/undefined)
      */
     deployMinter(
-      deployer: string,
+      deployer: TronSender,
       validators: string[],
       threshold: number,
       whitelist: string[] | undefined
@@ -80,12 +83,12 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
 export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<string, string, BigNumber, string, string> &
+  TransferForeign<TronSender, string, BigNumber, string, string> &
   // TODO: Use TX Fees
-  TransferNftForeign<string, string, BigNumber, EthNftInfo, string, string> &
+  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string, string> &
   // TODO: Use TX Fees
-  UnfreezeForeign<string, string, string, string, string> &
-  UnfreezeForeignNft<string, string, BigNumber, EthNftInfo, string, string> &
+  UnfreezeForeign<TronSender, string, string, string, string> &
+  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, string, string> &
   DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft<EthNftInfo> &
   EstimateTxFees<EthNftInfo, BigNumber> &
@@ -97,11 +100,11 @@ export type TronHelper = BaseTronHelper &
 export async function baseTronHelperFactory(
   provider: TronWeb
 ): Promise<BaseTronHelper> {
-  const setSigner = (signer: string) => {
-    return provider.setPrivateKey(signer);
+  const setSigner = (signer: TronSender) => {
+    return signer && provider.setPrivateKey(signer);
   };
 
-  const deployErc721_i = async (deployer: string) => {
+  const deployErc721_i = async (deployer: TronSender) => {
     setSigner(deployer);
 
     const contract = await provider.contract().new({
@@ -113,7 +116,7 @@ export async function baseTronHelperFactory(
     return contract;
   };
 
-  const deployErc1155_i = async (owner: string) => {
+  const deployErc1155_i = async (owner: TronSender) => {
     setSigner(owner);
 
     const contract = await provider.contract().new({
@@ -125,7 +128,7 @@ export async function baseTronHelperFactory(
     return contract;
   };
 
-  const deployXpNft = async (deployer: string) => {
+  const deployXpNft = async (deployer: TronSender) => {
     setSigner(deployer);
 
     const contract = await provider.contract().new({
@@ -138,7 +141,7 @@ export async function baseTronHelperFactory(
   };
 
   return {
-    async mintNft(owner: string, options: NftMintArgs): Promise<any> {
+    async mintNft(owner: TronSender, options: NftMintArgs): Promise<any> {
       setSigner(owner);
       const erc = await provider.contract(
         UserNftMinter__factory.abi,
@@ -153,7 +156,7 @@ export async function baseTronHelperFactory(
     deployErc721: async (owner) =>
       await deployErc721_i(owner).then((c) => c.address),
     async deployMinter(
-      deployer: string,
+      deployer: TronSender,
       validators: string[],
       threshold: number,
       whitelist: string[] = []
@@ -216,8 +219,8 @@ export async function tronHelperFactory(
     },
   });
 
-  const setSigner = (signer: string) => {
-    return provider.setPrivateKey(signer);
+  const setSigner = (signer: TronSender) => {
+    return signer && provider.setPrivateKey(signer);
   };
 
   async function extractTxn(hash: string): Promise<[string, string]> {
@@ -321,7 +324,7 @@ export async function tronHelperFactory(
       };
     },
     async transferNativeToForeign(
-      sender: string,
+      sender: TronSender,
       chain_nonce: number,
       to: string,
       value: BigNumber,
@@ -337,7 +340,7 @@ export async function tronHelperFactory(
       return await extractTxn(res);
     },
     async unfreezeWrapped(
-      sender: string,
+      sender: TronSender,
       chain_nonce: number,
       to: string,
       value: string,
@@ -350,7 +353,7 @@ export async function tronHelperFactory(
       return await extractTxn(res);
     },
     async unfreezeWrappedNft(
-      sender: string,
+      sender: TronSender,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
@@ -365,7 +368,7 @@ export async function tronHelperFactory(
       return tronParams.nonce;
     },
     async transferNftToForeign(
-      sender: string,
+      sender: TronSender,
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
