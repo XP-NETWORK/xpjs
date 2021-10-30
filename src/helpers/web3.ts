@@ -250,7 +250,7 @@ export async function web3HelperFactory(
   ) => {
     const erc = UserNftMinter__factory.connect(id.native.contract, signer)
     const approvedAddress = await erc.getApproved(id.native.tokenId);
-    if (approvedAddress === id.native.contract) {
+    if (approvedAddress === minter_addr) {
       return true;
     }
     return false;
@@ -267,7 +267,7 @@ export async function web3HelperFactory(
     }
 
     const receipt = await erc.approve(
-      await sender.getAddress(),
+      minter_addr,
       id.native.tokenId
     );
     await receipt.wait();
