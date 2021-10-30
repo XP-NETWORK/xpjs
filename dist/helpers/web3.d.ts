@@ -6,7 +6,6 @@ import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft, WrappedNftCheck } from "./chain";
 import { Signer, BigNumber as EthBN } from "ethers";
 import { TransactionReceipt, Provider } from "@ethersproject/providers";
-import { UserNftMinter } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft } from "..";
 import { NftMintArgs } from "..";
 declare type EasyBalance = string | number | EthBN;
@@ -33,10 +32,10 @@ export declare type MintArgs = {
     uri: string;
 };
 export interface IsApproved {
-    isApprovedForMinter(address: NftInfo<EthNftInfo>, erc: UserNftMinter): Promise<boolean>;
+    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Signer): Promise<boolean>;
 }
 export interface Approve {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Signer, erc: UserNftMinter): Promise<boolean>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Signer): Promise<boolean>;
 }
 /**
  * Base util traits
