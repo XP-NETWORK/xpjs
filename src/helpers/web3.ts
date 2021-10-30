@@ -261,7 +261,7 @@ export async function web3HelperFactory(
     sender: Signer
   ) => {
     const isApproved = await isApprovedForMinter(id, sender);
-    const erc = UserNftMinter__factory.connect(id.native.contract, w3)
+    const erc = UserNftMinter__factory.connect(id.native.contract, sender)
     if (isApproved) {
       return true;
     }
