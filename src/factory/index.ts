@@ -73,7 +73,7 @@ type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string
-  ): Promise<string>;
+  ): Promise<[TxF, string]>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -275,7 +275,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       nft,
       sender,
       receiver
-    ): Promise<string> => {
+    )=> {
       if (fromChain.isWrappedNft(nft)) {
         const decoded = fromChain.decodeWrappedNft(nft);
         if (decoded.chain_nonce != toChain.getNonce()) {
@@ -291,13 +291,13 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
           toChain.getNonce(),
           estimate
         );
-        const [, action] = await fromChain.unfreezeWrappedNft(
+        const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,
           nft,
           conv
         );
-        return action;
+        return res;
       } else {
         const packed = fromChain.wrapNftForTransfer(nft);
         const estimate = await toChain.estimateValidateTransferNft(
@@ -309,14 +309,14 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
           toChain.getNonce(),
           estimate
         );
-        const [, action] = await fromChain.transferNftToForeign(
+        const res = await fromChain.transferNftToForeign(
           sender,
           toChain.getNonce(),
           receiver,
           nft,
           conv
         );
-        return action;
+        return res;
       }
     },
     mint: async <Signer>(
