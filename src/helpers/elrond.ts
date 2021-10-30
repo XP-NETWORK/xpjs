@@ -51,6 +51,8 @@ import {
 } from "..";
 import { NftMintArgs } from "..";
 
+type ElrondSigner = ISigner | ExtensionProvider;
+
 type EasyBalance = string | number | BigNumber;
 
 const ESDT_ISSUE_ADDR = new Address(
@@ -134,7 +136,7 @@ export interface IssueESDTNFT {
    * @returns ticker of the esdt
    */
   issueESDTNft(
-    sender: ISigner,
+    sender: ElrondSigner,
     name: string,
     ticker: string,
     canFreeze: boolean | undefined,
@@ -176,7 +178,7 @@ export interface SetESDTRoles {
    * @param token  ESDT Identifier
    * @param roles  Roles to set
    */
-  setESDTRole(sender: ISigner, token: string, roles: [ESDTRole]): Promise<void>;
+  setESDTRole(sender: ElrondSigner, token: string, roles: [ESDTRole]): Promise<void>;
 }
 
 /**
@@ -189,10 +191,10 @@ type EventIdent = string;
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ISigner, string, BigNumber, Transaction, EventIdent> &
-  UnfreezeForeign<ISigner, string, BigNumber, Transaction, EventIdent> &
+  TransferForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> &
+  UnfreezeForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> &
   TransferNftForeign<
-    ISigner,
+    ElrondSigner,
     string,
     BigNumber,
     EsdtNftInfo,
@@ -200,7 +202,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EventIdent
   > &
   UnfreezeForeignNft<
-    ISigner,
+    ElrondSigner,
     string,
     BigNumber,
     EsdtNftInfo,
@@ -208,7 +210,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EventIdent
   > &
   IssueESDTNFT &
-  MintNft<ISigner, NftMintArgs, Transaction> &
+  MintNft<ElrondSigner, NftMintArgs, Transaction> &
   DecodeWrappedNft<EsdtNftInfo> &
   DecodeRawNft<EsdtNftInfo> & {
     mintableEsdts(address: Address): Promise<string[]>;
@@ -257,15 +259,15 @@ export const elrondHelperFactory: (
     networkConfig.MinGasPrice.valueOf() *
     networkConfig.GasPriceModifier.valueOf();
 
-  const syncAccount = async (signer: ISigner | ExtensionProvider) => {
-    const account = new Account(new Address(await signer.getAddress()));
+  const syncAccount = async (signer: ElrondSigner) => {
+    const account = new Account(await getAddress(signer));
     await account.sync(provider);
 
     return account;
   };
 
   const signAndSend = async (
-    signer: ISigner | ExtensionProvider,
+    signer: ElrondSigner,
     tx: Transaction
   ) => {
     const acc = await syncAccount(signer);
@@ -322,7 +324,7 @@ export const elrondHelperFactory: (
     throw Error(`failed to query transaction exceeded 10 retries ${tx_hash}`);
   };
 
-  const doEgldSwap = async (sender: ISigner, value: EasyBalance) => {
+  const doEgldSwap = async (sender: ElrondSigner, value: EasyBalance) => {
     const utx = new Transaction({
       receiver: swapContract,
       gasLimit: new GasLimit(50000000),
@@ -625,6 +627,10 @@ export const elrondHelperFactory: (
     return base_fees.times((cnt + 1) * gasPriceModif); // assume execution takes about twice as much gas fees
   }
 
+  async function getAddress(sender: ElrondSigner): Promise<Address> {
+    return new Address(await sender.getAddress())
+  }
+
   return {
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
@@ -650,7 +656,7 @@ export const elrondHelperFactory: (
       return res;
     },
     async transferNativeToForeign(
-      sender: ISigner,
+      sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       value: EasyBalance,
@@ -666,7 +672,7 @@ export const elrondHelperFactory: (
       return await extractId(tx);
     },
     async unfreezeWrapped(
-      sender: ISigner,
+      sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       value: EasyBalance,
@@ -675,7 +681,7 @@ export const elrondHelperFactory: (
       await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeTxn(
         chain_nonce,
-        sender.getAddress(),
+        await getAddress(sender),
         to,
         value
       );
@@ -684,7 +690,7 @@ export const elrondHelperFactory: (
       return await extractId(tx);
     },
     async transferNftToForeign(
-      sender: ISigner,
+      sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       info: NftInfo<EsdtNftInfo>,
@@ -693,7 +699,7 @@ export const elrondHelperFactory: (
       await doEgldSwap(sender, txFees);
       const txu = unsignedTransferNftTxn(
         chain_nonce,
-        sender.getAddress(),
+        await getAddress(sender),
         to,
         info.native,
         new BigNumber(txFees.toString())
@@ -703,14 +709,14 @@ export const elrondHelperFactory: (
       return await extractId(tx);
     },
     async unfreezeWrappedNft(
-      sender: ISigner,
+      sender: ElrondSigner,
       to: string,
       nft: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
     ): Promise<[Transaction, EventIdent]> {
       await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeNftTxn(
-        sender.getAddress(),
+        await getAddress(sender),
         to,
         nft.native.nonce,
         new BigNumber(txFees.toString())
@@ -721,7 +727,7 @@ export const elrondHelperFactory: (
     },
     unsignedIssueESDTNft,
     async issueESDTNft(
-      sender: ISigner,
+      sender: ElrondSigner,
       name: string,
       ticker: string,
       canFreeze: boolean = false,
@@ -741,8 +747,8 @@ export const elrondHelperFactory: (
       const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8");
     },
-    async mintNft(owner: ISigner, args: NftMintArgs): Promise<Transaction> {
-      const txu = unsignedMintNftTxn(owner.getAddress(), args as NftIssueArgs);
+    async mintNft(owner: ElrondSigner, args: NftMintArgs): Promise<Transaction> {
+      const txu = unsignedMintNftTxn(await getAddress(owner), args as NftIssueArgs);
 
       return await signAndSend(owner, txu);
     },
@@ -760,7 +766,7 @@ export const elrondHelperFactory: (
     },
     listNft,
     async setESDTRole(
-      manager: ISigner,
+      manager: ElrondSigner,
       token: string,
       target: Address,
       roles: [ESDTRole]
