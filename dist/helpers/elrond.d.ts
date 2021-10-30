@@ -4,11 +4,12 @@
  * Note that Unsigned Transactions need to be manually handled after they have been added to the block
  * @module
  */
-import { Address, ISigner, Transaction } from "@elrondnetwork/erdjs";
+import { Address, ExtensionProvider, ISigner, Transaction } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
 import { ChainNonceGet, EstimateTxFees, PackNft, PopulateDecodedNft } from "..";
 import { NftMintArgs } from "..";
+declare type ElrondSigner = ISigner | ExtensionProvider;
 /**
  * Information associated with an ESDT Token
  */
@@ -60,7 +61,7 @@ export interface IssueESDTNFT {
      *
      * @returns ticker of the esdt
      */
-    issueESDTNft(sender: ISigner, name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Promise<string>;
+    issueESDTNft(sender: ElrondSigner, name: string, ticker: string, canFreeze: boolean | undefined, canWipe: boolean | undefined, canTransferNFTCreateRole: boolean | undefined): Promise<string>;
 }
 /**
  * Possible roles for an ESDT
@@ -86,7 +87,7 @@ export interface SetESDTRoles {
      * @param token  ESDT Identifier
      * @param roles  Roles to set
      */
-    setESDTRole(sender: ISigner, token: string, roles: [ESDTRole]): Promise<void>;
+    setESDTRole(sender: ElrondSigner, token: string, roles: [ESDTRole]): Promise<void>;
 }
 /**
  * Identifier for tracking a given action
@@ -95,7 +96,7 @@ declare type EventIdent = string;
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ISigner, string, BigNumber, Transaction, EventIdent> & UnfreezeForeign<ISigner, string, BigNumber, Transaction, EventIdent> & TransferNftForeign<ISigner, string, BigNumber, EsdtNftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ISigner, string, BigNumber, EsdtNftInfo, Transaction, EventIdent> & IssueESDTNFT & MintNft<ISigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> & UnfreezeForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction, EventIdent> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
     mintableEsdts(address: Address): Promise<string[]>;
 } & WrappedNftCheck<EsdtNftInfo> & EstimateTxFees<EsdtNftInfo, BigNumber> & PackNft<EsdtNftInfo> & ChainNonceGet & PopulateDecodedNft<EsdtNftInfo>;
 /**
