@@ -27,7 +27,7 @@ declare type ChainFactory = {
      * @param sender {@link Sender} The owner of the NFT.
      * @param receiver Address of the Receiver of the NFT.
      */
-    transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string): Promise<string>;
+    transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string): Promise<[TxF, string]>;
     /**
      * Mints an NFT on the chain.
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
