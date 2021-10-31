@@ -90,13 +90,9 @@ export interface SetESDTRoles {
     setESDTRole(sender: ElrondSigner, token: string, roles: [ESDTRole]): Promise<void>;
 }
 /**
- * Identifier for tracking a given action
- */
-declare type EventIdent = string;
-/**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> & UnfreezeForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction, EventIdent> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction, EventIdent> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber, Transaction> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
     mintableEsdts(address: Address): Promise<string[]>;
 } & WrappedNftCheck<EsdtNftInfo> & EstimateTxFees<EsdtNftInfo, BigNumber> & PackNft<EsdtNftInfo> & ChainNonceGet & PopulateDecodedNft<EsdtNftInfo>;
 /**

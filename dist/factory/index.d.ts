@@ -6,7 +6,7 @@ import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees,
 import BigNumber from "bignumber.js";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft> & DecodeWrappedNft<RawNft> & DecodeRawNft<RawNft> & PopulateDecodedNft<RawNft>;
-declare type FullChain<Signer, RawNft, Tx> = TransferNftForeign<Signer, string, BigNumber, RawNft, Tx, string> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string> & EstimateTxFees<RawNft, BigNumber> & PackNft<RawNft> & NftUriChain<RawNft>;
+declare type FullChain<Signer, RawNft, Tx> = TransferNftForeign<Signer, string, BigNumber, RawNft, Tx> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx> & EstimateTxFees<RawNft, BigNumber> & PackNft<RawNft> & NftUriChain<RawNft>;
 /**
  * A type representing a chain factory.
  *
@@ -27,7 +27,7 @@ declare type ChainFactory = {
      * @param sender {@link Sender} The owner of the NFT.
      * @param receiver Address of the Receiver of the NFT.
      */
-    transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber): Promise<[TxF, string]>;
+    transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(fromChain: FullChain<SignerF, RawNftF, TxF>, toChain: FullChain<SignerT, RawNftT, TxT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber): Promise<TxF>;
     /**
      * Mints an NFT on the chain.
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.

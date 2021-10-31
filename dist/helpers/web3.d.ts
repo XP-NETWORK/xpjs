@@ -4,8 +4,8 @@
  */
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft, WrappedNftCheck } from "./chain";
-import { Signer, BigNumber as EthBN } from "ethers";
-import { TransactionReceipt, Provider } from "@ethersproject/providers";
+import { Signer, BigNumber as EthBN, ContractTransaction } from "ethers";
+import { Provider } from "@ethersproject/providers";
 import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft } from "..";
 import { NftMintArgs } from "..";
 declare type EasyBalance = string | number | EthBN;
@@ -60,7 +60,7 @@ MintNft<Signer, NftMintArgs, any> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, TransactionReceipt, string> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionReceipt, string> & UnfreezeForeign<Signer, string, EasyBalance, TransactionReceipt, string> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionReceipt, string> & DecodeWrappedNft<EthNftInfo> & DecodeRawNft<EthNftInfo> & EstimateTxFees<EthNftInfo, BigNumber> & PackNft<EthNftInfo> & WrappedNftCheck<MintArgs> & ChainNonceGet & PopulateDecodedNft<EthNftInfo> & IsApproved & Approve;
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, ContractTransaction> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, ContractTransaction> & UnfreezeForeign<Signer, string, EasyBalance, ContractTransaction> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, ContractTransaction> & DecodeWrappedNft<EthNftInfo> & DecodeRawNft<EthNftInfo> & EstimateTxFees<EthNftInfo, BigNumber> & PackNft<EthNftInfo> & WrappedNftCheck<MintArgs> & ChainNonceGet & PopulateDecodedNft<EthNftInfo> & IsApproved & Approve;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
