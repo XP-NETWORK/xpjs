@@ -21,14 +21,14 @@ export type NftInfo<Raw> = {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferForeign<Signer, ForeignAddr, Balance, Tx> {
+export interface TransferForeign<Signer, ForeignAddr, Balance> {
   transferNativeToForeign(
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
     value: Balance,
     txFees: Balance
-  ): Promise<Tx>;
+  ): Promise<string>;
 }
 
 /**
@@ -41,14 +41,14 @@ export interface TransferForeign<Signer, ForeignAddr, Balance, Tx> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx> {
+export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
   unfreezeWrapped(
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
     value: Balance,
     txFees: Balance
-  ): Promise<Tx>;
+  ): Promise<string>;
 }
 
 /**
@@ -65,8 +65,7 @@ export interface TransferNftForeign<
   Signer,
   ForeignAddr,
   Balance,
-  RawNft,
-  Tx
+  RawNft
 > {
   transferNftToForeign(
     sender: Signer,
@@ -74,7 +73,7 @@ export interface TransferNftForeign<
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance
-  ): Promise<Tx>;
+  ): Promise<string>;
 }
 
 /**
@@ -91,15 +90,14 @@ export interface UnfreezeForeignNft<
   Signer,
   ForeignAddr,
   Balance,
-  RawNft,
-  Tx
+  RawNft
 > {
   unfreezeWrappedNft(
     sender: Signer,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance
-  ): Promise<Tx>;
+  ): Promise<string>;
 }
 
 /**
