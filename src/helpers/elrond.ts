@@ -685,6 +685,7 @@ export const elrondHelperFactory: (
 
       return tx.getHash().toString();
     },
+    doEgldSwap,
     async transferNftToForeign(
       sender: ElrondSigner,
       chain_nonce: number,
@@ -692,7 +693,6 @@ export const elrondHelperFactory: (
       info: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
     ): Promise<string> {
-      await doEgldSwap(sender, txFees);
       const txu = unsignedTransferNftTxn(
         chain_nonce,
         await getAddress(sender),
