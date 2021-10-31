@@ -39,10 +39,9 @@ type FullChain<Signer, RawNft, Tx> = TransferNftForeign<
   string,
   BigNumber,
   RawNft,
-  Tx,
-  string
+  Tx
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string> &
+  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx> &
   EstimateTxFees<RawNft, BigNumber> &
   PackNft<RawNft> &
   NftUriChain<RawNft>;
@@ -74,7 +73,7 @@ type ChainFactory = {
     sender: SignerF,
     receiver: string,
     fee?: BigNumber
-  ): Promise<[TxF, string]>;
+  ): Promise<TxF>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
