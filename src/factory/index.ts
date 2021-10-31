@@ -111,10 +111,7 @@ type ChainFactory = {
     receiver: string
   ): Promise<BigNumber>;
   // Update parameters for a specific chain
-  updateParams<T, TP>(
-    nonce: ChainNonce<T, TP>,
-    params: TP
-  ): void;
+  updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
 };
 
 /**
@@ -203,7 +200,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-  const estimateFees = async<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
+  const estimateFees = async <SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
     fromChain: FullChain<SignerF, RawNftF, TxF>,
     toChain: FullChain<SignerT, RawNftT, TxT>,
     nft: NftInfo<RawNftF>,
@@ -235,21 +232,15 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       );
       return conv;
     }
-  }
+  };
   return {
     estimateFees,
     inner,
-    updateParams<T, TP>(
-      chainNonce: ChainNonce<T, TP>,
-      params: TP
-    ) {
+    updateParams<T, TP>(chainNonce: ChainNonce<T, TP>, params: TP) {
       map.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },
-    async nftList<T>(
-      chain: NftUriChain<T>,
-      owner: string
-    ) {
+    async nftList<T>(chain: NftUriChain<T>, owner: string) {
       let endpoint;
       switch (chain.getNonce()) {
         case Chain.ELROND:
@@ -275,14 +266,7 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
         chainId: chain.getNonce().toString(),
       };
     },
-    transferNft: async (
-      fromChain,
-      toChain,
-      nft,
-      sender,
-      receiver,
-      fee
-    )=> {
+    transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
       }
@@ -291,40 +275,20 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
         if (decoded.chain_nonce != toChain.getNonce()) {
           throw Error("trying to send wrapped nft to non-origin chain!!!");
         }
-        const approxNft = await toChain.decodeNftFromRaw(decoded.data);
-        const estimate = await toChain.estimateValidateUnfreezeNft(
-          receiver,
-          approxNft
-        );
-        const conv = await calcExchangeFees(
-          fromChain.getNonce(),
-          toChain.getNonce(),
-          estimate
-        );
         const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,
           nft,
-          conv
+          fee
         );
         return res;
       } else {
-        const packed = fromChain.wrapNftForTransfer(nft);
-        const estimate = await toChain.estimateValidateTransferNft(
-          receiver,
-          packed
-        );
-        const conv = await calcExchangeFees(
-          fromChain.getNonce(),
-          toChain.getNonce(),
-          estimate
-        );
         const res = await fromChain.transferNftToForeign(
           sender,
           toChain.getNonce(),
           receiver,
           nft,
-          conv
+          fee
         );
         return res;
       }
