@@ -72,7 +72,8 @@ type ChainFactory = {
     toChain: FullChain<SignerT, RawNftT, TxT>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
-    receiver: string
+    receiver: string,
+    fee?: BigNumber
   ): Promise<[TxF, string]>;
   /**
    * Mints an NFT on the chain.
@@ -202,36 +203,41 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-
+  const estimateFees = async<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
+    fromChain: FullChain<SignerF, RawNftF, TxF>,
+    toChain: FullChain<SignerT, RawNftT, TxT>,
+    nft: NftInfo<RawNftF>,
+    receiver: string
+  ) => {
+    if (fromChain.isWrappedNft(nft)) {
+      const decoded = fromChain.decodeWrappedNft(nft);
+      const approxNft = await toChain.decodeNftFromRaw(decoded.data);
+      const estimate = await toChain.estimateValidateUnfreezeNft(
+        receiver,
+        approxNft
+      );
+      const conv = await calcExchangeFees(
+        fromChain.getNonce(),
+        toChain.getNonce(),
+        estimate
+      );
+      return conv;
+    } else {
+      const packed = fromChain.wrapNftForTransfer(nft);
+      const estimate = await toChain.estimateValidateTransferNft(
+        receiver,
+        packed
+      );
+      const conv = await calcExchangeFees(
+        fromChain.getNonce(),
+        toChain.getNonce(),
+        estimate
+      );
+      return conv;
+    }
+  }
   return {
-    async estimateFees(fromChain, toChain, nft, receiver) {
-      if (fromChain.isWrappedNft(nft)) {
-        const decoded = fromChain.decodeWrappedNft(nft);
-        const approxNft = await toChain.decodeNftFromRaw(decoded.data);
-        const estimate = await toChain.estimateValidateUnfreezeNft(
-          receiver,
-          approxNft
-        );
-        const conv = await calcExchangeFees(
-          fromChain.getNonce(),
-          toChain.getNonce(),
-          estimate
-        );
-        return conv;
-      } else {
-        const packed = fromChain.wrapNftForTransfer(nft);
-        const estimate = await toChain.estimateValidateTransferNft(
-          receiver,
-          packed
-        );
-        const conv = await calcExchangeFees(
-          fromChain.getNonce(),
-          toChain.getNonce(),
-          estimate
-        );
-        return conv;
-      }
-    },
+    estimateFees,
     inner,
     updateParams<T, TP>(
       chainNonce: ChainNonce<T, TP>,
@@ -274,8 +280,12 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       toChain,
       nft,
       sender,
-      receiver
+      receiver,
+      fee
     )=> {
+      if (!fee) {
+        fee = await estimateFees(fromChain, toChain, nft, receiver);
+      }
       if (fromChain.isWrappedNft(nft)) {
         const decoded = fromChain.decodeWrappedNft(nft);
         if (decoded.chain_nonce != toChain.getNonce()) {
