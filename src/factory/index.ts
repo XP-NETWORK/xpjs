@@ -34,14 +34,13 @@ type NftUriChain<RawNft> = ChainNonceGet &
   DecodeRawNft<RawNft> &
   PopulateDecodedNft<RawNft>;
 
-type FullChain<Signer, RawNft, Tx> = TransferNftForeign<
+type FullChain<Signer, RawNft> = TransferNftForeign<
   Signer,
   string,
   BigNumber,
-  RawNft,
-  Tx
+  RawNft
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx> &
+  UnfreezeForeignNft<Signer, string, BigNumber, RawNft> &
   EstimateTxFees<RawNft, BigNumber> &
   PackNft<RawNft> &
   NftUriChain<RawNft>;
@@ -66,14 +65,14 @@ type ChainFactory = {
    * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT.
    */
-  transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
-    fromChain: FullChain<SignerF, RawNftF, TxF>,
-    toChain: FullChain<SignerT, RawNftT, TxT>,
+  transferNft<SignerF, RawNftF, SignerT, RawNftT>(
+    fromChain: FullChain<SignerF, RawNftF>,
+    toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
     fee?: BigNumber
-  ): Promise<TxF>;
+  ): Promise<string>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -103,9 +102,9 @@ type ChainFactory = {
     chain: NftUriChain<RawNft>,
     nft: NftInfo<RawNft>
   ): Promise<BareNft>;
-  estimateFees<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
-    fromChain: FullChain<SignerF, RawNftF, TxF>,
-    toChain: FullChain<SignerT, RawNftT, TxT>,
+  estimateFees<SignerF, RawNftF, SignerT, RawNftT>(
+    fromChain: FullChain<SignerF, RawNftF>,
+    toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
@@ -199,9 +198,9 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-  const estimateFees = async <SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
-    fromChain: FullChain<SignerF, RawNftF, TxF>,
-    toChain: FullChain<SignerT, RawNftT, TxT>,
+  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT>(
+    fromChain: FullChain<SignerF, RawNftF>,
+    toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {

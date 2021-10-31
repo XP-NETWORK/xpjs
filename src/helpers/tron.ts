@@ -83,12 +83,12 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
 export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<TronSender, string, BigNumber, string> &
+  TransferForeign<TronSender, string, BigNumber> &
   // TODO: Use TX Fees
-  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> &
+  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo> &
   // TODO: Use TX Fees
-  UnfreezeForeign<TronSender, string, string, string> &
-  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, string> &
+  UnfreezeForeign<TronSender, string, string> &
+  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo> &
   DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft<EthNftInfo> &
   EstimateTxFees<EthNftInfo, BigNumber> &
