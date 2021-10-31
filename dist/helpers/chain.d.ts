@@ -17,8 +17,8 @@ export declare type NftInfo<Raw> = {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferForeign<Signer, ForeignAddr, Balance, Tx> {
-    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<Tx>;
+export interface TransferForeign<Signer, ForeignAddr, Balance> {
+    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<string>;
 }
 /**
  * Unfreeze native liquidity existing on a foreign chain(Send back Liquidity)
@@ -30,8 +30,8 @@ export interface TransferForeign<Signer, ForeignAddr, Balance, Tx> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx> {
-    unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<Tx>;
+export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
+    unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<string>;
 }
 /**
  * Transfer NFT to a foreign chain, freezing the original one
@@ -43,8 +43,8 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft, Tx> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<Tx>;
+export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft> {
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<string>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
@@ -56,8 +56,8 @@ export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft, Tx> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft, Tx> {
-    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<Tx>;
+export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft> {
+    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<string>;
 }
 /**
  * Get the balance of an address on the chain

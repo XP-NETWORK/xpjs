@@ -92,7 +92,7 @@ export interface SetESDTRoles {
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber, Transaction> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
     mintableEsdts(address: Address): Promise<string[]>;
 } & WrappedNftCheck<EsdtNftInfo> & EstimateTxFees<EsdtNftInfo, BigNumber> & PackNft<EsdtNftInfo> & ChainNonceGet & PopulateDecodedNft<EsdtNftInfo>;
 /**
