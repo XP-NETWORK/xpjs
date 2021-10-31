@@ -284,7 +284,7 @@ export const elrondHelperFactory: (
         throw e;
       }
     }
-    return tx;
+    return stx;
   };
 
   const transactionResult = async (tx_hash: TransactionHash) => {
