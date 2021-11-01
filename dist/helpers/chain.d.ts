@@ -116,6 +116,9 @@ export interface DecodeRawNft<NativeRaw> {
      */
     decodeNftFromRaw(data: Uint8Array): Promise<NftInfo<NativeRaw>>;
 }
+export interface ValidateAddress {
+    validateAddress(adr: string): Promise<boolean>;
+}
 export declare type BareNft = {
     chainId: string;
     uri: string;

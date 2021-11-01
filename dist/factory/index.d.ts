@@ -2,11 +2,11 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { ChainNonce } from "../consts";
-import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, WrappedNftCheck } from "..";
+import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft> & DecodeWrappedNft<RawNft> & DecodeRawNft<RawNft> & PopulateDecodedNft<RawNft>;
-declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<RawNft, BigNumber> & PackNft<RawNft> & NftUriChain<RawNft>;
+declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<RawNft, BigNumber> & PackNft<RawNft> & NftUriChain<RawNft> & ValidateAddress;
 /**
  * A type representing a chain factory.
  *
