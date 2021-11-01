@@ -826,14 +826,9 @@ export const elrondHelperFactory: (
     async validateAddress(adr: string) {
       try {
         new Address(adr);
-        const remote = await providerRest.get(`/address/${adr}/esdt`);
-        if (remote.data.code != "successful") {
-          if (!remote.data.error.includes("account was not found")) {
-            console.warn(`elrond: validateAddress: unhandled error ${JSON.stringify(remote.data)}`);
-          }
-          return false;
-        }
-        return true;
+        return await providerRest.get(`/address/${adr}/esdt`)
+          .then(_ => true)
+          .catch(_ => false);
       } catch (_) {
         return false;
       }
