@@ -48,6 +48,7 @@ import {
   NftInfo,
   PackNft,
   PopulateDecodedNft,
+  ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
 
@@ -214,7 +215,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   EstimateTxFees<EsdtNftInfo, BigNumber> &
   PackNft<EsdtNftInfo> &
   ChainNonceGet &
-  PopulateDecodedNft<EsdtNftInfo>;
+  PopulateDecodedNft<EsdtNftInfo> &
+  ValidateAddress;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -821,6 +823,21 @@ export const elrondHelperFactory: (
       const dataLen = 4 + tokenIdentReal(nft.native.tokenIdentifier).length + 4;
       return new Uint8Array(dataLen);
     },
+    async validateAddress(adr: string) {
+      try {
+        new Address(adr);
+        const remote = await providerRest.get(`/address/${adr}/esdt`);
+        if (remote.data.code != "successful") {
+          if (!remote.data.error.includes("account was not found")) {
+            console.warn(`elrond: validateAddress: unhandled error ${JSON.stringify(remote.data)}`);
+          }
+          return false;
+        }
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
   };
 };
 

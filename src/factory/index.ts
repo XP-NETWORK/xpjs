@@ -15,6 +15,7 @@ import {
   PopulateDecodedNft,
   TransferNftForeign,
   UnfreezeForeignNft,
+  ValidateAddress,
   WrappedNftCheck,
 } from "..";
 import {
@@ -43,7 +44,8 @@ type FullChain<Signer, RawNft> = TransferNftForeign<
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft> &
   EstimateTxFees<RawNft, BigNumber> &
   PackNft<RawNft> &
-  NftUriChain<RawNft>;
+  NftUriChain<RawNft> &
+  ValidateAddress;
 
 /**
  * A type representing a chain factory.
@@ -267,6 +269,9 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
+      }
+      if (!await toChain.validateAddress(receiver)) {
+        throw Error('invalid address');
       }
       if (fromChain.isWrappedNft(nft)) {
         const decoded = fromChain.decodeWrappedNft(nft);

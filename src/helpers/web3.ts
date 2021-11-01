@@ -23,6 +23,7 @@ import {
   PopulatedTransaction,
   Wallet,
   ContractTransaction,
+  ethers,
 } from "ethers";
 import {
   TransactionReceipt,
@@ -44,6 +45,7 @@ import {
   NftInfo,
   PackNft,
   PopulateDecodedNft,
+  ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
 import { ApiProvider } from "@elrondnetwork/erdjs/out";
@@ -135,7 +137,8 @@ export type Web3Helper = BaseWeb3Helper &
   ChainNonceGet &
   PopulateDecodedNft<EthNftInfo> &
   IsApproved &
-  Approve;
+  Approve &
+  ValidateAddress;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -427,5 +430,8 @@ export async function web3HelperFactory(
 
       return tokdat.serializeBinary();
     },
+    validateAddress(adr) {
+      return Promise.resolve(ethers.utils.isAddress(adr));
+    }
   };
 }
