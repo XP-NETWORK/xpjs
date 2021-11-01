@@ -710,7 +710,6 @@ export const elrondHelperFactory: (
       nft: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
     ): Promise<string> {
-      await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,
