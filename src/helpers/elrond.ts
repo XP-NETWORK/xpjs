@@ -791,7 +791,7 @@ export const elrondHelperFactory: (
         uri: "",
         native: {
           balance: 1,
-          tokenIdentifier: `${nft_info.token}-${nft_info.nonce.toString(16)}`,
+          tokenIdentifier: `${nft_info.token}-${nft_info.nonce.toString()}`,
           creator: "",
           name: "",
           nonce: nft_info.nonce,
