@@ -21,14 +21,14 @@ export type NftInfo<Raw> = {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
+export interface TransferForeign<Signer, ForeignAddr, Balance> {
   transferNativeToForeign(
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
     value: Balance,
     txFees: Balance
-  ): Promise<[Tx, EventIdent]>;
+  ): Promise<string>;
 }
 
 /**
@@ -41,14 +41,14 @@ export interface TransferForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeign<Signer, ForeignAddr, Balance, Tx, EventIdent> {
+export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
   unfreezeWrapped(
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
     value: Balance,
     txFees: Balance
-  ): Promise<[Tx, EventIdent]>;
+  ): Promise<string>;
 }
 
 /**
@@ -65,9 +65,7 @@ export interface TransferNftForeign<
   Signer,
   ForeignAddr,
   Balance,
-  RawNft,
-  Tx,
-  EventIdent
+  RawNft
 > {
   transferNftToForeign(
     sender: Signer,
@@ -75,7 +73,7 @@ export interface TransferNftForeign<
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance
-  ): Promise<[Tx, EventIdent]>;
+  ): Promise<string>;
 }
 
 /**
@@ -92,16 +90,14 @@ export interface UnfreezeForeignNft<
   Signer,
   ForeignAddr,
   Balance,
-  RawNft,
-  Tx,
-  EventIdent
+  RawNft
 > {
   unfreezeWrappedNft(
     sender: Signer,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance
-  ): Promise<[Tx, EventIdent]>;
+  ): Promise<string>;
 }
 
 /**
@@ -171,6 +167,10 @@ export interface DecodeRawNft<NativeRaw> {
    * uri should be unset!
    */
   decodeNftFromRaw(data: Uint8Array): Promise<NftInfo<NativeRaw>>;
+}
+
+export interface ValidateAddress {
+  validateAddress(adr: string): Promise<boolean>;
 }
 
 export type BareNft = {

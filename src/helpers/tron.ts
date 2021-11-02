@@ -83,12 +83,12 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
 export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<TronSender, string, BigNumber, string, string> &
+  TransferForeign<TronSender, string, BigNumber> &
   // TODO: Use TX Fees
-  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string, string> &
+  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo> &
   // TODO: Use TX Fees
-  UnfreezeForeign<TronSender, string, string, string, string> &
-  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, string, string> &
+  UnfreezeForeign<TronSender, string, string> &
+  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo> &
   DecodeWrappedNft<EthNftInfo> &
   DecodeRawNft<EthNftInfo> &
   EstimateTxFees<EthNftInfo, BigNumber> &
@@ -329,7 +329,7 @@ export async function tronHelperFactory(
       to: string,
       value: BigNumber,
       txFees: BigNumber
-    ): Promise<[string, string]> {
+    ): Promise<string> {
       setSigner(sender);
 
       const val = EthBN.from(value.toString());
@@ -337,7 +337,7 @@ export async function tronHelperFactory(
       let res = await minter
         .freeze(chain_nonce, to, val)
         .send({ callValue: totalVal });
-      return await extractTxn(res);
+      return res;
     },
     async unfreezeWrapped(
       sender: TronSender,
@@ -345,24 +345,24 @@ export async function tronHelperFactory(
       to: string,
       value: string,
       txFees: string
-    ): Promise<[string, string]> {
+    ): Promise<string> {
       setSigner(sender);
       const res = await minter
         .withdraw(chain_nonce, to, value)
         .send({ callValue: EthBN.from(txFees.toString()) });
-      return await extractTxn(res);
+      return res;
     },
     async unfreezeWrappedNft(
       sender: TronSender,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<[string, string]> {
+    ): Promise<string> {
       setSigner(sender);
       const res = await minter
         .withdrawNft(to, id.native.tokenId)
         .send({ callValue: EthBN.from(txFees.toString()) });
-      return await extractTxn(res);
+      return res;
     },
     getNonce() {
       return tronParams.nonce;
@@ -373,7 +373,7 @@ export async function tronHelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<[string, string]> {
+    ): Promise<string> {
       setSigner(sender);
       const erc = await provider.contract(
         UserNftMinter__factory.abi,
@@ -385,7 +385,7 @@ export async function tronHelperFactory(
         .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
         .send({ callValue: EthBN.from(txFees.toString()) });
 
-      return await extractTxn(txr);
+      return txr;
     },
     async balanceWrappedBatch(
       address: string,
