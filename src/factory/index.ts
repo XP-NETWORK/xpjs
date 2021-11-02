@@ -2,6 +2,7 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
+export * from "./factories"
 
 import {
   BareNft,
