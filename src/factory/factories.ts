@@ -18,7 +18,7 @@ export namespace ChainFactories {
   export const TestNetChainFactory = (moralis: AppConfig) => {
     return ChainFactory(moralis, {
       elrondParams: {
-        node_uri: "https://devnet-api.elrond.com",
+        node_uri: TestNetRpcUri.ELROND,
         minter_address:
           "erd1qqqqqqqqqqqqqpgq3cpmdjk5mwnvqqe7tswcwhdufsddjd4vk4as8qtp05",
         esdt_swap_address:
@@ -124,7 +124,7 @@ export namespace ChainFactories {
   export const MainNetChainFactory = (moralis: AppConfig) => {
     return ChainFactory(moralis,{
       elrondParams: {
-        node_uri: "https://elrondnode.xp.network/proxy/",
+        node_uri: MainNetRpcUri.ELROND,
         minter_address:
           "erd1qqqqqqqqqqqqqpgqe4hsht34ut085demqk2g2llcznankw84p7tqx5s9ce",
         esdt_swap_address:
