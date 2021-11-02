@@ -7451,7 +7451,7 @@ xmlhttprequest@1.8.0:
 
 "xpnet-nft-list@git+https://github.com/xp-network/nft-list-backend#bleeding-edge":
   version "0.0.1"
-  resolved "git+https://github.com/xp-network/nft-list-backend#5f76af5da19302165075bbbc79b4a8aaccf32eeb"
+  resolved "git+https://github.com/xp-network/nft-list-backend#089d9c2dfc0e372c1d5ab3104dc6e6f51191c4b4"
   dependencies:
     "@elrondnetwork/erdjs" "^8.0.1-alpha.8"
     axios "^0.23.0"
