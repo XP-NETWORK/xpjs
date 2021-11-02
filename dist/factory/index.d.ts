@@ -2,6 +2,7 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { ChainNonce } from "../consts";
+export * from "./factories";
 import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
@@ -92,4 +93,3 @@ export interface NftMintArgs {
     readonly hash?: string | undefined;
     readonly attrs: string | undefined;
 }
-export {};
