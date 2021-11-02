@@ -29,6 +29,11 @@ Features Available :-
   ```javascript
   const factory = ChainFactory(
     {
+      exchangRateUri: "https://<crypto-exchange-rate_backend>",
+      moralisServer: "https://<moralis_server>/server",
+      moralisAppId: "MORALIS_APP_ID"
+    },
+    {
     ...,
     avalancheParams: {
       erc1155_addr: "ADDRESS OF ERC1155 CONTRACT",
