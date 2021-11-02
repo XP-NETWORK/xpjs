@@ -293,7 +293,7 @@ export async function web3HelperFactory(
       return new BigNumber(bal.toString());
     },
     isWrappedNft(nft) {
-      return nft.native.contract === params.erc721_addr;
+      return nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase();
     },
     async balanceWrappedBatch(
       address: string,

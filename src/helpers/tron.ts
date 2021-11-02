@@ -313,7 +313,7 @@ export async function tronHelperFactory(
       };
     },
     isWrappedNft(nft) {
-      return nft.native.contract === tronParams.erc721_addr;
+      return nft.native.contract.toLowerCase() === tronParams.erc721_addr.toLowerCase();
     },
     decodeWrappedNft(raw_data: NftInfo<EthNftInfo>): WrappedNft {
       const u8D = Base64.toUint8Array(raw_data.native.uri);
