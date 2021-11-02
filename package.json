@@ -24,7 +24,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@elrondnetwork/erdjs": "^8.0.1-alpha.5",
+    "@elrondnetwork/erdjs": "^8.0.1-alpha.8",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "crypto-exchange-rate": "https://github.com/xp-network/exchange-rate#master-dist",
@@ -34,6 +34,7 @@
     "tronstation": "^1.0.1",
     "tronweb": "^4.0.0",
     "validator": "git+https://github.com/xp-network/Migration-validator#web3-new",
+    "xpnet-nft-list": "git+https://github.com/xp-network/nft-list-backend#bleeding-edge",
     "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#dist"
   }
 }

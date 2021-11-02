@@ -26,6 +26,8 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios, { AxiosResponse } from "axios";
+import { elrondNftList, exchangeRateRepo, moralisNftList } from "./cons";
+import { Address } from "@elrondnetwork/erdjs/out";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -131,6 +133,12 @@ export interface ChainParams {
   ontologyParams: Web3Params;
 }
 
+export interface AppConfig {
+  exchangeRateUri: string,
+  moralisServer: string,
+  moralisAppId: string
+}
+
 function mapNonceToParams(
   chainParams: Partial<ChainParams>
 ): Map<number, Web3Params | ElrondParams | TronParams | undefined> {
@@ -158,20 +166,17 @@ function mapNonceToParams(
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
-export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
+export function ChainFactory(
+  appConfig: AppConfig,
+  chainParams: Partial<ChainParams>,
+): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
-  function configBatchExchangeService(): NetworkModel.BatchExchangeRateService {
-    return NetworkModel.batchExchangeRateService(
-      "https://testing-bridge.xp.network/exchange"
-    );
-  }
-  const remoteExchangeRate = cachedExchangeRateRepo(
-    networkBatchExchangeRateRepo(
-      configBatchExchangeService(),
-      NetworkModel.exchangeRateDtoMapper()
-    )
-  );
+  const remoteExchangeRate = exchangeRateRepo(appConfig.exchangeRateUri);
+
+  const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || '');
+  const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId);
+
   const nftlistRest = axios.create({
     baseURL: "https://nft-list.herokuapp.com/",
   });
@@ -241,18 +246,20 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
-      let endpoint;
+      let res: NftInfo<T>[];
       switch (chain.getNonce()) {
         case Chain.ELROND:
-          endpoint = `/elrond/${owner}`;
+          res = await elrondNftRepo.nfts(BigInt(chain.getNonce()), new Address(owner)) as any as NftInfo<T>[];
+          break;
+        case Chain.FANTOM:
+          res = await nftlistRest.get(`/web3/${chain.getNonce()}/${owner}`).then(v => v.data);
           break;
         default:
-          endpoint = `/web3/${chain.getNonce()}/${owner}`;
+          res = await moralisNftRepo.nfts(BigInt(chain.getNonce()), owner) as any as NftInfo<T>[];
           break;
       }
-      const res: AxiosResponse<NftInfo<T>[]> = await nftlistRest.get(endpoint);
 
-      return res.data;
+      return res;
     },
     async nftUri(chain, nft) {
       if (chain.isWrappedNft(nft)) {
