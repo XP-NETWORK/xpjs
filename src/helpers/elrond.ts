@@ -48,6 +48,7 @@ import {
   NftInfo,
   PackNft,
   PopulateDecodedNft,
+  ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
 
@@ -191,23 +192,19 @@ type EventIdent = string;
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> &
-  UnfreezeForeign<ElrondSigner, string, BigNumber, Transaction, EventIdent> &
+  TransferForeign<ElrondSigner, string, BigNumber> &
+  UnfreezeForeign<ElrondSigner, string, BigNumber> &
   TransferNftForeign<
     ElrondSigner,
     string,
     BigNumber,
-    EsdtNftInfo,
-    Transaction,
-    EventIdent
+    EsdtNftInfo
   > &
   UnfreezeForeignNft<
     ElrondSigner,
     string,
     BigNumber,
-    EsdtNftInfo,
-    Transaction,
-    EventIdent
+    EsdtNftInfo
   > &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, Transaction> &
@@ -218,7 +215,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   EstimateTxFees<EsdtNftInfo, BigNumber> &
   PackNft<EsdtNftInfo> &
   ChainNonceGet &
-  PopulateDecodedNft<EsdtNftInfo>;
+  PopulateDecodedNft<EsdtNftInfo> &
+  ValidateAddress;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -288,7 +286,7 @@ export const elrondHelperFactory: (
         throw e;
       }
     }
-    return tx;
+    return stx;
   };
 
   const transactionResult = async (tx_hash: TransactionHash) => {
@@ -661,7 +659,7 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance,
       txFees: EasyBalance
-    ): Promise<[Transaction, EventIdent]> {
+    ): Promise<string> {
       const txu = unsignedTransferTxn(
         chain_nonce,
         to,
@@ -669,7 +667,7 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return await extractId(tx);
+      return tx.getHash().toString();
     },
     async unfreezeWrapped(
       sender: ElrondSigner,
@@ -677,7 +675,7 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance,
       txFees: EasyBalance
-    ): Promise<[Transaction, EventIdent]> {
+    ): Promise<string> {
       await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeTxn(
         chain_nonce,
@@ -687,16 +685,16 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return await extractId(tx);
+      return tx.getHash().toString();
     },
+    doEgldSwap,
     async transferNftToForeign(
       sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       info: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
-    ): Promise<[Transaction, EventIdent]> {
-      await doEgldSwap(sender, txFees);
+    ): Promise<string> {
       const txu = unsignedTransferNftTxn(
         chain_nonce,
         await getAddress(sender),
@@ -706,15 +704,14 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return await extractId(tx);
+      return tx.getHash().toString();
     },
     async unfreezeWrappedNft(
       sender: ElrondSigner,
       to: string,
       nft: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
-    ): Promise<[Transaction, EventIdent]> {
-      await doEgldSwap(sender, txFees);
+    ): Promise<string> {
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,
@@ -723,7 +720,7 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return await extractId(tx);
+      return tx.getHash().toString();
     },
     unsignedIssueESDTNft,
     async issueESDTNft(
@@ -826,6 +823,16 @@ export const elrondHelperFactory: (
       const dataLen = 4 + tokenIdentReal(nft.native.tokenIdentifier).length + 4;
       return new Uint8Array(dataLen);
     },
+    async validateAddress(adr: string) {
+      try {
+        new Address(adr);
+        return await providerRest.get(`/address/${adr}/esdt`)
+          .then(_ => true)
+          .catch(_ => false);
+      } catch (_) {
+        return false;
+      }
+    }
   };
 };
 

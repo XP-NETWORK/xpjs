@@ -15,6 +15,7 @@ import {
   PopulateDecodedNft,
   TransferNftForeign,
   UnfreezeForeignNft,
+  ValidateAddress,
   WrappedNftCheck,
 } from "..";
 import {
@@ -34,18 +35,17 @@ type NftUriChain<RawNft> = ChainNonceGet &
   DecodeRawNft<RawNft> &
   PopulateDecodedNft<RawNft>;
 
-type FullChain<Signer, RawNft, Tx> = TransferNftForeign<
+type FullChain<Signer, RawNft> = TransferNftForeign<
   Signer,
   string,
   BigNumber,
-  RawNft,
-  Tx,
-  string
+  RawNft
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Tx, string> &
+  UnfreezeForeignNft<Signer, string, BigNumber, RawNft> &
   EstimateTxFees<RawNft, BigNumber> &
   PackNft<RawNft> &
-  NftUriChain<RawNft>;
+  NftUriChain<RawNft> &
+  ValidateAddress;
 
 /**
  * A type representing a chain factory.
@@ -67,14 +67,14 @@ type ChainFactory = {
    * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT.
    */
-  transferNft<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
-    fromChain: FullChain<SignerF, RawNftF, TxF>,
-    toChain: FullChain<SignerT, RawNftT, TxT>,
+  transferNft<SignerF, RawNftF, SignerT, RawNftT>(
+    fromChain: FullChain<SignerF, RawNftF>,
+    toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
     fee?: BigNumber
-  ): Promise<[TxF, string]>;
+  ): Promise<string>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -104,9 +104,9 @@ type ChainFactory = {
     chain: NftUriChain<RawNft>,
     nft: NftInfo<RawNft>
   ): Promise<BareNft>;
-  estimateFees<SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
-    fromChain: FullChain<SignerF, RawNftF, TxF>,
-    toChain: FullChain<SignerT, RawNftT, TxT>,
+  estimateFees<SignerF, RawNftF, SignerT, RawNftT>(
+    fromChain: FullChain<SignerF, RawNftF>,
+    toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
@@ -200,9 +200,9 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-  const estimateFees = async <SignerF, RawNftF, TxF, SignerT, RawNftT, TxT>(
-    fromChain: FullChain<SignerF, RawNftF, TxF>,
-    toChain: FullChain<SignerT, RawNftT, TxT>,
+  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT>(
+    fromChain: FullChain<SignerF, RawNftF>,
+    toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {
@@ -269,6 +269,9 @@ export function ChainFactory(chainParams: Partial<ChainParams>): ChainFactory {
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
+      }
+      if (!await toChain.validateAddress(receiver)) {
+        throw Error('invalid address');
       }
       if (fromChain.isWrappedNft(nft)) {
         const decoded = fromChain.decodeWrappedNft(nft);
