@@ -2888,14 +2888,7 @@ crypto-browserify@3.12.0:
 
 "crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
   version "1.0.0"
-  uid "88beed89f97b1ddd957d4ec78bb5bbfbf350ce73"
-  resolved "git+https://github.com/xp-network/exchange-rate#88beed89f97b1ddd957d4ec78bb5bbfbf350ce73"
-  dependencies:
-    axios "^0.21.1"
-
-"crypto-exchange-rate@https://github.com/xp-network/exchange-rate#master-dist":
-  version "1.0.0"
-  resolved "https://github.com/xp-network/exchange-rate#88beed89f97b1ddd957d4ec78bb5bbfbf350ce73"
+  resolved "git+https://github.com/xp-network/exchange-rate#aa69f8dcc324a3a66e070542e966f61efd6e5c39"
   dependencies:
     axios "^0.21.1"
 
