@@ -66,6 +66,7 @@ export interface ChainParams {
     celoParams: Web3Params;
     harmonyParams: Web3Params;
     ontologyParams: Web3Params;
+    xDaiParams: Web3Params;
 }
 export interface AppConfig {
     exchangeRateUri: string;

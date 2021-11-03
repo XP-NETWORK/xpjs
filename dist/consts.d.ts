@@ -14,7 +14,8 @@ export declare enum TestNetRpcUri {
     FANTOM = "https://rpc.testnet.fantom.network/",
     TRON = "https://api.shasta.trongrid.io/",
     CELO = "https://alfajores-forno.celo-testnet.org",
-    HARMONY = "https://api.s0.b.hmny.io"
+    HARMONY = "https://api.s0.b.hmny.io",
+    XDAI = "https://sokol.poa.network"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -26,7 +27,8 @@ export declare enum MainNetRpcUri {
     FANTOM = "https://rpc.ftm.tools/",
     TRON = "https://api.trongrid.io/",
     CELO = "https://forno.celo.org",
-    HARMONY = "https://api.harmony.one"
+    HARMONY = "https://api.harmony.one",
+    XDAI = "https://rpc.xdaichain.com/"
 }
 export declare type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
@@ -43,6 +45,7 @@ export declare namespace Chain {
     const TRON: TronNonce;
     const CELO: Web3Nonce;
     const HARMONY: Web3Nonce;
+    const XDAI: Web3Nonce;
 }
 interface ChainData {
     name: string;
