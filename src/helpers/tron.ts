@@ -432,17 +432,14 @@ export async function tronHelperFactory(
       to: string,
       nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
-      const data = Base64.toUint8Array(nft.native.uri);
-      const nft_dat = NftEthNative.deserializeBinary(data);
-
       return await estimateGas(
         tronParams.validators,
         "validateUnfreezeNft(uint128,address,uint256,address)",
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },
-          { type: "uint256", value: nft_dat.getId().toString() },
-          { type: "address", value: nft_dat.getContractAddr() },
+          { type: "uint256", value: EthBN.from(nft.native.tokenId.toString()) },
+          { type: "address", value: nft.native.contract },
         ]
       );
     },
