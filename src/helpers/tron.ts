@@ -223,8 +223,11 @@ export async function tronHelperFactory(
     return signer && provider.setPrivateKey(signer);
   };
 
-  async function extractTxn(hash: string): Promise<[string, string]> {
+  async function notifyValidator(hash: string): Promise<void> {
     await event_middleware.post("/tx/tron", { tx_hash: hash });
+  }
+
+  async function extractTxn(hash: string): Promise<[string, string]> {
     await new Promise((r) => setTimeout(r, 6000));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -337,6 +340,8 @@ export async function tronHelperFactory(
       let res = await minter
         .freeze(chain_nonce, to, val)
         .send({ callValue: totalVal });
+
+      await notifyValidator(res);
       return res;
     },
     async unfreezeWrapped(
@@ -350,6 +355,8 @@ export async function tronHelperFactory(
       const res = await minter
         .withdraw(chain_nonce, to, value)
         .send({ callValue: EthBN.from(txFees.toString()) });
+
+      await notifyValidator(res);
       return res;
     },
     async unfreezeWrappedNft(
@@ -362,6 +369,8 @@ export async function tronHelperFactory(
       const res = await minter
         .withdrawNft(to, id.native.tokenId)
         .send({ callValue: EthBN.from(txFees.toString()) });
+
+      await notifyValidator(res);
       return res;
     },
     getNonce() {
@@ -385,6 +394,7 @@ export async function tronHelperFactory(
         .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
         .send({ callValue: EthBN.from(txFees.toString()) });
 
+      await notifyValidator(txr);
       return txr;
     },
     async balanceWrappedBatch(
