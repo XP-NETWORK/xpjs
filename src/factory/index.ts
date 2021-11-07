@@ -254,6 +254,7 @@ export function ChainFactory(
         case Chain.ELROND:
           res = await elrondNftRepo.nfts(BigInt(chain.getNonce()), new Address(owner)) as any as NftInfo<T>[];
           break;
+        case Chain.TRON:
         case Chain.FANTOM:
           res = await nftlistRest.get(`/web3/${chain.getNonce()}/${owner}`).then(v => v.data);
           break;
