@@ -1,5 +1,7 @@
 import { cachedExchangeRateRepo, ExchangeRateRepo, networkBatchExchangeRateRepo, NetworkModel } from "crypto-exchange-rate";
-import { ElrdNftListRepo, elrdNftListService, elrdRawTokenMapper, mockChainIdentMapper, moralisChainIdMapper, MoralisNftListRepo, moralisNftListService, moralisNftMapper, nftListRepo } from "xpnet-nft-list";
+import { ElrdNftListRepo, elrdNftListService, elrdRawTokenMapper, ethNftJMapper, EthNftJson, mockChainIdentMapper, moralisChainIdMapper, MoralisNftListRepo, moralisNftListService, moralisNftMapper, NftListRepo, nftListRepo, trxNftListService, TrxNftListService } from "xpnet-nft-list";
+//@ts-expect-error no types cope
+import TronWeb from "tronweb";
 
 export function elrondNftList(proxy: string): ElrdNftListRepo {
     return nftListRepo(
@@ -15,6 +17,14 @@ export function moralisNftList(server: string, appId: string): MoralisNftListRep
         moralisNftMapper(),
         moralisChainIdMapper()
     );
+}
+
+export function tronListNft(tronWeb: TronWeb, tronScan: string): NftListRepo<string, EthNftJson> {
+    return nftListRepo(
+        trxNftListService(tronWeb, tronScan),
+        ethNftJMapper(),
+        mockChainIdentMapper()
+    )
 }
 
 export function exchangeRateRepo(baseUrl: string): ExchangeRateRepo {

@@ -1519,6 +1519,11 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.0.0.tgz#8863915676f837d9dad7b76f50cb500c1e9422e9"
   integrity sha512-2pTGuibAXJswAPJjaKisthqS/NOK5ypG4LYT6tEAV0S/mxW0zOIvYvGK0V8w8+SHxAm6vRMSjqSalFXeBAqs+Q==
 
+"@supercharge/promise-pool@^1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@supercharge/promise-pool/-/promise-pool-1.9.0.tgz#7630c760535919db93711ca35716ada59d86feb7"
+  integrity sha512-UqQrree8uGTCEDKAnGJci1B7NGIZ1xepXHjUEqbH16Wgvr/j5+54hxebkpTpDcz5t2SrzY6J6USSlmgQeo66/g==
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -7444,9 +7449,10 @@ xmlhttprequest@1.8.0:
 
 "xpnet-nft-list@git+https://github.com/xp-network/nft-list-backend#bleeding-edge":
   version "0.0.1"
-  resolved "git+https://github.com/xp-network/nft-list-backend#089d9c2dfc0e372c1d5ab3104dc6e6f51191c4b4"
+  resolved "git+https://github.com/xp-network/nft-list-backend#03989da3f56ee29afee81cac6d0bc656ffeae98c"
   dependencies:
     "@elrondnetwork/erdjs" "^8.0.1-alpha.8"
+    "@supercharge/promise-pool" "^1.9.0"
     axios "^0.23.0"
     cors "^2.8.5"
     dotenv "^10.0.0"
@@ -7454,6 +7460,7 @@ xmlhttprequest@1.8.0:
     express "^4.17.1"
     js-base64 "^3.7.2"
     moralis "^0.0.116"
+    tronweb "^4.0.0"
 
 "xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#dist":
   version "0.1.0"
