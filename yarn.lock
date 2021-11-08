@@ -7449,7 +7449,7 @@ xmlhttprequest@1.8.0:
 
 "xpnet-nft-list@git+https://github.com/xp-network/nft-list-backend#bleeding-edge":
   version "0.0.1"
-  resolved "git+https://github.com/xp-network/nft-list-backend#91f48667258e0f331e28bd2dc96dfc68d63c4d27"
+  resolved "git+https://github.com/xp-network/nft-list-backend#03989da3f56ee29afee81cac6d0bc656ffeae98c"
   dependencies:
     "@elrondnetwork/erdjs" "^8.0.1-alpha.8"
     "@supercharge/promise-pool" "^1.9.0"
