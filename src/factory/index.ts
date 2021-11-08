@@ -19,15 +19,10 @@ import {
   ValidateAddress,
   WrappedNftCheck,
 } from "..";
-import {
-  cachedExchangeRateRepo,
-  networkBatchExchangeRateRepo,
-  NetworkModel,
-} from "crypto-exchange-rate";
 import BigNumber from "bignumber.js";
 
 import axios, { AxiosResponse } from "axios";
-import { elrondNftList, exchangeRateRepo, moralisNftList } from "./cons";
+import { elrondNftList, exchangeRateRepo, moralisNftList, tronListNft } from "./cons";
 import { Address } from "@elrondnetwork/erdjs/out";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
@@ -138,7 +133,8 @@ export interface ChainParams {
 export interface AppConfig {
   exchangeRateUri: string,
   moralisServer: string,
-  moralisAppId: string
+  moralisAppId: string,
+  tronScanUri: string
 }
 
 function mapNonceToParams(
@@ -179,6 +175,10 @@ export function ChainFactory(
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || '');
   const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId);
+  const tronNftRepo = chainParams.tronParams && tronListNft(
+    chainParams.tronParams.provider,
+    appConfig.tronScanUri
+  );
 
   const nftlistRest = axios.create({
     baseURL: "https://nft-list.herokuapp.com/",
@@ -255,8 +255,10 @@ export function ChainFactory(
           res = await elrondNftRepo.nfts(BigInt(chain.getNonce()), new Address(owner)) as any as NftInfo<T>[];
           break;
         case Chain.TRON:
-        case Chain.XDAI:
+          res = await tronNftRepo!.nfts(BigInt(0x9), owner) as any as NftInfo<T>[];
+          break;
         case Chain.FANTOM:
+        case Chain.XDAI:
           res = await nftlistRest.get(`/web3/${chain.getNonce()}/${owner}`).then(v => v.data);
           break;
         default:
