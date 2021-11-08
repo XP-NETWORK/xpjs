@@ -72,6 +72,7 @@ export interface AppConfig {
     exchangeRateUri: string;
     moralisServer: string;
     moralisAppId: string;
+    tronScanUri: string;
 }
 /**
  * This function is the basic entry point to use this package as a library.
