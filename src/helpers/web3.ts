@@ -11,9 +11,6 @@ import {
   TransferNftForeign,
   WrappedBalanceCheck,
   BatchWrappedBalanceCheck,
-  DecodeWrappedNft,
-  WrappedNft,
-  DecodeRawNft,
   MintNft,
   WrappedNftCheck,
 } from "./chain";
@@ -39,16 +36,14 @@ import {
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
 import {
-  BareNft,
   ChainNonceGet,
   EstimateTxFees,
   NftInfo,
-  PackNft,
-  PopulateDecodedNft,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
-import { ApiProvider } from "@elrondnetwork/erdjs/out";
+import axios from "axios";
+import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -129,13 +124,9 @@ export type Web3Helper = BaseWeb3Helper &
     BigNumber,
     EthNftInfo
   > &
-  DecodeWrappedNft<EthNftInfo> &
-  DecodeRawNft<EthNftInfo> &
-  EstimateTxFees<EthNftInfo, BigNumber> &
-  PackNft<EthNftInfo> &
   WrappedNftCheck<MintArgs> &
+  EstimateTxFees<BigNumber> &
   ChainNonceGet &
-  PopulateDecodedNft<EthNftInfo> &
   IsApproved &
   Approve &
   ValidateAddress;
@@ -214,14 +205,6 @@ export async function web3HelperFactory(
     return [receipt, action_id];
   }
 
-  async function nftUri(contract: string, tokenId: EthBN): Promise<BareNft> {
-    const erc = UserNftMinter__factory.connect(contract, w3);
-    return {
-      uri: await erc.tokenURI(tokenId),
-      chainId: params.nonce.toString(),
-    };
-  }
-
   const randomAction = () =>
     EthBN.from(
       Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000))
@@ -280,9 +263,6 @@ export async function web3HelperFactory(
     ...base,
     approveForMinter,
     isApprovedForMinter,
-    async populateNft(nft) {
-      return await nftUri(nft.native.contract, EthBN.from(nft.native.tokenId));
-    },
     getNonce: () => params.nonce,
     async balanceWrapped(
       address: string,
@@ -329,7 +309,6 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<string> {
-      const erc = UserNftMinter__factory.connect(id.native.contract, sender);
       await approveForMinter(id, sender);
 
       const txr = await minter
@@ -369,66 +348,31 @@ export async function web3HelperFactory(
 
       return res.hash;
     },
-    decodeWrappedNft(nft: NftInfo<EthNftInfo>): WrappedNft {
-      const u8D = Base64.toUint8Array(nft.native.uri);
-      const packed = NftPacked.deserializeBinary(u8D);
-
-      return {
-        chain_nonce: packed.getChainNonce(),
-        data: packed.getData_asU8(),
-      };
-    },
-    async decodeNftFromRaw(data: Uint8Array) {
-      const packed = NftEthNative.deserializeBinary(data);
-
-      return {
-        uri: "",
-        native: {
-          uri: "",
-          contract: packed.getContractAddr(),
-          tokenId: packed.getId(),
-          owner: minter_addr,
-          chainId: params.nonce.toString(),
-        },
-      };
-    },
     async estimateValidateTransferNft(
       to: string,
-      nft: Uint8Array
+      nftUri: string
     ): Promise<BigNumber> {
-      const encoded = new NftPacked();
-      encoded.setChainNonce(0x1351);
-      encoded.setData(nft);
-
       const utx = await minter.populateTransaction.validateTransferNft(
         randomAction(),
         to,
-        Buffer.from(encoded.serializeBinary()).toString("base64")
+        nftUri
       );
 
       return await estimateGas(params.validators, utx);
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nft: NftInfo<EthNftInfo>
+      nftUri: string
     ): Promise<BigNumber> {
+      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(nftUri);
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,
-        EthBN.from(nft.native.tokenId.toString()),
-        nft.native.contract
+        EthBN.from(wrappedData.data.wrapped.tokenId),
+        wrappedData.data.wrapped.contract
       );
 
       return await estimateGas(params.validators, utx);
-    },
-    wrapNftForTransfer(nft) {
-      // Protobuf is not deterministic, though perhaps we can approximate this statically
-      const tokdat = new NftEthNative();
-      tokdat.setId(nft.native.tokenId);
-      tokdat.setNftKind(1);
-      tokdat.setContractAddr(nft.native.contract);
-
-      return tokdat.serializeBinary();
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));

@@ -2,8 +2,6 @@ import { BigNumber } from "bignumber.js";
 import {
   BalanceCheck,
   BatchWrappedBalanceCheck,
-  DecodeRawNft,
-  DecodeWrappedNft,
   EstimateTxFees,
   MintNft,
   TransferForeign,
@@ -11,7 +9,6 @@ import {
   UnfreezeForeign,
   UnfreezeForeignNft,
   WrappedBalanceCheck,
-  WrappedNft,
   WrappedNftCheck,
 } from "./chain";
 
@@ -30,15 +27,13 @@ import {
   XPNet__factory,
   XPNft__factory,
 } from "xpnet-web3-contracts";
-import { NftMintArgs } from "..";
+import { NftMintArgs, ValidateAddress } from "..";
 import { NftEthNative, NftPacked } from "validator";
 import {
-  BareNft,
   ChainNonceGet,
-  NftInfo,
-  PackNft,
-  PopulateDecodedNft,
+  NftInfo
 } from "..";
+import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 
 // Uses default private key in provider if sender is undefinedd
 type TronSender = string | undefined;
@@ -89,13 +84,10 @@ export type TronHelper = BaseTronHelper &
   // TODO: Use TX Fees
   UnfreezeForeign<TronSender, string, string> &
   UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo> &
-  DecodeWrappedNft<EthNftInfo> &
-  DecodeRawNft<EthNftInfo> &
-  EstimateTxFees<EthNftInfo, BigNumber> &
   WrappedNftCheck<MintArgs> &
+  EstimateTxFees<BigNumber> &
   ChainNonceGet &
-  PackNft<EthNftInfo> &
-  PopulateDecodedNft<EthNftInfo>;
+  ValidateAddress;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -249,17 +241,6 @@ export async function tronHelperFactory(
     return [hash, action_id];
   }
 
-  const nftUri = async (
-    contract: string,
-    tokenId: string
-  ): Promise<BareNft> => {
-    const erc = await provider.contract(UserNftMinter__factory.abi, contract);
-    return {
-      uri: await erc.tokenURI(tokenId).call(),
-      chainId: tronParams.nonce.toString(),
-    };
-  };
-
   const randomAction = () =>
     Math.floor(
       Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000)
@@ -298,33 +279,8 @@ export async function tronHelperFactory(
 
   return {
     ...base,
-    async populateNft(nft) {
-      return await nftUri(nft.native.contract, nft.native.tokenId);
-    },
-    async decodeNftFromRaw(data: Uint8Array) {
-      const packed = NftEthNative.deserializeBinary(data);
-
-      return {
-        uri: "",
-        native: {
-          uri: "",
-          contract: packed.getContractAddr(),
-          tokenId: packed.getId(),
-          owner: minter_addr,
-          chainId: tronParams.nonce.toString(),
-        },
-      };
-    },
     isWrappedNft(nft) {
       return nft.native.contract.toLowerCase() === tronParams.erc721_addr.toLowerCase();
-    },
-    decodeWrappedNft(raw_data: NftInfo<EthNftInfo>): WrappedNft {
-      const u8D = Base64.toUint8Array(raw_data.native.uri);
-      const packed = NftPacked.deserializeBinary(u8D);
-      return {
-        chain_nonce: packed.getChainNonce(),
-        data: packed.getData_asU8(),
-      };
     },
     async transferNativeToForeign(
       sender: TronSender,
@@ -419,12 +375,8 @@ export async function tronHelperFactory(
     },
     async estimateValidateTransferNft(
       to: string,
-      nft: Uint8Array
+      nftUri: string
     ): Promise<BigNumber> {
-      const encoded = new NftPacked();
-      encoded.setChainNonce(0x1351);
-      encoded.setData(nft);
-
       return await estimateGas(
         tronParams.validators,
         "validateTransferNft(uint128,address,string)",
@@ -433,33 +385,29 @@ export async function tronHelperFactory(
           { type: "address", value: to },
           {
             type: "string",
-            value: Buffer.from(nft).toString("base64"),
+            value: nftUri,
           },
         ]
       );
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nft: NftInfo<EthNftInfo>
+      nftUri: string
     ): Promise<BigNumber> {
+      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(nftUri);
       return await estimateGas(
         tronParams.validators,
         "validateUnfreezeNft(uint128,address,uint256,address)",
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },
-          { type: "uint256", value: EthBN.from(nft.native.tokenId.toString()) },
-          { type: "address", value: nft.native.contract },
+          { type: "uint256", value: EthBN.from(wrappedData.data.wrapped.tokenId) },
+          { type: "address", value: wrappedData.data.wrapped.contract },
         ]
       );
     },
-    wrapNftForTransfer(nft: NftInfo<EthNftInfo>) {
-      // Protobuf is not deterministic, though perhaps we can approximate this statically
-      const tokdat = new NftEthNative();
-      tokdat.setId(nft.native.tokenId);
-      tokdat.setNftKind(1);
-      tokdat.setContractAddr(nft.native.contract);
-      return tokdat.serializeBinary();
-    },
+    async validateAddress(adr: string): Promise<boolean> {
+      return provider.isAddress(adr);
+    }
   };
 }
