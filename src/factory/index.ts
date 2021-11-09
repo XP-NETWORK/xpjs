@@ -5,15 +5,10 @@ import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
 export * from "./factories"
 
 import {
-  BareNft,
   ChainNonceGet,
-  DecodeRawNft,
-  DecodeWrappedNft,
   EstimateTxFees,
   MintNft,
   NftInfo,
-  PackNft,
-  PopulateDecodedNft,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -21,17 +16,15 @@ import {
 } from "..";
 import BigNumber from "bignumber.js";
 
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { elrondNftList, exchangeRateRepo, moralisNftList, tronListNft } from "./cons";
 import { Address } from "@elrondnetwork/erdjs/out";
+import { Erc721MetadataEx } from "../erc721_metadata";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
 type NftUriChain<RawNft> = ChainNonceGet &
-  WrappedNftCheck<RawNft> &
-  DecodeWrappedNft<RawNft> &
-  DecodeRawNft<RawNft> &
-  PopulateDecodedNft<RawNft>;
+  WrappedNftCheck<RawNft>;
 
 type FullChain<Signer, RawNft> = TransferNftForeign<
   Signer,
@@ -40,8 +33,7 @@ type FullChain<Signer, RawNft> = TransferNftForeign<
   RawNft
 > &
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft> &
-  EstimateTxFees<RawNft, BigNumber> &
-  PackNft<RawNft> &
+  EstimateTxFees<BigNumber> &
   NftUriChain<RawNft> &
   ValidateAddress;
 
@@ -93,15 +85,6 @@ type ChainFactory = {
     chain: NftUriChain<RawNft>,
     owner: string
   ): Promise<NftInfo<RawNft>[]>;
-  /**
-   * Fetches the URI of the NFTs on the chain.
-   * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
-   * @param nft: {@link NftInfo<RawNft>} The NFT of which you want to fetch the URI. Usually comes from the `nftList` method.
-   */
-  nftUri<RawNft>(
-    chain: NftUriChain<RawNft>,
-    nft: NftInfo<RawNft>
-  ): Promise<BareNft>;
   estimateFees<SignerF, RawNftF, SignerT, RawNftT>(
     fromChain: FullChain<SignerF, RawNftF>,
     toChain: FullChain<SignerT, RawNftT>,
@@ -215,11 +198,9 @@ export function ChainFactory(
     receiver: string
   ) => {
     if (fromChain.isWrappedNft(nft)) {
-      const decoded = fromChain.decodeWrappedNft(nft);
-      const approxNft = await toChain.decodeNftFromRaw(decoded.data);
       const estimate = await toChain.estimateValidateUnfreezeNft(
         receiver,
-        approxNft
+        nft.uri
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
@@ -228,10 +209,9 @@ export function ChainFactory(
       );
       return conv;
     } else {
-      const packed = fromChain.wrapNftForTransfer(nft);
       const estimate = await toChain.estimateValidateTransferNft(
         receiver,
-        packed
+        "a".repeat(55) // approx size of uri
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
@@ -268,19 +248,10 @@ export function ChainFactory(
 
       return res;
     },
-    async nftUri(chain, nft) {
-      if (chain.isWrappedNft(nft)) {
-        const decoded = chain.decodeWrappedNft(nft);
-        const helper: CrossChainHelper = await inner(decoded.chain_nonce);
-        const native = await helper.decodeNftFromRaw(decoded.data);
-        return await helper.populateNft(native as any);
-      }
-      return {
-        uri: nft.uri,
-        chainId: chain.getNonce().toString(),
-      };
-    },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
+      if (fromChain.getNonce() == 0x2 || toChain.getNonce() == 0x2) {
+        throw Error("Elrond is temporarily disabled!");
+      }
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
       }
@@ -288,8 +259,8 @@ export function ChainFactory(
         throw Error('invalid address');
       }
       if (fromChain.isWrappedNft(nft)) {
-        const decoded = fromChain.decodeWrappedNft(nft);
-        if (decoded.chain_nonce != toChain.getNonce()) {
+        const meta = await axios.get<Erc721MetadataEx<unknown>>(nft.uri);
+        if (meta.data.wrapped.origin != toChain.getNonce().toString()) {
           throw Error("trying to send wrapped nft to non-origin chain!!!");
         }
         const res = await fromChain.unfreezeWrappedNft(
