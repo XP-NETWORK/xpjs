@@ -249,9 +249,6 @@ export function ChainFactory(
       return res;
     },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
-      if (fromChain.getNonce() == 0x2 || toChain.getNonce() == 0x2) {
-        throw Error("Elrond is temporarily disabled!");
-      }
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
       }
