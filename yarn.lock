@@ -7447,9 +7447,10 @@ xmlhttprequest@1.8.0:
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   integrity sha1-Z/4HXFwk/vOfnWX197f+dRcZaPw=
 
-"xpnet-nft-list@git+https://github.com/xp-network/nft-list-backend#bleeding-edge":
-  version "0.0.1"
-  resolved "git+https://github.com/xp-network/nft-list-backend#03989da3f56ee29afee81cac6d0bc656ffeae98c"
+xpnet-nft-list@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/xpnet-nft-list/-/xpnet-nft-list-0.1.0.tgz#d23fc470724d9b42906d668b2e856eb64cdcc904"
+  integrity sha512-Up65s7ZWeF/xmanyoqUZE62mjviMv4khUwmrKX+M4GW7FcQyEDnRAS0z/zpT+Gvz5k8qrdmXnrWvad6WWwzy+A==
   dependencies:
     "@elrondnetwork/erdjs" "^8.0.1-alpha.8"
     "@supercharge/promise-pool" "^1.9.0"
