@@ -6,8 +6,8 @@
  */
 import { Address, ExtensionProvider, ISigner, Transaction } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { BalanceCheck, BatchWrappedBalanceCheck, DecodeRawNft, DecodeWrappedNft, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
-import { ChainNonceGet, EstimateTxFees, PackNft, PopulateDecodedNft, ValidateAddress } from "..";
+import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
+import { ChainNonceGet, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type ElrondSigner = ISigner | ExtensionProvider;
 /**
@@ -92,9 +92,9 @@ export interface SetESDTRoles {
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & DecodeWrappedNft<EsdtNftInfo> & DecodeRawNft<EsdtNftInfo> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & WrappedNftCheck<EsdtNftInfo> & EstimateTxFees<EsdtNftInfo, BigNumber> & PackNft<EsdtNftInfo> & ChainNonceGet & PopulateDecodedNft<EsdtNftInfo> & ValidateAddress;
+} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress;
 /**
  * Create an object implementing cross chain utilities for elrond
  *
