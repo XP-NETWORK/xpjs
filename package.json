@@ -1,7 +1,7 @@
 {
   "name": "xp.network",
-  "version": "0.0.1",
-  "author": "rupansh <rupanshsekar@hotmail.com>",
+  "version": "0.0.2",
+  "author": "xp-network <dima@xp.network>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
