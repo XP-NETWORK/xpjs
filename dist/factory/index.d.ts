@@ -2,12 +2,11 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { ChainNonce } from "../consts";
-export * from "./factories";
-import { ChainNonceGet, EstimateTxFees, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import { BareNft, ChainNonceGet, DecodeRawNft, DecodeWrappedNft, EstimateTxFees, MintNft, NftInfo, PackNft, PopulateDecodedNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
-declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
-declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
+declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft> & DecodeWrappedNft<RawNft> & DecodeRawNft<RawNft> & PopulateDecodedNft<RawNft>;
+declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<RawNft, BigNumber> & PackNft<RawNft> & NftUriChain<RawNft> & ValidateAddress;
 /**
  * A type representing a chain factory.
  *
@@ -42,6 +41,12 @@ declare type ChainFactory = {
      * @param owner: Address of the owner of the NFT.
      */
     nftList<RawNft>(chain: NftUriChain<RawNft>, owner: string): Promise<NftInfo<RawNft>[]>;
+    /**
+     * Fetches the URI of the NFTs on the chain.
+     * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
+     * @param nft: {@link NftInfo<RawNft>} The NFT of which you want to fetch the URI. Usually comes from the `nftList` method.
+     */
+    nftUri<RawNft>(chain: NftUriChain<RawNft>, nft: NftInfo<RawNft>): Promise<BareNft>;
     estimateFees<SignerF, RawNftF, SignerT, RawNftT>(fromChain: FullChain<SignerF, RawNftF>, toChain: FullChain<SignerT, RawNftT>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
     updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
 };
@@ -60,13 +65,11 @@ export interface ChainParams {
     celoParams: Web3Params;
     harmonyParams: Web3Params;
     ontologyParams: Web3Params;
-    xDaiParams: Web3Params;
 }
 export interface AppConfig {
     exchangeRateUri: string;
     moralisServer: string;
     moralisAppId: string;
-    tronScanUri: string;
 }
 /**
  * This function is the basic entry point to use this package as a library.
@@ -89,3 +92,4 @@ export interface NftMintArgs {
     readonly hash?: string | undefined;
     readonly attrs: string | undefined;
 }
+export {};

@@ -27,7 +27,7 @@
     "@elrondnetwork/erdjs": "^8.0.1-alpha.8",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
-    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#master-dist",
+    "crypto-exchange-rate": "https://github.com/xp-network/exchange-rate#master-dist",
     "ethers": "5.4.4",
     "js-base64": "^3.6.1",
     "socket.io-client": "^4.1.3",

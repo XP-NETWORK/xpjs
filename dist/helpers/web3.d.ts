@@ -3,10 +3,10 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck } from "./chain";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, DecodeWrappedNft, DecodeRawNft, MintNft, WrappedNftCheck } from "./chain";
 import { Signer, BigNumber as EthBN } from "ethers";
 import { Provider } from "@ethersproject/providers";
-import { ChainNonceGet, EstimateTxFees, NftInfo, ValidateAddress } from "..";
+import { ChainNonceGet, EstimateTxFees, NftInfo, PackNft, PopulateDecodedNft, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type EasyBalance = string | number | EthBN;
 /**
@@ -60,7 +60,7 @@ MintNft<Signer, NftMintArgs, any> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> & WrappedNftCheck<MintArgs> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved & Approve & ValidateAddress;
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> & DecodeWrappedNft<EthNftInfo> & DecodeRawNft<EthNftInfo> & EstimateTxFees<EthNftInfo, BigNumber> & PackNft<EthNftInfo> & WrappedNftCheck<MintArgs> & ChainNonceGet & PopulateDecodedNft<EthNftInfo> & IsApproved & Approve & ValidateAddress;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
