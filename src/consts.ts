@@ -6,17 +6,32 @@ import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { ElrondHelper, Web3Helper, TronHelper } from "validator";
 
 // All the supported testnet uri's are here.
-export enum RpcUri {
+export enum TestNetRpcUri {
   ELROND = "https://devnet-api.elrond.com",
   HECO = "https://http-testnet.hecochain.com",
   BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
-  ROPSTEN = "https://ropsten.infura.io/v3/182b3d3fb2d14d5fbe7421348624d1ce",
+  ROPSTEN = "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://matic-testnet-archive-rpc.bwarelabs.com",
   FANTOM = "https://rpc.testnet.fantom.network/",
   TRON = "https://api.shasta.trongrid.io/",
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
+  XDAI = "https://sokol.poa.network"
+}
+
+export enum MainNetRpcUri {
+  ELROND = "https://gateway.elrond.com",
+  HECO = "https://http-mainnet-node.huobichain.com",
+  BSC = "https://bsc-dataseed.binance.org/",
+  ETHEREUM = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+  AVALANCHE = "https://api.avax.network/ext/bc/C/rpc",
+  POLYGON = "https://rpc-mainnet.matic.network",
+  FANTOM = "https://rpc.ftm.tools/",
+  TRON = "https://api.trongrid.io/",
+  CELO = "https://forno.celo.org",
+  HARMONY = "https://api.harmony.one",
+  XDAI = "https://rpc.xdaichain.com/"
 }
 
 export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
@@ -35,6 +50,7 @@ export namespace Chain {
   export const TRON: TronNonce = 9;
   export const CELO: Web3Nonce = 0xb;
   export const HARMONY: Web3Nonce = 0xc;
+  export const XDAI: Web3Nonce = 0xe;
 }
 
 interface ChainData {
@@ -155,4 +171,24 @@ export const CHAIN_INFO: ChainInfo = {
     currency: SupportedCurrency.CELO,
     validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
+  // 13: {
+  //   name: "Ontology",
+  //   nonce: 0xd,
+  //   decimals: 1e18,
+  //   chainId: 1666700000,
+  //   blockExplorerUrl: "https://explorer.pops.one/tx",
+  //   constructor: (p) => web3HelperFactory(p as Web3Params),
+  //   currency: SupportedCurrency.CELO,
+  //   validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
+  // },
+  14: {
+    name: "xDai",
+    nonce: 0xe,
+    decimals: 1e18,
+    chainId: 0x64,
+    blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
+    constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.STAKE,
+    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
+  }
 };

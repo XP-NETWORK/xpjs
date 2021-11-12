@@ -30,24 +30,18 @@ import {
   BalanceCheck,
   BatchWrappedBalanceCheck,
   ConcurrentSendError,
-  DecodeRawNft,
-  DecodeWrappedNft,
   MintNft,
   TransferForeign,
   TransferNftForeign,
   UnfreezeForeign,
   UnfreezeForeignNft,
-  WrappedNft,
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
 import {
-  BareNft,
   ChainNonceGet,
   EstimateTxFees,
   NftInfo,
-  PackNft,
-  PopulateDecodedNft,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -207,15 +201,10 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EsdtNftInfo
   > &
   IssueESDTNFT &
-  MintNft<ElrondSigner, NftMintArgs, Transaction> &
-  DecodeWrappedNft<EsdtNftInfo> &
-  DecodeRawNft<EsdtNftInfo> & {
+  MintNft<ElrondSigner, NftMintArgs, Transaction> & {
     mintableEsdts(address: Address): Promise<string[]>;
   } & WrappedNftCheck<EsdtNftInfo> &
-  EstimateTxFees<EsdtNftInfo, BigNumber> &
-  PackNft<EsdtNftInfo> &
   ChainNonceGet &
-  PopulateDecodedNft<EsdtNftInfo> &
   ValidateAddress;
 
 /**
@@ -572,38 +561,6 @@ export const elrondHelperFactory: (
     });
   };
 
-  async function getLockedNft(ident: string): Promise<BareNft | undefined> {
-    const nfts = await listNft(elrondParams.minter_address);
-    const res = nfts.get(ident);
-    return (
-      res && {
-        uri: Base64.atob(res.uris[0]),
-        chainId: elrondParams.nonce.toString(),
-      }
-    );
-  }
-
-  const rawNftDecoder = (nftDat: Uint8Array) => {
-    /// TokenLen(4 by), TokenIdent(TokenLen by), Nonce(8 by)
-    /// BinaryCodec is broken for browsers. Decode manually :|
-    if (nftDat.length < 12) {
-      throw Error("not a wrapped nft");
-    }
-
-    const tokenLen = new Uint32Array(nftDat.slice(0, 4).reverse())[0];
-    if (nftDat.length !== 12 + tokenLen) {
-      throw Error("not a wrapped nft");
-    }
-    const token = decoder.decode(nftDat.slice(4, 4 + tokenLen));
-    // TODO: Consider LO
-    // tfw js can't convert be bytes to u64
-    const nonce = new Uint32Array(
-      nftDat.slice(4 + tokenLen, 12 + tokenLen).reverse()
-    )[0];
-
-    return { token, nonce };
-  };
-
   async function extractId(
     tx: Transaction
   ): Promise<[Transaction, EventIdent]> {
@@ -775,47 +732,13 @@ export const elrondHelperFactory: (
     getNonce() {
       return elrondParams.nonce;
     },
-    decodeWrappedNft(nft: NftInfo<EsdtNftInfo>): WrappedNft {
-      if (!nft.native.attributes) {
-        throw Error("can't decode chain nonce");
-      }
-      return {
-        // TODO: CONSIDER ALL BE BYTES
-        chain_nonce: Base64.toUint8Array(nft.native.attributes[0])[0],
-        data: Base64.toUint8Array(nft.native.uris[0]),
-      };
-    },
-    async decodeNftFromRaw(data: Uint8Array) {
-      const nft_info = rawNftDecoder(data);
-
-      return {
-        uri: "",
-        native: {
-          balance: 1,
-          tokenIdentifier: `${nft_info.token}-${nft_info.nonce.toString()}`,
-          creator: "",
-          name: "",
-          nonce: nft_info.nonce,
-          royalties: "",
-          uris: [],
-        },
-      };
-    },
-    async populateNft(nft: NftInfo<EsdtNftInfo>) {
-      const locked = await getLockedNft(nft.native.tokenIdentifier);
-
-      if (locked === undefined) {
-        throw Error("Not a wrapped nft");
-      }
-      return locked;
-    },
     async estimateValidateTransferNft(
       _toAddress: string,
-      _nftInfo: Uint8Array
+      _nftUri: string
     ) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
-    async estimateValidateUnfreezeNft(_to: string, _nft: NftInfo<EsdtNftInfo>) {
+    async estimateValidateUnfreezeNft(_to: string, _nftUri: string) {
       return estimateGas(NFT_UNFREEZE_COST, elrondParams.validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
     },
     wrapNftForTransfer(nft: NftInfo<EsdtNftInfo>) {

@@ -2,40 +2,29 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
+export * from "./factories"
 
 import {
-  BareNft,
   ChainNonceGet,
-  DecodeRawNft,
-  DecodeWrappedNft,
   EstimateTxFees,
   MintNft,
   NftInfo,
-  PackNft,
-  PopulateDecodedNft,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
   WrappedNftCheck,
 } from "..";
-import {
-  cachedExchangeRateRepo,
-  networkBatchExchangeRateRepo,
-  NetworkModel,
-} from "crypto-exchange-rate";
 import BigNumber from "bignumber.js";
 
-import axios, { AxiosResponse } from "axios";
-import { elrondNftList, exchangeRateRepo, moralisNftList } from "./cons";
+import axios from "axios";
+import { elrondNftList, exchangeRateRepo, moralisNftList, tronListNft } from "./cons";
 import { Address } from "@elrondnetwork/erdjs/out";
+import { Erc721MetadataEx } from "../erc721_metadata";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
 type NftUriChain<RawNft> = ChainNonceGet &
-  WrappedNftCheck<RawNft> &
-  DecodeWrappedNft<RawNft> &
-  DecodeRawNft<RawNft> &
-  PopulateDecodedNft<RawNft>;
+  WrappedNftCheck<RawNft>;
 
 type FullChain<Signer, RawNft> = TransferNftForeign<
   Signer,
@@ -44,8 +33,7 @@ type FullChain<Signer, RawNft> = TransferNftForeign<
   RawNft
 > &
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft> &
-  EstimateTxFees<RawNft, BigNumber> &
-  PackNft<RawNft> &
+  EstimateTxFees<BigNumber> &
   NftUriChain<RawNft> &
   ValidateAddress;
 
@@ -65,9 +53,9 @@ type ChainFactory = {
    * Transfers the NFT from one chain to other.
    * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
    * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
-   * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the nftList method of the factory.
+   * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the `nftList` method of the factory.
    * @param sender {@link Sender} The owner of the NFT.
-   * @param receiver Address of the Receiver of the NFT.
+   * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    */
   transferNft<SignerF, RawNftF, SignerT, RawNftT>(
     fromChain: FullChain<SignerF, RawNftF>,
@@ -80,7 +68,7 @@ type ChainFactory = {
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
-   * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
+   * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
    */
   mint<Signer, R>(
@@ -91,28 +79,30 @@ type ChainFactory = {
   /**
    * Lists all the NFTs on the chain owner by {@param owner}.
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
-   * @param owner: Address of the owner of the NFT.
+   * @param owner: Address of the owner of the NFT as a raw string.
    */
   nftList<RawNft>(
     chain: NftUriChain<RawNft>,
     owner: string
   ): Promise<NftInfo<RawNft>[]>;
   /**
-   * Fetches the URI of the NFTs on the chain.
-   * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
-   * @param nft: {@link NftInfo<RawNft>} The NFT of which you want to fetch the URI. Usually comes from the `nftList` method.
+   * Estimates the required fee for transferring an NFT.
+   * @param fromChain: {@link FullChain} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
+   * @param toChain: {@link FullChain} Chain to which the NFT must be sent. Can be obtained from the `inner` method on the factory.
+   * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
+   * @param receiver: Address of the receiver of the NFT in raw string..
    */
-  nftUri<RawNft>(
-    chain: NftUriChain<RawNft>,
-    nft: NftInfo<RawNft>
-  ): Promise<BareNft>;
   estimateFees<SignerF, RawNftF, SignerT, RawNftT>(
     fromChain: FullChain<SignerF, RawNftF>,
     toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
-  // Update parameters for a specific chain
+  /**
+   * 
+   * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
+   * @param params : New Params to be set.
+   */
   updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
 };
 
@@ -131,12 +121,21 @@ export interface ChainParams {
   celoParams: Web3Params;
   harmonyParams: Web3Params;
   ontologyParams: Web3Params;
+  xDaiParams: Web3Params;
 }
 
+/**
+ * A struct for the configuration of the library.
+ * @field exchangeRateUri: The URI of the exchange rate service.
+ * @field moralisServer: The URI of the moralis server.
+ * @field moralisAppId: The app id of the moralis server.
+ * @field tronScanUri: The URI of the tron scan service.
+ */
 export interface AppConfig {
   exchangeRateUri: string,
   moralisServer: string,
-  moralisAppId: string
+  moralisAppId: string,
+  tronScanUri: string
 }
 
 function mapNonceToParams(
@@ -159,10 +158,12 @@ function mapNonceToParams(
   cToP.set(11, chainParams.celoParams);
   cToP.set(12, chainParams.harmonyParams);
   cToP.set(13, chainParams.ontologyParams);
+  cToP.set(14, chainParams.xDaiParams);
   return cToP;
 }
 /**
  * This function is the basic entry point to use this package as a library.
+ * @param appConfig: {@link AppConfig} The configuration of the library.
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
@@ -176,6 +177,10 @@ export function ChainFactory(
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || '');
   const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId);
+  const tronNftRepo = chainParams.tronParams && tronListNft(
+    chainParams.tronParams.provider,
+    appConfig.tronScanUri
+  );
 
   const nftlistRest = axios.create({
     baseURL: "https://nft-list.herokuapp.com/",
@@ -212,11 +217,9 @@ export function ChainFactory(
     receiver: string
   ) => {
     if (fromChain.isWrappedNft(nft)) {
-      const decoded = fromChain.decodeWrappedNft(nft);
-      const approxNft = await toChain.decodeNftFromRaw(decoded.data);
       const estimate = await toChain.estimateValidateUnfreezeNft(
         receiver,
-        approxNft
+        nft.uri
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
@@ -225,10 +228,9 @@ export function ChainFactory(
       );
       return conv;
     } else {
-      const packed = fromChain.wrapNftForTransfer(nft);
       const estimate = await toChain.estimateValidateTransferNft(
         receiver,
-        packed
+        "a".repeat(55) // approx size of uri
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
@@ -251,7 +253,11 @@ export function ChainFactory(
         case Chain.ELROND:
           res = await elrondNftRepo.nfts(BigInt(chain.getNonce()), new Address(owner)) as any as NftInfo<T>[];
           break;
+        case Chain.TRON:
+          res = await tronNftRepo!.nfts(BigInt(0x9), owner) as any as NftInfo<T>[];
+          break;
         case Chain.FANTOM:
+        case Chain.XDAI:
           res = await nftlistRest.get(`/web3/${chain.getNonce()}/${owner}`).then(v => v.data);
           break;
         default:
@@ -261,18 +267,6 @@ export function ChainFactory(
 
       return res;
     },
-    async nftUri(chain, nft) {
-      if (chain.isWrappedNft(nft)) {
-        const decoded = chain.decodeWrappedNft(nft);
-        const helper: CrossChainHelper = await inner(decoded.chain_nonce);
-        const native = await helper.decodeNftFromRaw(decoded.data);
-        return await helper.populateNft(native as any);
-      }
-      return {
-        uri: nft.uri,
-        chainId: chain.getNonce().toString(),
-      };
-    },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
@@ -281,8 +275,8 @@ export function ChainFactory(
         throw Error('invalid address');
       }
       if (fromChain.isWrappedNft(nft)) {
-        const decoded = fromChain.decodeWrappedNft(nft);
-        if (decoded.chain_nonce != toChain.getNonce()) {
+        const meta = await axios.get<Erc721MetadataEx<unknown>>(nft.uri);
+        if (meta.data.wrapped.origin != toChain.getNonce().toString()) {
           throw Error("trying to send wrapped nft to non-origin chain!!!");
         }
         const res = await fromChain.unfreezeWrappedNft(
