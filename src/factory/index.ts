@@ -53,9 +53,9 @@ type ChainFactory = {
    * Transfers the NFT from one chain to other.
    * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
    * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
-   * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the nftList method of the factory.
+   * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the `nftList` method of the factory.
    * @param sender {@link Sender} The owner of the NFT.
-   * @param receiver Address of the Receiver of the NFT.
+   * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    */
   transferNft<SignerF, RawNftF, SignerT, RawNftT>(
     fromChain: FullChain<SignerF, RawNftF>,
@@ -68,7 +68,7 @@ type ChainFactory = {
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
-   * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar wallet.
+   * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
    */
   mint<Signer, R>(
@@ -79,19 +79,30 @@ type ChainFactory = {
   /**
    * Lists all the NFTs on the chain owner by {@param owner}.
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
-   * @param owner: Address of the owner of the NFT.
+   * @param owner: Address of the owner of the NFT as a raw string.
    */
   nftList<RawNft>(
     chain: NftUriChain<RawNft>,
     owner: string
   ): Promise<NftInfo<RawNft>[]>;
+  /**
+   * Estimates the required fee for transferring an NFT.
+   * @param fromChain: {@link FullChain} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
+   * @param toChain: {@link FullChain} Chain to which the NFT must be sent. Can be obtained from the `inner` method on the factory.
+   * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
+   * @param receiver: Address of the receiver of the NFT in raw string..
+   */
   estimateFees<SignerF, RawNftF, SignerT, RawNftT>(
     fromChain: FullChain<SignerF, RawNftF>,
     toChain: FullChain<SignerT, RawNftT>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
-  // Update parameters for a specific chain
+  /**
+   * 
+   * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
+   * @param params : New Params to be set.
+   */
   updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
 };
 
@@ -113,6 +124,13 @@ export interface ChainParams {
   xDaiParams: Web3Params;
 }
 
+/**
+ * A struct for the configuration of the library.
+ * @field exchangeRateUri: The URI of the exchange rate service.
+ * @field moralisServer: The URI of the moralis server.
+ * @field moralisAppId: The app id of the moralis server.
+ * @field tronScanUri: The URI of the tron scan service.
+ */
 export interface AppConfig {
   exchangeRateUri: string,
   moralisServer: string,
@@ -145,6 +163,7 @@ function mapNonceToParams(
 }
 /**
  * This function is the basic entry point to use this package as a library.
+ * @param appConfig: {@link AppConfig} The configuration of the library.
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
