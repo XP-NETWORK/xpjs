@@ -1,7 +1,5 @@
 /**
- * Internal NFT Info
- * WARN: should be used with care. URI might not be correct
- * and must be manually resolved via cross chain helper
+ * NFT Info
  */
 export declare type NftInfo<Raw> = {
     readonly uri: string;
@@ -91,10 +89,6 @@ export interface BatchWrappedBalanceCheck<Addr, Balance> {
 export interface MintNft<Signer, Args, Identifier> {
     mintNft(owner: Signer, options: Args): Promise<Identifier>;
 }
-export declare type WrappedNft = {
-    chain_nonce: number;
-    data: Uint8Array;
-};
 /**
  * Whether the given NFT is from a foreign chain
  * @param {NftIdent} nft NFT Identity
@@ -103,35 +97,12 @@ export declare type WrappedNft = {
 export interface WrappedNftCheck<RawNft> {
     isWrappedNft(nft: NftInfo<RawNft>): boolean;
 }
-export interface PackNft<Raw> {
-    wrapNftForTransfer(nft: NftInfo<Raw>): Uint8Array;
-}
-export interface DecodeWrappedNft<Data> {
-    decodeWrappedNft(raw_data: NftInfo<Data>): WrappedNft;
-}
-export interface DecodeRawNft<NativeRaw> {
-    /**
-     * convert raw nft to native one
-     * uri should be unset!
-     */
-    decodeNftFromRaw(data: Uint8Array): Promise<NftInfo<NativeRaw>>;
-}
 export interface ValidateAddress {
     validateAddress(adr: string): Promise<boolean>;
 }
-export declare type BareNft = {
-    chainId: string;
-    uri: string;
-};
-export interface PopulateDecodedNft<NativeRaw> {
-    /**
-     * Get uri for an nft from "decodeNftFromRaw"
-     */
-    populateNft(nft: NftInfo<NativeRaw>): Promise<BareNft>;
-}
-export interface EstimateTxFees<RawNft, Balance> {
-    estimateValidateTransferNft(to: string, nft: Uint8Array): Promise<Balance>;
-    estimateValidateUnfreezeNft(to: string, nft: NftInfo<RawNft>): Promise<Balance>;
+export interface EstimateTxFees<Balance> {
+    estimateValidateTransferNft(to: string, metadataUri: string): Promise<Balance>;
+    estimateValidateUnfreezeNft(to: string, metadataUri: string): Promise<Balance>;
 }
 export declare function ConcurrentSendError(): Error;
 export interface ChainNonceGet {
