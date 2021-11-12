@@ -7465,7 +7465,7 @@ xpnet-nft-list@0.1.4:
 
 "xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#dist":
   version "0.1.0"
-  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#97e721fe84f6b73a62414f96f882ec95b3627904"
+  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#091246c404973dc9024895d28f999b71a702f82e"
   dependencies:
     ethers "^5.4.1"
 
