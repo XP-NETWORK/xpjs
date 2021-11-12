@@ -10,6 +10,14 @@ Features Available :-
 - [x] Estimating the TX fee
 - [ ] ... and More
 
+  ### Create a moralis account
+
+  Before getting started, we recommend making a moralis account if you dont have one already. We use moralis to query WEB3 Blockchain nodes to query the NFTs owned by an address.
+
+  - [Register for a free Moralis account here](https://admin.moralis.io/register)
+
+  When your account created, click the "View Details" button and take the "Server URL" & "Application ID". We will need this in the later part of this section.
+
 ## To Mint an NFT, Follow the steps as specified -
 
 - First make sure nodejs is installed in your machine.
@@ -25,13 +33,6 @@ Features Available :-
   ```
   npm install xp.network
   ```
-
-  ### Create a moralis account
-
-  - [Register for a free Moralis account here](https://admin.moralis.io/register)
-
-  1. We use moralis to query WEB3 Blockchain nodes to query the NFTs owned by an address.
-  2. When the server is set up, click the "View Details" button and take the "Server URL" & "Application ID"
 
   ```javascript
   import { ChainFactoryConfigs, ChainFactory } from "xp.network/dist";
@@ -55,12 +56,52 @@ Features Available :-
 
   ```javascript
   const avax = await factory.inner<Web3Helper, Web3Params>(Chain.AVALANCHE);
+  const elrond = await factory.inner<ElrondHelper, ElrondParams>(Chain.ELROND);
+  const tron = await factory.inner<TronHelper, TronParams>(Chain.TRON);
   ```
 
-- Just call the mint function on the factory with suitable arguments
+- Just call the mint function on the factory with suitable arguments.
+
+  1. For Web3 Chains:
 
   ```javascript
+  // Web3Provider generally refers to a walletProvider like Metamask.
   const receipt = await factory.mint(avax, web3Provider.getSigner(address), {
+    // Could be an IPFS URL or Any URL that points to a Metadata
+    uris: [metadata.url],
+    // Description of your NFT. Can be an object.
+    attrs: description,
+    // A name that defines your NFT.
+    name: name,
+    // The contract with which you want to mint the NFT.
+    contract: "Can be fetched from the mainnetConfig or testnetConfig",
+  });
+  ```
+
+  2. For Elrond:
+
+  ```javascript
+  // Dont forget to import ExtensionProvider from @elrondnetwork/erdjs library.
+  const receipt = await factory.mint(elrond, ExtensionProvider.getInstance(), {
+    // Could be an IPFS URL or Any URL that points to a Metadata
+    uris: [metadata.url],
+    // Description of your NFT. Can be an object.
+    attrs: description,
+    // A name that defines your NFT.
+    name: name,
+    // The identifier with which you want to mint the NFT. You have to own this identifier. i.e.
+    identifier: "PANDA-eda5d0-c5",
+  });
+  ```
+
+  3.  For Tron:
+
+  ```javascript
+  // Address is fetched from tronweb
+  const addresses = await window.tronLink.tronWeb.request({
+    method: "tron_requestAccounts",
+  });
+  const receipt = await factory.mint(avax, addresses[0], {
     // Could be an IPFS URL or Any URL that points to a Metadata
     uris: [metadata.url],
     // Description of your NFT. Can be an object.
@@ -107,7 +148,31 @@ Features Available :-
 
   ```javascript
   const nfts = await factory.nftList(avax, "NFT OWNER ADDRESS");
+  // Choose an NFT to transfer, we are choosing the first one here.
+  const theChosenOne = nfts[0];
   ```
+
+- Getting a Wallet/Signer to sign the transaction. This could be done in many ways. i.e.
+
+  For Example:
+
+  1. Via Ethers : We need the provider from the config of the source chain and the Private Key of the Signer/Sender/Owner.
+
+  ```javascript
+  // Dont forget to import Wallet from ethersjs.
+  const signer = new Wallet(
+    "PRIVATE KEY HERE",
+    mainnetConfig.avalancheParams.provider
+  );
+  ```
+
+  2. Via Metamask: Connecting to metamask is beyond the library's scope. but, to get the signer from metamask.
+
+  ```javascript
+  const signer = metamaskProvider.getSigner();
+  ```
+
+  3. For other methods, check this repo [Mainnet-UI](https://github.com/xp-network/mainnet-bridge-ui).
 
 - Call the transferNft function on the factory with suitable arguments
 
@@ -115,12 +180,9 @@ Features Available :-
   factory.transferNft(
     avax, // Source Chain.
     bsc, // Destination Chain.
-    nfts[0], // Or the nft of your choosing.
-    new Wallet(
-      "ADDRESS OF THE SENDER", // Can use Metamask for Web3 Chains, Tronlink for Tron
-      avaxProvider // and Maiar for Elrond if running in browser.
-    ),
-    "ADDRESS OF THE RECEIVER" // The person to whom you are transferring the NFT to.
+    theChosenOne, // Or the nft of your choosing.
+    signer, // or tronlink or maiar.
+    "ADDRESS OF THE RECEIVER" // The address to whom you are transferring the NFT to.
   );
   ```
 
