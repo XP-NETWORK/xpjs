@@ -35,7 +35,16 @@ Features Available :-
   ```
 
   ```javascript
-  import { ChainFactoryConfigs, ChainFactory } from "xp.network/dist";
+  import {
+    ChainFactoryConfigs,
+    ChainFactory,
+    ElrondHelper,
+    ElrondParams,
+    TronHelper,
+    TronParams,
+    Web3Helper,
+    Web3Params,
+  } from "xp.network/dist";
 
   // Fetch the config for required networks i.e. Mainnet/Testnet
   // Networks from the ChainFactoryConfigs namespace. You can also mix
@@ -65,8 +74,13 @@ Features Available :-
   1. For Web3 Chains:
 
   ```javascript
+  import detectEthereumProvider from "@metamask/detect-provider";
+
+  const metamask = await detectEthereumProvider();
+  const metamaskProvider = ethers.providers.Web3Provider(metamask);
+  const signer = metamaskProvider.getSigner();
   // Web3Provider generally refers to a walletProvider like Metamask.
-  const receipt = await factory.mint(avax, web3Provider.getSigner(address), {
+  const receipt = await factory.mint(avax, signer, {
     // Could be an IPFS URL or Any URL that points to a Metadata
     uris: [metadata.url],
     // Description of your NFT. Can be an object.
@@ -82,6 +96,7 @@ Features Available :-
 
   ```javascript
   // Dont forget to import ExtensionProvider from @elrondnetwork/erdjs library.
+  import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
   const receipt = await factory.mint(elrond, ExtensionProvider.getInstance(), {
     // Could be an IPFS URL or Any URL that points to a Metadata
     uris: [metadata.url],
@@ -120,7 +135,14 @@ Features Available :-
 - Instantiate a ChainFactory from the package depending on the the network you want to use (ie Testnet or Mainnet). It has our smart contract address.
 
   ```javascript
-  import { ChainFactoryConfigs, ChainFactory } from "xp.network/dist";
+  import {
+    ChainFactoryConfigs,
+    ChainFactory,
+    Web3Helper,
+    Web3Params,
+  } from "xp.network/dist";
+  import { Wallet } from "ethers";
+  import detectEthereumProvider from "@metamask/detect-provider";
 
   // Fetch the config for required networks i.e. Mainnet/Testnet
   // Networks from the ChainFactoryConfigs namespace. You can also mix
@@ -160,6 +182,7 @@ Features Available :-
 
   ```javascript
   // Dont forget to import Wallet from ethersjs.
+  import { Wallet } from "ethers";
   const signer = new Wallet(
     "PRIVATE KEY HERE",
     mainnetConfig.avalancheParams.provider
@@ -169,6 +192,8 @@ Features Available :-
   2. Via Metamask: Connecting to metamask is beyond the library's scope. but, to get the signer from metamask.
 
   ```javascript
+  const metamask = await detectEthereumProvider();
+  const metamaskProvider = ethers.providers.Web3Provider(metamask);
   const signer = metamaskProvider.getSigner();
   ```
 
