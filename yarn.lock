@@ -7447,10 +7447,10 @@ xmlhttprequest@1.8.0:
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   integrity sha1-Z/4HXFwk/vOfnWX197f+dRcZaPw=
 
-xpnet-nft-list@0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/xpnet-nft-list/-/xpnet-nft-list-0.1.4.tgz#7429577720b9d6fa858bd303f617dce0f7bc1a7c"
-  integrity sha512-2MxhfyFX/7jgg5mcrd8ZBUSh1FNfXaNiU2/Pfq8+o4NBeDNdLN9bMLD5tIxdArhXYGOsLfxGsGzRVaMTUoO1IA==
+xpnet-nft-list@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/xpnet-nft-list/-/xpnet-nft-list-0.2.1.tgz#48bb0711a65dd821f3094943495a44efe321b126"
+  integrity sha512-s+P97e9ALT6DamO1tDguVCobtP9WuIP9BuWUlOSzcq1ZKJEVGoPTrKdixkLy2qo3MMmOBNQRkE2f7F1nVjpWjg==
   dependencies:
     "@elrondnetwork/erdjs" "^8.0.1-alpha.8"
     "@supercharge/promise-pool" "^1.9.0"
