@@ -20,6 +20,7 @@ import axios from "axios";
 import { elrondNftList, exchangeRateRepo, moralisNftList, tronListNft } from "./cons";
 import { Address } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
+import { bridgeHeartbeat } from "../heartbeat";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -49,6 +50,11 @@ type ChainFactory = {
    * @param chain: {@link Chain} to create the helper for.
    */
   inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
+  /**
+   * Whether or not the bridge is alive for a given chain
+   * this is checked regardless before using any bridge related function(e.g transferNft) is called
+   */
+  bridgeStatus(): Promise<{ [chainNonce: number]: "alive" | "dead" }>;
   /**
    * Transfers the NFT from one chain to other.
    * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
@@ -133,9 +139,10 @@ export interface ChainParams {
  */
 export interface AppConfig {
   exchangeRateUri: string,
+  heartbeatUri: string,
   moralisServer: string,
   moralisAppId: string,
-  tronScanUri: string
+  tronScanUri: string,
 }
 
 function mapNonceToParams(
@@ -173,6 +180,9 @@ export function ChainFactory(
 ): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
+
+  const heartbeatRepo = bridgeHeartbeat(appConfig.heartbeatUri);
+
   const remoteExchangeRate = exchangeRateRepo(appConfig.exchangeRateUri);
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || '');
@@ -240,9 +250,34 @@ export function ChainFactory(
       return conv;
     }
   };
+
+  async function bridgeStatus(): Promise<{ [x: number]: "alive" | "dead" }> {
+    const res = await heartbeatRepo.status();
+    return Object.fromEntries(
+      Object.entries(res)
+        .map(([c, s]) => [c, s.bridge_alive ? "alive" : "dead"])
+    );
+  }
+
+  async function requireBridge(chains: number[]): Promise<void> {
+    const status = await heartbeatRepo.status();
+    let deadChain: number | undefined;
+    const alive = chains.every(c => {
+      const stat = status[c].bridge_alive;
+      if (!stat) {
+        deadChain = c;
+      }
+      return stat;
+    });
+    if (!alive) {
+      throw Error(`chain ${deadChain} is dead! its unsafe to use the bridge`);
+    }
+  }
+
   return {
     estimateFees,
     inner,
+    bridgeStatus,
     updateParams<T, TP>(chainNonce: ChainNonce<T, TP>, params: TP) {
       map.delete(chainNonce);
       cToP.set(chainNonce, params as any);
@@ -268,6 +303,8 @@ export function ChainFactory(
       return res;
     },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
+      await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
+
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
       }
