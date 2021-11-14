@@ -25,7 +25,7 @@ const EVM_TESTNET_VALIDATORS = [
 ];
 
 export namespace ChainFactoryConfigs {
-  export const TestNet: Partial<ChainParams> = {
+  export const TestNet: () => Partial<ChainParams> = () => ({
     elrondParams: {
       node_uri: TestNetRpcUri.ELROND,
       minter_address:
@@ -119,9 +119,9 @@ export namespace ChainFactoryConfigs {
       validators: EVM_TESTNET_VALIDATORS,
       nonce: Chain.XDAI,
     },
-  };
+  });
 
-  export const MainNet: Partial<ChainParams> = {
+  export const MainNet: () => Partial<ChainParams> = () => ({
     elrondParams: {
       node_uri: MainNetRpcUri.ELROND,
       minter_address:
@@ -215,5 +215,5 @@ export namespace ChainFactoryConfigs {
       validators: EVM_VALIDATORS,
       nonce: Chain.XDAI,
     },
-  };
+  });
 }
