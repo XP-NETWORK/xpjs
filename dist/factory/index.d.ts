@@ -21,6 +21,13 @@ declare type ChainFactory = {
      */
     inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
     /**
+     * Whether or not the bridge is alive for a given chain
+     * this is checked regardless before using any bridge related function(e.g transferNft) is called
+     */
+    bridgeStatus(): Promise<{
+        [chainNonce: number]: "alive" | "dead";
+    }>;
+    /**
      * Transfers the NFT from one chain to other.
      * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
      * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
@@ -83,6 +90,7 @@ export interface ChainParams {
  */
 export interface AppConfig {
     exchangeRateUri: string;
+    heartbeatUri: string;
     moralisServer: string;
     moralisAppId: string;
     tronScanUri: string;
