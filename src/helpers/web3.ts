@@ -69,17 +69,17 @@ export type MintArgs = {
   uri: string;
 };
 
-export interface IsApproved {
+export interface IsApproved<Sender> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
-    sender: Signer
+    sender: Sender
   ): Promise<boolean>;
 }
 
-export interface Approve {
+export interface Approve<Sender> {
   approveForMinter(
     address: NftInfo<EthNftInfo>,
-    sender: Signer
+    sender: Sender
   ): Promise<boolean>;
 }
 
@@ -127,8 +127,8 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedNftCheck<MintArgs> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
-  IsApproved &
-  Approve &
+  IsApproved<Signer> &
+  Approve<Signer> &
   ValidateAddress;
 
 /**

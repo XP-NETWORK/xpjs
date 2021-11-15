@@ -27,7 +27,7 @@ import {
   XPNet__factory,
   XPNft__factory,
 } from "xpnet-web3-contracts";
-import { NftMintArgs, ValidateAddress } from "..";
+import { Approve, IsApproved, NftMintArgs, ValidateAddress } from "..";
 import { NftEthNative, NftPacked } from "validator";
 import {
   ChainNonceGet,
@@ -87,6 +87,7 @@ export type TronHelper = BaseTronHelper &
   WrappedNftCheck<MintArgs> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
+  Approve<TronSender> &
   ValidateAddress;
 
 export async function baseTronHelperFactory(
@@ -277,8 +278,44 @@ export async function tronHelperFactory(
     return fee;
   }
 
+  const isApprovedForMinter = async (
+    erc: any,
+    id: NftInfo<EthNftInfo>
+  ) => {
+    const approvedAddress = await erc.getApproved(id.native.tokenId).call({
+      from: tronParams.provider.defaultAddress.base58
+    });
+    if (approvedAddress === minter_addr) {
+      return true;
+    }
+    return false;
+  };
+
+  const approveForMinter = async (
+    id: NftInfo<EthNftInfo>,
+    sender: TronSender | undefined
+  ) => {
+    await setSigner(sender);
+    const erc = await provider.contract(
+      UserNftMinter__factory.abi,
+      id.native.contract
+    );
+    const isApproved = await isApprovedForMinter(erc, id);
+    if (isApproved) {
+      return true;
+    }
+
+    await erc.approve(
+      minter_addr,
+      id.native.tokenId
+    ).send();
+
+    return true;
+  };
+
   return {
     ...base,
+    approveForMinter,
     isWrappedNft(nft) {
       return nft.native.contract.toLowerCase() === tronParams.erc721_addr.toLowerCase();
     },
@@ -340,11 +377,7 @@ export async function tronHelperFactory(
       txFees: BigNumber
     ): Promise<string> {
       setSigner(sender);
-      const erc = await provider.contract(
-        UserNftMinter__factory.abi,
-        id.native.contract
-      );
-      await erc.approve(minter.address, id.native.tokenId).send();
+      await approveForMinter(id, sender);
 
       const txr = await minter
         .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
