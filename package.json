@@ -34,7 +34,7 @@
     "tronstation": "^1.0.1",
     "tronweb": "^4.0.0",
     "validator": "git+https://github.com/xp-network/Migration-validator#web3-new",
-    "xpnet-nft-list": "0.2.1",
+    "xpnet-nft-list": "^0.2.2",
     "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#dist"
   }
 }
