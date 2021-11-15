@@ -23,6 +23,7 @@ import {
   TransactionHash,
   TransactionPayload,
   U64Value,
+  WalletConnectProvider
 } from "@elrondnetwork/erdjs";
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -46,7 +47,7 @@ import {
 } from "..";
 import { NftMintArgs } from "..";
 
-type ElrondSigner = ISigner | ExtensionProvider;
+type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 
 type EasyBalance = string | number | BigNumber;
 
@@ -260,6 +261,9 @@ export const elrondHelperFactory: (
     const acc = await syncAccount(signer);
     tx.setNonce(acc.nonce);
     let stx: Transaction;
+    if (signer instanceof WalletConnectProvider) {
+      stx = await signer.signTransaction(tx)
+    }
     if (signer instanceof ExtensionProvider) {
       stx = await signer.signTransaction(tx);
     } else {
