@@ -5138,10 +5138,10 @@ mock-fs@^4.1.0:
   resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.14.0.tgz#ce5124d2c601421255985e6e94da80a7357b1b18"
   integrity sha512-qYvlv/exQ4+svI3UOvPUpLDF0OMX5euvUH0Ny4N5QyRyhNdgAgUrVH3iUINSzEPLvx0kbo/Bp28GJKIqvE7URw==
 
-moralis@^0.0.116:
-  version "0.0.116"
-  resolved "https://registry.yarnpkg.com/moralis/-/moralis-0.0.116.tgz#e58ad5c8bac7184934218cac69b8934b5dd0739b"
-  integrity sha512-ZdYei8hDi4qrJmDpl7MV9/hpFGnVBmNG0pdraGo96z9GMbtbHYHw8Qs2M6UqSHAwcKc0I65ISO3VUS5NituBFA==
+moralis@^0.0.132:
+  version "0.0.132"
+  resolved "https://registry.yarnpkg.com/moralis/-/moralis-0.0.132.tgz#3b651274b6e0172f5aa390f0cab4639a8c10d1aa"
+  integrity sha512-ftkBDkFmoNmFEjxWITY1q9hVrd94w8dviwsWsajIH2OW4xOm33nV6Ay3aSsaWC6tTJHRV5/NYv8Hz4XARVw3mQ==
   dependencies:
     "@babel/runtime" "7.12.5"
     "@babel/runtime-corejs3" "7.12.5"
@@ -5150,7 +5150,7 @@ moralis@^0.0.116:
     lint-staged "^11.1.2"
     react-native-crypto-js "1.0.0"
     uuid "3.4.0"
-    web3 "^1.3.6"
+    web3 "^1.6.0"
     ws "^7.4.6"
     xmlhttprequest "1.8.0"
   optionalDependencies:
@@ -7243,7 +7243,7 @@ web3-utils@1.6.0:
     randombytes "^2.1.0"
     utf8 "3.0.0"
 
-web3@^1.3.6:
+web3@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.6.0.tgz#d8fa0cd9e7bf252f9fe43bb77dc42bc6671affde"
   integrity sha512-rWpXnO88MiVX5yTRqMBCVKASxc7QDkXZZUl1D48sKlbX4dt3BAV+nVMVUKCBKiluZ5Bp8pDrVCUdPx/jIYai5Q==
@@ -7447,10 +7447,10 @@ xmlhttprequest@1.8.0:
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   integrity sha1-Z/4HXFwk/vOfnWX197f+dRcZaPw=
 
-xpnet-nft-list@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/xpnet-nft-list/-/xpnet-nft-list-0.2.1.tgz#48bb0711a65dd821f3094943495a44efe321b126"
-  integrity sha512-s+P97e9ALT6DamO1tDguVCobtP9WuIP9BuWUlOSzcq1ZKJEVGoPTrKdixkLy2qo3MMmOBNQRkE2f7F1nVjpWjg==
+xpnet-nft-list@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/xpnet-nft-list/-/xpnet-nft-list-0.2.2.tgz#f2b14986ca9fca0cf76791a555e7f02e1452ebf3"
+  integrity sha512-DwMveHrCGid/EyW5NMLNaO3fpXVI358qz60xVH9/iYQ6Uqm+24XnmuFBN/+292MIQtjqr5zgmEJjtJw9s4IrJw==
   dependencies:
     "@elrondnetwork/erdjs" "^8.0.1-alpha.8"
     "@supercharge/promise-pool" "^1.9.0"
@@ -7460,7 +7460,7 @@ xpnet-nft-list@0.2.1:
     ethers "^5.5.1"
     express "^4.17.1"
     js-base64 "^3.7.2"
-    moralis "^0.0.116"
+    moralis "^0.0.132"
     tronweb "^4.0.0"
 
 "xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#dist":
