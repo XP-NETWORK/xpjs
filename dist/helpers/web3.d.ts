@@ -31,11 +31,11 @@ export declare type MintArgs = {
     contract: string;
     uri: string;
 };
-export interface IsApproved {
-    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Signer): Promise<boolean>;
+export interface IsApproved<Sender> {
+    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<boolean>;
 }
-export interface Approve {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Signer): Promise<boolean>;
+export interface Approve<Sender> {
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<boolean>;
 }
 /**
  * Base util traits
@@ -60,7 +60,7 @@ MintNft<Signer, NftMintArgs, any> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> & WrappedNftCheck<MintArgs> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved & Approve & ValidateAddress;
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> & WrappedNftCheck<MintArgs> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
