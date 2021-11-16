@@ -88,7 +88,7 @@ export type TronHelper = BaseTronHelper &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
   Approve<TronSender> &
-  ValidateAddress;
+  ValidateAddress & IsApproved<TronSender>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -279,9 +279,13 @@ export async function tronHelperFactory(
   }
 
   const isApprovedForMinter = async (
-    erc: any,
-    id: NftInfo<EthNftInfo>
+    id: NftInfo<EthNftInfo>,
+    _sender: TronSender
   ) => {
+    const erc = await provider.contract(
+      UserNftMinter__factory.abi,
+      id.native.contract
+    );
     const approvedAddress = await erc.getApproved(id.native.tokenId).call({
       from: tronParams.provider.defaultAddress.base58
     });
@@ -300,7 +304,7 @@ export async function tronHelperFactory(
       UserNftMinter__factory.abi,
       id.native.contract
     );
-    const isApproved = await isApprovedForMinter(erc, id);
+    const isApproved = await isApprovedForMinter(id, sender);
     if (isApproved) {
       return true;
     }
@@ -319,6 +323,7 @@ export async function tronHelperFactory(
     isWrappedNft(nft) {
       return nft.native.contract.toLowerCase() === tronParams.erc721_addr.toLowerCase();
     },
+    isApprovedForMinter,
     async transferNativeToForeign(
       sender: TronSender,
       chain_nonce: number,
