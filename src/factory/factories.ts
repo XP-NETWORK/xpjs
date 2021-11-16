@@ -47,7 +47,7 @@ export namespace ChainFactoryConfigs {
       nonce: 2,
     },
     tronParams: {
-      provider: new TronWeb({ fullhost: TestNetRpcUri.TRON }),
+      provider: new TronWeb({ fullHost: TestNetRpcUri.TRON }),
       middleware_uri: "string",
       erc1155_addr: "string",
       minter_addr: "string",

@@ -19,9 +19,9 @@ export function moralisNftList(server: string, appId: string): MoralisNftListRep
     );
 }
 
-export function tronListNft(tronWeb: TronWeb, tronScan: string): NftListRepo<string, EthNftJson> {
+export function tronListNft(tronWeb: TronWeb, tronScan: string, xpnftAddr: string): NftListRepo<string, EthNftJson> {
     return nftListRepo(
-        trxNftListService(tronWeb, tronScan),
+        trxNftListService(tronWeb, tronScan, xpnftAddr),
         ethNftJMapper(),
         mockChainIdentMapper()
     )
