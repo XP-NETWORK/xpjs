@@ -189,7 +189,8 @@ export function ChainFactory(
   const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId);
   const tronNftRepo = chainParams.tronParams && tronListNft(
     chainParams.tronParams.provider,
-    appConfig.tronScanUri
+    appConfig.tronScanUri,
+    chainParams.tronParams.erc721_addr
   );
 
   const nftlistRest = axios.create({
