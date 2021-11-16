@@ -262,9 +262,9 @@ export const elrondHelperFactory: (
     tx.setNonce(acc.nonce);
     let stx: Transaction;
     if (signer instanceof WalletConnectProvider) {
-      stx = await signer.signTransaction(tx)
-    }
-    if (signer instanceof ExtensionProvider) {
+      const txs = await signer.signTransactions([tx]);
+      stx = txs[0];
+    } else if (signer instanceof ExtensionProvider) {
       stx = await signer.signTransaction(tx);
     } else {
       await (signer as ISigner).sign(tx);
