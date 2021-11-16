@@ -124,7 +124,7 @@ export type Web3Helper = BaseWeb3Helper &
     BigNumber,
     EthNftInfo
   > &
-  WrappedNftCheck<MintArgs> &
+  WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
   IsApproved<Signer> &

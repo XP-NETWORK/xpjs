@@ -84,7 +84,7 @@ export type TronHelper = BaseTronHelper &
   // TODO: Use TX Fees
   UnfreezeForeign<TronSender, string, string> &
   UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo> &
-  WrappedNftCheck<MintArgs> &
+  WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
   Approve<TronSender> &
