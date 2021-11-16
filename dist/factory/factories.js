@@ -48,7 +48,7 @@ var ChainFactoryConfigs;
             nonce: 2,
         },
         tronParams: {
-            provider: new tronweb_1.default({ fullhost: consts_1.TestNetRpcUri.TRON }),
+            provider: new tronweb_1.default({ fullHost: consts_1.TestNetRpcUri.TRON }),
             middleware_uri: "string",
             erc1155_addr: "string",
             minter_addr: "string",
