@@ -4,12 +4,12 @@
  * Note that Unsigned Transactions need to be manually handled after they have been added to the block
  * @module
  */
-import { Address, ExtensionProvider, ISigner, Transaction } from "@elrondnetwork/erdjs";
+import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
 import { ChainNonceGet, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
-declare type ElrondSigner = ISigner | ExtensionProvider;
+declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 /**
  * Information associated with an ESDT Token
  */
