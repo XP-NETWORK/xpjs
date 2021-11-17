@@ -28,6 +28,7 @@ Features Available :-
   npm install xp.network @elrondnetwork ethers
   ```
 <hr/>
+
 ### 2. Import the dependencies
 
   ```javascript
@@ -94,8 +95,9 @@ Features Available :-
 This operation does not depend on a wallet, since reading operations are free and, therefore, do not require signing.
 
   ```javascript
+  // Since nftList returns a Promise it's a good idea to await it which requires an async function
   (async () => {
-    // 
+    // Await the list of NFTs before trying to use it
     const nfts = await factory.nftList(
         polygon,    // The chain of interest 
         "0x...."    // The public key of the NFT owner
@@ -108,16 +110,33 @@ This operation does not depend on a wallet, since reading operations are free an
   ```
 <hr/>
 
-### 6. Transferring an NFT
+### 6. Approve accessing your NFT by the bridge smart contract
+```javascript
+// Since approveForMinter returns a Promise it's a good idea to await it which requires an async function
+(async () => {
+    // Await the result of the transaction before moving on to the next steps
+    const isApproved = await polygon.approveForMinter(theChosenOne, signer);
+    console.log("Is Approved:", isApproved)
+
+})();
+```
+<hr/>
+
+### 7. Transferring an NFT
 
   ```javascript
-  factory.transferNft(
-    polygon,                    // The Source Chain.
-    bsc,                        // The Destination Chain.
-    theChosenOne,               // Or the NFT you have chosen.
-    signer,                     // Or tronlink or maiar.
-    "ADDRESS OF THE RECEIVER"   // The address who you are transferring the NFT to.
-  );
+  // Since transferNft returns a Promise it's a good idea to await it which requires an async function
+  (async () => {
+    // Await the result of the transaction before trying to use it
+    const result = await factory.transferNft(
+      polygon,                    // The Source Chain.
+      bsc,                        // The Destination Chain.
+      theChosenOne,               // Or the NFT you have chosen.
+      signer,                     // Or tronlink or maiar.
+      "ADDRESS OF THE RECEIVER"   // The address who you are transferring the NFT to.
+    );
+    console.log(result)
+  })();
   ```
 
 <hr/>
