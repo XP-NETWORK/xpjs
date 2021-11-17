@@ -38,7 +38,7 @@ export declare namespace Chain {
     const ELROND: ElrondNonce;
     const HECO: Web3Nonce;
     const BSC: Web3Nonce;
-    const ROPSTEN: Web3Nonce;
+    const ETHEREUM: Web3Nonce;
     const AVALANCHE: Web3Nonce;
     const POLYGON: Web3Nonce;
     const FANTOM: Web3Nonce;
