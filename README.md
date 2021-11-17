@@ -14,7 +14,7 @@ Features Available :-
 
 ## To list and transfer NFTs, follow the steps below:
 
-- Make sure [nodejs](https://nodejs.org/en/download/) is installed in your machine.
+- Make sure [nodejs](https://nodejs.org/en/download/) is installed on your machine.
 
 ### 1. Import xp.network package into your project with the following command:
 
