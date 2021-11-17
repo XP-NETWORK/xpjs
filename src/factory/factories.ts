@@ -109,7 +109,7 @@ export namespace ChainFactoryConfigs {
       erc1155_addr: "0xe909b9b7667121d774133bcd4C1b6f3693239bc4",
       erc721_addr: "0xe909b9b7667121d774133bcd4C1b6f3693239bc4",
       validators: EVM_TESTNET_VALIDATORS,
-      nonce: Chain.ROPSTEN,
+      nonce: Chain.ETHEREUM,
     },
     xDaiParams: {
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
@@ -205,7 +205,7 @@ export namespace ChainFactoryConfigs {
       erc1155_addr: "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
       erc721_addr: "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
       validators: EVM_VALIDATORS,
-      nonce: Chain.ROPSTEN,
+      nonce: Chain.ETHEREUM,
     },
     xDaiParams: {
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.XDAI),

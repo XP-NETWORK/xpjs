@@ -43,7 +43,7 @@ export namespace Chain {
   export const ELROND: ElrondNonce = 2;
   export const HECO: Web3Nonce = 3;
   export const BSC: Web3Nonce = 4;
-  export const ROPSTEN: Web3Nonce = 5;
+  export const ETHEREUM: Web3Nonce = 5;
   export const AVALANCHE: Web3Nonce = 6;
   export const POLYGON: Web3Nonce = 7;
   export const FANTOM: Web3Nonce = 8;
