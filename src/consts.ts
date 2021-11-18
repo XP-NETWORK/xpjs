@@ -191,3 +191,11 @@ export const CHAIN_INFO: ChainInfo = {
     validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   }
 };
+
+export const Config = {
+  exchangeRateUri:  "https://testing-bridge.xp.network/exchange/",
+  moralisServer:    "https://azz9akudh6cf.usemoralis.com:2053/server",
+  moralisAppId:     "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
+  tronScanUri:      "https://apilist.tronscan.org/api/",
+  heartbeatUri:     "https://xpheartbeat.herokuapp.com"
+};
