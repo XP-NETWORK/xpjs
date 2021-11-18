@@ -143,6 +143,7 @@ export interface AppConfig {
   moralisServer: string,
   moralisAppId: string,
   tronScanUri: string,
+  moralisSecret?: string,
 }
 
 function mapNonceToParams(
@@ -186,7 +187,7 @@ export function ChainFactory(
   const remoteExchangeRate = exchangeRateRepo(appConfig.exchangeRateUri);
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || '');
-  const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId);
+  const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId, appConfig.moralisSecret);
   const tronNftRepo = chainParams.tronParams && tronListNft(
     chainParams.tronParams.provider,
     appConfig.tronScanUri,
