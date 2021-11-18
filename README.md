@@ -73,8 +73,6 @@ Features Available :-
   const bsc       = await factory.inner<Web3Helper,     Web3Params>  (Chain.BSC);
   const polygon   = await factory.inner<Web3Helper,     Web3Params>  (Chain.POLYGON);
   const avax      = await factory.inner<Web3Helper,     Web3Params>  (Chain.AVALANCHE);
-  const harmony   = await factory.inner<Web3Helper,     Web3Params>  (Chain.HARMONY);
-  const celo      = await factory.inner<Web3Helper,     Web3Params>  (Chain.CELO);
   const fantom    = await factory.inner<Web3Helper,     Web3Params>  (Chain.FANTOM);
   const xdai      = await factory.inner<Web3Helper,     Web3Params>  (Chain.XDAI);
   const elrond    = await factory.inner<ElrondHelper,   ElrondParams>(Chain.ELROND);
