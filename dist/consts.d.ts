@@ -1,9 +1,8 @@
 import { CrossChainHelper } from ".";
-import { ElrondParams } from "./helpers/elrond";
-import { TronParams } from "./helpers/tron";
-import { Web3Params } from "./helpers/web3";
+import { ElrondParams, ElrondHelper } from "./helpers/elrond";
+import { TronParams, TronHelper } from "./helpers/tron";
+import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { ElrondHelper, Web3Helper, TronHelper } from "validator";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
