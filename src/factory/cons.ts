@@ -11,9 +11,9 @@ export function elrondNftList(proxy: string): ElrdNftListRepo {
     );
 }
 
-export function moralisNftList(server: string, appId: string): MoralisNftListRepo {
+export function moralisNftList(server: string, appId: string, moralisSecret?: string): MoralisNftListRepo {
     return nftListRepo(
-        moralisNftListService({ serverUrl: server, appId }),
+        moralisNftListService({ serverUrl: server, appId, moralisSecret }),
         moralisNftMapper(),
         moralisChainIdMapper()
     );
@@ -33,9 +33,9 @@ export function exchangeRateRepo(baseUrl: string): ExchangeRateRepo {
     );
 
     return cachedExchangeRateRepo(
-    networkBatchExchangeRateRepo(
-        baseService,
-        NetworkModel.exchangeRateDtoMapper()
-    )
+        networkBatchExchangeRateRepo(
+            baseService,
+            NetworkModel.exchangeRateDtoMapper()
+        )
     );
 }
