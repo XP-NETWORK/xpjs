@@ -94,6 +94,7 @@ export interface AppConfig {
     moralisServer: string;
     moralisAppId: string;
     tronScanUri: string;
+    moralisSecret?: string;
 }
 /**
  * This function is the basic entry point to use this package as a library.
