@@ -60,4 +60,11 @@ interface ChainInfo {
     [nonce: number]: ChainData;
 }
 export declare const CHAIN_INFO: ChainInfo;
+export declare const Config: {
+    exchangeRateUri: string;
+    moralisServer: string;
+    moralisAppId: string;
+    tronScanUri: string;
+    heartbeatUri: string;
+};
 export {};
