@@ -42,7 +42,7 @@ type FullChain<Signer, RawNft> = TransferNftForeign<
  * A type representing a chain factory.
  *
  */
-type ChainFactory = {
+export type ChainFactory = {
   /**
    * Creates an helper factory for a given chain
    * @type T: Either {@link ElrondHelper} | {@link Web3Helper} | {@link TronHelper} as required.
