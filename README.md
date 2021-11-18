@@ -19,13 +19,13 @@ Features Available :-
 ### 1. Import xp.network package into your project with the following command:
 
   ```
-  yarn add xp.network @elrondnetwork ethers
+  yarn add xp.network @elrondnetwork/erdjs ethers
   ```
 
   OR
 
   ```
-  npm install xp.network @elrondnetwork ethers
+  npm install xp.network @elrondnetwork/erdjs ethers
   ```
 <hr/>
 
@@ -40,7 +40,7 @@ Features Available :-
   // EVM chains compatible wallet:
   import { Wallet } from "ethers";
   // Chanin name to chain nonce mapper:
-  import {Chain} from 'xp.network/dist/consts';
+  import {Chain, Config} from 'xp.network/dist/consts';
   // Elrond provider:
   import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
 
@@ -49,14 +49,6 @@ Features Available :-
   // and match the configs to your heart's desire.
   const mainnetConfig = ChainFactoryConfigs.MainNet; // You can also call the ChainFactoryConfigs.MainNet
 
-  // Create an object with the following details
-  const Config = {
-    exchangeRateUri:  "https://testing-bridge.xp.network/exchange/",
-    moralisServer:    "https://azz9akudh6cf.usemoralis.com:2053/server",
-    moralisAppId:     "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
-    tronScanUri:      "https://apilist.tronscan.org/api/",
-    heartbeatUri:     "https://xpheartbeat.herokuapp.com"
-  };
   // Instantiate the factory by populating the function call with the above objects.
   const factory = ChainFactory(Config, mainnetConfig());
   ```
@@ -194,6 +186,25 @@ This operation does not depend on a wallet, since reading operations are free an
     contract: "Can be fetched from the mainnetConfig or testnetConfig",
   });
   ```
+
   <hr/>
 
   P.S. The library is a work in progress. More features will be added soon.
+
+ <hr/>
+
+  ## Troubleshooting 
+
+- In case you're using the library in a console application and getting errors, go to:
+  
+- node_modules/xpnet-nft-list/dist/nft-list/model/moralis/MoralisNftListService.js
+
+Now your line #7 looks like this (to be used in the FE):
+```javascript
+7   const moralis_1 = __importDefault(require("moralis"));
+```
+
+Change it like so (for BE usage):
+```javascript
+7   const moralis_1 = __importDefault(require("moralis/node"));
+```
