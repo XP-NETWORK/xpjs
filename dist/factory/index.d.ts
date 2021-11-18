@@ -12,7 +12,7 @@ declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigN
  * A type representing a chain factory.
  *
  */
-declare type ChainFactory = {
+export declare type ChainFactory = {
     /**
      * Creates an helper factory for a given chain
      * @type T: Either {@link ElrondHelper} | {@link Web3Helper} | {@link TronHelper} as required.
