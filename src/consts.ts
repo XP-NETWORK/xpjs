@@ -1,9 +1,8 @@
 import { CrossChainHelper } from ".";
-import { elrondHelperFactory, ElrondParams } from "./helpers/elrond";
-import { tronHelperFactory, TronParams } from "./helpers/tron";
-import { web3HelperFactory, Web3Params } from "./helpers/web3";
+import { elrondHelperFactory, ElrondParams, ElrondHelper } from "./helpers/elrond";
+import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
+import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { ElrondHelper, Web3Helper, TronHelper } from "validator";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {

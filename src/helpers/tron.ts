@@ -28,7 +28,6 @@ import {
   XPNft__factory,
 } from "xpnet-web3-contracts";
 import { Approve, IsApproved, NftMintArgs, ValidateAddress } from "..";
-import { NftEthNative, NftPacked } from "validator";
 import {
   ChainNonceGet,
   NftInfo
