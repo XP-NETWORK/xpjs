@@ -27,7 +27,6 @@ import {
   TransactionResponse,
   Provider,
 } from "@ethersproject/providers";
-import { NftEthNative, NftPacked } from "validator";
 import {
   Minter__factory,
   UserNftMinter,
