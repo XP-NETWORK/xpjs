@@ -34,12 +34,7 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import {
-  ChainNonceGet,
-  EstimateTxFees,
-  NftInfo,
-  ValidateAddress,
-} from "..";
+import { ChainNonceGet, EstimateTxFees, NftInfo, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 import axios from "axios";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
@@ -110,19 +105,9 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<Signer, string, BigNumber> &
-  TransferNftForeign<
-    Signer,
-    string,
-    BigNumber,
-    EthNftInfo
-  > &
+  TransferNftForeign<Signer, string, BigNumber, EthNftInfo> &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<
-    Signer,
-    string,
-    BigNumber,
-    EthNftInfo
-  > &
+  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -230,7 +215,7 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     signer: Signer
   ) => {
-    const erc = UserNftMinter__factory.connect(id.native.contract, signer)
+    const erc = UserNftMinter__factory.connect(id.native.contract, signer);
     const approvedAddress = await erc.getApproved(id.native.tokenId);
     if (approvedAddress === minter_addr) {
       return true;
@@ -238,20 +223,14 @@ export async function web3HelperFactory(
     return false;
   };
 
-  const approveForMinter = async (
-    id: NftInfo<EthNftInfo>,
-    sender: Signer
-  ) => {
+  const approveForMinter = async (id: NftInfo<EthNftInfo>, sender: Signer) => {
     const isApproved = await isApprovedForMinter(id, sender);
-    const erc = UserNftMinter__factory.connect(id.native.contract, sender)
+    const erc = UserNftMinter__factory.connect(id.native.contract, sender);
     if (isApproved) {
       return true;
     }
 
-    const receipt = await erc.approve(
-      minter_addr,
-      id.native.tokenId
-    );
+    const receipt = await erc.approve(minter_addr, id.native.tokenId);
     await receipt.wait();
     return true;
   };
@@ -272,7 +251,9 @@ export async function web3HelperFactory(
       return new BigNumber(bal.toString());
     },
     isWrappedNft(nft) {
-      return nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase();
+      return (
+        nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase()
+      );
     },
     async balanceWrappedBatch(
       address: string,
@@ -363,7 +344,9 @@ export async function web3HelperFactory(
       to: string,
       nftUri: string
     ): Promise<BigNumber> {
-      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(nftUri);
+      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
+        nftUri
+      );
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,
@@ -375,6 +358,6 @@ export async function web3HelperFactory(
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
-    }
+    },
   };
 }
