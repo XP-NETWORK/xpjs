@@ -207,9 +207,9 @@ var ChainFactoryConfigs;
         },
         xDaiParams: {
             provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.MainNetRpcUri.XDAI),
-            minter_addr: "0xcE0066b1008237625dDDBE4a751827de037E53D2",
-            erc1155_addr: "0x7B4f352Cd40114f12e82fC675b5BA8C7582FC513",
-            erc721_addr: "0xAdE429ba898c34722e722415D722A70a297cE3a2",
+            minter_addr: "0x14fb9d669d4ddf712f1c56Ba7C54FF82D9be6377",
+            erc1155_addr: "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
+            erc721_addr: "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
             validators: EVM_VALIDATORS,
             nonce: consts_1.Chain.XDAI,
         },
