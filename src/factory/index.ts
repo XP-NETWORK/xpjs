@@ -1,7 +1,14 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
+import {
+  Chain,
+  ChainNonce,
+  CHAIN_INFO,
+  ElrondNonce,
+  TronNonce,
+  Web3Nonce,
+} from "../consts";
 export * from "./factories";
 
 import {
@@ -23,9 +30,10 @@ import {
   moralisNftList,
   tronListNft,
 } from "./cons";
-import { Address } from "@elrondnetwork/erdjs/out";
+import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
+import { Wallet } from "ethers";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -81,11 +89,11 @@ export type ChainFactory = {
    * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
    */
-  mint<Signer, R>(
-    chain: MintNft<Signer, NftMintArgs, R>,
+  mint<Signer>(
+    chain: MintNft<Signer, NftMintArgs, string>,
     owner: Signer,
     args: NftMintArgs
-  ): Promise<R>;
+  ): Promise<string>;
   /**
    * Lists all the NFTs on the chain owner by {@param owner}.
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
@@ -114,6 +122,8 @@ export type ChainFactory = {
    * @param params : New Params to be set.
    */
   updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
+  nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
+  pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
 };
 
 /**
@@ -288,7 +298,65 @@ export function ChainFactory(
     }
   }
 
+  function nonceToChainNonce(
+    nonce: number
+  ): ElrondNonce | Web3Nonce | TronNonce {
+    switch (nonce) {
+      case 2: {
+        return Chain.ELROND;
+      }
+      case 3: {
+        return Chain.HECO;
+      }
+      case 4: {
+        return Chain.BSC;
+      }
+      case 5: {
+        return Chain.ETHEREUM;
+      }
+      case 6: {
+        return Chain.AVALANCHE;
+      }
+      case 7: {
+        return Chain.POLYGON;
+      }
+      case 8: {
+        return Chain.FANTOM;
+      }
+      case 9: {
+        return Chain.TRON;
+      }
+      case 11: {
+        return Chain.CELO;
+      }
+      case 12: {
+        return Chain.HARMONY;
+      }
+      case 14: {
+        return Chain.XDAI;
+      }
+      default: {
+        throw Error(`unknown chain ${nonce}`);
+      }
+    }
+  }
+
   return {
+    nonceToChainNonce,
+    pkeyToSigner(nonce, key) {
+      let chain = nonceToChainNonce(nonce);
+      switch (chain) {
+        case Chain.ELROND: {
+          return UserSigner.fromPem(key);
+        }
+        case Chain.TRON: {
+          return key;
+        }
+        default: {
+          return new Wallet(key);
+        }
+      }
+    },
     estimateFees,
     inner,
     bridgeStatus,
@@ -360,11 +428,11 @@ export function ChainFactory(
       }
     },
     mint: async <Signer>(
-      chain: MintNft<Signer, NftMintArgs, any>,
+      chain: MintNft<Signer, NftMintArgs, string>,
       owner: Signer,
       args: NftMintArgs
-    ): Promise<any> => {
-      return chain.mintNft(owner, args);
+    ): Promise<string> => {
+      return await chain.mintNft(owner, args);
     },
   };
 }

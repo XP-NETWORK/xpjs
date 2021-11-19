@@ -46,7 +46,7 @@ export type MinterRes = {
 };
 
 export type BaseTronHelper = BalanceCheck<string, BigNumber> &
-  MintNft<TronSender, NftMintArgs, any> & {
+  MintNft<TronSender, NftMintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract
@@ -131,13 +131,14 @@ export async function baseTronHelperFactory(
   };
 
   return {
-    async mintNft(owner: TronSender, options: NftMintArgs): Promise<any> {
+    async mintNft(owner: TronSender, options: NftMintArgs): Promise<string> {
       setSigner(owner);
       const erc = await provider.contract(
         UserNftMinter__factory.abi,
         options.contract
       );
-      await erc.mint(options.uris[0]).send();
+      const res = await erc.mint(options.uris[0]).send();
+      return res;
     },
     async balance(address: string): Promise<BigNumber> {
       const balance = await provider.trx.getBalance(address);
