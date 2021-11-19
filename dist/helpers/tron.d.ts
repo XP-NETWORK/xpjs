@@ -11,7 +11,7 @@ export declare type MinterRes = {
     xpnet: string;
     whitelist: string[];
 };
-export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<TronSender, NftMintArgs, any> & {
+export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<TronSender, NftMintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract

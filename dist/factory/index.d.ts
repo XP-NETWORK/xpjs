@@ -1,10 +1,12 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { ChainNonce } from "../consts";
+import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
+import { UserSigner } from "@elrondnetwork/erdjs/out";
+import { Wallet } from "ethers";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
@@ -42,7 +44,7 @@ export declare type ChainFactory = {
      * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
      * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
      */
-    mint<Signer, R>(chain: MintNft<Signer, NftMintArgs, R>, owner: Signer, args: NftMintArgs): Promise<R>;
+    mint<Signer>(chain: MintNft<Signer, NftMintArgs, string>, owner: Signer, args: NftMintArgs): Promise<string>;
     /**
      * Lists all the NFTs on the chain owner by {@param owner}.
      * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
@@ -63,6 +65,8 @@ export declare type ChainFactory = {
      * @param params : New Params to be set.
      */
     updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
+    nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
+    pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
 };
 /**
  * A type representing all the supported chain params.
