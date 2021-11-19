@@ -59,12 +59,7 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<
-  Signer,
-  ForeignAddr,
-  Balance,
-  RawNft
-> {
+export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft> {
   transferNftToForeign(
     sender: Signer,
     chain_nonce: number,
@@ -84,12 +79,7 @@ export interface TransferNftForeign<
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<
-  Signer,
-  ForeignAddr,
-  Balance,
-  RawNft
-> {
+export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft> {
   unfreezeWrappedNft(
     sender: Signer,
     to: ForeignAddr,
@@ -151,7 +141,10 @@ export interface ValidateAddress {
 }
 
 export interface EstimateTxFees<Balance> {
-  estimateValidateTransferNft(to: string, metadataUri: string): Promise<Balance>;
+  estimateValidateTransferNft(
+    to: string,
+    metadataUri: string
+  ): Promise<Balance>;
   estimateValidateUnfreezeNft(
     to: string,
     metadataUri: string

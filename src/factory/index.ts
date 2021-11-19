@@ -2,7 +2,7 @@ import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { Chain, ChainNonce, CHAIN_INFO } from "../consts";
-export * from "./factories"
+export * from "./factories";
 
 import {
   ChainNonceGet,
@@ -17,15 +17,19 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { elrondNftList, exchangeRateRepo, moralisNftList, tronListNft } from "./cons";
+import {
+  elrondNftList,
+  exchangeRateRepo,
+  moralisNftList,
+  tronListNft,
+} from "./cons";
 import { Address } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
-type NftUriChain<RawNft> = ChainNonceGet &
-  WrappedNftCheck<RawNft>;
+type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
 type FullChain<Signer, RawNft> = TransferNftForeign<
   Signer,
@@ -105,7 +109,7 @@ export type ChainFactory = {
     receiver: string
   ): Promise<BigNumber>;
   /**
-   * 
+   *
    * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
    * @param params : New Params to be set.
    */
@@ -138,12 +142,12 @@ export interface ChainParams {
  * @field tronScanUri: The URI of the tron scan service.
  */
 export interface AppConfig {
-  exchangeRateUri: string,
-  heartbeatUri: string,
-  moralisServer: string,
-  moralisAppId: string,
-  tronScanUri: string,
-  moralisSecret?: string,
+  exchangeRateUri: string;
+  heartbeatUri: string;
+  moralisServer: string;
+  moralisAppId: string;
+  tronScanUri: string;
+  moralisSecret?: string;
 }
 
 function mapNonceToParams(
@@ -177,7 +181,7 @@ function mapNonceToParams(
  */
 export function ChainFactory(
   appConfig: AppConfig,
-  chainParams: Partial<ChainParams>,
+  chainParams: Partial<ChainParams>
 ): ChainFactory {
   let map = new Map<number, CrossChainHelper>();
   let cToP = mapNonceToParams(chainParams);
@@ -186,13 +190,19 @@ export function ChainFactory(
 
   const remoteExchangeRate = exchangeRateRepo(appConfig.exchangeRateUri);
 
-  const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || '');
-  const moralisNftRepo = moralisNftList(appConfig.moralisServer, appConfig.moralisAppId, appConfig.moralisSecret);
-  const tronNftRepo = chainParams.tronParams && tronListNft(
-    chainParams.tronParams.provider,
-    appConfig.tronScanUri,
-    chainParams.tronParams.erc721_addr
+  const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || "");
+  const moralisNftRepo = moralisNftList(
+    appConfig.moralisServer,
+    appConfig.moralisAppId,
+    appConfig.moralisSecret
   );
+  const tronNftRepo =
+    chainParams.tronParams &&
+    tronListNft(
+      chainParams.tronParams.provider,
+      appConfig.tronScanUri,
+      chainParams.tronParams.erc721_addr
+    );
 
   const nftlistRest = axios.create({
     baseURL: "https://nft-list.herokuapp.com/",
@@ -256,15 +266,17 @@ export function ChainFactory(
   async function bridgeStatus(): Promise<{ [x: number]: "alive" | "dead" }> {
     const res = await heartbeatRepo.status();
     return Object.fromEntries(
-      Object.entries(res)
-        .map(([c, s]) => [c, s.bridge_alive ? "alive" : "dead"])
+      Object.entries(res).map(([c, s]) => [
+        c,
+        s.bridge_alive ? "alive" : "dead",
+      ])
     );
   }
 
   async function requireBridge(chains: number[]): Promise<void> {
     const status = await heartbeatRepo.status();
     let deadChain: number | undefined;
-    const alive = chains.every(c => {
+    const alive = chains.every((c) => {
       const stat = status[c].bridge_alive;
       if (!stat) {
         deadChain = c;
@@ -288,17 +300,28 @@ export function ChainFactory(
       let res: NftInfo<T>[];
       switch (chain.getNonce()) {
         case Chain.ELROND:
-          res = await elrondNftRepo.nfts(BigInt(chain.getNonce()), new Address(owner)) as any as NftInfo<T>[];
+          res = (await elrondNftRepo.nfts(
+            BigInt(chain.getNonce()),
+            new Address(owner)
+          )) as any as NftInfo<T>[];
           break;
         case Chain.TRON:
-          res = await tronNftRepo!.nfts(BigInt(0x9), owner) as any as NftInfo<T>[];
+          res = (await tronNftRepo!.nfts(
+            BigInt(0x9),
+            owner
+          )) as any as NftInfo<T>[];
           break;
         case Chain.FANTOM:
         case Chain.XDAI:
-          res = await nftlistRest.get(`/web3/${chain.getNonce()}/${owner}`).then(v => v.data);
+          res = await nftlistRest
+            .get(`/web3/${chain.getNonce()}/${owner}`)
+            .then((v) => v.data);
           break;
         default:
-          res = await moralisNftRepo.nfts(BigInt(chain.getNonce()), owner) as any as NftInfo<T>[];
+          res = (await moralisNftRepo.nfts(
+            BigInt(chain.getNonce()),
+            owner
+          )) as any as NftInfo<T>[];
           break;
       }
 
@@ -310,8 +333,8 @@ export function ChainFactory(
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
       }
-      if (!await toChain.validateAddress(receiver)) {
-        throw Error('invalid address');
+      if (!(await toChain.validateAddress(receiver))) {
+        throw Error("invalid address");
       }
       if (fromChain.isWrappedNft(nft)) {
         const meta = await axios.get<Erc721MetadataEx<unknown>>(nft.uri);

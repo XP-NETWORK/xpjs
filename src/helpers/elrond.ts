@@ -23,7 +23,7 @@ import {
   TransactionHash,
   TransactionPayload,
   U64Value,
-  WalletConnectProvider
+  WalletConnectProvider,
 } from "@elrondnetwork/erdjs";
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -39,12 +39,7 @@ import {
   WrappedNftCheck,
 } from "./chain";
 import { Base64 } from "js-base64";
-import {
-  ChainNonceGet,
-  EstimateTxFees,
-  NftInfo,
-  ValidateAddress,
-} from "..";
+import { ChainNonceGet, EstimateTxFees, NftInfo, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 
 type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
@@ -174,7 +169,11 @@ export interface SetESDTRoles {
    * @param token  ESDT Identifier
    * @param roles  Roles to set
    */
-  setESDTRole(sender: ElrondSigner, token: string, roles: [ESDTRole]): Promise<void>;
+  setESDTRole(
+    sender: ElrondSigner,
+    token: string,
+    roles: [ESDTRole]
+  ): Promise<void>;
 }
 
 /**
@@ -189,18 +188,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
   TransferForeign<ElrondSigner, string, BigNumber> &
   UnfreezeForeign<ElrondSigner, string, BigNumber> &
-  TransferNftForeign<
-    ElrondSigner,
-    string,
-    BigNumber,
-    EsdtNftInfo
-  > &
-  UnfreezeForeignNft<
-    ElrondSigner,
-    string,
-    BigNumber,
-    EsdtNftInfo
-  > &
+  TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo> &
+  UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo> &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, Transaction> & {
     mintableEsdts(address: Address): Promise<string[]>;
@@ -254,10 +243,7 @@ export const elrondHelperFactory: (
     return account;
   };
 
-  const signAndSend = async (
-    signer: ElrondSigner,
-    tx: Transaction
-  ) => {
+  const signAndSend = async (signer: ElrondSigner, tx: Transaction) => {
     const acc = await syncAccount(signer);
     tx.setNonce(acc.nonce);
     let stx: Transaction;
@@ -587,7 +573,7 @@ export const elrondHelperFactory: (
   }
 
   async function getAddress(sender: ElrondSigner): Promise<Address> {
-    return new Address(await sender.getAddress())
+    return new Address(await sender.getAddress());
   }
 
   return {
@@ -705,8 +691,14 @@ export const elrondHelperFactory: (
       const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8");
     },
-    async mintNft(owner: ElrondSigner, args: NftMintArgs): Promise<Transaction> {
-      const txu = unsignedMintNftTxn(await getAddress(owner), args as NftIssueArgs);
+    async mintNft(
+      owner: ElrondSigner,
+      args: NftMintArgs
+    ): Promise<Transaction> {
+      const txu = unsignedMintNftTxn(
+        await getAddress(owner),
+        args as NftIssueArgs
+      );
 
       return await signAndSend(owner, txu);
     },
@@ -736,10 +728,7 @@ export const elrondHelperFactory: (
     getNonce() {
       return elrondParams.nonce;
     },
-    async estimateValidateTransferNft(
-      _toAddress: string,
-      _nftUri: string
-    ) {
+    async estimateValidateTransferNft(_toAddress: string, _nftUri: string) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
     async estimateValidateUnfreezeNft(_to: string, _nftUri: string) {
@@ -753,13 +742,14 @@ export const elrondHelperFactory: (
     async validateAddress(adr: string) {
       try {
         new Address(adr);
-        return await providerRest.get(`/address/${adr}/esdt`)
-          .then(_ => true)
-          .catch(_ => false);
+        return await providerRest
+          .get(`/address/${adr}/esdt`)
+          .then((_) => true)
+          .catch((_) => false);
       } catch (_) {
         return false;
       }
-    }
+    },
   };
 };
 

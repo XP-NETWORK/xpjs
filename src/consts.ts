@@ -1,5 +1,9 @@
 import { CrossChainHelper } from ".";
-import { elrondHelperFactory, ElrondParams, ElrondHelper } from "./helpers/elrond";
+import {
+  elrondHelperFactory,
+  ElrondParams,
+  ElrondHelper,
+} from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
@@ -16,7 +20,7 @@ export enum TestNetRpcUri {
   TRON = "https://api.shasta.trongrid.io/",
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
-  XDAI = "https://sokol.poa.network"
+  XDAI = "https://sokol.poa.network",
 }
 
 export enum MainNetRpcUri {
@@ -30,7 +34,7 @@ export enum MainNetRpcUri {
   TRON = "https://api.trongrid.io/",
   CELO = "https://forno.celo.org",
   HARMONY = "https://api.harmony.one",
-  XDAI = "https://rpc.xdaichain.com/"
+  XDAI = "https://rpc.xdaichain.com/",
 }
 
 export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
@@ -189,13 +193,13 @@ export const CHAIN_INFO: ChainInfo = {
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.STAKE,
     validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
-  }
+  },
 };
 
 export const Config = {
-  exchangeRateUri:  "https://testing-bridge.xp.network/exchange/",
-  moralisServer:    "https://azz9akudh6cf.usemoralis.com:2053/server",
-  moralisAppId:     "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
-  tronScanUri:      "https://apilist.tronscan.org/api/",
-  heartbeatUri:     "https://xpheartbeat.herokuapp.com"
+  exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+  moralisServer: "https://azz9akudh6cf.usemoralis.com:2053/server",
+  moralisAppId: "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
+  tronScanUri: "https://apilist.tronscan.org/api/",
+  heartbeatUri: "https://xpheartbeat.herokuapp.com",
 };

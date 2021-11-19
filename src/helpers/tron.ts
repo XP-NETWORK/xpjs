@@ -28,10 +28,7 @@ import {
   XPNft__factory,
 } from "xpnet-web3-contracts";
 import { Approve, IsApproved, NftMintArgs, ValidateAddress } from "..";
-import {
-  ChainNonceGet,
-  NftInfo
-} from "..";
+import { ChainNonceGet, NftInfo } from "..";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 
 // Uses default private key in provider if sender is undefinedd
@@ -87,7 +84,8 @@ export type TronHelper = BaseTronHelper &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
   Approve<TronSender> &
-  ValidateAddress & IsApproved<TronSender>;
+  ValidateAddress &
+  IsApproved<TronSender>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -286,7 +284,7 @@ export async function tronHelperFactory(
       id.native.contract
     );
     const approvedAddress = await erc.getApproved(id.native.tokenId).call({
-      from: tronParams.provider.defaultAddress.base58
+      from: tronParams.provider.defaultAddress.base58,
     });
     if (approvedAddress === minter_addr) {
       return true;
@@ -308,10 +306,7 @@ export async function tronHelperFactory(
       return true;
     }
 
-    await erc.approve(
-      minter_addr,
-      id.native.tokenId
-    ).send();
+    await erc.approve(minter_addr, id.native.tokenId).send();
 
     return true;
   };
@@ -320,7 +315,10 @@ export async function tronHelperFactory(
     ...base,
     approveForMinter,
     isWrappedNft(nft) {
-      return nft.native.contract.toLowerCase() === tronParams.erc721_addr.toLowerCase();
+      return (
+        nft.native.contract.toLowerCase() ===
+        tronParams.erc721_addr.toLowerCase()
+      );
     },
     isApprovedForMinter,
     async transferNativeToForeign(
@@ -431,20 +429,25 @@ export async function tronHelperFactory(
       to: string,
       nftUri: string
     ): Promise<BigNumber> {
-      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(nftUri);
+      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
+        nftUri
+      );
       return await estimateGas(
         tronParams.validators,
         "validateUnfreezeNft(uint128,address,uint256,address)",
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },
-          { type: "uint256", value: EthBN.from(wrappedData.data.wrapped.tokenId) },
+          {
+            type: "uint256",
+            value: EthBN.from(wrappedData.data.wrapped.tokenId),
+          },
           { type: "address", value: wrappedData.data.wrapped.contract },
         ]
       );
     },
     async validateAddress(adr: string): Promise<boolean> {
       return provider.isAddress(adr);
-    }
+    },
   };
 }
