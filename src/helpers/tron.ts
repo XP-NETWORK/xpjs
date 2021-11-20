@@ -27,7 +27,13 @@ import {
   XPNet__factory,
   XPNft__factory,
 } from "xpnet-web3-contracts";
-import { Approve, IsApproved, NftMintArgs, ValidateAddress } from "..";
+import {
+  Approve,
+  ExtractTxn,
+  IsApproved,
+  NftMintArgs,
+  ValidateAddress,
+} from "..";
 import { ChainNonceGet, NftInfo } from "..";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 
@@ -85,7 +91,8 @@ export type TronHelper = BaseTronHelper &
   ChainNonceGet &
   Approve<TronSender> &
   ValidateAddress &
-  IsApproved<TronSender>;
+  IsApproved<TronSender> &
+  ExtractTxn<string>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -314,6 +321,7 @@ export async function tronHelperFactory(
 
   return {
     ...base,
+    extractTxn,
     approveForMinter,
     isWrappedNft(nft) {
       return (

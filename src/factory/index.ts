@@ -14,6 +14,7 @@ export * from "./factories";
 import {
   ChainNonceGet,
   EstimateTxFees,
+  ExtractTxn,
   MintNft,
   NftInfo,
   TransferNftForeign,
@@ -124,6 +125,10 @@ export type ChainFactory = {
   updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
   nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
   pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
+  getDestinationTransaction<Txn>(
+    hash: Txn,
+    nonce: ExtractTxn<Txn>
+  ): Promise<[string, string]>;
 };
 
 /**
@@ -342,6 +347,9 @@ export function ChainFactory(
   }
 
   return {
+    getDestinationTransaction<T>(hash: T, chain: ExtractTxn<T>) {
+      return chain.extractTxn(hash);
+    },
     nonceToChainNonce,
     pkeyToSigner(nonce, key) {
       let chain = nonceToChainNonce(nonce);
