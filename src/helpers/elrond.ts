@@ -192,10 +192,22 @@ type EventIdent = string;
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ElrondSigner, string, BigNumber> &
+  TransferForeign<ElrondSigner, string, BigNumber, Transaction> &
   UnfreezeForeign<ElrondSigner, string, BigNumber> &
-  TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo> &
-  UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo> &
+  TransferNftForeign<
+    ElrondSigner,
+    string,
+    BigNumber,
+    EsdtNftInfo,
+    Transaction
+  > &
+  UnfreezeForeignNft<
+    ElrondSigner,
+    string,
+    BigNumber,
+    EsdtNftInfo,
+    Transaction
+  > &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
@@ -611,7 +623,7 @@ export const elrondHelperFactory: (
       to: string,
       value: EasyBalance,
       txFees: EasyBalance
-    ): Promise<string> {
+    ): Promise<Transaction> {
       const txu = unsignedTransferTxn(
         chain_nonce,
         to,
@@ -619,7 +631,7 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return tx.getHash().toString();
+      return tx;
     },
     async unfreezeWrapped(
       sender: ElrondSigner,
@@ -647,7 +659,7 @@ export const elrondHelperFactory: (
       to: string,
       info: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
-    ): Promise<string> {
+    ): Promise<Transaction> {
       const txu = unsignedTransferNftTxn(
         chain_nonce,
         await getAddress(sender),
@@ -657,14 +669,14 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return tx.getHash().toString();
+      return tx;
     },
     async unfreezeWrappedNft(
       sender: ElrondSigner,
       to: string,
       nft: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
-    ): Promise<string> {
+    ): Promise<Transaction> {
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,
@@ -673,7 +685,7 @@ export const elrondHelperFactory: (
       );
       const tx = await signAndSend(sender, txu);
 
-      return tx.getHash().toString();
+      return tx;
     },
     unsignedIssueESDTNft,
     async issueESDTNft(

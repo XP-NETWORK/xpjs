@@ -40,13 +40,14 @@ export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
 type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
-type FullChain<Signer, RawNft> = TransferNftForeign<
+type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
   string,
   BigNumber,
-  RawNft
+  RawNft,
+  Resp
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft> &
+  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
   EstimateTxFees<BigNumber> &
   NftUriChain<RawNft> &
   ValidateAddress;
@@ -76,14 +77,14 @@ export type ChainFactory = {
    * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    */
-  transferNft<SignerF, RawNftF, SignerT, RawNftT>(
-    fromChain: FullChain<SignerF, RawNftF>,
-    toChain: FullChain<SignerT, RawNftT>,
+  transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
     fee?: BigNumber
-  ): Promise<string>;
+  ): Promise<Resp>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -111,9 +112,9 @@ export type ChainFactory = {
    * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
    * @param receiver: Address of the receiver of the NFT in raw string..
    */
-  estimateFees<SignerF, RawNftF, SignerT, RawNftT>(
-    fromChain: FullChain<SignerF, RawNftF>,
-    toChain: FullChain<SignerT, RawNftT>,
+  estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
@@ -247,9 +248,9 @@ export function ChainFactory(
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT>(
-    fromChain: FullChain<SignerF, RawNftF>,
-    toChain: FullChain<SignerT, RawNftT>,
+  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {
