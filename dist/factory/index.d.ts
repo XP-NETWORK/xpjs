@@ -3,7 +3,7 @@ import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
-import { ChainNonceGet, EstimateTxFees, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractTxn, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Wallet } from "ethers";
@@ -67,6 +67,7 @@ export declare type ChainFactory = {
     updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
     nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
     pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
+    getDestinationTransaction<Txn>(hash: Txn, nonce: ExtractTxn<Txn>): Promise<[string, string]>;
 };
 /**
  * A type representing all the supported chain params.

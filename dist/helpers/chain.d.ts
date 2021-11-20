@@ -108,3 +108,6 @@ export declare function ConcurrentSendError(): Error;
 export interface ChainNonceGet {
     getNonce(): number;
 }
+export interface ExtractTxn<Txn> {
+    extractTxn(txn: Txn): Promise<[string, string]>;
+}
