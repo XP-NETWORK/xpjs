@@ -36,6 +36,7 @@ import {
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
+import { Transaction } from "ethers";
 
 // Uses default private key in provider if sender is undefinedd
 type TronSender = string | undefined;
@@ -80,12 +81,12 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
 export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<TronSender, string, BigNumber> &
+  TransferForeign<TronSender, string, BigNumber, string> &
   // TODO: Use TX Fees
-  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo> &
+  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> &
   // TODO: Use TX Fees
   UnfreezeForeign<TronSender, string, string> &
-  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo> &
+  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -368,7 +369,7 @@ export async function tronHelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<string> {
+    ): Promise<Transaction> {
       setSigner(sender);
       const res = await minter
         .withdrawNft(to, id.native.tokenId)

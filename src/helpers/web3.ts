@@ -21,6 +21,7 @@ import {
   Wallet,
   ContractTransaction,
   ethers,
+  Transaction,
 } from "ethers";
 import {
   TransactionReceipt,
@@ -110,10 +111,10 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<Signer, string, BigNumber> &
-  TransferNftForeign<Signer, string, BigNumber, EthNftInfo> &
+  TransferForeign<Signer, string, BigNumber, Transaction> &
+  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> &
+  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -282,13 +283,13 @@ export async function web3HelperFactory(
       to: string,
       value: BigNumber,
       txFees: BigNumber
-    ): Promise<string> {
+    ): Promise<Transaction> {
       const val = EthBN.from(value.toString());
       const totalVal = val.add(EthBN.from(txFees.toString()));
       const res = await minter.connect(sender).freeze(chain_nonce, to, val, {
         value: totalVal,
       });
-      return res.hash;
+      return res;
     },
     async transferNftToForeign(
       sender: Signer,
@@ -296,7 +297,7 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<string> {
+    ): Promise<Transaction> {
       await approveForMinter(id, sender);
 
       const txr = await minter
@@ -305,7 +306,7 @@ export async function web3HelperFactory(
           value: EthBN.from(txFees.toString()),
         });
 
-      return txr.hash;
+      return txr;
     },
     async unfreezeWrapped(
       sender: Signer,
@@ -327,14 +328,14 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<string> {
+    ): Promise<Transaction> {
       const res = await minter
         .connect(sender)
         .withdrawNft(to, id.native.tokenId, {
           value: EthBN.from(txFees.toString()),
         });
 
-      return res.hash;
+      return res;
     },
     async estimateValidateTransferNft(
       to: string,
