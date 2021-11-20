@@ -67,7 +67,7 @@ export declare type ChainFactory = {
     updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
     nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
     pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
-    getDestinationTransaction<Txn>(hash: Txn, nonce: ExtractTxn<Txn>): Promise<[string, string]>;
+    getDestinationTransaction<Txn>(hash: Txn, chain: ExtractTxn<Txn>): Promise<[string, string]>;
 };
 /**
  * A type representing all the supported chain params.
