@@ -127,7 +127,7 @@ export type ChainFactory = {
   pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
   getDestinationTransaction<Txn>(
     hash: Txn,
-    nonce: ExtractTxn<Txn>
+    chain: ExtractTxn<Txn>
   ): Promise<[string, string]>;
 };
 
