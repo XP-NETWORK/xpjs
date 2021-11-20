@@ -1,6 +1,3 @@
-import { Signer } from "ethers";
-import { UserNftMinter } from "xpnet-web3-contracts";
-
 /**
  * NFT Info
  */
@@ -157,4 +154,8 @@ export function ConcurrentSendError(): Error {
 
 export interface ChainNonceGet {
   getNonce(): number;
+}
+
+export interface ExtractTxn<Txn> {
+  extractTxn(txn: Txn): Promise<[string, string]>;
 }

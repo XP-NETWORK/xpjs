@@ -34,7 +34,13 @@ import {
   XPNet__factory,
 } from "xpnet-web3-contracts";
 import { Base64 } from "js-base64";
-import { ChainNonceGet, EstimateTxFees, NftInfo, ValidateAddress } from "..";
+import {
+  ChainNonceGet,
+  EstimateTxFees,
+  ExtractTxn,
+  NftInfo,
+  ValidateAddress,
+} from "..";
 import { NftMintArgs } from "..";
 import axios from "axios";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
@@ -113,7 +119,8 @@ export type Web3Helper = BaseWeb3Helper &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
-  ValidateAddress;
+  ValidateAddress &
+  ExtractTxn<TransactionResponse>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -176,9 +183,8 @@ export async function web3HelperFactory(
   const erc1155 = XPNet__factory.connect(erc1155_addr, provider);
 
   async function extractTxn(
-    txr: TransactionResponse,
-    _evName: string
-  ): Promise<[TransactionReceipt, string]> {
+    txr: TransactionResponse
+  ): Promise<[string, string]> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
@@ -187,7 +193,7 @@ export async function web3HelperFactory(
 
     const evdat = minter.interface.parseLog(log);
     const action_id: string = evdat.args[0].toString();
-    return [receipt, action_id];
+    return [receipt.transactionHash, action_id];
   }
 
   const randomAction = () =>
@@ -242,6 +248,7 @@ export async function web3HelperFactory(
     ...base,
     approveForMinter,
     isApprovedForMinter,
+    extractTxn,
     getNonce: () => params.nonce,
     async balanceWrapped(
       address: string,
