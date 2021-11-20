@@ -9,7 +9,7 @@ import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Wallet } from "ethers";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
-declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
+declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
 /**
  * A type representing a chain factory.
  *
@@ -37,7 +37,7 @@ export declare type ChainFactory = {
      * @param sender {@link Sender} The owner of the NFT.
      * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
      */
-    transferNft<SignerF, RawNftF, SignerT, RawNftT>(fromChain: FullChain<SignerF, RawNftF>, toChain: FullChain<SignerT, RawNftT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber): Promise<string>;
+    transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber): Promise<Resp>;
     /**
      * Mints an NFT on the chain.
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -58,7 +58,7 @@ export declare type ChainFactory = {
      * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
      * @param receiver: Address of the receiver of the NFT in raw string..
      */
-    estimateFees<SignerF, RawNftF, SignerT, RawNftT>(fromChain: FullChain<SignerF, RawNftF>, toChain: FullChain<SignerT, RawNftT>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
+    estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
     /**
      *
      * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
