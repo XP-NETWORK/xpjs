@@ -3,6 +3,7 @@ import { ElrondParams, ElrondHelper } from "./helpers/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
+import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -33,6 +34,7 @@ export declare type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
+export declare type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandArgs>;
 export declare namespace Chain {
     const ELROND: ElrondNonce;
     const HECO: Web3Nonce;
@@ -45,6 +47,7 @@ export declare namespace Chain {
     const CELO: Web3Nonce;
     const HARMONY: Web3Nonce;
     const XDAI: Web3Nonce;
+    const ALGORAND: AlgoNonce;
 }
 interface ChainData {
     name: string;

@@ -7,6 +7,7 @@ import { ChainNonceGet, EstimateTxFees, ExtractTxn, MintNft, NftInfo, TransferNf
 import BigNumber from "bignumber.js";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Wallet } from "ethers";
+import { AlgorandArgs } from "../helpers/algorand";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
@@ -85,6 +86,7 @@ export interface ChainParams {
     harmonyParams: Web3Params;
     ontologyParams: Web3Params;
     xDaiParams: Web3Params;
+    algorandParams: AlgorandArgs;
 }
 /**
  * A struct for the configuration of the library.
