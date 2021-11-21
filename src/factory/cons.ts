@@ -5,6 +5,9 @@ import {
   NetworkModel,
 } from "crypto-exchange-rate";
 import {
+  algoAssetMapper,
+  algoNftListService,
+  AlgorandNftListRepo, 
   ElrdNftListRepo,
   elrdNftListService,
   elrdRawTokenMapper,
@@ -18,7 +21,6 @@ import {
   NftListRepo,
   nftListRepo,
   trxNftListService,
-  TrxNftListService,
 } from "xpnet-nft-list";
 //@ts-expect-error no types cope
 import TronWeb from "tronweb";
@@ -53,6 +55,14 @@ export function tronListNft(
     ethNftJMapper(),
     mockChainIdentMapper()
   );
+}
+
+export function algoListNft(baseURL: string): AlgorandNftListRepo {
+    return nftListRepo(
+        algoNftListService(baseURL),
+        algoAssetMapper(),
+        mockChainIdentMapper()
+    )
 }
 
 export function exchangeRateRepo(baseUrl: string): ExchangeRateRepo {

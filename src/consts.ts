@@ -7,6 +7,7 @@ import {
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
+import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -21,6 +22,7 @@ export enum TestNetRpcUri {
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
   XDAI = "https://sokol.poa.network",
+  // TODO: Algorand
 }
 
 export enum MainNetRpcUri {
@@ -35,12 +37,14 @@ export enum MainNetRpcUri {
   CELO = "https://forno.celo.org",
   HARMONY = "https://api.harmony.one",
   XDAI = "https://rpc.xdaichain.com/",
+  // TODO: Algorand
 }
 
 export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
 export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export type TronNonce = ChainNonce<TronHelper, TronParams>;
+export type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandArgs>;
 
 export namespace Chain {
   export const ELROND: ElrondNonce = 2;
@@ -54,6 +58,7 @@ export namespace Chain {
   export const CELO: Web3Nonce = 0xb;
   export const HARMONY: Web3Nonce = 0xc;
   export const XDAI: Web3Nonce = 0xe;
+  export const ALGORAND: AlgoNonce = 0xf;
 }
 
 interface ChainData {
@@ -194,6 +199,7 @@ export const CHAIN_INFO: ChainInfo = {
     currency: SupportedCurrency.STAKE,
     validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
+  // TODO: Algorand
 };
 
 export const Config = {
@@ -202,4 +208,4 @@ export const Config = {
   moralisAppId: "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
   tronScanUri: "https://apilist.tronscan.org/api/",
   heartbeatUri: "https://xpheartbeat.herokuapp.com",
-};
+}

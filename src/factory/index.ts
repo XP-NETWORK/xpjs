@@ -26,6 +26,7 @@ import BigNumber from "bignumber.js";
 
 import axios from "axios";
 import {
+  algoListNft,
   elrondNftList,
   exchangeRateRepo,
   moralisNftList,
@@ -35,6 +36,7 @@ import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { Wallet } from "ethers";
+import { AlgorandArgs } from "../helpers/algorand";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -148,6 +150,7 @@ export interface ChainParams {
   harmonyParams: Web3Params;
   ontologyParams: Web3Params;
   xDaiParams: Web3Params;
+  algorandParams: AlgorandArgs;
 }
 
 /**
@@ -219,6 +222,7 @@ export function ChainFactory(
       appConfig.tronScanUri,
       chainParams.tronParams.erc721_addr
     );
+  const algoNftRepo = chainParams.algorandParams && algoListNft(chainParams.algorandParams.algodUri)
 
   const nftlistRest = axios.create({
     baseURL: "https://nft-list.herokuapp.com/",
@@ -387,6 +391,9 @@ export function ChainFactory(
             BigInt(0x9),
             owner
           )) as any as NftInfo<T>[];
+          break;
+        case Chain.ALGORAND:
+          res = await algoNftRepo!.nfts(BigInt(0xf), owner) as any as NftInfo<T>[];
           break;
         case Chain.FANTOM:
         case Chain.XDAI:
