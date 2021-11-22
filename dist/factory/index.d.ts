@@ -5,6 +5,7 @@ import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, ExtractTxn, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
+import { MoralisNetwork } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Wallet } from "ethers";
 import { AlgorandArgs } from "../helpers/algorand";
@@ -102,6 +103,7 @@ export interface AppConfig {
     moralisAppId: string;
     tronScanUri: string;
     moralisSecret?: string;
+    moralisNetwork: MoralisNetwork;
 }
 /**
  * This function is the basic entry point to use this package as a library.
