@@ -1,30 +1,29 @@
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
+import { ClaimNftInfo } from "./helpers/algorand";
 
-type ChainAwaiter = {
-  [action_id: string]:
-    | {
-        resolve?: (hash: string) => void;
-        event_res?: string;
-      }
-    | undefined;
+type ChainAwaiter<T> = {
+  [action_id: string]: {
+        resolve?: (data: T) => void;
+        event_res?: T;
+    } | undefined;
 };
 
-type TxResInnerBuf = {
-  [chain: number]: ChainAwaiter;
+type SocketResInnerBuf<T> = {
+  [chain: number]: ChainAwaiter<T>;
 };
 
-type TxResBuf = {
+type SocketResBuf<T> = {
   getResolver(
     chain_id: number,
     action_id: string
-  ): ((hash: string) => void) | undefined;
+  ): ((data: T) => void) | undefined;
   setResolver(
     chain_id: number,
     action_id: string,
-    resolver: (hash: string) => void
+    resolver: (data: T) => void
   ): void;
-  getEventRes(chain_id: number, action_id: string): string | undefined;
-  setEventRes(chain_id: number, action_id: string, res: string): void;
+  getEventRes(chain_id: number, action_id: string): T | undefined;
+  setEventRes(chain_id: number, action_id: string, res: T): void;
   unsetAction(chain_id: number, action_id: string): void;
 };
 
@@ -41,8 +40,17 @@ export type TxnSocketHelper = {
   waitTxHash(chain: number, action_id: string): Promise<string>;
 };
 
-function txResBuf(): TxResBuf {
-  const inner: TxResInnerBuf = {};
+export type AlgorandSocketHelper = {
+  waitAlgorandNft(action_id: string): Promise<ClaimNftInfo>;
+}
+
+function pairActionAlgo(action_id: string): number {
+  const numId = parseInt(action_id);
+  return numId >= 15 ? numId * 15 + 15 + numId : numId + 15*15;
+}
+
+function socketResBuf<T>(): SocketResBuf<T> {
+  const inner: SocketResInnerBuf<T> = {};
 
   const requireChain = (chain_id: number) => {
     if (inner[chain_id] === undefined) {
@@ -54,7 +62,7 @@ function txResBuf(): TxResBuf {
     getResolver(
       chain_id: number,
       action_id: string
-    ): ((hash: string) => void) | undefined {
+    ): ((data: T) => void) | undefined {
       requireChain(chain_id);
 
       return inner[chain_id][action_id]?.resolve;
@@ -62,18 +70,18 @@ function txResBuf(): TxResBuf {
     setResolver(
       chain_id: number,
       action_id: string,
-      resolver: (hash: string) => void
+      resolver: (data: T) => void
     ): void {
       requireChain(chain_id);
 
       inner[chain_id][action_id] = { resolve: resolver };
     },
-    getEventRes(chain_id: number, action_id: string): string | undefined {
+    getEventRes(chain_id: number, action_id: string): T | undefined {
       requireChain(chain_id);
 
       return inner[chain_id][action_id]?.event_res;
     },
-    setEventRes(chain_id: number, action_id: string, res: string): void {
+    setEventRes(chain_id: number, action_id: string, res: T): void {
       requireChain(chain_id);
 
       inner[chain_id][action_id] = { event_res: res };
@@ -86,6 +94,29 @@ function txResBuf(): TxResBuf {
   };
 }
 
+function add_event<T>(buf: SocketResBuf<T>, chain: number, id: string, data: T) {
+  const resolve = buf.getResolver(chain, id);
+  if (resolve === undefined) {
+    buf.setEventRes(chain, id, data);
+    return;
+  }
+  resolve(data);
+}
+
+async function waitSocketData<T>(buf: SocketResBuf<T>, chain: number, action_id: string): Promise<T> {
+  const data = buf.getEventRes(chain, action_id);
+  if (data !== undefined) {
+    buf.unsetAction(chain, action_id);
+    return data;
+  }
+
+  const dataP: Promise<T> = new Promise(r => {
+    buf.setResolver(chain, action_id, r);
+  });
+
+  return await dataP;
+}
+
 /**
  * Create a [[TxnSocketHelper]]
  *
@@ -95,39 +126,48 @@ function txResBuf(): TxResBuf {
 export function txnSocketHelper(
   uri: string,
   options?: Partial<SocketOptions & ManagerOptions>
-): TxnSocketHelper {
+): TxnSocketHelper & AlgorandSocketHelper {
   const socket = io(uri, options);
-  const buf: TxResBuf = txResBuf();
-
-  function add_event(chain: number, id: string, hash: string) {
-    const resolve = buf.getResolver(chain, id);
-    if (resolve === undefined) {
-      buf.setEventRes(chain, id, hash);
-      return;
-    }
-    resolve(hash);
-  }
+  const txbuf: SocketResBuf<string> = socketResBuf();
+  const algoBuf: SocketResBuf<ClaimNftInfo> = socketResBuf();
 
   socket.on(
     "tx_executed_event",
     (chain: number, action_id: string, hash: string) => {
-      add_event(chain, action_id, hash);
+      add_event(txbuf, chain, action_id, hash);
     }
+  );
+
+  socket.on(
+    "algorand_minted_event",
+    (_: number, action_id: string, app_id: number, nft_id: number) => add_event(
+        algoBuf,
+        15,
+        action_id,
+        {
+          appId: app_id,
+          nftId: nft_id
+        }
+      )
   );
 
   return {
     async waitTxHash(chain: number, action_id: string): Promise<string> {
-      const hash = buf.getEventRes(chain, action_id);
-      if (hash !== undefined) {
-        buf.unsetAction(chain, action_id);
-        return hash;
-      }
-
-      const hashP: Promise<string> = new Promise((r) => {
-        buf.setResolver(chain, action_id, r);
-      });
-
-      return await hashP;
+      return await waitSocketData(
+        txbuf,
+        chain,
+        action_id
+      );
     },
+    async waitAlgorandNft(action_id: string): Promise<ClaimNftInfo> {
+      // Validator sends a an action paired with chain id
+      // this is implementation dependent on validator
+      const paired = pairActionAlgo(action_id).toString();
+      return await waitSocketData(
+        algoBuf,
+        15,
+        paired
+      );
+    }
   };
 }

@@ -17,10 +17,15 @@ type SignedTxn = {
 type Ledger = "MainNet" | "TestNet";
 
 type BrowserSigner = {
-    accounts(args: { ledger: Ledger }): Promise<{ address: string[] }>;
+    accounts(args: { ledger: Ledger }): Promise<{ address: string }[]>;
     signTxn(transactions: { txn: string }[]): Promise<SignedTxn[]>;
     send(info: { ledger: Ledger, tx: string }): Promise<TxResp>;
 }
+
+export type ClaimNftInfo = {
+    appId: number;
+    nftId: number;
+};
 
 /**
  * Selected address & ledger must be given explicitly
@@ -47,6 +52,31 @@ export function typedAlgoSigner(): BrowserSigner {
     return AlgoSigner;
 }
 
+export function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): BrowserSigner {
+    return {
+        accounts(_) {
+            return Promise.resolve([{
+                address: acc.addr
+            }])
+        },
+        signTxn(txns) {
+            return Promise.resolve(txns.map(t => {
+                const signed = algosdk.signTransaction(
+                    algosdk.decodeUnsignedTransaction(Base64.toUint8Array(t.txn)),
+                    acc.sk
+                );
+                return {
+                    txID: signed.txID,
+                    blob: Base64.fromUint8Array(signed.blob)
+                }
+            }))
+        },
+        send({ tx }) {
+            return algod.sendRawTransaction(Base64.toUint8Array(tx)).do();
+        }
+    }
+}
+
 export type AlgorandHelper = ChainNonceGet &
     WrappedNftCheck<AlgoNft> &
     TransferNftForeign<
@@ -58,12 +88,17 @@ export type AlgorandHelper = ChainNonceGet &
     > &
     UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
     EstimateTxFees<BigNumber> &
-    ValidateAddress;
+    ValidateAddress & {
+        claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
+    } & {
+        algod: algosdk.Algodv2;
+    };
 
 
 export type AlgorandArgs = {
     algodApiKey: string;
     algodUri: string;
+    algodPort: number | undefined;
     sendNftAppId: number;
     nonce: number;
 }
@@ -79,7 +114,7 @@ const MINT_NFT_COST = new BigNumber(1000);
 
 export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
     const appAddr = algosdk.getApplicationAddress(args.sendNftAppId);
-    const algod = new algosdk.Algodv2(args.algodApiKey, args.algodUri)
+    const algod = new algosdk.Algodv2(args.algodApiKey, args.algodUri, args.algodPort)
 
     async function waitTxnConfirm(txId: string, timeout: number) {
         const status = await algod.status().do();
@@ -136,10 +171,10 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
             suggestedParams: suggested
         });
         const encodedTx = Base64.fromUint8Array(callTx.toByte());
-        const signedTx = await signer.algoSigner.signTxn([{ txn: encodedTx }]);
+        const signedTxCall = await signer.algoSigner.signTxn([{ txn: encodedTx }]);
         const res = await signer.algoSigner.send({
             ledger: signer.ledger,
-            tx: signedTx[0].blob
+            tx: signedTxCall[0].blob
         });
         await waitTxnConfirm(res.txId, 10000);
 
@@ -162,7 +197,10 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
             appArgs: [
                 encoder.encode("receive_nft"),
                 encoder.encode(to),
-                encoder.encode(chain_nonce.toString())
+                new Uint8Array(Buffer.concat([
+                    Buffer.from(new Uint32Array([0]).buffer),
+                    Buffer.from(new Uint32Array([chain_nonce]).buffer).reverse()
+                ]))
             ],
             foreignAssets: [nft.native.nftId],
             suggestedParams: suggested
@@ -177,13 +215,14 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
         const sendRes = await algod.sendRawTransaction([
             Base64.toUint8Array(signedTxns[0].blob),
             Base64.toUint8Array(signedTxns[1].blob),
-            Base64.toUint8Array(signedTx[2].blob)
+            Base64.toUint8Array(signedTxns[2].blob)
         ]).do();
         await waitTxnConfirm(sendRes.txId, 10000);
 
         return sendRes.txId as string;
     }
     return {
+        algod,
         getNonce: () => args.nonce,
         isWrappedNft(nft) {
             return nft.native.creator === appAddr
@@ -206,6 +245,47 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
         },
         estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),
         estimateValidateUnfreezeNft: () => Promise.resolve(MINT_NFT_COST),
-        validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr))
+        validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr)),
+        async claimNft(
+            signer,
+            info
+        ) {
+            const suggested = await algod.getTransactionParams().do();
+            const optIn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+                from: signer.address,
+                to: signer.address,
+                amount: 0,
+                assetIndex: info.nftId,
+                suggestedParams: suggested
+            });
+            const encodedTx = Base64.fromUint8Array(optIn.toByte());
+            const signedTx = await signer.algoSigner.signTxn([{ txn: encodedTx }]);
+            const res = await signer.algoSigner.send({
+                ledger: signer.ledger,
+                tx: signedTx[0].blob
+            });
+            await waitTxnConfirm(res.txId, 10000);
+
+            const callTxn = algosdk.makeApplicationNoOpTxnFromObject({
+                from: signer.address,
+                appIndex: info.appId,
+                appArgs: [
+                    encoder.encode("transfer_nft")
+                ],
+                foreignAssets: [info.nftId],
+                suggestedParams: suggested,
+            });
+            const encodedCall = Base64.fromUint8Array(callTxn.toByte());
+            const signedCall = await signer.algoSigner.signTxn([{
+                txn: encodedCall,
+            }])
+            const callRes = await signer.algoSigner.send({
+                ledger: signer.ledger,
+                tx: signedCall[0].blob
+            });
+
+            await waitTxnConfirm(callRes.txId, 10000);
+            return callRes.txId;
+        }
     }
 }
