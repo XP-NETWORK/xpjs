@@ -42,7 +42,7 @@ export function moralisNftList(
   return nftListRepo(
     moralisNftListService({ serverUrl: server, appId, moralisSecret }),
     moralisNftMapper(),
-    moralisTestNetChainIdMapper()
+    moralisChainIdMapper()
   );
 }
 
