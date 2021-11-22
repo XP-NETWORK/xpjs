@@ -30,6 +30,7 @@ import {
   elrondNftList,
   exchangeRateRepo,
   moralisNftList,
+  moralisTestnetNftList,
   tronListNft,
 } from "./cons";
 import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
@@ -37,6 +38,10 @@ import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { Wallet } from "ethers";
 import { AlgorandArgs } from "../helpers/algorand";
+import {
+  MoralisNftListRepo,
+  moralisTestNetChainIdMapper,
+} from "xpnet-nft-list";
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -156,6 +161,8 @@ export interface ChainParams {
   algorandParams: AlgorandArgs;
 }
 
+export type MoralisNetwork = "mainnet" | "testnet";
+
 /**
  * A struct for the configuration of the library.
  * @field exchangeRateUri: The URI of the exchange rate service.
@@ -170,6 +177,7 @@ export interface AppConfig {
   moralisAppId: string;
   tronScanUri: string;
   moralisSecret?: string;
+  moralisNetwork: MoralisNetwork;
 }
 
 function mapNonceToParams(
@@ -213,11 +221,18 @@ export function ChainFactory(
   const remoteExchangeRate = exchangeRateRepo(appConfig.exchangeRateUri);
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || "");
-  const moralisNftRepo = moralisNftList(
-    appConfig.moralisServer,
-    appConfig.moralisAppId,
-    appConfig.moralisSecret
-  );
+  const moralisNftRepo =
+    appConfig.moralisNetwork === "mainnet"
+      ? moralisNftList(
+          appConfig.moralisServer,
+          appConfig.moralisAppId,
+          appConfig.moralisSecret
+        )
+      : moralisTestnetNftList(
+          appConfig.moralisServer,
+          appConfig.moralisAppId,
+          appConfig.moralisSecret
+        );
   const tronNftRepo =
     chainParams.tronParams &&
     tronListNft(
@@ -225,7 +240,9 @@ export function ChainFactory(
       appConfig.tronScanUri,
       chainParams.tronParams.erc721_addr
     );
-  const algoNftRepo = chainParams.algorandParams && algoListNft(chainParams.algorandParams.algodUri)
+  const algoNftRepo =
+    chainParams.algorandParams &&
+    algoListNft(chainParams.algorandParams.algodUri);
 
   const nftlistRest = axios.create({
     baseURL: "https://nft-list.herokuapp.com/",
@@ -397,7 +414,10 @@ export function ChainFactory(
           )) as any as NftInfo<T>[];
           break;
         case Chain.ALGORAND:
-          res = await algoNftRepo!.nfts(BigInt(0xf), owner) as any as NftInfo<T>[];
+          res = (await algoNftRepo!.nfts(
+            BigInt(0xf),
+            owner
+          )) as any as NftInfo<T>[];
           break;
         case Chain.FANTOM:
         case Chain.XDAI:
