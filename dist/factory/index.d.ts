@@ -5,7 +5,6 @@ import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, ExtractTxn, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
-import { MoralisNetwork } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Wallet } from "ethers";
 import { AlgorandArgs } from "../helpers/algorand";
@@ -89,6 +88,7 @@ export interface ChainParams {
     xDaiParams: Web3Params;
     algorandParams: AlgorandArgs;
 }
+export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
  * A struct for the configuration of the library.
  * @field exchangeRateUri: The URI of the exchange rate service.
