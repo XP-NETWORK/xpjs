@@ -7,7 +7,7 @@ import {
 import {
   algoAssetMapper,
   algoNftListService,
-  AlgorandNftListRepo, 
+  AlgorandNftListRepo,
   ElrdNftListRepo,
   elrdNftListService,
   elrdRawTokenMapper,
@@ -18,6 +18,7 @@ import {
   MoralisNftListRepo,
   moralisNftListService,
   moralisNftMapper,
+  moralisTestNetChainIdMapper,
   NftListRepo,
   nftListRepo,
   trxNftListService,
@@ -41,7 +42,19 @@ export function moralisNftList(
   return nftListRepo(
     moralisNftListService({ serverUrl: server, appId, moralisSecret }),
     moralisNftMapper(),
-    moralisChainIdMapper()
+    moralisTestNetChainIdMapper()
+  );
+}
+
+export function moralisTestnetNftList(
+  server: string,
+  appId: string,
+  moralisSecret?: string
+): MoralisNftListRepo {
+  return nftListRepo(
+    moralisNftListService({ serverUrl: server, appId, moralisSecret }),
+    moralisNftMapper(),
+    moralisTestNetChainIdMapper()
   );
 }
 
@@ -58,11 +71,11 @@ export function tronListNft(
 }
 
 export function algoListNft(baseURL: string): AlgorandNftListRepo {
-    return nftListRepo(
-        algoNftListService(baseURL),
-        algoAssetMapper(),
-        mockChainIdentMapper()
-    )
+  return nftListRepo(
+    algoNftListService(baseURL),
+    algoAssetMapper(),
+    mockChainIdentMapper()
+  );
 }
 
 export function exchangeRateRepo(baseUrl: string): ExchangeRateRepo {
