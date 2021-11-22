@@ -1,3 +1,4 @@
+import algosdk from "algosdk";
 import { BigNumber } from "bignumber.js";
 import { AlgoNft } from "xpnet-nft-list";
 import { ChainNonceGet, EstimateTxFees, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
@@ -13,8 +14,8 @@ declare type BrowserSigner = {
     accounts(args: {
         ledger: Ledger;
     }): Promise<{
-        address: string[];
-    }>;
+        address: string;
+    }[]>;
     signTxn(transactions: {
         txn: string;
     }[]): Promise<SignedTxn[]>;
@@ -22,6 +23,10 @@ declare type BrowserSigner = {
         ledger: Ledger;
         tx: string;
     }): Promise<TxResp>;
+};
+export declare type ClaimNftInfo = {
+    appId: number;
+    nftId: number;
 };
 /**
  * Selected address & ledger must be given explicitly
@@ -38,10 +43,16 @@ export declare type AlgoSignerH = {
  * @return Strongly typed AlgoSigner from extension
  */
 export declare function typedAlgoSigner(): BrowserSigner;
-export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress;
+export declare function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): BrowserSigner;
+export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress & {
+    claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
+} & {
+    algod: algosdk.Algodv2;
+};
 export declare type AlgorandArgs = {
     algodApiKey: string;
     algodUri: string;
+    algodPort: number | undefined;
     sendNftAppId: number;
     nonce: number;
 };
