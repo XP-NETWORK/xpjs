@@ -121,7 +121,9 @@ export type Web3Helper = BaseWeb3Helper &
   IsApproved<Signer> &
   Approve<Signer> &
   ValidateAddress &
-  ExtractTxn<TransactionResponse>;
+  ExtractTxn<TransactionResponse> & {
+    createWallet(privateKey: string): Wallet;
+  };
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -263,6 +265,9 @@ export async function web3HelperFactory(
       return (
         nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase()
       );
+    },
+    createWallet(privateKey: string): Wallet {
+      return new Wallet(privateKey, provider);
     },
     async balanceWrappedBatch(
       address: string,

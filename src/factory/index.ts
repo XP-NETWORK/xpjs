@@ -125,7 +125,10 @@ export type ChainFactory = {
    */
   updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
   nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
-  pkeyToSigner(nonce: number, key: string): Wallet | UserSigner | string;
+  pkeyToSigner(
+    nonce: number,
+    key: string
+  ): Promise<Wallet | UserSigner | string>;
   getDestinationTransaction<Txn>(
     hash: Txn,
     chain: ExtractTxn<Txn>
@@ -352,7 +355,7 @@ export function ChainFactory(
       return chain.extractTxn(hash);
     },
     nonceToChainNonce,
-    pkeyToSigner(nonce, key) {
+    async pkeyToSigner(nonce, key) {
       let chain = nonceToChainNonce(nonce);
       switch (chain) {
         case Chain.ELROND: {
@@ -362,7 +365,8 @@ export function ChainFactory(
           return key;
         }
         default: {
-          return new Wallet(key);
+          const inner = await this.inner<Web3Helper, Web3Nonce>(chain);
+          return inner.createWallet(key);
         }
       }
     },
