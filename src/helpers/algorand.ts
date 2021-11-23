@@ -14,7 +14,7 @@ type SignedTxn = {
     blob: string;
 }
 
-type Ledger = "MainNet" | "TestNet";
+type Ledger = "MainNet" | "TestNet" | "any";
 
 type BrowserSigner = {
     accounts(args: { ledger: Ledger }): Promise<{ address: string }[]>;
@@ -52,8 +52,8 @@ export function typedAlgoSigner(): BrowserSigner {
     return AlgoSigner;
 }
 
-export function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): BrowserSigner {
-    return {
+export function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): AlgoSignerH {
+    const signer: BrowserSigner = {
         accounts(_) {
             return Promise.resolve([{
                 address: acc.addr
@@ -74,6 +74,12 @@ export function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account):
         send({ tx }) {
             return algod.sendRawTransaction(Base64.toUint8Array(tx)).do();
         }
+    }
+
+    return {
+        algoSigner: signer,
+        address: acc.addr,
+        ledger: "any"
     }
 }
 
@@ -296,7 +302,7 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
                 nft,
                 txFees
             )
-       z1,
+        },
         estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),
         estimateValidateUnfreezeNft: () => Promise.resolve(MINT_NFT_COST),
         validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr)),
