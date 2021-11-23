@@ -40,7 +40,8 @@ export enum MainNetRpcUri {
   // TODO: Algorand
 }
 
-export type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
+// Marker type
+export type ChainNonce<_, __> = number;
 export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export type TronNonce = ChainNonce<TronHelper, TronParams>;

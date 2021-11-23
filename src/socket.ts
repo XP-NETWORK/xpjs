@@ -118,12 +118,12 @@ async function waitSocketData<T>(buf: SocketResBuf<T>, chain: number, action_id:
 }
 
 /**
- * Create a [[TxnSocketHelper]]
+ * Create a [[SocketHelper]]
  *
  * @param uri  URI of the Migration-Validator socket api
  * @param options  socket.io options
  */
-export function txnSocketHelper(
+export function socketHelper(
   uri: string,
   options?: Partial<SocketOptions & ManagerOptions>
 ): TxnSocketHelper & AlgorandSocketHelper {

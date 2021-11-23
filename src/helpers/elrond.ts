@@ -38,12 +38,12 @@ import {
   UnfreezeForeignNft,
   WrappedNftCheck,
 } from "./chain";
-import { Base64 } from "js-base64";
 import {
   ChainNonceGet,
   EstimateTxFees,
-  ExtractTxn,
+  ExtractAction,
   NftInfo,
+  PreTransfer,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -214,7 +214,9 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   } & WrappedNftCheck<EsdtNftInfo> &
   ChainNonceGet &
   ValidateAddress &
-  ExtractTxn<Transaction>;
+  ExtractAction<Transaction> &
+  PreTransfer<ElrondSigner, BigNumber> &
+  EstimateTxFees<BigNumber>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -337,7 +339,7 @@ export const elrondHelperFactory: (
     const tx = await signAndSend(sender, utx);
     await transactionResult(tx.getHash());
 
-    return tx;
+    return tx.getHash().toString();
   };
 
   const unsignedTransferTxn = (
@@ -570,19 +572,19 @@ export const elrondHelperFactory: (
     });
   };
 
-  async function extractTxn(tx: Transaction): Promise<[string, string]> {
+  async function extractAction(tx: Transaction): Promise<string> {
     let err;
     await tx.awaitExecuted(provider).catch((e) => (err = e));
     if (err) {
       await new Promise((r) => setTimeout(r, 3000));
-      return extractTxn(tx);
+      return await extractAction(tx);
     }
 
     const txr = await transactionResult(tx.getHash());
 
     const id = filterEventId(txr["smartContractResults"]);
 
-    return [tx.getHash().toString(), id.toString()];
+    return id.toString();
   }
 
   function estimateGas(base_fees: BigNumber, cnt: number) {
@@ -652,7 +654,9 @@ export const elrondHelperFactory: (
       return tx.getHash().toString();
     },
     doEgldSwap,
-    extractTxn,
+    preTransfer: doEgldSwap,
+    preUnfreeze: doEgldSwap,
+    extractAction,
     async transferNftToForeign(
       sender: ElrondSigner,
       chain_nonce: number,

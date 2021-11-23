@@ -38,8 +38,9 @@ import { Base64 } from "js-base64";
 import {
   ChainNonceGet,
   EstimateTxFees,
-  ExtractTxn,
+  ExtractAction,
   NftInfo,
+  PreTransfer,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -81,7 +82,7 @@ export interface Approve<Sender> {
   approveForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender
-  ): Promise<boolean>;
+  ): Promise<string | undefined>;
 }
 
 /**
@@ -121,9 +122,10 @@ export type Web3Helper = BaseWeb3Helper &
   IsApproved<Signer> &
   Approve<Signer> &
   ValidateAddress &
-  ExtractTxn<TransactionResponse> & {
+  ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  };
+  } &
+  Pick<PreTransfer<Signer, NftInfo<EthNftInfo>>, "preTransfer">;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -185,9 +187,9 @@ export async function web3HelperFactory(
   const minter = Minter__factory.connect(minter_addr, provider);
   const erc1155 = XPNet__factory.connect(erc1155_addr, provider);
 
-  async function extractTxn(
+  async function extractAction(
     txr: TransactionResponse
-  ): Promise<[string, string]> {
+  ): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
@@ -196,7 +198,7 @@ export async function web3HelperFactory(
 
     const evdat = minter.interface.parseLog(log);
     const action_id: string = evdat.args[0].toString();
-    return [receipt.transactionHash, action_id];
+    return action_id;
   }
 
   const randomAction = () =>
@@ -237,12 +239,12 @@ export async function web3HelperFactory(
     const isApproved = await isApprovedForMinter(id, sender);
     const erc = UserNftMinter__factory.connect(id.native.contract, sender);
     if (isApproved) {
-      return true;
+      return undefined;
     }
 
     const receipt = await erc.approve(minter_addr, id.native.tokenId);
     await receipt.wait();
-    return true;
+    return receipt.hash;
   };
 
   const base = await baseWeb3HelperFactory(params.provider);
@@ -251,7 +253,8 @@ export async function web3HelperFactory(
     ...base,
     approveForMinter,
     isApprovedForMinter,
-    extractTxn,
+    preTransfer: (s, id) => approveForMinter(id, s),
+    extractAction,
     getNonce: () => params.nonce,
     async balanceWrapped(
       address: string,
