@@ -14,9 +14,10 @@ export * from "./factories";
 import {
   ChainNonceGet,
   EstimateTxFees,
-  ExtractTxn,
+  ExtractAction,
   MintNft,
   NftInfo,
+  socketHelper,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -37,11 +38,8 @@ import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { Wallet } from "ethers";
-import { AlgorandArgs } from "../helpers/algorand";
-import {
-  MoralisNftListRepo,
-  moralisTestNetChainIdMapper,
-} from "xpnet-nft-list";
+import { AlgorandArgs, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
+
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -80,9 +78,11 @@ export type ChainFactory = {
    * Transfers the NFT from one chain to other.
    * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
    * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
+   * WARN: Algorand NFTs must be manually claimed by the receiver
    * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the `nftList` method of the factory.
    * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
+   * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
    */
   transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
@@ -136,10 +136,36 @@ export type ChainFactory = {
     nonce: number,
     key: string
   ): Promise<Wallet | UserSigner | string>;
+  /**
+   * 
+   * Get transaction in the destination chain
+   * WARN: use claimAlgorandNft instead for algorand.
+   * 
+   * @param chain source chain
+   * @param destination destination chain
+   * @param hash transaction hash from source chain
+   * 
+   * @returns transaction hash in original chain, unique action id
+   */
   getDestinationTransaction<Txn>(
+    chain: ExtractAction<Txn>,
+    destination: number,
     hash: Txn,
-    chain: ExtractTxn<Txn>
-  ): Promise<[string, string]>;
+  ): Promise<string>;
+  /**
+   * 
+   * Claim an algorand nft
+   * 
+   * 
+   * @param originChain chain from which the nft was transferred
+   * @param txn Transaction Hash of the original
+   * @param claimer the account which can claim the nft
+   */
+  claimAlgorandNft<Txn>(
+    originChain: ExtractAction<Txn>,
+    txn: Txn,
+    claimer: AlgoSignerH
+  ): Promise<string>
 };
 
 /**
@@ -173,6 +199,7 @@ export type MoralisNetwork = "mainnet" | "testnet";
 export interface AppConfig {
   exchangeRateUri: string;
   heartbeatUri: string;
+  txSocketUri: string;
   moralisServer: string;
   moralisAppId: string;
   tronScanUri: string;
@@ -219,6 +246,8 @@ export function ChainFactory(
   const heartbeatRepo = bridgeHeartbeat(appConfig.heartbeatUri);
 
   const remoteExchangeRate = exchangeRateRepo(appConfig.exchangeRateUri);
+
+  const txSocket = socketHelper(appConfig.txSocketUri);
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || "");
   const moralisNftRepo =
@@ -372,8 +401,9 @@ export function ChainFactory(
   }
 
   return {
-    getDestinationTransaction<T>(hash: T, chain: ExtractTxn<T>) {
-      return chain.extractTxn(hash);
+    async getDestinationTransaction<T>(chain: ExtractAction<T>, targetNonce: number, hash: T) {
+      const action = await chain.extractAction(hash);
+      return await txSocket.waitTxHash(targetNonce, action);
     },
     nonceToChainNonce,
     async pkeyToSigner(nonce, key) {
@@ -386,8 +416,8 @@ export function ChainFactory(
           return key;
         }
         default: {
-          const inner = await this.inner<Web3Helper, Web3Nonce>(chain);
-          return inner.createWallet(key);
+          const chainH = await inner<Web3Helper, Web3Nonce>(chain);
+          return chainH.createWallet(key);
         }
       }
     },
@@ -474,6 +504,16 @@ export function ChainFactory(
     ): Promise<string> => {
       return await chain.mintNft(owner, args);
     },
+    claimAlgorandNft: async (
+      origin,
+      hash,
+      claimer
+    ) => {
+      const action = await origin.extractAction(hash);
+      const algo: AlgorandHelper = await inner(Chain.ALGORAND);
+
+      return await algo.claimAlgorandNft(claimer, action, txSocket);
+    }
   };
 }
 /**

@@ -29,9 +29,10 @@ import {
 } from "xpnet-web3-contracts";
 import {
   Approve,
-  ExtractTxn,
+  ExtractAction,
   IsApproved,
   NftMintArgs,
+  PreTransfer,
   ValidateAddress,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
@@ -93,7 +94,8 @@ export type TronHelper = BaseTronHelper &
   Approve<TronSender> &
   ValidateAddress &
   IsApproved<TronSender> &
-  ExtractTxn<string>;
+  ExtractAction<string> &
+  Pick<PreTransfer<TronSender, NftInfo<EthNftInfo>>, "preTransfer">;;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -226,7 +228,7 @@ export async function tronHelperFactory(
     await event_middleware.post("/tx/tron", { tx_hash: hash });
   }
 
-  async function extractTxn(hash: string): Promise<[string, string]> {
+  async function extractAction(hash: string): Promise<string> {
     await new Promise((r) => setTimeout(r, 6000));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -245,7 +247,7 @@ export async function tronHelperFactory(
     const evs = await getEv();
     const ev = evs.find((e: any) => e?.contract == minter_addr);
     const action_id: string = ev.result["actionId"].toString();
-    return [hash, action_id];
+    return action_id;
   }
 
   const randomAction = () =>
@@ -312,18 +314,18 @@ export async function tronHelperFactory(
     );
     const isApproved = await isApprovedForMinter(id, sender);
     if (isApproved) {
-      return true;
+      return undefined;
     }
 
-    await erc.approve(minter_addr, id.native.tokenId).send();
-
-    return true;
+    const txHash: string = await erc.approve(minter_addr, id.native.tokenId).send();
+    return txHash
   };
 
   return {
     ...base,
-    extractTxn,
+    extractAction,
     approveForMinter,
+    preTransfer: (s, id) => approveForMinter(id, s),
     isWrappedNft(nft) {
       return (
         nft.native.contract.toLowerCase() ===
