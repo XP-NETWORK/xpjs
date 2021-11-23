@@ -39,6 +39,8 @@ import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { Wallet } from "ethers";
 import { AlgorandArgs, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
+import algosdk from "algosdk";
+import { Base64 } from "js-base64";
 
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
@@ -132,10 +134,10 @@ export type ChainFactory = {
    */
   updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
   nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
-  pkeyToSigner(
-    nonce: number,
+  pkeyToSigner<S>(
+    nonce: ChainNonce<WrappedNftCheck<S>, unknown>,
     key: string
-  ): Promise<Wallet | UserSigner | string>;
+  ): Promise<S>;
   /**
    * 
    * Get transaction in the destination chain
@@ -406,18 +408,22 @@ export function ChainFactory(
       return await txSocket.waitTxHash(targetNonce, action);
     },
     nonceToChainNonce,
-    async pkeyToSigner(nonce, key) {
+    async pkeyToSigner<S>(nonce: ChainNonce<S, unknown>, key: string) {
       let chain = nonceToChainNonce(nonce);
       switch (chain) {
         case Chain.ELROND: {
-          return UserSigner.fromPem(key);
+          return UserSigner.fromPem(key) as unknown as S;
         }
         case Chain.TRON: {
-          return key;
+          return key as unknown as S;
+        }
+        case Chain.ALGORAND: {
+          const mnem = algosdk.secretKeyToMnemonic(Base64.toUint8Array(key));
+          return algosdk.mnemonicToSecretKey(mnem) as unknown as S;
         }
         default: {
           const chainH = await inner<Web3Helper, Web3Nonce>(chain);
-          return chainH.createWallet(key);
+          return chainH.createWallet(key) as unknown as S;
         }
       }
     },
