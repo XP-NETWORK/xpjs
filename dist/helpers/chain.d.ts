@@ -32,6 +32,13 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
     unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<string>;
 }
 /**
+ * Action to perform before transfer/unfreeze (if any)
+ */
+export interface PreTransfer<Signer, Args> {
+    preTransfer(sender: Signer, args: Args): Promise<string | undefined>;
+    preUnfreeze(sender: Signer, args: Args): Promise<string | undefined>;
+}
+/**
  * Transfer NFT to a foreign chain, freezing the original one
  *
  * @param sender  Account which owns the NFT on the native chain, able to sign transactions
@@ -108,6 +115,6 @@ export declare function ConcurrentSendError(): Error;
 export interface ChainNonceGet {
     getNonce(): number;
 }
-export interface ExtractTxn<Txn> {
-    extractTxn(txn: Txn): Promise<[string, string]>;
+export interface ExtractAction<Txn> {
+    extractAction(txn: Txn): Promise<string>;
 }

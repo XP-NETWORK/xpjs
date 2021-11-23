@@ -16,9 +16,9 @@ export declare type AlgorandSocketHelper = {
     waitAlgorandNft(action_id: string): Promise<ClaimNftInfo>;
 };
 /**
- * Create a [[TxnSocketHelper]]
+ * Create a [[SocketHelper]]
  *
  * @param uri  URI of the Migration-Validator socket api
  * @param options  socket.io options
  */
-export declare function txnSocketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper & AlgorandSocketHelper;
+export declare function socketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper & AlgorandSocketHelper;

@@ -7,7 +7,7 @@
 import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
-import { ChainNonceGet, ExtractTxn, ValidateAddress } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, PreTransfer, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 /**
@@ -94,7 +94,7 @@ export interface SetESDTRoles {
  */
 export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractTxn<Transaction>;
+} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, BigNumber> & EstimateTxFees<BigNumber>;
 /**
  * Create an object implementing cross chain utilities for elrond
  *

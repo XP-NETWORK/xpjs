@@ -30,7 +30,7 @@ export declare enum MainNetRpcUri {
     HARMONY = "https://api.harmony.one",
     XDAI = "https://rpc.xdaichain.com/"
 }
-export declare type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
+export declare type ChainNonce<_, __> = number;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
