@@ -38,7 +38,7 @@ import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { Wallet } from "ethers";
-import { AlgorandArgs, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
+import { AlgorandArgs, AlgorandHelper, AlgoSignerH, algoSignerWrapper, ClaimNftInfo } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
 
@@ -418,8 +418,9 @@ export function ChainFactory(
           return key as unknown as S;
         }
         case Chain.ALGORAND: {
+          const algo: AlgorandHelper = await inner(Chain.ALGORAND);
           const mnem = algosdk.secretKeyToMnemonic(Base64.toUint8Array(key));
-          return algosdk.mnemonicToSecretKey(mnem) as unknown as S;
+          return algoSignerWrapper(algo.algod, algosdk.mnemonicToSecretKey(mnem)) as unknown as S;
         }
         default: {
           const chainH = await inner<Web3Helper, Web3Nonce>(chain);
