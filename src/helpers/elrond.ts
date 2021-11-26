@@ -216,7 +216,9 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, BigNumber> &
-  EstimateTxFees<BigNumber>;
+  EstimateTxFees<BigNumber> & {
+    doEgldSwap(sender: ElrondSigner, value: EasyBalance): Promise<string>;
+  };
 
 /**
  * Create an object implementing cross chain utilities for elrond
