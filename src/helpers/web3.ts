@@ -124,8 +124,7 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } &
-  Pick<PreTransfer<Signer, NftInfo<EthNftInfo>>, "preTransfer">;
+  } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer">;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -187,9 +186,7 @@ export async function web3HelperFactory(
   const minter = Minter__factory.connect(minter_addr, provider);
   const erc1155 = XPNet__factory.connect(erc1155_addr, provider);
 
-  async function extractAction(
-    txr: TransactionResponse
-  ): Promise<string> {
+  async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
@@ -253,7 +250,7 @@ export async function web3HelperFactory(
     ...base,
     approveForMinter,
     isApprovedForMinter,
-    preTransfer: (s, id) => approveForMinter(id, s),
+    preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,
     getNonce: () => params.nonce,
     async balanceWrapped(

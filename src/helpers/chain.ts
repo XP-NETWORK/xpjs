@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 /**
  * NFT Info
  */
@@ -49,9 +51,17 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
 /**
  * Action to perform before transfer/unfreeze (if any)
  */
-export interface PreTransfer<Signer, Args> {
-  preTransfer(sender: Signer, args: Args): Promise<string | undefined>;
-  preUnfreeze(sender: Signer, args: Args): Promise<string | undefined>;
+export interface PreTransfer<Signer, Nft> {
+  preTransfer(
+    sender: Signer,
+    nft: NftInfo<Nft>,
+    fee: BigNumber
+  ): Promise<string | undefined>;
+  preUnfreeze(
+    sender: Signer,
+    nft: NftInfo<Nft>,
+    fee: BigNumber
+  ): Promise<string | undefined>;
 }
 
 /**
