@@ -10,6 +10,7 @@ import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, Trans
 import { ChainNonceGet, EstimateTxFees, ExtractAction, PreTransfer, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
+declare type EasyBalance = string | number | BigNumber;
 /**
  * Information associated with an ESDT Token
  */
@@ -94,7 +95,9 @@ export interface SetESDTRoles {
  */
 export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, BigNumber> & EstimateTxFees<BigNumber>;
+} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, BigNumber> & EstimateTxFees<BigNumber> & {
+    doEgldSwap(sender: ElrondSigner, value: EasyBalance): Promise<string>;
+};
 /**
  * Create an object implementing cross chain utilities for elrond
  *
