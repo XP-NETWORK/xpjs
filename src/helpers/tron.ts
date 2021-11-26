@@ -95,7 +95,7 @@ export type TronHelper = BaseTronHelper &
   ValidateAddress &
   IsApproved<TronSender> &
   ExtractAction<string> &
-  Pick<PreTransfer<TronSender, NftInfo<EthNftInfo>>, "preTransfer">;;
+  Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer">;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -317,15 +317,17 @@ export async function tronHelperFactory(
       return undefined;
     }
 
-    const txHash: string = await erc.approve(minter_addr, id.native.tokenId).send();
-    return txHash
+    const txHash: string = await erc
+      .approve(minter_addr, id.native.tokenId)
+      .send();
+    return txHash;
   };
 
   return {
     ...base,
     extractAction,
     approveForMinter,
-    preTransfer: (s, id) => approveForMinter(id, s),
+    preTransfer: (s, nft, _fee) => approveForMinter(nft, s),
     isWrappedNft(nft) {
       return (
         nft.native.contract.toLowerCase() ===

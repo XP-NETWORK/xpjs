@@ -215,10 +215,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ChainNonceGet &
   ValidateAddress &
   ExtractAction<Transaction> &
-  PreTransfer<ElrondSigner, BigNumber> &
-  EstimateTxFees<BigNumber> & {
-    doEgldSwap(sender: ElrondSigner, value: EasyBalance): Promise<string>;
-  };
+  PreTransfer<ElrondSigner, EsdtNftInfo> &
+  EstimateTxFees<BigNumber>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -324,24 +322,33 @@ export const elrondHelperFactory: (
     throw Error(`failed to query transaction exceeded 10 retries ${tx_hash}`);
   };
 
-  const doEgldSwap = async (sender: ElrondSigner, value: EasyBalance) => {
-    const utx = new Transaction({
-      receiver: swapContract,
-      gasLimit: new GasLimit(50000000),
-      value: new Balance(
-        Egld.getToken(),
-        Egld.getNonce(),
-        new BigNumber(value.toString())
-      ),
-      data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("wrapEgld"))
-        .build(),
-    });
+  const doEgldSwap = async (
+    sender: ElrondSigner,
+    nft: NftInfo<EsdtNftInfo>,
+    value: BigNumber
+  ) => {
+    const esdts = await listEsdt((await sender.getAddress()).toString());
+    const res = esdts[nft.native.nonce];
+    if (res === undefined || new BigNumber(res.balance).lt(value)) {
+      const utx = new Transaction({
+        receiver: swapContract,
+        gasLimit: new GasLimit(50000000),
+        value: new Balance(
+          Egld.getToken(),
+          Egld.getNonce(),
+          new BigNumber(value.toString())
+        ),
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("wrapEgld"))
+          .build(),
+      });
 
-    const tx = await signAndSend(sender, utx);
-    await transactionResult(tx.getHash());
+      const tx = await signAndSend(sender, utx);
+      await transactionResult(tx.getHash());
 
-    return tx.getHash().toString();
+      return tx.getHash().toString();
+    }
+    return undefined;
   };
 
   const unsignedTransferTxn = (
@@ -597,6 +604,23 @@ export const elrondHelperFactory: (
     return new Address(await sender.getAddress());
   }
 
+  async function balanceWrappedBatch(
+    address: string | Address,
+    chain_nonces: number[]
+  ): Promise<Map<number, BigNumber>> {
+    const esdts = Object.values(await listEsdt(address.toString()));
+
+    const res = new Map(chain_nonces.map((v) => [v, new BigNumber(0)]));
+
+    for (const esdt of esdts) {
+      esdt.nonce &&
+        esdt.tokenIdentifier.startsWith(esdt.tokenIdentifier) &&
+        res.set(esdt.nonce, new BigNumber(esdt.balance));
+    }
+
+    return res;
+  }
+
   return {
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
@@ -605,22 +629,7 @@ export const elrondHelperFactory: (
 
       return wallet.balance.valueOf();
     },
-    async balanceWrappedBatch(
-      address: string | Address,
-      chain_nonces: number[]
-    ): Promise<Map<number, BigNumber>> {
-      const esdts = Object.values(await listEsdt(address.toString()));
-
-      const res = new Map(chain_nonces.map((v) => [v, new BigNumber(0)]));
-
-      for (const esdt of esdts) {
-        esdt.nonce &&
-          esdt.tokenIdentifier.startsWith(esdt.tokenIdentifier) &&
-          res.set(esdt.nonce, new BigNumber(esdt.balance));
-      }
-
-      return res;
-    },
+    balanceWrappedBatch,
     async transferNativeToForeign(
       sender: ElrondSigner,
       chain_nonce: number,
@@ -642,9 +651,8 @@ export const elrondHelperFactory: (
       chain_nonce: number,
       to: string,
       value: EasyBalance,
-      txFees: EasyBalance
+      _txFees: EasyBalance
     ): Promise<string> {
-      await doEgldSwap(sender, txFees);
       const txu = unsignedUnfreezeTxn(
         chain_nonce,
         await getAddress(sender),
@@ -655,7 +663,6 @@ export const elrondHelperFactory: (
 
       return tx.getHash().toString();
     },
-    doEgldSwap,
     preTransfer: doEgldSwap,
     preUnfreeze: doEgldSwap,
     extractAction,
