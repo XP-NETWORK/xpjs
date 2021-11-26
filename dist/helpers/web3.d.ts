@@ -62,7 +62,7 @@ MintNft<Signer, NftMintArgs, string> & {
  */
 export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, Transaction> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-} & Pick<PreTransfer<Signer, NftInfo<EthNftInfo>>, "preTransfer">;
+} & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer">;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
