@@ -113,10 +113,22 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<Signer, string, BigNumber, Transaction> &
-  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> &
+  TransferForeign<Signer, string, BigNumber, PopulatedTransaction> &
+  TransferNftForeign<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    PopulatedTransaction
+  > &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> &
+  UnfreezeForeignNft<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    PopulatedTransaction
+  > &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -285,17 +297,22 @@ export async function web3HelperFactory(
       );
     },
     async transferNativeToForeign(
-      sender: Signer,
+      _sender: Signer,
       chain_nonce: number,
       to: string,
       value: BigNumber,
       txFees: BigNumber
-    ): Promise<Transaction> {
+    ): Promise<PopulatedTransaction> {
       const val = EthBN.from(value.toString());
       const totalVal = val.add(EthBN.from(txFees.toString()));
-      const res = await minter.connect(sender).freeze(chain_nonce, to, val, {
-        value: totalVal,
-      });
+      const res = await minter.populateTransaction.freeze(
+        chain_nonce,
+        to,
+        val,
+        {
+          value: totalVal,
+        }
+      );
       return res;
     },
     async transferNftToForeign(
@@ -304,14 +321,18 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<Transaction> {
+    ): Promise<PopulatedTransaction> {
       await approveForMinter(id, sender);
 
-      const txr = await minter
-        .connect(sender)
-        .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to, {
+      const txr = await minter.populateTransaction.freezeErc721(
+        id.native.contract,
+        id.native.tokenId,
+        chain_nonce,
+        to,
+        {
           value: EthBN.from(txFees.toString()),
-        });
+        }
+      );
 
       return txr;
     },
@@ -335,16 +356,18 @@ export async function web3HelperFactory(
       return res.hash;
     },
     async unfreezeWrappedNft(
-      sender: Signer,
+      _sender: Signer,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<Transaction> {
-      const res = await minter
-        .connect(sender)
-        .withdrawNft(to, id.native.tokenId, {
+    ): Promise<PopulatedTransaction> {
+      const res = await minter.populateTransaction.withdrawNft(
+        to,
+        id.native.tokenId,
+        {
           value: EthBN.from(txFees.toString()),
-        });
+        }
+      );
 
       return res;
     },

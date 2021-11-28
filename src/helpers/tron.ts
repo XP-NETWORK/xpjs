@@ -338,21 +338,15 @@ export async function tronHelperFactory(
     },
     isApprovedForMinter,
     async transferNativeToForeign(
-      sender: TronSender,
+      _sender: TronSender,
       chain_nonce: number,
       to: string,
       value: BigNumber,
       txFees: BigNumber
     ): Promise<string> {
-      setSigner(sender);
-
       const val = EthBN.from(value.toString());
       const totalVal = val.add(EthBN.from(txFees.toString()));
-      let res = await minter
-        .freeze(chain_nonce, to, val)
-        .send({ callValue: totalVal });
-
-      await notifyValidator(res);
+      let res = await minter.freeze(chain_nonce, to, val);
       return res;
     },
     async signAndSend(signer, txn, args) {
@@ -362,32 +356,23 @@ export async function tronHelperFactory(
       return res;
     },
     async unfreezeWrapped(
-      sender: TronSender,
+      _sender: TronSender,
       chain_nonce: number,
       to: string,
       value: string,
-      txFees: string
+      _txFees: string
     ): Promise<string> {
-      setSigner(sender);
-      const res = await minter
-        .withdraw(chain_nonce, to, value)
-        .send({ callValue: EthBN.from(txFees.toString()) });
-
-      await notifyValidator(res);
+      const res = await minter.withdraw(chain_nonce, to, value);
       return res;
     },
     async unfreezeWrappedNft(
-      sender: TronSender,
+      _sender: TronSender,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber
+      _txFees: BigNumber
     ): Promise<Transaction> {
-      setSigner(sender);
-      const res = await minter
-        .withdrawNft(to, id.native.tokenId)
-        .send({ callValue: EthBN.from(txFees.toString()) });
+      const res = await minter.withdrawNft(to, id.native.tokenId);
 
-      await notifyValidator(res);
       return res;
     },
     getNonce() {
@@ -398,16 +383,16 @@ export async function tronHelperFactory(
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber
+      _txFees: BigNumber
     ): Promise<string> {
-      setSigner(sender);
       await approveForMinter(id, sender);
 
-      const txr = await minter
-        .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
-        .send({ callValue: EthBN.from(txFees.toString()) });
-
-      await notifyValidator(txr);
+      const txr = await minter.freezeErc721(
+        id.native.contract,
+        id.native.tokenId,
+        chain_nonce,
+        to
+      );
       return txr;
     },
     async balanceWrappedBatch(
