@@ -4,7 +4,7 @@
  */
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck, SignAndSend } from "./chain";
-import { Signer, BigNumber as EthBN, PopulatedTransaction, Wallet, Transaction } from "ethers";
+import { Signer, BigNumber as EthBN, PopulatedTransaction, Wallet } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, NftInfo, PreTransfer, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
@@ -60,7 +60,7 @@ MintNft<Signer, NftMintArgs, string> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, Transaction> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, PopulatedTransaction> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, PopulatedTransaction> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, PopulatedTransaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
 } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> & SignAndSend<Signer, PopulatedTransaction, TransactionResponse>;
 /**
