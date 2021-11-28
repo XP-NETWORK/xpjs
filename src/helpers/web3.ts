@@ -13,6 +13,7 @@ import {
   BatchWrappedBalanceCheck,
   MintNft,
   WrappedNftCheck,
+  SignAndSend,
 } from "./chain";
 import {
   Signer,
@@ -124,7 +125,8 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer">;
+  } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> &
+  SignAndSend<Signer, PopulatedTransaction, TransactionResponse>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -312,6 +314,10 @@ export async function web3HelperFactory(
         });
 
       return txr;
+    },
+    async signAndSend(signer, txn) {
+      const stx = await signer.signTransaction(txn);
+      return await provider.sendTransaction(stx);
     },
     async unfreezeWrapped(
       sender: Signer,

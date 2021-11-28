@@ -37,6 +37,7 @@ import {
   UnfreezeForeign,
   UnfreezeForeignNft,
   WrappedNftCheck,
+  SignAndSend,
 } from "./chain";
 import {
   ChainNonceGet,
@@ -216,7 +217,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo> &
-  EstimateTxFees<BigNumber>;
+  EstimateTxFees<BigNumber> &
+  SignAndSend<ElrondSigner, Transaction, Transaction>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -630,6 +632,7 @@ export const elrondHelperFactory: (
       return wallet.balance.valueOf();
     },
     balanceWrappedBatch,
+    signAndSend,
     async transferNativeToForeign(
       sender: ElrondSigner,
       chain_nonce: number,

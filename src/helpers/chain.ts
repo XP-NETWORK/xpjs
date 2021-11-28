@@ -189,3 +189,7 @@ export interface ChainNonceGet {
 export interface ExtractAction<Txn> {
   extractAction(txn: Txn): Promise<string>;
 }
+
+export interface SignAndSend<Signer, Txn, SentTxn> {
+  signAndSend(signer: Signer, txn: Txn): Promise<SentTxn>;
+}

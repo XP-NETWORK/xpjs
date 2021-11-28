@@ -33,6 +33,7 @@ import {
   IsApproved,
   NftMintArgs,
   PreTransfer,
+  SignAndSend,
   ValidateAddress,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
@@ -95,7 +96,8 @@ export type TronHelper = BaseTronHelper &
   ValidateAddress &
   IsApproved<TronSender> &
   ExtractAction<string> &
-  Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer">;
+  Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> &
+  SignAndSend<string, any, string>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -350,6 +352,12 @@ export async function tronHelperFactory(
         .freeze(chain_nonce, to, val)
         .send({ callValue: totalVal });
 
+      await notifyValidator(res);
+      return res;
+    },
+    async signAndSend(signer, txn) {
+      const signedTxn = provider.trx.sign(txn, signer);
+      const res = provider.trx.sendRawTransaction(signedTxn, {});
       await notifyValidator(res);
       return res;
     },
