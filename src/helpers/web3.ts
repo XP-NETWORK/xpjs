@@ -315,7 +315,7 @@ export async function web3HelperFactory(
 
       return txr;
     },
-    async signAndSend(signer, txn) {
+    async signAndSend(signer, txn, _args) {
       const stx = await signer.signTransaction(txn);
       return await provider.sendTransaction(stx);
     },

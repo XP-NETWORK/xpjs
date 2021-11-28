@@ -191,5 +191,5 @@ export interface ExtractAction<Txn> {
 }
 
 export interface SignAndSend<Signer, Txn, SentTxn> {
-  signAndSend(signer: Signer, txn: Txn): Promise<SentTxn>;
+  signAndSend(signer: Signer, txn: Txn, args?: {}): Promise<SentTxn>;
 }

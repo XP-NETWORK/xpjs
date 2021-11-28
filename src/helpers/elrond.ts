@@ -266,7 +266,11 @@ export const elrondHelperFactory: (
     return account;
   };
 
-  const signAndSend = async (signer: ElrondSigner, tx: Transaction) => {
+  const signAndSend = async (
+    signer: ElrondSigner,
+    tx: Transaction,
+    _args?: {}
+  ) => {
     const acc = await syncAccount(signer);
     tx.setNonce(acc.nonce);
     let stx: Transaction;

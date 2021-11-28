@@ -355,9 +355,9 @@ export async function tronHelperFactory(
       await notifyValidator(res);
       return res;
     },
-    async signAndSend(signer, txn) {
+    async signAndSend(signer, txn, args) {
       const signedTxn = provider.trx.sign(txn, signer);
-      const res = provider.trx.sendRawTransaction(signedTxn, {});
+      const res = provider.trx.sendRawTransaction(signedTxn, args);
       await notifyValidator(res);
       return res;
     },
