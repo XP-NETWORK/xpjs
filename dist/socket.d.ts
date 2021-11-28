@@ -1,4 +1,5 @@
 import { ManagerOptions, SocketOptions } from "socket.io-client";
+import { ClaimNftInfo } from "./helpers/algorand";
 /**
  * Tracker for cross chain transaction
  */
@@ -11,10 +12,13 @@ export declare type TxnSocketHelper = {
      */
     waitTxHash(chain: number, action_id: string): Promise<string>;
 };
+export declare type AlgorandSocketHelper = {
+    waitAlgorandNft(action_id: string): Promise<ClaimNftInfo>;
+};
 /**
- * Create a [[TxnSocketHelper]]
+ * Create a [[SocketHelper]]
  *
  * @param uri  URI of the Migration-Validator socket api
  * @param options  socket.io options
  */
-export declare function txnSocketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper;
+export declare function socketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper & AlgorandSocketHelper;

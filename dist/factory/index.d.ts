@@ -1,18 +1,19 @@
 import { ElrondHelper, ElrondParams } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
-import { ChainNonce } from "../consts";
+import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
-import { ChainNonceGet, EstimateTxFees, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
+import { AlgorandArgs, AlgoSignerH } from "../helpers/algorand";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
-declare type FullChain<Signer, RawNft> = TransferNftForeign<Signer, string, BigNumber, RawNft> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
+declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
 /**
  * A type representing a chain factory.
  *
  */
-declare type ChainFactory = {
+export declare type ChainFactory = {
     /**
      * Creates an helper factory for a given chain
      * @type T: Either {@link ElrondHelper} | {@link Web3Helper} | {@link TronHelper} as required.
@@ -31,18 +32,20 @@ declare type ChainFactory = {
      * Transfers the NFT from one chain to other.
      * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
      * @param toChain {@link FullChain} the chain to transfer to. Use inner method of the factory to get this.
+     * WARN: Algorand NFTs must be manually claimed by the receiver
      * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the `nftList` method of the factory.
      * @param sender {@link Sender} The owner of the NFT.
      * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
+     * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
      */
-    transferNft<SignerF, RawNftF, SignerT, RawNftT>(fromChain: FullChain<SignerF, RawNftF>, toChain: FullChain<SignerT, RawNftT>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber): Promise<string>;
+    transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber): Promise<Resp>;
     /**
      * Mints an NFT on the chain.
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
      * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
      * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
      */
-    mint<Signer, R>(chain: MintNft<Signer, NftMintArgs, R>, owner: Signer, args: NftMintArgs): Promise<R>;
+    mint<Signer>(chain: MintNft<Signer, NftMintArgs, string>, owner: Signer, args: NftMintArgs): Promise<string>;
     /**
      * Lists all the NFTs on the chain owner by {@param owner}.
      * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
@@ -56,13 +59,37 @@ declare type ChainFactory = {
      * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
      * @param receiver: Address of the receiver of the NFT in raw string..
      */
-    estimateFees<SignerF, RawNftF, SignerT, RawNftT>(fromChain: FullChain<SignerF, RawNftF>, toChain: FullChain<SignerT, RawNftT>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
+    estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
     /**
      *
      * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
      * @param params : New Params to be set.
      */
     updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
+    nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
+    pkeyToSigner<S>(nonce: ChainNonce<WrappedNftCheck<S>, unknown>, key: string): Promise<S>;
+    /**
+     *
+     * Get transaction in the destination chain
+     * WARN: use claimAlgorandNft instead for algorand.
+     *
+     * @param chain source chain
+     * @param destination destination chain
+     * @param hash transaction hash from source chain
+     *
+     * @returns transaction hash in original chain, unique action id
+     */
+    getDestinationTransaction<Txn>(chain: ExtractAction<Txn>, destination: number, hash: Txn): Promise<string>;
+    /**
+     *
+     * Claim an algorand nft
+     *
+     *
+     * @param originChain chain from which the nft was transferred
+     * @param txn Transaction Hash of the original
+     * @param claimer the account which can claim the nft
+     */
+    claimAlgorandNft<Txn>(originChain: ExtractAction<Txn>, txn: Txn, claimer: AlgoSignerH): Promise<string>;
 };
 /**
  * A type representing all the supported chain params.
@@ -80,7 +107,9 @@ export interface ChainParams {
     harmonyParams: Web3Params;
     ontologyParams: Web3Params;
     xDaiParams: Web3Params;
+    algorandParams: AlgorandArgs;
 }
+export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
  * A struct for the configuration of the library.
  * @field exchangeRateUri: The URI of the exchange rate service.
@@ -91,9 +120,12 @@ export interface ChainParams {
 export interface AppConfig {
     exchangeRateUri: string;
     heartbeatUri: string;
+    txSocketUri: string;
     moralisServer: string;
     moralisAppId: string;
     tronScanUri: string;
+    moralisSecret?: string;
+    moralisNetwork: MoralisNetwork;
 }
 /**
  * This function is the basic entry point to use this package as a library.

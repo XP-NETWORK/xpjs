@@ -6,8 +6,8 @@
  */
 import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
-import { ChainNonceGet, ValidateAddress } from "..";
+import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck, SignAndSend } from "./chain";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, PreTransfer, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 /**
@@ -92,9 +92,9 @@ export interface SetESDTRoles {
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, Transaction> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress;
+} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo> & EstimateTxFees<BigNumber> & SignAndSend<ElrondSigner, Transaction, Transaction>;
 /**
  * Create an object implementing cross chain utilities for elrond
  *

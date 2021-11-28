@@ -3,10 +3,10 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck } from "./chain";
-import { Signer, BigNumber as EthBN } from "ethers";
-import { Provider } from "@ethersproject/providers";
-import { ChainNonceGet, EstimateTxFees, NftInfo, ValidateAddress } from "..";
+import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck, SignAndSend } from "./chain";
+import { Signer, BigNumber as EthBN, PopulatedTransaction, Wallet, Transaction } from "ethers";
+import { TransactionResponse, Provider } from "@ethersproject/providers";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, NftInfo, PreTransfer, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type EasyBalance = string | number | EthBN;
 /**
@@ -35,7 +35,7 @@ export interface IsApproved<Sender> {
     isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<boolean>;
 }
 export interface Approve<Sender> {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<boolean>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<string | undefined>;
 }
 /**
  * Base util traits
@@ -47,7 +47,7 @@ export declare type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
  * @argument signer  owner of the smart contract
  * @argument args  See [[MintArgs]]
  */
-MintNft<Signer, NftMintArgs, any> & {
+MintNft<Signer, NftMintArgs, string> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -60,7 +60,9 @@ MintNft<Signer, NftMintArgs, any> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo> & WrappedNftCheck<MintArgs> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress;
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, Transaction> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
+    createWallet(privateKey: string): Wallet;
+} & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> & SignAndSend<Signer, PopulatedTransaction, TransactionResponse>;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *

@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 /**
  * NFT Info
  */
@@ -15,8 +16,8 @@ export declare type NftInfo<Raw> = {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferForeign<Signer, ForeignAddr, Balance> {
-    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<string>;
+export interface TransferForeign<Signer, ForeignAddr, Balance, Resp> {
+    transferNativeToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<Resp>;
 }
 /**
  * Unfreeze native liquidity existing on a foreign chain(Send back Liquidity)
@@ -32,6 +33,13 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
     unfreezeWrapped(sender: Signer, chain_nonce: number, to: ForeignAddr, value: Balance, txFees: Balance): Promise<string>;
 }
 /**
+ * Action to perform before transfer/unfreeze (if any)
+ */
+export interface PreTransfer<Signer, Nft> {
+    preTransfer(sender: Signer, nft: NftInfo<Nft>, fee: BigNumber): Promise<string | undefined>;
+    preUnfreeze(sender: Signer, nft: NftInfo<Nft>, fee: BigNumber): Promise<string | undefined>;
+}
+/**
  * Transfer NFT to a foreign chain, freezing the original one
  *
  * @param sender  Account which owns the NFT on the native chain, able to sign transactions
@@ -41,8 +49,8 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<string>;
+export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft, Resp> {
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<Resp>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
@@ -54,8 +62,8 @@ export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft> {
-    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<string>;
+export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft, Resp> {
+    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<Resp>;
 }
 /**
  * Get the balance of an address on the chain
@@ -107,4 +115,10 @@ export interface EstimateTxFees<Balance> {
 export declare function ConcurrentSendError(): Error;
 export interface ChainNonceGet {
     getNonce(): number;
+}
+export interface ExtractAction<Txn> {
+    extractAction(txn: Txn): Promise<string>;
+}
+export interface SignAndSend<Signer, Txn, SentTxn> {
+    signAndSend(signer: Signer, txn: Txn, args?: {}): Promise<SentTxn>;
 }

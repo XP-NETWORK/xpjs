@@ -1,9 +1,9 @@
 import { CrossChainHelper } from ".";
-import { ElrondParams } from "./helpers/elrond";
-import { TronParams } from "./helpers/tron";
-import { Web3Params } from "./helpers/web3";
+import { ElrondParams, ElrondHelper } from "./helpers/elrond";
+import { TronParams, TronHelper } from "./helpers/tron";
+import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { ElrondHelper, Web3Helper, TronHelper } from "validator";
+import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -30,15 +30,16 @@ export declare enum MainNetRpcUri {
     HARMONY = "https://api.harmony.one",
     XDAI = "https://rpc.xdaichain.com/"
 }
-export declare type ChainNonce<T, P> = number & ThisType<T> & ThisType<P>;
+export declare type ChainNonce<_, __> = number;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
+export declare type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandArgs>;
 export declare namespace Chain {
     const ELROND: ElrondNonce;
     const HECO: Web3Nonce;
     const BSC: Web3Nonce;
-    const ROPSTEN: Web3Nonce;
+    const ETHEREUM: Web3Nonce;
     const AVALANCHE: Web3Nonce;
     const POLYGON: Web3Nonce;
     const FANTOM: Web3Nonce;
@@ -46,6 +47,7 @@ export declare namespace Chain {
     const CELO: Web3Nonce;
     const HARMONY: Web3Nonce;
     const XDAI: Web3Nonce;
+    const ALGORAND: AlgoNonce;
 }
 interface ChainData {
     name: string;
@@ -61,4 +63,11 @@ interface ChainInfo {
     [nonce: number]: ChainData;
 }
 export declare const CHAIN_INFO: ChainInfo;
+export declare const Config: {
+    exchangeRateUri: string;
+    moralisServer: string;
+    moralisAppId: string;
+    tronScanUri: string;
+    heartbeatUri: string;
+};
 export {};

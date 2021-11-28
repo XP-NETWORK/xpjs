@@ -1,9 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { BalanceCheck, BatchWrappedBalanceCheck, EstimateTxFees, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedBalanceCheck, WrappedNftCheck } from "./chain";
 import { TronWeb } from "tronweb";
-import { EthNftInfo, MintArgs } from "./web3";
-import { Approve, IsApproved, NftMintArgs, ValidateAddress } from "..";
+import { EthNftInfo } from "./web3";
+import { Approve, ExtractAction, IsApproved, NftMintArgs, PreTransfer, SignAndSend, ValidateAddress } from "..";
 import { ChainNonceGet } from "..";
+import { Transaction } from "ethers";
 declare type TronSender = string | undefined;
 export declare type MinterRes = {
     minter: string;
@@ -11,7 +12,7 @@ export declare type MinterRes = {
     xpnet: string;
     whitelist: string[];
 };
-export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<TronSender, NftMintArgs, any> & {
+export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<TronSender, NftMintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract
@@ -30,7 +31,7 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<T
      */
     deployMinter(deployer: TronSender, validators: string[], threshold: number, whitelist: string[] | undefined): Promise<MinterRes>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<TronSender, string, BigNumber> & TransferNftForeign<TronSender, string, BigNumber, EthNftInfo> & UnfreezeForeign<TronSender, string, string> & UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo> & WrappedNftCheck<MintArgs> & EstimateTxFees<BigNumber> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender>;
+export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<TronSender, string, BigNumber, string> & TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> & UnfreezeForeign<TronSender, string, string> & UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> & SignAndSend<string, any, string>;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
