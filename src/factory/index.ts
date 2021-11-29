@@ -252,18 +252,22 @@ export function ChainFactory(
   const txSocket = socketHelper(appConfig.txSocketUri);
 
   const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || "");
-  const moralisNftRepo =
-    appConfig.moralisNetwork === "mainnet"
-      ? moralisNftList(
-          appConfig.moralisServer,
-          appConfig.moralisAppId,
-          appConfig.moralisSecret
-        )
-      : moralisTestnetNftList(
-          appConfig.moralisServer,
-          appConfig.moralisAppId,
-          appConfig.moralisSecret
-        );
+  const moralisNftRepo = moralisNftList(
+    appConfig.moralisServer,
+    appConfig.moralisAppId,
+    appConfig.moralisSecret
+  )
+  // appConfig.moralisNetwork === "mainnet"
+  //   ? moralisNftList(
+  //       appConfig.moralisServer,
+  //       appConfig.moralisAppId,
+  //       appConfig.moralisSecret
+  //     )
+  //   : moralisTestnetNftList(
+  //       appConfig.moralisServer,
+  //       appConfig.moralisAppId,
+  //       appConfig.moralisSecret
+  //     );
   const tronNftRepo =
     chainParams.tronParams &&
     tronListNft(
