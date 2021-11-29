@@ -78,6 +78,7 @@ export declare function baseWeb3HelperFactory(provider: Provider): Promise<BaseW
  */
 export interface Web3Params {
     provider: Provider;
+    middleware_uri: string;
     minter_addr: string;
     erc1155_addr: string;
     erc721_addr: string;
