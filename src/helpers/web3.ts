@@ -171,6 +171,7 @@ export async function baseWeb3HelperFactory(
  */
 export interface Web3Params {
   provider: Provider;
+  middleware_uri: string;
   minter_addr: string;
   erc1155_addr: string;
   erc721_addr: string;
@@ -186,7 +187,20 @@ export async function web3HelperFactory(
   const minter = Minter__factory.connect(minter_addr, provider);
   const erc1155 = XPNet__factory.connect(erc1155_addr, provider);
 
-  async function extractAction(txr: TransactionResponse): Promise<string> {
+  const event_middleware = axios.create({
+    baseURL: params.middleware_uri,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  async function notifyValidator(hash: string): Promise<void> {
+    await event_middleware.post("/tx/web3", { chain_nonce: params.nonce, tx_hash: hash });
+  }
+
+  async function extractAction(
+    txr: TransactionResponse
+  ): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
@@ -311,6 +325,7 @@ export async function web3HelperFactory(
           value: EthBN.from(txFees.toString()),
         });
 
+      await notifyValidator(txr.hash);
       return txr;
     },
     async unfreezeWrapped(
@@ -339,6 +354,9 @@ export async function web3HelperFactory(
         .withdrawNft(to, id.native.tokenId, {
           value: EthBN.from(txFees.toString()),
         });
+
+
+      await notifyValidator(res.hash);
 
       return res;
     },
