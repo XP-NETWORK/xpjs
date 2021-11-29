@@ -154,12 +154,12 @@ export namespace ChainFactoryConfigs {
     },
     tronParams: {
       provider: new TronWeb({ fullHost: MainNetRpcUri.TRON }),
-      middleware_uri: "string",
-      erc1155_addr: "string",
-      minter_addr: "string",
-      erc721_addr: "string",
+      middleware_uri: "https://identifiytx.herokuapp.com",
+      erc1155_addr: "TSg3nSjuSuVf5vEk6f2WwM9Ph8bEaNNz9B",
+      minter_addr: "TMx1nCzbK7tbBinLh29CewahpbR1k64c8E",
+      erc721_addr: "TRON",
       nonce: Chain.TRON,
-      validators: [""],
+      validators: EVM_VALIDATORS,
     },
     avalancheParams: {
       middleware_uri,
