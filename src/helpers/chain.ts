@@ -100,7 +100,8 @@ export interface TransferNftForeignUnsigned<
     chain_nonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
-    txFees: Balance
+    txFees: Balance,
+    senderAddress: string
   ): Promise<Resp>;
 }
 
@@ -138,7 +139,8 @@ export interface UnfreezeForeignNftUnsigned<
   unfreezeWrappedNftTxn(
     to: ForeignAddr,
     id: NftInfo<RawNft>,
-    txFees: Balance
+    txFees: Balance,
+    sender: string
   ): Promise<Resp>;
 }
 
