@@ -1,4 +1,9 @@
-import { ElrondHelper, ElrondParams, ElrondRawUnsignedTxn, EsdtNftInfo } from "../helpers/elrond";
+import {
+  ElrondHelper,
+  ElrondParams,
+  ElrondRawUnsignedTxn,
+  EsdtNftInfo,
+} from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
 import { EthNftInfo, Web3Helper, Web3Params } from "../helpers/web3";
 import {
@@ -183,7 +188,15 @@ export type ChainFactory = {
     txn: Txn,
     claimer: AlgoSignerH
   ): Promise<string>;
-
+  /**
+   * Returns a raw txn (hopefully Typed JS Objects in all chains) which can be sent over the wire for signing and broadcasting.
+   * @param from The chain from which the NFT is being sent.
+   * @param toNonce The nonce of the chain to which the NFT is being sent.
+   * @param sender the address of the sender of the NFT.
+   * @param to the address of the receiver of the NFT.
+   * @param nft the NFT to be transferred.
+   * @param fee the fee to be paid for the transaction.
+   */
   generateNftTxn<RawNftF, Resp>(
     from: RawTxnBuiladableChain<RawNftF, Resp>,
     toNonce: number,
