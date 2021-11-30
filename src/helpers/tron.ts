@@ -83,12 +83,12 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
 export type TronHelper = BaseTronHelper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<TronSender, string, BigNumber, string> &
+  TransferForeign<string, BigNumber, string> &
   // TODO: Use TX Fees
-  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> &
+  TransferNftForeign<string, BigNumber, EthNftInfo, string> &
   // TODO: Use TX Fees
   UnfreezeForeign<TronSender, string, string> &
-  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
+  UnfreezeForeignNft<string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -338,7 +338,6 @@ export async function tronHelperFactory(
     },
     isApprovedForMinter,
     async transferNativeToForeign(
-      _sender: TronSender,
       chain_nonce: number,
       to: string,
       value: BigNumber,
@@ -366,7 +365,6 @@ export async function tronHelperFactory(
       return res;
     },
     async unfreezeWrappedNft(
-      _sender: TronSender,
       to: string,
       id: NftInfo<EthNftInfo>,
       _txFees: BigNumber
@@ -379,14 +377,17 @@ export async function tronHelperFactory(
       return tronParams.nonce;
     },
     async transferNftToForeign(
-      sender: TronSender,
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
       _txFees: BigNumber
     ): Promise<string> {
-      await approveForMinter(id, sender);
-
+      const isApproved = await isApprovedForMinter(id, undefined);
+      if (!isApproved) {
+        throw new Error(
+          "NFT not approved for minter. Call the pretransfer method first."
+        );
+      }
       const txr = await minter.freezeErc721(
         id.native.contract,
         id.native.tokenId,

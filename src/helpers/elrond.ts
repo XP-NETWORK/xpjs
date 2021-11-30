@@ -193,22 +193,10 @@ type EventIdent = string;
  */
 export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ElrondSigner, string, BigNumber, Transaction> &
+  TransferForeign<string, BigNumber, Transaction> &
   UnfreezeForeign<ElrondSigner, string, BigNumber> &
-  TransferNftForeign<
-    ElrondSigner,
-    string,
-    BigNumber,
-    EsdtNftInfo,
-    Transaction
-  > &
-  UnfreezeForeignNft<
-    ElrondSigner,
-    string,
-    BigNumber,
-    EsdtNftInfo,
-    Transaction
-  > &
+  TransferNftForeign<string, BigNumber, EsdtNftInfo, Transaction> &
+  UnfreezeForeignNft<string, BigNumber, EsdtNftInfo, Transaction> &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
@@ -634,7 +622,6 @@ export const elrondHelperFactory: (
     balanceWrappedBatch,
     signAndSend,
     async transferNativeToForeign(
-      _sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       value: EasyBalance,
@@ -648,25 +635,19 @@ export const elrondHelperFactory: (
       return txu.toPlainObject();
     },
     async unfreezeWrapped(
-      sender: ElrondSigner,
+      _sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       value: EasyBalance,
       _txFees: EasyBalance
     ): Promise<any> {
-      const txu = unsignedUnfreezeTxn(
-        chain_nonce,
-        await getAddress(sender),
-        to,
-        value
-      );
+      const txu = unsignedUnfreezeTxn(chain_nonce, new Address(""), to, value);
       return txu.toPlainObject();
     },
     preTransfer: doEgldSwap,
     preUnfreeze: doEgldSwap,
     extractAction,
     async transferNftToForeign(
-      sender: ElrondSigner,
       chain_nonce: number,
       to: string,
       info: NftInfo<EsdtNftInfo>,
@@ -674,7 +655,7 @@ export const elrondHelperFactory: (
     ): Promise<any> {
       const txu = unsignedTransferNftTxn(
         chain_nonce,
-        await getAddress(sender),
+        new Address(""),
         to,
         info.native,
         new BigNumber(txFees.toString())
@@ -682,13 +663,12 @@ export const elrondHelperFactory: (
       return txu.toPlainObject();
     },
     async unfreezeWrappedNft(
-      sender: ElrondSigner,
       to: string,
       nft: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
     ): Promise<any> {
       const txu = unsignedUnfreezeNftTxn(
-        await getAddress(sender),
+        new Address(""),
         to,
         nft.native.nonce,
         new BigNumber(txFees.toString())

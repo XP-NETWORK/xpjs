@@ -113,22 +113,10 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<Signer, string, BigNumber, PopulatedTransaction> &
-  TransferNftForeign<
-    Signer,
-    string,
-    BigNumber,
-    EthNftInfo,
-    PopulatedTransaction
-  > &
+  TransferForeign<string, BigNumber, PopulatedTransaction> &
+  TransferNftForeign<string, BigNumber, EthNftInfo, PopulatedTransaction> &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<
-    Signer,
-    string,
-    BigNumber,
-    EthNftInfo,
-    PopulatedTransaction
-  > &
+  UnfreezeForeignNft<string, BigNumber, EthNftInfo, PopulatedTransaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -236,7 +224,7 @@ export async function web3HelperFactory(
 
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
-    signer: Signer
+    signer: Signer | Provider
   ) => {
     const erc = UserNftMinter__factory.connect(id.native.contract, signer);
     const approvedAddress = await erc.getApproved(id.native.tokenId);
@@ -297,7 +285,6 @@ export async function web3HelperFactory(
       );
     },
     async transferNativeToForeign(
-      _sender: Signer,
       chain_nonce: number,
       to: string,
       value: BigNumber,
@@ -316,13 +303,17 @@ export async function web3HelperFactory(
       return res;
     },
     async transferNftToForeign(
-      sender: Signer,
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<PopulatedTransaction> {
-      await approveForMinter(id, sender);
+      const isApproved = await isApprovedForMinter(id, provider);
+      if (!isApproved) {
+        throw Error(
+          "Nft must be approved for minter. Call the preTransfer function First."
+        );
+      }
 
       const txr = await minter.populateTransaction.freezeErc721(
         id.native.contract,
@@ -356,7 +347,6 @@ export async function web3HelperFactory(
       return res.hash;
     },
     async unfreezeWrappedNft(
-      _sender: Signer,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber

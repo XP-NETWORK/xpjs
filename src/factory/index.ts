@@ -17,6 +17,7 @@ import {
   ExtractAction,
   MintNft,
   NftInfo,
+  SignAndSend,
   socketHelper,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -38,26 +39,31 @@ import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { Wallet } from "ethers";
-import { AlgorandArgs, AlgorandHelper, AlgoSignerH, algoSignerWrapper, ClaimNftInfo } from "../helpers/algorand";
+import {
+  AlgorandArgs,
+  AlgorandHelper,
+  AlgoSignerH,
+  algoSignerWrapper,
+  ClaimNftInfo,
+} from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
-
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
 type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
-type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
-  Signer,
+type FullChain<Signer, RawNft, Txn, SentTxn> = TransferNftForeign<
   string,
   BigNumber,
   RawNft,
-  Resp
+  Txn
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
+  UnfreezeForeignNft<string, BigNumber, RawNft, Txn> &
   EstimateTxFees<BigNumber> &
   NftUriChain<RawNft> &
-  ValidateAddress;
+  ValidateAddress &
+  SignAndSend<Signer, Txn, SentTxn>;
 
 /**
  * A type representing a chain factory.
@@ -86,14 +92,14 @@ export type ChainFactory = {
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
    */
-  transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  transferNft<SignerF, RawNftF, SignerT, RawNftT, Txn, SentTxn>(
+    fromChain: FullChain<SignerF, RawNftF, Txn, SentTxn>,
+    toChain: FullChain<SignerT, RawNftT, Txn, SentTxn>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
     fee?: BigNumber
-  ): Promise<Resp>;
+  ): Promise<SentTxn>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -121,9 +127,9 @@ export type ChainFactory = {
    * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
    * @param receiver: Address of the receiver of the NFT in raw string..
    */
-  estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  estimateFees<SignerF, RawNftF, SignerT, RawNftT, Txn, SentTxn>(
+    fromChain: FullChain<SignerF, RawNftF, Txn, SentTxn>,
+    toChain: FullChain<SignerT, RawNftT, Txn, SentTxn>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
@@ -139,26 +145,26 @@ export type ChainFactory = {
     key: string
   ): Promise<S>;
   /**
-   * 
+   *
    * Get transaction in the destination chain
    * WARN: use claimAlgorandNft instead for algorand.
-   * 
+   *
    * @param chain source chain
    * @param destination destination chain
    * @param hash transaction hash from source chain
-   * 
+   *
    * @returns transaction hash in original chain, unique action id
    */
   getDestinationTransaction<Txn>(
     chain: ExtractAction<Txn>,
     destination: number,
-    hash: Txn,
+    hash: Txn
   ): Promise<string>;
   /**
-   * 
+   *
    * Claim an algorand nft
-   * 
-   * 
+   *
+   *
    * @param originChain chain from which the nft was transferred
    * @param txn Transaction Hash of the original
    * @param claimer the account which can claim the nft
@@ -167,7 +173,7 @@ export type ChainFactory = {
     originChain: ExtractAction<Txn>,
     txn: Txn,
     claimer: AlgoSignerH
-  ): Promise<string>
+  ): Promise<string>;
 };
 
 /**
@@ -303,9 +309,9 @@ export function ChainFactory(
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Txn, SentTxn>(
+    fromChain: FullChain<SignerF, RawNftF, Txn, SentTxn>,
+    toChain: FullChain<SignerT, RawNftT, Txn, SentTxn>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {
@@ -403,7 +409,11 @@ export function ChainFactory(
   }
 
   return {
-    async getDestinationTransaction<T>(chain: ExtractAction<T>, targetNonce: number, hash: T) {
+    async getDestinationTransaction<T>(
+      chain: ExtractAction<T>,
+      targetNonce: number,
+      hash: T
+    ) {
       const action = await chain.extractAction(hash);
       return await txSocket.waitTxHash(targetNonce, action);
     },
@@ -420,7 +430,10 @@ export function ChainFactory(
         case Chain.ALGORAND: {
           const algo: AlgorandHelper = await inner(Chain.ALGORAND);
           const mnem = algosdk.secretKeyToMnemonic(Base64.toUint8Array(key));
-          return algoSignerWrapper(algo.algod, algosdk.mnemonicToSecretKey(mnem)) as unknown as S;
+          return algoSignerWrapper(
+            algo.algod,
+            algosdk.mnemonicToSecretKey(mnem)
+          ) as unknown as S;
         }
         default: {
           const chainH = await inner<Web3Helper, Web3Nonce>(chain);
@@ -486,21 +499,17 @@ export function ChainFactory(
         if (meta.data.wrapped.origin != toChain.getNonce().toString()) {
           throw Error("trying to send wrapped nft to non-origin chain!!!");
         }
-        const res = await fromChain.unfreezeWrappedNft(
-          sender,
-          receiver,
-          nft,
-          fee
-        );
+        const resTxn = await fromChain.unfreezeWrappedNft(receiver, nft, fee);
+        const res = await fromChain.signAndSend(sender, resTxn, fee);
         return res;
       } else {
-        const res = await fromChain.transferNftToForeign(
-          sender,
+        const resTxn = await fromChain.transferNftToForeign(
           toChain.getNonce(),
           receiver,
           nft,
           fee
         );
+        const res = await fromChain.signAndSend(sender, resTxn, fee);
         return res;
       }
     },
@@ -511,16 +520,12 @@ export function ChainFactory(
     ): Promise<string> => {
       return await chain.mintNft(owner, args);
     },
-    claimAlgorandNft: async (
-      origin,
-      hash,
-      claimer
-    ) => {
+    claimAlgorandNft: async (origin, hash, claimer) => {
       const action = await origin.extractAction(hash);
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
 
       return await algo.claimAlgorandNft(claimer, action, txSocket);
-    }
+    },
   };
 }
 /**
