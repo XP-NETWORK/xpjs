@@ -209,12 +209,13 @@ export async function web3HelperFactory(
   });
 
   async function notifyValidator(hash: string): Promise<void> {
-    await event_middleware.post("/tx/web3", { chain_nonce: params.nonce, tx_hash: hash });
+    await event_middleware.post("/tx/web3", {
+      chain_nonce: params.nonce,
+      tx_hash: hash,
+    });
   }
 
-  async function extractAction(
-    txr: TransactionResponse
-  ): Promise<string> {
+  async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
@@ -294,7 +295,7 @@ export async function web3HelperFactory(
         nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase()
       );
     },
-    async unfreezeWrappedNftTxn(to, id, txFees) {
+    async unfreezeWrappedNftTxn(to, id, txFees, _sender) {
       const res = await minter.populateTransaction.withdrawNft(
         to,
         id.native.tokenId,
@@ -338,7 +339,8 @@ export async function web3HelperFactory(
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber
+      txFees: BigNumber,
+      _sender
     ) {
       const txr = await minter.populateTransaction.freezeErc721(
         id.native.contract,
@@ -395,7 +397,6 @@ export async function web3HelperFactory(
         .withdrawNft(to, id.native.tokenId, {
           value: EthBN.from(txFees.toString()),
         });
-
 
       await notifyValidator(res.hash);
 

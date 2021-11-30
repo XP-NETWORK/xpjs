@@ -44,6 +44,8 @@ import {
   ExtractAction,
   NftInfo,
   PreTransfer,
+  TransferNftForeignUnsigned,
+  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -187,6 +189,20 @@ export interface SetESDTRoles {
  */
 type EventIdent = string;
 
+export interface ElrondRawUnsignedTxn {
+  readonly nonce: number;
+  readonly value: string;
+  readonly receiver: string;
+  readonly sender: string;
+  readonly gasPrice: number;
+  readonly gasLimit: number;
+  readonly data?: string;
+  readonly chainID: string;
+  readonly version: number;
+  readonly options?: number;
+  readonly signature?: string;
+}
+
 /**
  * Traits implemented by this module
  */
@@ -216,7 +232,19 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo> &
-  EstimateTxFees<BigNumber>;
+  EstimateTxFees<BigNumber> &
+  TransferNftForeignUnsigned<
+    string,
+    BigNumber,
+    EsdtNftInfo,
+    ElrondRawUnsignedTxn
+  > &
+  UnfreezeForeignNftUnsigned<
+    string,
+    BigNumber,
+    EsdtNftInfo,
+    ElrondRawUnsignedTxn
+  >;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -630,6 +658,25 @@ export const elrondHelperFactory: (
       return wallet.balance.valueOf();
     },
     balanceWrappedBatch,
+    async transferNftToForeignTxn(chain_nonce, to, nft, txFees, sender) {
+      return unsignedTransferNftTxn(
+        chain_nonce,
+        new Address(sender),
+        to,
+        nft.native,
+        new BigNumber(txFees.toString())
+      ).toPlainObject();
+    },
+    async unfreezeWrappedNftTxn(to, nft, fee, sender) {
+      const txu = unsignedUnfreezeNftTxn(
+        new Address(sender),
+        to,
+        nft.native.nonce,
+        new BigNumber(fee.toString())
+      );
+      txu.getSignature().hex();
+      return txu.toPlainObject();
+    },
     async transferNativeToForeign(
       sender: ElrondSigner,
       chain_nonce: number,

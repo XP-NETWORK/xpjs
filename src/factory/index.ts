@@ -1,6 +1,6 @@
-import { ElrondHelper, ElrondParams } from "../helpers/elrond";
+import { ElrondHelper, ElrondParams, ElrondRawUnsignedTxn, EsdtNftInfo } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
-import { Web3Helper, Web3Params } from "../helpers/web3";
+import { EthNftInfo, Web3Helper, Web3Params } from "../helpers/web3";
 import {
   Chain,
   ChainNonce,
@@ -19,7 +19,9 @@ import {
   NftInfo,
   socketHelper,
   TransferNftForeign,
+  TransferNftForeignUnsigned,
   UnfreezeForeignNft,
+  UnfreezeForeignNftUnsigned,
   ValidateAddress,
   WrappedNftCheck,
 } from "..";
@@ -37,11 +39,16 @@ import {
 import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
-import { Wallet } from "ethers";
-import { AlgorandArgs, AlgorandHelper, AlgoSignerH, algoSignerWrapper, ClaimNftInfo } from "../helpers/algorand";
+import { PopulatedTransaction, Wallet } from "ethers";
+import {
+  AlgorandArgs,
+  AlgorandHelper,
+  AlgoSignerH,
+  algoSignerWrapper,
+  ClaimNftInfo,
+} from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
-
 
 export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 
@@ -59,6 +66,14 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   NftUriChain<RawNft> &
   ValidateAddress;
 
+type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
+  string,
+  BigNumber,
+  RawNft,
+  Resp
+> &
+  UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> &
+  WrappedNftCheck<RawNft>;
 /**
  * A type representing a chain factory.
  *
@@ -139,26 +154,26 @@ export type ChainFactory = {
     key: string
   ): Promise<S>;
   /**
-   * 
+   *
    * Get transaction in the destination chain
    * WARN: use claimAlgorandNft instead for algorand.
-   * 
+   *
    * @param chain source chain
    * @param destination destination chain
    * @param hash transaction hash from source chain
-   * 
+   *
    * @returns transaction hash in original chain, unique action id
    */
   getDestinationTransaction<Txn>(
     chain: ExtractAction<Txn>,
     destination: number,
-    hash: Txn,
+    hash: Txn
   ): Promise<string>;
   /**
-   * 
+   *
    * Claim an algorand nft
-   * 
-   * 
+   *
+   *
    * @param originChain chain from which the nft was transferred
    * @param txn Transaction Hash of the original
    * @param claimer the account which can claim the nft
@@ -167,7 +182,16 @@ export type ChainFactory = {
     originChain: ExtractAction<Txn>,
     txn: Txn,
     claimer: AlgoSignerH
-  ): Promise<string>
+  ): Promise<string>;
+
+  generateNftTxn<RawNftF, Resp>(
+    from: RawTxnBuiladableChain<RawNftF, Resp>,
+    toNonce: number,
+    sender: string,
+    to: string,
+    nft: NftInfo<RawNftF>,
+    fee: BigNumber
+  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn>;
 };
 
 /**
@@ -256,18 +280,18 @@ export function ChainFactory(
     appConfig.moralisServer,
     appConfig.moralisAppId,
     appConfig.moralisSecret
-  )
+  );
   appConfig.moralisNetwork === "mainnet"
-     ? moralisNftList(
-         appConfig.moralisServer,
-         appConfig.moralisAppId,
-         appConfig.moralisSecret
-       )
-     : moralisTestnetNftList(
-         appConfig.moralisServer,
-         appConfig.moralisAppId,
-         appConfig.moralisSecret
-       );
+    ? moralisNftList(
+        appConfig.moralisServer,
+        appConfig.moralisAppId,
+        appConfig.moralisSecret
+      )
+    : moralisTestnetNftList(
+        appConfig.moralisServer,
+        appConfig.moralisAppId,
+        appConfig.moralisSecret
+      );
   const tronNftRepo =
     chainParams.tronParams &&
     tronListNft(
@@ -407,7 +431,24 @@ export function ChainFactory(
   }
 
   return {
-    async getDestinationTransaction<T>(chain: ExtractAction<T>, targetNonce: number, hash: T) {
+    async generateNftTxn(chain, toNonce, sender, receiver, nft, fee) {
+      if (chain.isWrappedNft(nft)) {
+        return chain.unfreezeWrappedNftTxn(receiver, nft, fee, sender);
+      } else {
+        return chain.transferNftToForeignTxn(
+          toNonce,
+          receiver,
+          nft,
+          fee,
+          sender
+        );
+      }
+    },
+    async getDestinationTransaction<T>(
+      chain: ExtractAction<T>,
+      targetNonce: number,
+      hash: T
+    ) {
       const action = await chain.extractAction(hash);
       return await txSocket.waitTxHash(targetNonce, action);
     },
@@ -424,7 +465,10 @@ export function ChainFactory(
         case Chain.ALGORAND: {
           const algo: AlgorandHelper = await inner(Chain.ALGORAND);
           const mnem = algosdk.secretKeyToMnemonic(Base64.toUint8Array(key));
-          return algoSignerWrapper(algo.algod, algosdk.mnemonicToSecretKey(mnem)) as unknown as S;
+          return algoSignerWrapper(
+            algo.algod,
+            algosdk.mnemonicToSecretKey(mnem)
+          ) as unknown as S;
         }
         default: {
           const chainH = await inner<Web3Helper, Web3Nonce>(chain);
@@ -515,16 +559,12 @@ export function ChainFactory(
     ): Promise<string> => {
       return await chain.mintNft(owner, args);
     },
-    claimAlgorandNft: async (
-      origin,
-      hash,
-      claimer
-    ) => {
+    claimAlgorandNft: async (origin, hash, claimer) => {
       const action = await origin.extractAction(hash);
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
 
       return await algo.claimAlgorandNft(claimer, action, txSocket);
-    }
+    },
   };
 }
 /**
