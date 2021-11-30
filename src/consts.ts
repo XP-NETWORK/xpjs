@@ -8,6 +8,7 @@ import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
+import {AppConfig} from "./factory";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -203,10 +204,12 @@ export const CHAIN_INFO: ChainInfo = {
   // TODO: Algorand
 };
 
-export const Config = {
+export const Config: AppConfig = {
   exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+  txSocketUri: 'https://sockettx.herokuapp.com',
   moralisServer: "https://azz9akudh6cf.usemoralis.com:2053/server",
   moralisAppId: "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
   tronScanUri: "https://apilist.tronscan.org/api/",
   heartbeatUri: "https://xpheartbeat.herokuapp.com",
+  moralisNetwork: "mainnet"
 }

@@ -257,17 +257,17 @@ export function ChainFactory(
     appConfig.moralisAppId,
     appConfig.moralisSecret
   )
-  // appConfig.moralisNetwork === "mainnet"
-  //   ? moralisNftList(
-  //       appConfig.moralisServer,
-  //       appConfig.moralisAppId,
-  //       appConfig.moralisSecret
-  //     )
-  //   : moralisTestnetNftList(
-  //       appConfig.moralisServer,
-  //       appConfig.moralisAppId,
-  //       appConfig.moralisSecret
-  //     );
+  appConfig.moralisNetwork === "mainnet"
+     ? moralisNftList(
+         appConfig.moralisServer,
+         appConfig.moralisAppId,
+         appConfig.moralisSecret
+       )
+     : moralisTestnetNftList(
+         appConfig.moralisServer,
+         appConfig.moralisAppId,
+         appConfig.moralisSecret
+       );
   const tronNftRepo =
     chainParams.tronParams &&
     tronListNft(
