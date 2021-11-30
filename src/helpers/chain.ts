@@ -90,6 +90,20 @@ export interface TransferNftForeign<
   ): Promise<Resp>;
 }
 
+export interface TransferNftForeignUnsigned<
+  ForeignAddr,
+  Balance,
+  RawNft,
+  Resp
+> {
+  transferNftToForeignTxn(
+    chain_nonce: number,
+    to: ForeignAddr,
+    id: NftInfo<RawNft>,
+    txFees: Balance
+  ): Promise<Resp>;
+}
+
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
  * chain_nonce is automatically derived
@@ -109,6 +123,19 @@ export interface UnfreezeForeignNft<
 > {
   unfreezeWrappedNft(
     sender: Signer,
+    to: ForeignAddr,
+    id: NftInfo<RawNft>,
+    txFees: Balance
+  ): Promise<Resp>;
+}
+
+export interface UnfreezeForeignNftUnsigned<
+  ForeignAddr,
+  Balance,
+  RawNft,
+  Resp
+> {
+  unfreezeWrappedNftTxn(
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance

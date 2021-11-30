@@ -41,6 +41,8 @@ import {
   ExtractAction,
   NftInfo,
   PreTransfer,
+  TransferNftForeignUnsigned,
+  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -124,7 +126,19 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer">;
+  } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> &
+  UnfreezeForeignNftUnsigned<
+    string,
+    BigNumber,
+    EthNftInfo,
+    PopulatedTransaction
+  > &
+  TransferNftForeignUnsigned<
+    string,
+    BigNumber,
+    EthNftInfo,
+    PopulatedTransaction
+  >;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -266,6 +280,16 @@ export async function web3HelperFactory(
         nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase()
       );
     },
+    async unfreezeWrappedNftTxn(to, id, txFees) {
+      const res = await minter.populateTransaction.withdrawNft(
+        to,
+        id.native.tokenId,
+        {
+          value: EthBN.from(txFees.toString()),
+        }
+      );
+      return res;
+    },
     createWallet(privateKey: string): Wallet {
       return new Wallet(privateKey, provider);
     },
@@ -295,6 +319,23 @@ export async function web3HelperFactory(
         value: totalVal,
       });
       return res;
+    },
+    async transferNftToForeignTxn(
+      chain_nonce: number,
+      to: string,
+      id: NftInfo<EthNftInfo>,
+      txFees: BigNumber
+    ) {
+      const txr = await minter.populateTransaction.freezeErc721(
+        id.native.contract,
+        id.native.tokenId,
+        chain_nonce,
+        to,
+        {
+          value: EthBN.from(txFees.toString()),
+        }
+      );
+      return txr;
     },
     async transferNftToForeign(
       sender: Signer,
