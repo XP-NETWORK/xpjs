@@ -4,6 +4,7 @@ import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
+import { AppConfig } from "./factory";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -63,11 +64,5 @@ interface ChainInfo {
     [nonce: number]: ChainData;
 }
 export declare const CHAIN_INFO: ChainInfo;
-export declare const Config: {
-    exchangeRateUri: string;
-    moralisServer: string;
-    moralisAppId: string;
-    tronScanUri: string;
-    heartbeatUri: string;
-};
+export declare const Config: AppConfig;
 export {};
