@@ -24,6 +24,8 @@ const EVM_TESTNET_VALIDATORS = [
   "0x4Cfc8800606EDBd970298bB040Fc8D859c806702",
 ];
 
+const middleware_uri = "TODO"
+
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Partial<ChainParams> = () => ({
     elrondParams: {
@@ -48,7 +50,7 @@ export namespace ChainFactoryConfigs {
     },
     tronParams: {
       provider: new TronWeb({ fullHost: TestNetRpcUri.TRON }),
-      middleware_uri: "string",
+      middleware_uri,
       erc1155_addr: "string",
       minter_addr: "string",
       erc721_addr: "string",
@@ -56,6 +58,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.TRON,
     },
     avalancheParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AVALANCHE),
       minter_addr: "0x273c507D8E21cDE039491B14647Fe9278D88e91D",
       erc1155_addr: "0x04F75a27cE2FDC591C71a88f1EcaC7e5Ce44f5Fc",
@@ -64,6 +67,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.AVALANCHE,
     },
     polygonParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.POLYGON),
       minter_addr: "0xc6148C73f4beCbd7aE39ba23a9CeBa9518fF96BE",
       erc1155_addr: "0xAE25CF0d6D8d7c420768Ed179Ef01cf80c3708B1",
@@ -72,6 +76,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.POLYGON,
     },
     fantomParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FANTOM),
       minter_addr: "0x4Bd915C3e39cfF4eac842255965E79061c38cACD",
       erc1155_addr: "0xAAd4F7BB5FB661181D500829e60010043833a85B",
@@ -80,6 +85,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.FANTOM,
     },
     bscParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BSC),
       minter_addr: "0x346cb8F9081CA561946E5F0f258e64dB7C075465",
       erc1155_addr: "0x434541d6aA0e8395d30e6E6Dd0A83680bc8Cd4B7",
@@ -88,6 +94,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.BSC,
     },
     celoParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.CELO),
       minter_addr: "0x00CAC06Dd0BB4103f8b62D280fE9BCEE8f26fD59",
       erc1155_addr: "0xAD2935E147b61175D5dc3A9e7bDa93B0975A43BA",
@@ -96,6 +103,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.CELO,
     },
     harmonyParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HARMONY),
       minter_addr: "0xb9bEECD1A582768711dE1EE7B0A1d582D9d72a6C",
       erc1155_addr: "0xb9bEECD1A582768711dE1EE7B0A1d582D9d72a6C",
@@ -104,6 +112,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.HARMONY,
     },
     ropstenParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ROPSTEN),
       minter_addr: "0x8C03d5A667A03Ef2A56E78609E510B6cB33147AD",
       erc1155_addr: "0xe909b9b7667121d774133bcd4C1b6f3693239bc4",
@@ -112,6 +121,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.ETHEREUM,
     },
     xDaiParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
       minter_addr: "string",
       erc1155_addr: "string",
@@ -144,14 +154,15 @@ export namespace ChainFactoryConfigs {
     },
     tronParams: {
       provider: new TronWeb({ fullHost: MainNetRpcUri.TRON }),
-      middleware_uri: "string",
-      erc1155_addr: "string",
-      minter_addr: "string",
-      erc721_addr: "string",
+      middleware_uri: "https://identifiytx.herokuapp.com",
+      erc1155_addr: "TSg3nSjuSuVf5vEk6f2WwM9Ph8bEaNNz9B",
+      minter_addr: "TMx1nCzbK7tbBinLh29CewahpbR1k64c8E",
+      erc721_addr: "TRON",
       nonce: Chain.TRON,
-      validators: [""],
+      validators: EVM_VALIDATORS,
     },
     avalancheParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
       minter_addr: "0x5B916EFb0e7bc0d8DdBf2d6A9A7850FdAb1984C4",
       erc1155_addr: "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
@@ -160,6 +171,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.AVALANCHE,
     },
     polygonParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
       minter_addr: "0x2f072879411503580B8974A221bf76638C50a82a",
       erc1155_addr: "0xc69ECD37122A9b5FD7e62bC229d478BB83063C9d",
@@ -168,6 +180,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.POLYGON,
     },
     fantomParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
       minter_addr: "0x5B916EFb0e7bc0d8DdBf2d6A9A7850FdAb1984C4",
       erc1155_addr: "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
@@ -176,6 +189,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.FANTOM,
     },
     bscParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BSC),
       minter_addr: "0xF8679A16858cB7d21b3aF6b2AA1d6818876D3741",
       erc1155_addr: "0xa1B8947Ff4C1fD992561F629cfE67aEb90DfcBd5",
@@ -184,6 +198,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.BSC,
     },
     celoParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CELO),
       minter_addr: "string",
       erc1155_addr: "string",
@@ -192,6 +207,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.CELO,
     },
     harmonyParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HARMONY),
       minter_addr: "string",
       erc1155_addr: "string",
@@ -200,6 +216,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.HARMONY,
     },
     ropstenParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ETHEREUM),
       minter_addr: "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
       erc1155_addr: "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
@@ -208,6 +225,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.ETHEREUM,
     },
     xDaiParams: {
+      middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.XDAI),
       minter_addr: "0x14fb9d669d4ddf712f1c56Ba7C54FF82D9be6377",
       erc1155_addr: "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
