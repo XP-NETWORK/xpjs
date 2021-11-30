@@ -24,7 +24,7 @@ const EVM_TESTNET_VALIDATORS = [
   "0x4Cfc8800606EDBd970298bB040Fc8D859c806702",
 ];
 
-const middleware_uri = "TODO"
+const middleware_uri = "https://notifierrest.herokuapp.com"
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Partial<ChainParams> = () => ({
@@ -154,7 +154,7 @@ export namespace ChainFactoryConfigs {
     },
     tronParams: {
       provider: new TronWeb({ fullHost: MainNetRpcUri.TRON }),
-      middleware_uri: "https://identifiytx.herokuapp.com",
+      middleware_uri,
       erc1155_addr: "TSg3nSjuSuVf5vEk6f2WwM9Ph8bEaNNz9B",
       minter_addr: "TMx1nCzbK7tbBinLh29CewahpbR1k64c8E",
       erc721_addr: "TRON",
