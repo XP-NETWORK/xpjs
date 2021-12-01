@@ -33,11 +33,15 @@ import {
   IsApproved,
   NftMintArgs,
   PreTransfer,
+  PreTransferRawTxn,
+  TransferNftForeignUnsigned,
+  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 import { Transaction } from "ethers";
+import { UnfreezeNftEvent } from "xpnet-web3-contracts/dist/Minter";
 
 // Uses default private key in provider if sender is undefinedd
 type TronSender = string | undefined;
@@ -95,7 +99,10 @@ export type TronHelper = BaseTronHelper &
   ValidateAddress &
   IsApproved<TronSender> &
   ExtractAction<string> &
-  Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer">;
+  Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> &
+  PreTransferRawTxn<EthNftInfo, any> &
+  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, any> &
+  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, any>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -328,6 +335,34 @@ export async function tronHelperFactory(
     extractAction,
     approveForMinter,
     preTransfer: (s, nft, _fee) => approveForMinter(nft, s),
+    async preTransferRawTxn(nft, address, _value) {
+      await setSigner(address);
+      const erc = await provider.contract(
+        UserNftMinter__factory.abi,
+        nft.native.contract
+      );
+      const isApproved = await isApprovedForMinter(nft, address);
+      if (isApproved) {
+        return undefined;
+      }
+
+      const txHash: string = await erc.approve(minter_addr, nft.native.tokenId);
+      return JSON.stringify(txHash);
+    },
+    async transferNftToForeignTxn(nonce, to, id, _fee) {
+      const txr = await minter.freezeErc721(
+        id.native.contract,
+        id.native.tokenId,
+        nonce,
+        to
+      );
+      return JSON.stringify(txr, null, 2);
+    },
+    async unfreezeWrappedNftTxn(to, id, _fee, sender) {
+      setSigner(sender);
+      const res = await minter.withdrawNft(to, id.native.tokenId);
+      return JSON.stringify(res);
+    },
     isWrappedNft(nft) {
       return (
         nft.native.contract.toLowerCase() ===
