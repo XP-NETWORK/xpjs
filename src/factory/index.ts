@@ -2,10 +2,9 @@ import {
   ElrondHelper,
   ElrondParams,
   ElrondRawUnsignedTxn,
-  EsdtNftInfo,
 } from "../helpers/elrond";
 import { TronHelper, TronParams } from "../helpers/tron";
-import { EthNftInfo, Web3Helper, Web3Params } from "../helpers/web3";
+import { Web3Helper, Web3Params } from "../helpers/web3";
 import {
   Chain,
   ChainNonce,
@@ -22,6 +21,7 @@ import {
   ExtractAction,
   MintNft,
   NftInfo,
+  PreTransferRawTxn,
   socketHelper,
   TransferNftForeign,
   TransferNftForeignUnsigned,
@@ -44,13 +44,12 @@ import {
 import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
-import { PopulatedTransaction, Wallet } from "ethers";
+import { PopulatedTransaction } from "ethers";
 import {
   AlgorandArgs,
   AlgorandHelper,
   AlgoSignerH,
   algoSignerWrapper,
-  ClaimNftInfo,
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
@@ -78,7 +77,8 @@ type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
   Resp
 > &
   UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> &
-  WrappedNftCheck<RawNft>;
+  WrappedNftCheck<RawNft> &
+  PreTransferRawTxn<RawNft, Resp>;
 /**
  * A type representing a chain factory.
  *
@@ -205,6 +205,13 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     fee: BigNumber
   ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn>;
+
+  generatePreTransferTxn<RawNftF, Resp>(
+    from: RawTxnBuiladableChain<RawNftF, Resp>,
+    sender: string,
+    nft: NftInfo<RawNftF>,
+    fee: BigNumber
+  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | undefined>;
 };
 
 /**
@@ -444,6 +451,9 @@ export function ChainFactory(
   }
 
   return {
+    async generatePreTransferTxn(from, sender, nft, fee) {
+      return await from.preTransferRawTxn(nft, sender, fee);
+    },
     async generateNftTxn(chain, toNonce, sender, receiver, nft, fee) {
       if (chain.isWrappedNft(nft)) {
         return chain.unfreezeWrappedNftTxn(receiver, nft, fee, sender);
