@@ -204,14 +204,14 @@ export type ChainFactory = {
     to: string,
     nft: NftInfo<RawNftF>,
     fee: BigNumber
-  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn>;
+  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string>;
 
   generatePreTransferTxn<RawNftF, Resp>(
     from: RawTxnBuiladableChain<RawNftF, Resp>,
     sender: string,
     nft: NftInfo<RawNftF>,
     fee: BigNumber
-  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | undefined>;
+  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string | undefined>;
 };
 
 /**
