@@ -119,6 +119,9 @@ export interface EstimateTxFees<Balance> {
     estimateValidateUnfreezeNft(to: string, metadataUri: string): Promise<Balance>;
 }
 export declare function ConcurrentSendError(): Error;
+export interface PreTransferRawTxn<NativeNft, Ret> {
+    preTransferRawTxn(id: NftInfo<NativeNft>, address: string, value?: BigNumber): Promise<Ret | undefined>;
+}
 export interface ChainNonceGet {
     getNonce(): number;
 }
