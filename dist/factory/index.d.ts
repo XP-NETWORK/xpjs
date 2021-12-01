@@ -101,8 +101,8 @@ export declare type ChainFactory = {
      * @param nft the NFT to be transferred.
      * @param fee the fee to be paid for the transaction.
      */
-    generateNftTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, toNonce: number, sender: string, to: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn>;
-    generatePreTransferTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | undefined>;
+    generateNftTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, toNonce: number, sender: string, to: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string>;
+    generatePreTransferTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string | undefined>;
 };
 /**
  * A type representing all the supported chain params.
