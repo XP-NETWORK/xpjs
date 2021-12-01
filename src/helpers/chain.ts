@@ -1,3 +1,4 @@
+import { Address } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 
 /**
@@ -209,6 +210,14 @@ export interface EstimateTxFees<Balance> {
 
 export function ConcurrentSendError(): Error {
   return new Error("concurrent_send");
+}
+
+export interface PreTransferRawTxn<NativeNft, Ret> {
+  preTransferRawTxn(
+    id: NftInfo<NativeNft>,
+    address: string,
+    value?: BigNumber
+  ): Promise<Ret | undefined>;
 }
 
 export interface ChainNonceGet {

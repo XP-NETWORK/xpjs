@@ -22,6 +22,7 @@ import {
   ContractTransaction,
   ethers,
   Transaction,
+  VoidSigner,
 } from "ethers";
 import {
   TransactionReceipt,
@@ -41,6 +42,7 @@ import {
   ExtractAction,
   NftInfo,
   PreTransfer,
+  PreTransferRawTxn,
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
@@ -138,7 +140,8 @@ export type Web3Helper = BaseWeb3Helper &
     BigNumber,
     EthNftInfo,
     PopulatedTransaction
-  >;
+  > &
+  PreTransferRawTxn<EthNftInfo, PopulatedTransaction>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -289,6 +292,28 @@ export async function web3HelperFactory(
       const bal = await erc1155.balanceOf(address, chain_nonce);
 
       return new BigNumber(bal.toString());
+    },
+    async preTransferRawTxn(id, address, _value) {
+      const isApproved = await isApprovedForMinter(
+        id,
+        new VoidSigner(address, provider)
+      );
+
+      if (isApproved) {
+        return undefined;
+      }
+
+      const erc = UserNftMinter__factory.connect(
+        id.native.contract,
+        new VoidSigner(address, provider)
+      );
+
+      const approvetxn = await erc.populateTransaction.approve(
+        minter_addr,
+        id.native.tokenId
+      );
+
+      return approvetxn;
     },
     isWrappedNft(nft) {
       return (

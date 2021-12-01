@@ -44,6 +44,7 @@ import {
   ExtractAction,
   NftInfo,
   PreTransfer,
+  PreTransferRawTxn,
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
@@ -244,7 +245,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     BigNumber,
     EsdtNftInfo,
     ElrondRawUnsignedTxn
-  >;
+  > &
+  PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -788,6 +790,29 @@ export const elrondHelperFactory: (
       return (
         tokenIdentReal(nft.native.tokenIdentifier) === elrondParams.esdt_nft
       );
+    },
+    async preTransferRawTxn(id, address, value) {
+      if (!address || !value) {
+        throw new Error("address and value is required for elrond egld swap");
+      }
+      const esdts = await listEsdt(address);
+      const res = esdts[id.native.nonce];
+      if (res === undefined || new BigNumber(res.balance).lt(value)) {
+        const utx = new Transaction({
+          receiver: swapContract,
+          gasLimit: new GasLimit(50000000),
+          value: new Balance(
+            Egld.getToken(),
+            Egld.getNonce(),
+            new BigNumber(value.toString())
+          ),
+          data: TransactionPayload.contractCall()
+            .setFunction(new ContractFunction("wrapEgld"))
+            .build(),
+        });
+        return utx.toPlainObject();
+      }
+      return undefined;
     },
     listNft,
     async setESDTRole(
