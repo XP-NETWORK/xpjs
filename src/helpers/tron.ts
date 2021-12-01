@@ -101,8 +101,8 @@ export type TronHelper = BaseTronHelper &
   ExtractAction<string> &
   Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, any> &
-  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, any> &
-  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, any>;
+  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, string> &
+  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, string>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
