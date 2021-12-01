@@ -24,7 +24,7 @@ const EVM_TESTNET_VALIDATORS = [
   "0x4Cfc8800606EDBd970298bB040Fc8D859c806702",
 ];
 
-const middleware_uri = "https://notifierrest.herokuapp.com"
+const middleware_uri = "https://notifierrest.herokuapp.com";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Partial<ChainParams> = () => ({
