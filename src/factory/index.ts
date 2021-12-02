@@ -19,10 +19,12 @@ import {
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
+  ExtractTxnStatus,
   MintNft,
   NftInfo,
   PreTransferRawTxn,
   socketHelper,
+  TransactionStatus,
   TransferNftForeign,
   TransferNftForeignUnsigned,
   UnfreezeForeignNft,
@@ -173,7 +175,7 @@ export type ChainFactory = {
     chain: ExtractAction<Txn>,
     destination: number,
     hash: Txn
-  ): Promise<string>;
+  ): Promise<[string, TransactionStatus]>;
   /**
    *
    * Claim an algorand nft
@@ -468,12 +470,13 @@ export function ChainFactory(
       }
     },
     async getDestinationTransaction<T>(
-      chain: ExtractAction<T>,
+      chain: ExtractAction<T> & ExtractTxnStatus<T>,
       targetNonce: number,
-      hash: T
+      txn: T
     ) {
-      const action = await chain.extractAction(hash);
-      return await txSocket.waitTxHash(targetNonce, action);
+      const action = await chain.extractAction(txn);
+      const status = await chain.extractTxnStatus(txn);
+      return [await txSocket.waitTxHash(targetNonce, action), status];
     },
     nonceToChainNonce,
     async pkeyToSigner<S>(nonce: ChainNonce<S, unknown>, key: string) {
