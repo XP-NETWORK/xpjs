@@ -3,7 +3,7 @@ import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, MintNft, NftInfo, PreTransferRawTxn, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, MintNft, NftInfo, PreTransferRawTxn, TransactionStatus, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 import { PopulatedTransaction } from "ethers";
 import { AlgorandArgs, AlgoSignerH } from "../helpers/algorand";
@@ -81,7 +81,7 @@ export declare type ChainFactory = {
      *
      * @returns transaction hash in original chain, unique action id
      */
-    getDestinationTransaction<Txn>(chain: ExtractAction<Txn>, destination: number, hash: Txn): Promise<string>;
+    getDestinationTransaction<Txn>(chain: ExtractAction<Txn>, destination: number, hash: Txn): Promise<[string, TransactionStatus]>;
     /**
      *
      * Claim an algorand nft
