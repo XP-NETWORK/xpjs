@@ -118,6 +118,7 @@ const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
 import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
 const elrondSigner = ExtensionProvider.getInstance();
 ```
+<br>
 
 ### 3.4 Example of getting the signer object (in the FE for Tron):<br><br>
 ```typescript
@@ -132,7 +133,7 @@ const tronSigner = addresses[0];
 
 For the ways of connecting the wallets in the FE check-out our [bridge repository](https://github.com/xp-network/bridge-interface/blob/components-reorder/src/components/ConnectWallet.jsx)
 
-<hr/><br>
+<hr/>
 
 ### 4. Getting the inner objects from this factory that can be used for transferring, minting, estimation of gas fees.<br><br>
 
@@ -183,9 +184,9 @@ This operation does not depend on a wallet, since reading operations are free an
 
 ```javascript
 // Choosing an NFT to transfer:
-const web3ChosenOne = web3Nfts[0];
-const elrondChosenOne = elrondNfts[0];
-const tronChosenOne = tronNfts[0];
+const web3ChosenOne     = web3Nfts[0];
+const elrondChosenOne   = elrondNfts[0];
+const tronChosenOne     = tronNfts[0];
 
 // Checking the selected NFT object
 console.log("EVM Selected NFT:   ", web3ChosenOne);
@@ -200,19 +201,15 @@ console.log("tron Selected NFT:  ", tronChosenOne);
 ```javascript
 // EVM example
 (async () => {
-  const isApproved = await polygon.approveForMinter(theChosenOne, signer);
+  const isApproved = await polygon.approveForMinter(web3ChosenOne, signer);
   console.log("Is Approved:", isApproved);
-})();
 
 // Elrond example
-(async () => {
-  const isApproved = await elrond.approveForMinter(theChosenOne, elrondSigner);
+  const isApproved = await elrond.approveForMinter(elrondChosenOne, elrondSigner);
   console.log("Is Approved:", isApproved);
-})();
 
 // Tron example
-(async () => {
-  const isApproved = await elrond.approveForMinter(theChosenOne, tronSigner);
+  const isApproved = await elrond.approveForMinter(tronChosenOne, tronSigner);
   console.log("Is Approved:", isApproved);
 })();
 ```
@@ -224,38 +221,34 @@ console.log("tron Selected NFT:  ", tronChosenOne);
 ```javascript
 // EVM compatible chains example:
 (async () => {
-  const result = await factory.transferNft(
+  const web3Result = await factory.transferNft(
     polygon,                    // The Source Chain.
     bsc,                        // The Destination Chain.
     theChosenOne,               // Or the NFT object you have chosen from the list.
     signer,                     // The web3 signer object (see p. 3.2 above).
     "ADDRESS OF THE RECEIVER"   // The address whom you are transferring the NFT to.
   );
-  console.log(result);
-})();
+  console.log(web3Result);
 
 // Elrond example:
-(async () => {
-  const result = await factory.transferNft(
+  const elrondResult = await factory.transferNft(
     elrond,                     // The Source Chain.
     tron,                       // The Destination Chain.
-    theChosenOne,               // Or the NFT object you have chosen from the list.
+    elrondChosenOne,            // Or the NFT object you have chosen from the list.
     elrondSigner,               // The Elrond signer object (see p. 3.3 above).
     "ADDRESS OF THE RECEIVER"   // The address whom you are transferring the NFT to.
   );
-  console.log(result);
-})();
+  console.log(elrondResult);
 
 // Tron example:
-(async () => {
-  const result = await factory.transferNft(
+  const tronRresult = await factory.transferNft(
     tron,                       // The Source Chain.
     elrond,                     // The Destination Chain.
-    theChosenOne,               // Or the NFT object you have chosen from the list.
+    tronChosenOne,              // Or the NFT object you have chosen from the list.
     tronSigner,                 // The Tron signer object (see p. 3.4 above).
     "ADDRESS OF THE RECEIVER"   // The address whom you are transferring the NFT to.
   );
-  console.log(result);
+  console.log(tronRresult);
 })();
 ```
 
