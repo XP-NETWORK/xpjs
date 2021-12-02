@@ -128,3 +128,12 @@ export interface ChainNonceGet {
 export interface ExtractAction<Txn> {
     extractAction(txn: Txn): Promise<string>;
 }
+export declare enum TransactionStatus {
+    PENDING = "pending",
+    SUCCESS = "success",
+    FAILURE = "failure",
+    UNKNOWN = "unknown"
+}
+export interface ExtractTxnStatus<Txn> {
+    extractTxnStatus(txn: Txn): Promise<TransactionStatus>;
+}
