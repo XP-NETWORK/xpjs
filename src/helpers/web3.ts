@@ -144,7 +144,7 @@ export type Web3Helper = BaseWeb3Helper &
     PopulatedTransaction
   > &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
-  ExtractTxnStatus<ContractTransaction>;
+  ExtractTxnStatus;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -324,8 +324,7 @@ export async function web3HelperFactory(
       );
     },
     async extractTxnStatus(txn) {
-      const status = (await (await provider.getTransaction(txn.hash)).wait())
-        .status;
+      const status = (await (await provider.getTransaction(txn)).wait()).status;
       if (status === undefined) {
         return TransactionStatus.PENDING;
       }
