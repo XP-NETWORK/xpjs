@@ -134,6 +134,6 @@ export declare enum TransactionStatus {
     FAILURE = "failure",
     UNKNOWN = "unknown"
 }
-export interface ExtractTxnStatus<Txn> {
-    extractTxnStatus(txn: Txn): Promise<TransactionStatus>;
+export interface ExtractTxnStatus {
+    extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }

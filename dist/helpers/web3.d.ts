@@ -4,7 +4,7 @@
  */
 import BigNumber from "bignumber.js";
 import { TransferForeign, UnfreezeForeign, UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck } from "./chain";
-import { Signer, BigNumber as EthBN, PopulatedTransaction, Wallet, ContractTransaction, Transaction } from "ethers";
+import { Signer, BigNumber as EthBN, PopulatedTransaction, Wallet, Transaction } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, NftInfo, PreTransfer, PreTransferRawTxn, TransferNftForeignUnsigned, UnfreezeForeignNftUnsigned, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
@@ -62,7 +62,7 @@ MintNft<Signer, NftMintArgs, string> & {
  */
 export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<Signer, string, BigNumber, Transaction> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> & UnfreezeForeign<Signer, string, EasyBalance> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-} & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> & UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, PopulatedTransaction> & TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, PopulatedTransaction> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus<ContractTransaction>;
+} & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> & UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, PopulatedTransaction> & TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, PopulatedTransaction> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
