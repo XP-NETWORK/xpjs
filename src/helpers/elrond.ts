@@ -37,11 +37,13 @@ import {
   UnfreezeForeign,
   UnfreezeForeignNft,
   WrappedNftCheck,
+  TransactionStatus,
 } from "./chain";
 import {
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
+  ExtractTxnStatus,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
@@ -246,7 +248,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EsdtNftInfo,
     ElrondRawUnsignedTxn
   > &
-  PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn>;
+  PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
+  ExtractTxnStatus<Transaction>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -678,6 +681,19 @@ export const elrondHelperFactory: (
       );
       txu.getSignature().hex();
       return txu.toPlainObject();
+    },
+    async extractTxnStatus(txn) {
+      const status = await provider.getTransactionStatus(txn.getHash());
+      if (status.isPending()) {
+        return TransactionStatus.PENDING;
+      }
+      if (status.isSuccessful()) {
+        return TransactionStatus.SUCCESS;
+      }
+      if (status.isFailed()) {
+        return TransactionStatus.FAILURE;
+      }
+      return TransactionStatus.UNKNOWN;
     },
     async transferNativeToForeign(
       sender: ElrondSigner,

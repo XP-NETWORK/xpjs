@@ -40,9 +40,11 @@ import {
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
+  ExtractTxnStatus,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
+  TransactionStatus,
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
@@ -141,7 +143,8 @@ export type Web3Helper = BaseWeb3Helper &
     EthNftInfo,
     PopulatedTransaction
   > &
-  PreTransferRawTxn<EthNftInfo, PopulatedTransaction>;
+  PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
+  ExtractTxnStatus<ContractTransaction>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -319,6 +322,19 @@ export async function web3HelperFactory(
       return (
         nft.native.contract.toLowerCase() === params.erc721_addr.toLowerCase()
       );
+    },
+    async extractTxnStatus(txn) {
+      const status = (await (await provider.getTransaction(txn.hash)).wait())
+        .status;
+      if (status === undefined) {
+        return TransactionStatus.PENDING;
+      }
+      if (status === 1) {
+        return TransactionStatus.SUCCESS;
+      } else if (status === 0) {
+        return TransactionStatus.FAILURE;
+      }
+      return TransactionStatus.UNKNOWN;
     },
     async unfreezeWrappedNftTxn(to, id, txFees, _sender) {
       const res = await minter.populateTransaction.withdrawNft(

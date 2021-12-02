@@ -30,10 +30,12 @@ import {
 import {
   Approve,
   ExtractAction,
+  ExtractTxnStatus,
   IsApproved,
   NftMintArgs,
   PreTransfer,
   PreTransferRawTxn,
+  TransactionStatus,
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
@@ -102,7 +104,8 @@ export type TronHelper = BaseTronHelper &
   Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, any> &
   UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, string> &
-  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, string>;
+  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, string> &
+  ExtractTxnStatus<string>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -387,6 +390,16 @@ export async function tronHelperFactory(
 
       await notifyValidator(res);
       return res;
+    },
+    async extractTxnStatus(txnHash) {
+      const txn = await provider.trx.getConfirmedTransaction(txnHash);
+      const status = txn["ret"][0]["contractRet"];
+      if (status === "SUCCESS") {
+        return TransactionStatus.SUCCESS;
+      } else if (status === "FAIL") {
+        return TransactionStatus.FAILURE;
+      }
+      return TransactionStatus.PENDING;
     },
     async unfreezeWrapped(
       sender: TronSender,
