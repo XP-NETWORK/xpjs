@@ -249,7 +249,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     ElrondRawUnsignedTxn
   > &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
-  ExtractTxnStatus<Transaction>;
+  ExtractTxnStatus;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -683,7 +683,9 @@ export const elrondHelperFactory: (
       return txu.toPlainObject();
     },
     async extractTxnStatus(txn) {
-      const status = await provider.getTransactionStatus(txn.getHash());
+      const status = await provider.getTransactionStatus(
+        new TransactionHash(txn)
+      );
       if (status.isPending()) {
         return TransactionStatus.PENDING;
       }

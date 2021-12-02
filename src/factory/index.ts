@@ -172,7 +172,7 @@ export type ChainFactory = {
    * @returns transaction hash in original chain, unique action id
    */
   getDestinationTransaction<Txn>(
-    chain: ExtractAction<Txn>,
+    chain: ExtractAction<Txn> & ExtractTxnStatus,
     destination: number,
     hash: Txn
   ): Promise<[string, TransactionStatus]>;
@@ -470,13 +470,14 @@ export function ChainFactory(
       }
     },
     async getDestinationTransaction<T>(
-      chain: ExtractAction<T> & ExtractTxnStatus<T>,
+      chain: ExtractAction<T> & ExtractTxnStatus,
       targetNonce: number,
       txn: T
     ) {
       const action = await chain.extractAction(txn);
-      const status = await chain.extractTxnStatus(txn);
-      return [await txSocket.waitTxHash(targetNonce, action), status];
+      const hash = await txSocket.waitTxHash(targetNonce, action);
+      const status = await chain.extractTxnStatus(hash);
+      return [hash, status];
     },
     nonceToChainNonce,
     async pkeyToSigner<S>(nonce: ChainNonce<S, unknown>, key: string) {
