@@ -380,7 +380,7 @@ export async function tronHelperFactory(
         "freezeErc721(address,uint256,uint64,string)",
         {
           feeLimit: 1_000_000,
-          callValue: 0.1,
+          callValue: 0,
         },
         [
           {
@@ -412,7 +412,7 @@ export async function tronHelperFactory(
         "withdrawNft(string,uint256)",
         {
           feeLimit: 1_000_000,
-          callValue: 0.1,
+          callValue: 0,
         },
         [
           {
