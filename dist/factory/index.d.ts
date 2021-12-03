@@ -135,11 +135,9 @@ export interface AppConfig {
     exchangeRateUri: string;
     heartbeatUri: string;
     txSocketUri: string;
-    moralisServer: string;
-    moralisAppId: string;
+    nftListUri: string;
+    nftListAuthToken: string;
     tronScanUri: string;
-    moralisSecret?: string;
-    moralisNetwork: MoralisNetwork;
 }
 /**
  * This function is the basic entry point to use this package as a library.

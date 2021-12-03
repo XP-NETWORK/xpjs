@@ -1,9 +1,16 @@
 import algosdk from "algosdk";
 import { BigNumber } from "bignumber.js";
-import { AlgoNft } from "xpnet-nft-list";
 import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
 declare type TxResp = {
     txId: string;
+};
+declare type AlgoNft = {
+    "metadata-hash"?: string;
+    name?: string;
+    "unit-name"?: string;
+    url: string;
+    creator: string;
+    nftId: number;
 };
 declare type SignedTxn = {
     txID: string;
