@@ -41,6 +41,7 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
+  MintRawTxn,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
@@ -144,7 +145,8 @@ export type Web3Helper = BaseWeb3Helper &
     PopulatedTransaction
   > &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
-  ExtractTxnStatus;
+  ExtractTxnStatus &
+  MintRawTxn<PopulatedTransaction>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -360,6 +362,15 @@ export async function web3HelperFactory(
       return new Map(
         bals.map((v, i) => [chain_nonces[i], new BigNumber(v.toString())])
       );
+    },
+    async mintRawTxn(nft, sender) {
+      const erc721 = UserNftMinter__factory.connect(
+        nft.contract!,
+        new VoidSigner(sender)
+      );
+
+      const txm = await erc721.populateTransaction.mint(nft.uris[0]);
+      return txm;
     },
     async transferNativeToForeign(
       sender: Signer,
