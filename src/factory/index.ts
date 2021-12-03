@@ -37,14 +37,9 @@ import BigNumber from "bignumber.js";
 
 import axios from "axios";
 import {
-  algoListNft,
-  elrondNftList,
   exchangeRateRepo,
-  moralisNftList,
-  moralisTestnetNftList,
-  tronListNft,
 } from "./cons";
-import { Address, UserSigner } from "@elrondnetwork/erdjs/out";
+import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { PopulatedTransaction } from "ethers";

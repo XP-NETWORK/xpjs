@@ -2,7 +2,6 @@ import algosdk from "algosdk";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { Base64 } from "js-base64";
-import { AlgoNft } from "xpnet-nft-list";
 import {
   AlgorandSocketHelper,
   ChainNonceGet,
@@ -16,6 +15,15 @@ import {
 
 type TxResp = {
   txId: string;
+};
+
+type AlgoNft = {
+  "metadata-hash"?: string;
+  name?: string;
+  "unit-name"?: string;
+  url: string;
+  creator: string;
+  nftId: number;
 };
 
 type SignedTxn = {
