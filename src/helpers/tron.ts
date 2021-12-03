@@ -32,6 +32,7 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   IsApproved,
+  MintRawTxn,
   NftMintArgs,
   PreTransfer,
   PreTransferRawTxn,
@@ -105,7 +106,8 @@ export type TronHelper = BaseTronHelper &
   PreTransferRawTxn<EthNftInfo, any> &
   UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, string> &
   TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, string> &
-  ExtractTxnStatus;
+  ExtractTxnStatus &
+  MintRawTxn<string>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -351,6 +353,14 @@ export async function tronHelperFactory(
 
       const txHash: string = await erc.approve(minter_addr, nft.native.tokenId);
       return JSON.stringify(txHash);
+    },
+    async mintRawTxn(args, _sender) {
+      const erc = await provider.contract(
+        UserNftMinter__factory.abi,
+        args.contract
+      );
+      const res = await erc.mint(args.uris[0]);
+      return JSON.stringify(res);
     },
     async transferNftToForeignTxn(nonce, to, id, _fee) {
       const txr = await minter.freezeErc721(

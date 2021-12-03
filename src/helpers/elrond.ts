@@ -44,6 +44,7 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
+  MintRawTxn,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
@@ -249,7 +250,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     ElrondRawUnsignedTxn
   > &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
-  ExtractTxnStatus;
+  ExtractTxnStatus &
+  MintRawTxn<ElrondRawUnsignedTxn>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -849,6 +851,14 @@ export const elrondHelperFactory: (
     async estimateValidateTransferNft(_toAddress: string, _nftUri: string) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
+    async mintRawTxn(args, address) {
+      const txu = unsignedMintNftTxn(
+        new Address(address),
+        args as NftIssueArgs
+      );
+      return txu.toPlainObject();
+    },
+
     async estimateValidateUnfreezeNft(_to: string, _nftUri: string) {
       return estimateGas(NFT_UNFREEZE_COST, elrondParams.validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
     },

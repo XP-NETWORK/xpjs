@@ -1,5 +1,6 @@
 import { Address } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
+import { NftMintArgs } from "..";
 
 /**
  * NFT Info
@@ -218,6 +219,10 @@ export interface PreTransferRawTxn<NativeNft, Ret> {
     address: string,
     value?: BigNumber
   ): Promise<Ret | undefined>;
+}
+
+export interface MintRawTxn<Ret> {
+  mintRawTxn(id: NftMintArgs, address: string, value?: BigNumber): Promise<Ret>;
 }
 
 export interface ChainNonceGet {
