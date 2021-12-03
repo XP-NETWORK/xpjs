@@ -354,78 +354,78 @@ export async function tronHelperFactory(
       const txHash: string = await erc.approve(minter_addr, nft.native.tokenId);
       return JSON.stringify(txHash);
     },
-    async mintRawTxn(args, _sender) {
-      const { tx, result } =
-        provider.transactionBuilder.triggerConstantContract(
-          args.contract,
-          "mint(string)",
+    async mintRawTxn(args, sender) {
+      const { tx, result } = provider.transactionBuilder.triggerSmartContract(
+        args.contract,
+        "mint(string)",
+        {
+          feeLimit: 1_000_000,
+          callValue: 0.1,
+        },
+        [
           {
-            feeLimit: 1_000_000,
-            callValue: 0.1,
+            type: "string",
+            value: args.uris[0],
           },
-          [
-            {
-              type: "string",
-              value: args.uris[0],
-            },
-          ]
-        );
+        ],
+        sender
+      );
       if (!result.result) {
         throw new Error(result.toString());
       }
       return JSON.stringify(tx, null, 2);
     },
-    async transferNftToForeignTxn(nonce, to, id, _fee) {
-      const { tx, result } =
-        provider.transactionBuilder.triggerConstantContract(
-          "freezeErc721(address,uint256,uint64,string)",
+    async transferNftToForeignTxn(nonce, to, id, _fee, sender) {
+      const { tx, result } = provider.transactionBuilder.triggerSmartContract(
+        "freezeErc721(address,uint256,uint64,string)",
+        {
+          feeLimit: 1_000_000,
+          callValue: 0.1,
+        },
+        [
           {
-            feeLimit: 1_000_000,
-            callValue: 0.1,
+            type: "address",
+            value: id.native.contract,
           },
-          [
-            {
-              type: "address",
-              value: id.native.contract,
-            },
-            {
-              type: "uint256",
-              value: id.native.tokenId,
-            },
-            {
-              type: "uint64",
-              value: nonce,
-            },
-            {
-              type: "string",
-              value: to,
-            },
-          ]
-        );
+          {
+            type: "uint256",
+            value: id.native.tokenId,
+          },
+          {
+            type: "uint64",
+            value: nonce,
+          },
+          {
+            type: "string",
+            value: to,
+          },
+        ],
+        sender
+      );
       if (!result.result) {
         throw new Error(result.toString());
       }
       return JSON.stringify(tx, null, 2);
     },
-    async unfreezeWrappedNftTxn(to, id, _fee, _sender) {
-      const { tx, result } =
-        provider.transactionBuilder.triggerConstantContract(
-          "withdrawNft(string,uint256)",
+    async unfreezeWrappedNftTxn(to, id, _fee, sender) {
+      const { tx, result } = provider.transactionBuilder.triggerSmartContract(
+        "withdrawNft(string,uint256)",
+        {
+          feeLimit: 1_000_000,
+          callValue: 0.1,
+        },
+        [
           {
-            feeLimit: 1_000_000,
-            callValue: 0.1,
+            type: "string",
+            value: to,
           },
-          [
-            {
-              type: "string",
-              value: to,
-            },
-            {
-              type: "uint256",
-              value: id,
-            },
-          ]
-        );
+          {
+            type: "uint256",
+            value: id,
+          },
+        ],
+        sender
+      );
       if (!result.result) {
         throw new Error(result.toString());
       }
