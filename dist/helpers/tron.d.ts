@@ -31,7 +31,7 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<T
      */
     deployMinter(deployer: TronSender, validators: string[], threshold: number, whitelist: string[] | undefined): Promise<MinterRes>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<TronSender, string, BigNumber, string> & TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> & UnfreezeForeign<TronSender, string, string> & UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, any> & UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, string> & TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, string> & ExtractTxnStatus & MintRawTxn<string>;
+export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<TronSender, string, BigNumber, string> & TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> & UnfreezeForeign<TronSender, string, string> & UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, any> & UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> & TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> & ExtractTxnStatus & MintRawTxn<TronRawTxn>;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
@@ -41,6 +41,29 @@ export interface TronParams {
     erc721_addr: string;
     validators: string[];
     nonce: number;
+}
+export interface TronRawTxn {
+    readonly visible: boolean;
+    readonly txID: string;
+    readonly raw_data: {
+        readonly ref_block_bytes: string;
+        readonly ref_block_hash: string;
+        readonly expiration: number;
+        readonly fee_limit: number;
+        readonly timestamp: number;
+        readonly contract: {
+            readonly parameter: {
+                readonly value: {
+                    readonly data: string;
+                    readonly owner_address: string;
+                    readonly contract_address: string;
+                };
+                readonly type_url: string;
+            };
+            readonly type: string;
+        }[];
+    };
+    readonly raw_data_hex: string;
 }
 export declare function tronHelperFactory(tronParams: TronParams): Promise<TronHelper>;
 export {};
