@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { NftMintArgs } from "..";
 /**
  * NFT Info
  */
@@ -121,6 +122,9 @@ export interface EstimateTxFees<Balance> {
 export declare function ConcurrentSendError(): Error;
 export interface PreTransferRawTxn<NativeNft, Ret> {
     preTransferRawTxn(id: NftInfo<NativeNft>, address: string, value?: BigNumber): Promise<Ret | undefined>;
+}
+export interface MintRawTxn<Ret> {
+    mintRawTxn(id: NftMintArgs, address: string, value?: BigNumber): Promise<Ret>;
 }
 export interface ChainNonceGet {
     getNonce(): number;

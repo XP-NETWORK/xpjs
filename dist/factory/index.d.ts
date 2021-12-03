@@ -3,14 +3,14 @@ import { TronHelper, TronParams } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, NftInfo, PreTransferRawTxn, TransactionStatus, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, MintRawTxn, NftInfo, PreTransferRawTxn, TransactionStatus, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 import { PopulatedTransaction } from "ethers";
 import { AlgorandArgs, AlgoSignerH } from "../helpers/algorand";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
-declare type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<string, BigNumber, RawNft, Resp> & UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> & WrappedNftCheck<RawNft> & PreTransferRawTxn<RawNft, Resp>;
+declare type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<string, BigNumber, RawNft, Resp> & UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> & WrappedNftCheck<RawNft> & PreTransferRawTxn<RawNft, Resp> & MintRawTxn<Resp>;
 /**
  * A type representing a chain factory.
  *
@@ -103,6 +103,7 @@ export declare type ChainFactory = {
      */
     generateNftTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, toNonce: number, sender: string, to: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string>;
     generatePreTransferTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string | undefined>;
+    generateMintTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftMintArgs): Promise<Resp>;
 };
 /**
  * A type representing all the supported chain params.
