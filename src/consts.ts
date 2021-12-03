@@ -206,10 +206,9 @@ export const CHAIN_INFO: ChainInfo = {
 
 export const Config: AppConfig = {
   exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+  nftListUri: "https://nftindexing.herokuapp.com",
+  nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjI2ODQzNTQ1NSwiaWF0IjoxNjM4MTg3MTk5LCJleHAiOjE2Mzg3OTE5OTl9.aKs8K2V8K_rWqQPshae1EzuAEpPMVWBZakfmyBeeq-nJuiEKb1KBSle1F8LNemXLW_3_4KFwDjZrNOx0zA_GNw",
   txSocketUri: "https://sockettx.herokuapp.com",
-  moralisServer: "https://azz9akudh6cf.usemoralis.com:2053/server",
-  moralisAppId: "vt2JeuihhzyV9vgYbeAYO5BVSaCOdkAKr608XJOv",
   tronScanUri: "https://apilist.tronscan.org/api/",
-  heartbeatUri: "https://xpheartbeat.herokuapp.com",
-  moralisNetwork: "mainnet",
+  heartbeatUri: "https://xpheartbeat.herokuapp.com"
 };

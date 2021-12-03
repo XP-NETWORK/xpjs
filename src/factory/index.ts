@@ -258,11 +258,9 @@ export interface AppConfig {
   exchangeRateUri: string;
   heartbeatUri: string;
   txSocketUri: string;
-  moralisServer: string;
-  moralisAppId: string;
+  nftListUri: string;
+  nftListAuthToken: string;
   tronScanUri: string;
-  moralisSecret?: string;
-  moralisNetwork: MoralisNetwork;
 }
 
 function mapNonceToParams(
@@ -307,36 +305,11 @@ export function ChainFactory(
 
   const txSocket = socketHelper(appConfig.txSocketUri);
 
-  const elrondNftRepo = elrondNftList(chainParams.elrondParams?.node_uri || "");
-  const moralisNftRepo = moralisNftList(
-    appConfig.moralisServer,
-    appConfig.moralisAppId,
-    appConfig.moralisSecret
-  );
-  appConfig.moralisNetwork === "mainnet"
-    ? moralisNftList(
-        appConfig.moralisServer,
-        appConfig.moralisAppId,
-        appConfig.moralisSecret
-      )
-    : moralisTestnetNftList(
-        appConfig.moralisServer,
-        appConfig.moralisAppId,
-        appConfig.moralisSecret
-      );
-  const tronNftRepo =
-    chainParams.tronParams &&
-    tronListNft(
-      chainParams.tronParams.provider,
-      appConfig.tronScanUri,
-      chainParams.tronParams.erc721_addr
-    );
-  const algoNftRepo =
-    chainParams.algorandParams &&
-    algoListNft(chainParams.algorandParams.algodUri);
-
   const nftlistRest = axios.create({
-    baseURL: "https://nft-list.herokuapp.com/",
+    baseURL: appConfig.nftListUri,
+    headers: {
+      Authorization: `Bearer ${appConfig.nftListAuthToken}`
+    }
   });
 
   const inner = async <T, P>(chain: ChainNonce<T, P>): Promise<T> => {
@@ -524,41 +497,9 @@ export function ChainFactory(
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
-      let res: NftInfo<T>[];
-      switch (chain.getNonce()) {
-        case Chain.ELROND:
-          res = (await elrondNftRepo.nfts(
-            BigInt(chain.getNonce()),
-            new Address(owner)
-          )) as any as NftInfo<T>[];
-          break;
-        case Chain.TRON:
-          res = (await tronNftRepo!.nfts(
-            BigInt(0x9),
-            owner
-          )) as any as NftInfo<T>[];
-          break;
-        case Chain.ALGORAND:
-          res = (await algoNftRepo!.nfts(
-            BigInt(0xf),
-            owner
-          )) as any as NftInfo<T>[];
-          break;
-        case Chain.FANTOM:
-        case Chain.XDAI:
-          res = await nftlistRest
-            .get(`/web3/${chain.getNonce()}/${owner}`)
+      return await nftlistRest
+            .get<NftInfo<T>[]>(`/${chain.getNonce()}/${owner}`)
             .then((v) => v.data);
-          break;
-        default:
-          res = (await moralisNftRepo.nfts(
-            BigInt(chain.getNonce()),
-            owner
-          )) as any as NftInfo<T>[];
-          break;
-      }
-
-      return res;
     },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
