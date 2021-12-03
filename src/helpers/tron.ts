@@ -355,26 +355,81 @@ export async function tronHelperFactory(
       return JSON.stringify(txHash);
     },
     async mintRawTxn(args, _sender) {
-      const erc = await provider.contract(
-        UserNftMinter__factory.abi,
-        args.contract
-      );
-      const res = await erc.mint(args.uris[0]);
-      return JSON.stringify(res);
+      const { tx, result } =
+        provider.transactionBuilder.triggerConstantContract(
+          args.contract,
+          "mint(string)",
+          {
+            feeLimit: 1_000_000,
+            callValue: 0.1,
+          },
+          [
+            {
+              type: "string",
+              value: args.uris[0],
+            },
+          ]
+        );
+      if (!result.result) {
+        throw new Error(result.toString());
+      }
+      return JSON.stringify(tx, null, 2);
     },
     async transferNftToForeignTxn(nonce, to, id, _fee) {
-      const txr = await minter.freezeErc721(
-        id.native.contract,
-        id.native.tokenId,
-        nonce,
-        to
-      );
-      return JSON.stringify(txr, null, 2);
+      const { tx, result } =
+        provider.transactionBuilder.triggerConstantContract(
+          "freezeErc721(address,uint256,uint64,string)",
+          {
+            feeLimit: 1_000_000,
+            callValue: 0.1,
+          },
+          [
+            {
+              type: "address",
+              value: id.native.contract,
+            },
+            {
+              type: "uint256",
+              value: id.native.tokenId,
+            },
+            {
+              type: "uint64",
+              value: nonce,
+            },
+            {
+              type: "string",
+              value: to,
+            },
+          ]
+        );
+      if (!result.result) {
+        throw new Error(result.toString());
+      }
+      return JSON.stringify(tx, null, 2);
     },
-    async unfreezeWrappedNftTxn(to, id, _fee, sender) {
-      setSigner(sender);
-      const res = await minter.withdrawNft(to, id.native.tokenId);
-      return JSON.stringify(res);
+    async unfreezeWrappedNftTxn(to, id, _fee, _sender) {
+      const { tx, result } =
+        provider.transactionBuilder.triggerConstantContract(
+          "withdrawNft(string,uint256)",
+          {
+            feeLimit: 1_000_000,
+            callValue: 0.1,
+          },
+          [
+            {
+              type: "string",
+              value: to,
+            },
+            {
+              type: "uint256",
+              value: id,
+            },
+          ]
+        );
+      if (!result.result) {
+        throw new Error(result.toString());
+      }
+      return JSON.stringify(tx, null, 2);
     },
     isWrappedNft(nft) {
       return (

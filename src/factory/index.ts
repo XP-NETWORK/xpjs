@@ -21,6 +21,7 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   MintNft,
+  MintRawTxn,
   NftInfo,
   PreTransferRawTxn,
   socketHelper,
@@ -80,7 +81,8 @@ type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
 > &
   UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> &
   WrappedNftCheck<RawNft> &
-  PreTransferRawTxn<RawNft, Resp>;
+  PreTransferRawTxn<RawNft, Resp> &
+  MintRawTxn<Resp>;
 /**
  * A type representing a chain factory.
  *
@@ -214,6 +216,12 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     fee: BigNumber
   ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string | undefined>;
+
+  generateMintTxn<RawNftF, Resp>(
+    from: RawTxnBuiladableChain<RawNftF, Resp>,
+    sender: string,
+    nft: NftMintArgs
+  ): Promise<Resp>;
 };
 
 /**
@@ -468,6 +476,9 @@ export function ChainFactory(
           sender
         );
       }
+    },
+    async generateMintTxn(chain, sender, nft) {
+      return await chain.mintRawTxn(nft, sender);
     },
     async getDestinationTransaction<T>(
       chain: ExtractAction<T> & ExtractTxnStatus,
