@@ -3,7 +3,7 @@ import {
   ElrondParams,
   ElrondRawUnsignedTxn,
 } from "../helpers/elrond";
-import { TronHelper, TronParams } from "../helpers/tron";
+import { TronHelper, TronParams, TronRawTxn } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import {
   Chain,
@@ -208,20 +208,22 @@ export type ChainFactory = {
     to: string,
     nft: NftInfo<RawNftF>,
     fee: BigNumber
-  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string>;
+  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 
   generatePreTransferTxn<RawNftF, Resp>(
     from: RawTxnBuiladableChain<RawNftF, Resp>,
     sender: string,
     nft: NftInfo<RawNftF>,
     fee: BigNumber
-  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | string | undefined>;
+  ): Promise<
+    PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn | undefined
+  >;
 
   generateMintTxn<RawNftF, Resp>(
     from: RawTxnBuiladableChain<RawNftF, Resp>,
     sender: string,
     nft: NftMintArgs
-  ): Promise<Resp>;
+  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 };
 
 /**

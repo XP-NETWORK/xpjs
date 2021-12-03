@@ -104,10 +104,10 @@ export type TronHelper = BaseTronHelper &
   ExtractAction<string> &
   Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, any> &
-  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, string> &
-  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, string> &
+  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> &
+  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> &
   ExtractTxnStatus &
-  MintRawTxn<string>;
+  MintRawTxn<TronRawTxn>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -215,6 +215,30 @@ export interface TronParams {
   erc721_addr: string;
   validators: string[];
   nonce: number;
+}
+
+export interface TronRawTxn {
+  readonly visible: boolean;
+  readonly txID: string;
+  readonly raw_data: {
+    readonly ref_block_bytes: string;
+    readonly ref_block_hash: string;
+    readonly expiration: number;
+    readonly fee_limit: number;
+    readonly timestamp: number;
+    readonly contract: {
+      readonly parameter: {
+        readonly value: {
+          readonly data: string;
+          readonly owner_address: string;
+          readonly contract_address: string;
+        };
+        readonly type_url: string;
+      };
+      readonly type: string;
+    }[];
+  };
+  readonly raw_data_hex: string;
 }
 
 export async function tronHelperFactory(
