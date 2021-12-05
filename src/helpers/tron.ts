@@ -103,7 +103,7 @@ export type TronHelper = BaseTronHelper &
   IsApproved<TronSender> &
   ExtractAction<string> &
   Pick<PreTransfer<TronSender, EthNftInfo>, "preTransfer"> &
-  PreTransferRawTxn<EthNftInfo, any> &
+  PreTransferRawTxn<EthNftInfo, TronRawTxn> &
   UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> &
   TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> &
   ExtractTxnStatus &
@@ -223,7 +223,7 @@ export interface TronRawTxn {
   readonly raw_data: {
     readonly ref_block_bytes: string;
     readonly ref_block_hash: string;
-    readonly expiration: number;
+    expiration: number;
     readonly fee_limit: number;
     readonly timestamp: number;
     readonly contract: {
@@ -359,6 +359,13 @@ export async function tronHelperFactory(
     return txHash;
   };
 
+  const addMinToExpirationTime = (txn: TronRawTxn, minutes: number) => {
+    const expiration = txn.raw_data.expiration;
+    const newExpiration = new Date(expiration).getTime() + minutes * 60000;
+    txn.raw_data.expiration = newExpiration;
+    return txn;
+  };
+
   return {
     ...base,
     extractAction,
@@ -366,17 +373,34 @@ export async function tronHelperFactory(
     preTransfer: (s, nft, _fee) => approveForMinter(nft, s),
     async preTransferRawTxn(nft, address, _value) {
       await setSigner(address);
-      const erc = await provider.contract(
-        UserNftMinter__factory.abi,
-        nft.native.contract
-      );
       const isApproved = await isApprovedForMinter(nft, address);
       if (isApproved) {
         return undefined;
       }
-
-      const txHash: string = await erc.approve(minter_addr, nft.native.tokenId);
-      return JSON.stringify(txHash);
+      const { transaction, result } =
+        await provider.transactionBuilder.triggerSmartContract(
+          nft.native.contract,
+          "approve(address,uint256)",
+          {
+            feeLimit: 1_000_000,
+            callValue: 0,
+          },
+          [
+            {
+              type: "address",
+              value: minter_addr,
+            },
+            {
+              type: "uint256",
+              value: nft.native.tokenId,
+            },
+          ],
+          address
+        );
+      if (!result.result) {
+        throw new Error(result.toString());
+      }
+      return addMinToExpirationTime(transaction, 15);
     },
     async mintRawTxn(args, sender) {
       const { transaction, result } =
@@ -398,7 +422,7 @@ export async function tronHelperFactory(
       if (!result.result) {
         throw new Error(result.toString());
       }
-      return transaction;
+      return addMinToExpirationTime(transaction, 15);
     },
     async transferNftToForeignTxn(nonce, to, id, _fee, sender) {
       const { transaction, result } =
@@ -431,7 +455,7 @@ export async function tronHelperFactory(
       if (!result.result) {
         throw new Error(result.toString());
       }
-      return transaction;
+      return addMinToExpirationTime(transaction, 15);
     },
     async unfreezeWrappedNftTxn(to, id, _fee, sender) {
       const { transaction, result } =
@@ -456,7 +480,7 @@ export async function tronHelperFactory(
       if (!result.result) {
         throw new Error(result.toString());
       }
-      return transaction;
+      return addMinToExpirationTime(transaction, 15);
     },
     isWrappedNft(nft) {
       return (
