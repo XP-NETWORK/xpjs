@@ -48,7 +48,7 @@ export interface TronRawTxn {
     readonly raw_data: {
         readonly ref_block_bytes: string;
         readonly ref_block_hash: string;
-        readonly expiration: number;
+        expiration: number;
         readonly fee_limit: number;
         readonly timestamp: number;
         readonly contract: {
