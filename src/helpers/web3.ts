@@ -19,23 +19,18 @@ import {
   BigNumber as EthBN,
   PopulatedTransaction,
   Wallet,
-  ContractTransaction,
   ethers,
-  Transaction,
   VoidSigner,
 } from "ethers";
 import {
-  TransactionReceipt,
   TransactionResponse,
   Provider,
 } from "@ethersproject/providers";
 import {
   Minter__factory,
-  UserNftMinter,
   UserNftMinter__factory,
   XPNet__factory,
 } from "xpnet-web3-contracts";
-import { Base64 } from "js-base64";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -119,10 +114,10 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
 export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<Signer, string, BigNumber, Transaction> &
-  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, Transaction> &
+  TransferForeign<Signer, string, BigNumber, TransactionResponse> &
+  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, Transaction> &
+  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -378,7 +373,7 @@ export async function web3HelperFactory(
       to: string,
       value: BigNumber,
       txFees: BigNumber
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
       const val = EthBN.from(value.toString());
       const totalVal = val.add(EthBN.from(txFees.toString()));
       const res = await minter.connect(sender).freeze(chain_nonce, to, val, {
@@ -410,7 +405,7 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
 
       const txr = await minter
@@ -442,7 +437,7 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
       const res = await minter
         .connect(sender)
         .withdrawNft(to, id.native.tokenId, {
