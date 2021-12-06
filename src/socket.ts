@@ -43,12 +43,12 @@ export type TxnSocketHelper = {
 };
 
 export type AlgorandSocketHelper = {
-  waitAlgorandNft(action_id: string): Promise<ClaimNftInfo>;
+  waitAlgorandNft(sourceChain: number, action_id: string): Promise<ClaimNftInfo>;
 };
 
-function pairActionAlgo(action_id: string): number {
+function pairAction(sourceChain: number, action_id: string): number {
   const numId = parseInt(action_id);
-  return numId >= 15 ? numId * 15 + 15 + numId : numId + 15 * 15;
+  return numId >= sourceChain ? numId * numId + sourceChain + numId : numId + sourceChain * sourceChain;
 }
 
 function socketResBuf<T>(): SocketResBuf<T> {
@@ -162,10 +162,11 @@ export function socketHelper(
     async waitTxHash(chain: number, action_id: string): Promise<string> {
       return await waitSocketData(txbuf, chain, action_id);
     },
-    async waitAlgorandNft(action_id: string): Promise<ClaimNftInfo> {
+    async waitAlgorandNft(sourceChain: number, action_id: string): Promise<ClaimNftInfo> {
       // Validator sends a an action paired with chain id
       // this is implementation dependent on validator
-      const paired = pairActionAlgo(action_id).toString();
+      const paired = pairAction(sourceChain, action_id).toString();
+	  console.log(paired);
       return await waitSocketData(algoBuf, 15, paired);
     },
   };
