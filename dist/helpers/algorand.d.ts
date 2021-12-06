@@ -52,7 +52,7 @@ export declare type AlgoSignerH = {
 export declare function typedAlgoSigner(): BrowserSigner;
 export declare function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): AlgoSignerH;
 export interface ClaimAlgorandNft {
-    claimAlgorandNft(signer: AlgoSignerH, actionId: string, socket: AlgorandSocketHelper): Promise<string>;
+    claimAlgorandNft(signer: AlgoSignerH, sourceChain: number, actionId: string, socket: AlgorandSocketHelper): Promise<string>;
 }
 export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
