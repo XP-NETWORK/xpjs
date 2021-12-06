@@ -110,6 +110,7 @@ export function algoSignerWrapper(
 export interface ClaimAlgorandNft {
   claimAlgorandNft(
     signer: AlgoSignerH,
+	sourceChain: number,
     actionId: string,
     socket: AlgorandSocketHelper
   ): Promise<string>;
@@ -301,8 +302,8 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
     algod,
     getNonce: () => args.nonce,
     claimNft,
-    async claimAlgorandNft(signer, action, socket) {
-      const info = await socket.waitAlgorandNft(action);
+    async claimAlgorandNft(signer, sourceChain, action, socket) {
+      const info = await socket.waitAlgorandNft(sourceChain, action);
 
       return await claimNft(signer, info);
     },
