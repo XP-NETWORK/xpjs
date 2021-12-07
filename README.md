@@ -40,7 +40,7 @@ npm i --save xp.network @elrondnetwork/erdjs ethers
 To import the latest version of xp.network library:
 
 ```bash
-yarn add "git+https://https://github.com/xp-network/xpjs#master-dist"
+yarn add "git+https://github.com/xp-network/xpjs#master-dist"
 ```
 
 <br>
