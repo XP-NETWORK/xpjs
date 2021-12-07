@@ -7,7 +7,11 @@ import {
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
+import {
+  AlgorandParams,
+  AlgorandHelper,
+  algorandHelper,
+} from "./helpers/algorand";
 import { AppConfig } from "./factory";
 
 // All the supported testnet uri's are here.
@@ -46,7 +50,7 @@ export type ChainNonce<_, __> = number;
 export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export type TronNonce = ChainNonce<TronHelper, TronParams>;
-export type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandArgs>;
+export type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandParams>;
 
 export namespace Chain {
   export const ELROND: ElrondNonce = 2;
@@ -68,7 +72,7 @@ interface ChainData {
   nonce: number;
   decimals: number;
   constructor: (
-    params: Web3Params | TronParams | ElrondParams
+    params: Web3Params | TronParams | ElrondParams | AlgorandParams
   ) => Promise<CrossChainHelper>;
   blockExplorerUrl: string;
   chainId?: number;
@@ -201,14 +205,24 @@ export const CHAIN_INFO: ChainInfo = {
     currency: SupportedCurrency.STAKE,
     validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
-  // TODO: Algorand
+  15: {
+    name: "Algorand",
+    nonce: 0xf,
+    decimals: 1e6,
+    chainId: undefined,
+    blockExplorerUrl: "https://algoexplorer.io/tx",
+    currency: SupportedCurrency.ALGO,
+    validators: ["BO4OK76FDVM4YUXLY4YPWBV4HDA6DBVS5RDDCGRNEXBQ2YQTCZPUBWY5Z4"],
+    constructor: (p) => Promise.resolve(algorandHelper(p as AlgorandParams)),
+  },
 };
 
 export const Config: AppConfig = {
   exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
   nftListUri: "https://nftindexing.herokuapp.com",
-  nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjI2ODQzNTQ1NSwiaWF0IjoxNjM4MTg3MTk5LCJleHAiOjE2Mzg3OTE5OTl9.aKs8K2V8K_rWqQPshae1EzuAEpPMVWBZakfmyBeeq-nJuiEKb1KBSle1F8LNemXLW_3_4KFwDjZrNOx0zA_GNw",
+  nftListAuthToken:
+    "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjI2ODQzNTQ1NSwiaWF0IjoxNjM4MTg3MTk5LCJleHAiOjE2Mzg3OTE5OTl9.aKs8K2V8K_rWqQPshae1EzuAEpPMVWBZakfmyBeeq-nJuiEKb1KBSle1F8LNemXLW_3_4KFwDjZrNOx0zA_GNw",
   txSocketUri: "https://sockettx.herokuapp.com",
   tronScanUri: "https://apilist.tronscan.org/api/",
-  heartbeatUri: "https://xpheartbeat.herokuapp.com"
+  heartbeatUri: "https://xpheartbeat.herokuapp.com",
 };
