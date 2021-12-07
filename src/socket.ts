@@ -166,7 +166,6 @@ export function socketHelper(
       // Validator sends a an action paired with chain id
       // this is implementation dependent on validator
       const paired = pairAction(sourceChain, action_id).toString();
-	  console.log(paired);
       return await waitSocketData(algoBuf, 15, paired);
     },
   };
