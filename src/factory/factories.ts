@@ -1,4 +1,4 @@
-import { AppConfig, ChainFactory, ChainParams } from ".";
+import { ChainParams } from ".";
 //@ts-ignore
 import TronWeb from "tronweb";
 import { Chain, MainNetRpcUri, TestNetRpcUri } from "../consts";
