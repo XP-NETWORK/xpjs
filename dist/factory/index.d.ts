@@ -6,8 +6,8 @@ export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, MintRawTxn, NftInfo, PreTransferRawTxn, TransactionStatus, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 import { PopulatedTransaction } from "ethers";
-import { AlgorandArgs, AlgoSignerH } from "../helpers/algorand";
-export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
+import { AlgorandParams, AlgorandHelper, AlgoSignerH } from "../helpers/algorand";
+export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper | AlgorandHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
 declare type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<string, BigNumber, RawNft, Resp> & UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> & WrappedNftCheck<RawNft> & PreTransferRawTxn<RawNft, Resp> & MintRawTxn<Resp>;
@@ -121,7 +121,7 @@ export interface ChainParams {
     harmonyParams: Web3Params;
     ontologyParams: Web3Params;
     xDaiParams: Web3Params;
-    algorandParams: AlgorandArgs;
+    algorandParams: AlgorandParams;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**

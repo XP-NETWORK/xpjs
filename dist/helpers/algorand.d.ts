@@ -59,12 +59,12 @@ export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & 
 } & {
     algod: algosdk.Algodv2;
 } & ClaimAlgorandNft;
-export declare type AlgorandArgs = {
+export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;
     algodPort: number | undefined;
     sendNftAppId: number;
     nonce: number;
 };
-export declare function algorandHelper(args: AlgorandArgs): AlgorandHelper;
+export declare function algorandHelper(args: AlgorandParams): AlgorandHelper;
 export {};

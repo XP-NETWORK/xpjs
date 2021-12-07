@@ -3,7 +3,7 @@ import { ElrondParams, ElrondHelper } from "./helpers/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
-import { AlgorandArgs, AlgorandHelper } from "./helpers/algorand";
+import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { AppConfig } from "./factory";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
@@ -35,7 +35,7 @@ export declare type ChainNonce<_, __> = number;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
-export declare type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandArgs>;
+export declare type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandParams>;
 export declare namespace Chain {
     const ELROND: ElrondNonce;
     const HECO: Web3Nonce;
@@ -54,7 +54,7 @@ interface ChainData {
     name: string;
     nonce: number;
     decimals: number;
-    constructor: (params: Web3Params | TronParams | ElrondParams) => Promise<CrossChainHelper>;
+    constructor: (params: Web3Params | TronParams | ElrondParams | AlgorandParams) => Promise<CrossChainHelper>;
     blockExplorerUrl: string;
     chainId?: number;
     currency: SupportedCurrency;
