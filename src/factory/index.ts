@@ -36,7 +36,7 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { exchangeRateRepo } from "./cons";
+import { algoListNft, exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
@@ -49,6 +49,7 @@ import {
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
+import { nftListRepo } from "xpnet-nft-list";
 
 export type CrossChainHelper =
   | ElrondHelper
@@ -498,6 +499,12 @@ export function ChainFactory(
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
+      if (chain.getNonce() === Chain.ALGORAND) {
+        return (await algoListNft(chainParams.algorandParams!.algodUri).nfts(
+          BigInt(0xf),
+          owner
+        )) as unknown as NftInfo<T>[];
+      }
       return await nftlistRest
         .get<NftInfo<T>[]>(`/${chain.getNonce()}/${owner}`)
         .then((v) => v.data);

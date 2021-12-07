@@ -4,6 +4,12 @@ import {
   networkBatchExchangeRateRepo,
   NetworkModel,
 } from "crypto-exchange-rate";
+import {
+  algoAssetMapper,
+  algoNftListService,
+  mockChainIdentMapper,
+  nftListRepo,
+} from "xpnet-nft-list";
 
 export function exchangeRateRepo(baseUrl: string): ExchangeRateRepo {
   const baseService = NetworkModel.batchExchangeRateService(baseUrl);
@@ -15,3 +21,11 @@ export function exchangeRateRepo(baseUrl: string): ExchangeRateRepo {
     )
   );
 }
+
+export const algoListNft = (baseUri: string) => {
+  return nftListRepo(
+    algoNftListService(baseUri),
+    algoAssetMapper(),
+    mockChainIdentMapper()
+  );
+};
