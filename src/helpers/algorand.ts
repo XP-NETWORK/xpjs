@@ -152,39 +152,15 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
     args.algodPort
   );
 
-  async function waitTxnConfirm(txId: string, timeout: number) {
+  async function waitTxnConfirm(txId: string) {
     const status = await algod.status().do();
-    if (typeof status === "undefined")
-      throw new Error("Unable to get node status");
-
-    const startround = status["last-round"] + 1;
-    let currentround = startround;
-    while (currentround < startround + timeout) {
-      const pendingInfo = await algod.pendingTransactionInformation(txId).do();
-      if (pendingInfo !== undefined) {
-        if (
-          pendingInfo["confirmed-round"] !== null &&
-          pendingInfo["confirmed-round"] > 0
-        ) {
-          // Got the completed Transaction
-          return pendingInfo;
-        }
-
-        if (
-          pendingInfo["pool-error"] != null &&
-          pendingInfo["pool-error"].length > 0
-        ) {
-          // If there was a pool error, then the transaction has been rejected!
-          throw new Error(
-            `Transaction Rejected pool error${pendingInfo["pool-error"]}`
-          );
-        }
-      }
-      await algod.statusAfterBlock(currentround).do();
-      currentround += 1;
+    let lastRound = status["last-round"];
+    let pendingInfo = await algod.pendingTransactionInformation(txId).do();
+    while (!(pendingInfo["confirmed-round"] && pendingInfo["confirmed-round"] > 0)) {
+      lastRound += 1;
+      await algod.statusAfterBlock(lastRound).do();
+      pendingInfo = await algod.pendingTransactionInformation(txId).do();
     }
-
-    throw new Error(`Transaction not confirmed after ${timeout} rounds!`);
   }
 
   const transferNft = async (
@@ -208,7 +184,7 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
       ledger: signer.ledger,
       tx: signedTxCall[0].blob,
     });
-    await waitTxnConfirm(res.txId, 10000);
+    await waitTxnConfirm(res.txId);
 
     const feesTx = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from: signer.address,
@@ -254,7 +230,7 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
         Base64.toUint8Array(signedTxns[2].blob),
       ])
       .do();
-    await waitTxnConfirm(sendRes.txId, 10000);
+    await waitTxnConfirm(sendRes.txId);
 
     return sendRes.txId as string;
   };
@@ -274,7 +250,7 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
       ledger: signer.ledger,
       tx: signedTx[0].blob,
     });
-    await waitTxnConfirm(res.txId, 10000);
+    await waitTxnConfirm(res.txId);
 
     const callTxn = algosdk.makeApplicationNoOpTxnFromObject({
       from: signer.address,
@@ -294,7 +270,7 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
       tx: signedCall[0].blob,
     });
 
-    await waitTxnConfirm(callRes.txId, 10000);
+    await waitTxnConfirm(callRes.txId);
     return callRes.txId;
   }
 
