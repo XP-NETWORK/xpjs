@@ -129,6 +129,14 @@ export namespace ChainFactoryConfigs {
       validators: EVM_TESTNET_VALIDATORS,
       nonce: Chain.XDAI,
     },
+    algorandParams: {
+      algodApiKey:
+        "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
+      algodUri: "https://algorand-node.xp.network/",
+      nonce: Chain.ALGORAND,
+      sendNftAppId: 457256665,
+      algodPort: 443,
+    },
   });
 
   export const MainNet: () => Partial<ChainParams> = () => ({
@@ -232,6 +240,14 @@ export namespace ChainFactoryConfigs {
       erc721_addr: "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
       validators: EVM_VALIDATORS,
       nonce: Chain.XDAI,
+    },
+    algorandParams: {
+      algodApiKey:
+        "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
+      algodUri: "https://algorand-node.xp.network/",
+      nonce: Chain.ALGORAND,
+      sendNftAppId: 457256665,
+      algodPort: 443,
     },
   });
 }
