@@ -36,15 +36,13 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import {
-  exchangeRateRepo,
-} from "./cons";
+import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { PopulatedTransaction } from "ethers";
 import {
-  AlgorandArgs,
+  AlgorandParams,
   AlgorandHelper,
   AlgoSignerH,
   algoSignerWrapper,
@@ -52,7 +50,11 @@ import {
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
 
-export type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper;
+export type CrossChainHelper =
+  | ElrondHelper
+  | Web3Helper
+  | TronHelper
+  | AlgorandHelper;
 
 type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
@@ -237,7 +239,7 @@ export interface ChainParams {
   harmonyParams: Web3Params;
   ontologyParams: Web3Params;
   xDaiParams: Web3Params;
-  algorandParams: AlgorandArgs;
+  algorandParams: AlgorandParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -260,10 +262,13 @@ export interface AppConfig {
 
 function mapNonceToParams(
   chainParams: Partial<ChainParams>
-): Map<number, Web3Params | ElrondParams | TronParams | undefined> {
+): Map<
+  number,
+  Web3Params | ElrondParams | TronParams | AlgorandParams | undefined
+> {
   const cToP = new Map<
     number,
-    Web3Params | ElrondParams | TronParams | undefined
+    Web3Params | ElrondParams | TronParams | AlgorandParams | undefined
   >();
 
   cToP.set(2, chainParams.elrondParams);
@@ -279,6 +284,7 @@ function mapNonceToParams(
   cToP.set(12, chainParams.harmonyParams);
   cToP.set(13, chainParams.ontologyParams);
   cToP.set(14, chainParams.xDaiParams);
+  cToP.set(15, chainParams.algorandParams);
   return cToP;
 }
 /**
@@ -303,8 +309,8 @@ export function ChainFactory(
   const nftlistRest = axios.create({
     baseURL: appConfig.nftListUri,
     headers: {
-      Authorization: `Bearer ${appConfig.nftListAuthToken}`
-    }
+      Authorization: `Bearer ${appConfig.nftListAuthToken}`,
+    },
   });
 
   const inner = async <T, P>(chain: ChainNonce<T, P>): Promise<T> => {
@@ -493,8 +499,8 @@ export function ChainFactory(
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
       return await nftlistRest
-            .get<NftInfo<T>[]>(`/${chain.getNonce()}/${owner}`)
-            .then((v) => v.data);
+        .get<NftInfo<T>[]>(`/${chain.getNonce()}/${owner}`)
+        .then((v) => v.data);
     },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
@@ -539,7 +545,12 @@ export function ChainFactory(
       const action = await origin.extractAction(hash);
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
 
-      return await algo.claimAlgorandNft(claimer, origin.getNonce(), action, txSocket);
+      return await algo.claimAlgorandNft(
+        claimer,
+        origin.getNonce(),
+        action,
+        txSocket
+      );
     },
   };
 }

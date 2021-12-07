@@ -110,7 +110,7 @@ export function algoSignerWrapper(
 export interface ClaimAlgorandNft {
   claimAlgorandNft(
     signer: AlgoSignerH,
-	sourceChain: number,
+    sourceChain: number,
     actionId: string,
     socket: AlgorandSocketHelper
   ): Promise<string>;
@@ -127,7 +127,7 @@ export type AlgorandHelper = ChainNonceGet &
     algod: algosdk.Algodv2;
   } & ClaimAlgorandNft;
 
-export type AlgorandArgs = {
+export type AlgorandParams = {
   algodApiKey: string;
   algodUri: string;
   algodPort: number | undefined;
@@ -144,7 +144,7 @@ type MinWrappedNft = {
 const encoder = new TextEncoder();
 const MINT_NFT_COST = new BigNumber(1000);
 
-export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
+export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   const appAddr = algosdk.getApplicationAddress(args.sendNftAppId);
   const algod = new algosdk.Algodv2(
     args.algodApiKey,
@@ -156,7 +156,9 @@ export function algorandHelper(args: AlgorandArgs): AlgorandHelper {
     const status = await algod.status().do();
     let lastRound = status["last-round"];
     let pendingInfo = await algod.pendingTransactionInformation(txId).do();
-    while (!(pendingInfo["confirmed-round"] && pendingInfo["confirmed-round"] > 0)) {
+    while (
+      !(pendingInfo["confirmed-round"] && pendingInfo["confirmed-round"] > 0)
+    ) {
       lastRound += 1;
       await algod.statusAfterBlock(lastRound).do();
       pendingInfo = await algod.pendingTransactionInformation(txId).do();
