@@ -133,7 +133,7 @@ var ChainFactoryConfigs;
             algodApiKey: "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
             algodUri: "https://algorand-node.xp.network/",
             nonce: consts_1.Chain.ALGORAND,
-            sendNftAppId: 457256665,
+            sendNftAppId: 458971166,
             algodPort: 443,
         },
     });
@@ -241,7 +241,7 @@ var ChainFactoryConfigs;
             algodApiKey: "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
             algodUri: "https://algorand-node.xp.network/",
             nonce: consts_1.Chain.ALGORAND,
-            sendNftAppId: 457256665,
+            sendNftAppId: 458971166,
             algodPort: 443,
         },
     });
