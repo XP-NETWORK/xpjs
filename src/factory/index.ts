@@ -49,7 +49,6 @@ import {
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
-import { nftListRepo } from "xpnet-nft-list";
 
 export type CrossChainHelper =
   | ElrondHelper
@@ -322,8 +321,6 @@ export function ChainFactory(
     return helper! as any as T;
   };
 
-  const algoLister = algoListNft("https://algoexplorerapi.io/");
-
   async function calcExchangeFees(
     fromChain: number,
     toChain: number,
@@ -501,15 +498,16 @@ export function ChainFactory(
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
-      if (chain.getNonce() === Chain.ALGORAND) {
-        return (await algoLister.nfts(
-          BigInt(0xf),
-          owner
-        )) as unknown as NftInfo<T>[];
-      }
-      return await nftlistRest
-        .get<NftInfo<T>[]>(`/${chain.getNonce()}/${owner}`)
+      let data = await nftlistRest
+        .get<NftInfo<T>[]>(`/nfts/${chain.getNonce()}/${owner}`)
         .then((v) => v.data);
+
+      const nonce = chain.getNonce();
+      if (nonce != Chain.ALGORAND || nonce != Chain.ELROND) {
+        data = data.filter((v: any) => v.native.contractType != "ERC1155")
+      }
+
+      return data;
     },
     transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);

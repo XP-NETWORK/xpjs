@@ -219,9 +219,9 @@ export const CHAIN_INFO: ChainInfo = {
 
 export const Config: AppConfig = {
   exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
-  nftListUri: "https://nftindexing.herokuapp.com",
+  nftListUri: "https://indexnft.herokuapp.com",
   nftListAuthToken:
-    "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjI2ODQzNTQ1NSwiaWF0IjoxNjM4MTg3MTk5LCJleHAiOjE2Mzg3OTE5OTl9.aKs8K2V8K_rWqQPshae1EzuAEpPMVWBZakfmyBeeq-nJuiEKb1KBSle1F8LNemXLW_3_4KFwDjZrNOx0zA_GNw",
+    "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTYzODk2MjMzOCwiZXhwIjoxNjQ2NzM4MzM4fQ.9eQMNMtt-P6myPlji7nBC9PAwTftd0qQvwnIZSt4ycM4E45NpzCF0URsdYj_YN_xqQKQpcHiZu1o4EXjJa_-Zw",
   txSocketUri: "https://sockettx.herokuapp.com",
   tronScanUri: "https://apilist.tronscan.org/api/",
   heartbeatUri: "https://xpheartbeat.herokuapp.com",
