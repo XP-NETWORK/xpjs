@@ -36,7 +36,7 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { algoListNft, exchangeRateRepo } from "./cons";
+import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
