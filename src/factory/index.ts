@@ -322,6 +322,8 @@ export function ChainFactory(
     return helper! as any as T;
   };
 
+  const algoLister = algoListNft("https://algoexplorerapi.io/");
+
   async function calcExchangeFees(
     fromChain: number,
     toChain: number,
@@ -500,7 +502,7 @@ export function ChainFactory(
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
       if (chain.getNonce() === Chain.ALGORAND) {
-        return (await algoListNft(chainParams.algorandParams!.algodUri).nfts(
+        return (await algoLister.nfts(
           BigInt(0xf),
           owner
         )) as unknown as NftInfo<T>[];
