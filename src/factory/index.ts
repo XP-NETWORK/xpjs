@@ -499,8 +499,8 @@ export function ChainFactory(
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
       let data = await nftlistRest
-        .get<NftInfo<T>[]>(`/nfts/${chain.getNonce()}/${owner}`)
-        .then((v) => v.data);
+        .get<{ data: NftInfo<T>[] }>(`/nfts/${chain.getNonce()}/${owner}`)
+        .then((v) => v.data.data);
 
       const nonce = chain.getNonce();
       if (nonce != Chain.ALGORAND || nonce != Chain.ELROND) {
