@@ -117,6 +117,11 @@ export interface ClaimAlgorandNft {
   ): Promise<string>;
 }
 
+export type FullClaimNft = ClaimNftInfo & {
+  name: string;
+  uri: string;
+}
+
 export type AlgorandHelper = ChainNonceGet &
   WrappedNftCheck<AlgoNft> &
   TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
@@ -324,9 +329,24 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         }
       }
 
-      claims.filter((v) => !nfts.has(v.nftId));
 
-      return claims;
+      const res = await Promise.all(claims.map(async v => {
+        const appId = parseInt(v.app_id);
+        const nftId = parseInt(v.nft_id);
+        const assetInfo = await algod.getAssetByID(nftId).do();
+        if (nfts.has(nftId)) {
+          return [];
+        }
+
+        return [{
+          nftId,
+          appId,
+          uri: assetInfo.params.url,
+          name: assetInfo.params.name || ''
+        }]
+      }));
+
+      return res.flat();
     }
   };
 }
