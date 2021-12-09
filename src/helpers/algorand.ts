@@ -129,7 +129,7 @@ export type AlgorandHelper = ChainNonceGet &
   EstimateTxFees<BigNumber> &
   ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
-    claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<ClaimNftInfo[]>;
+    claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
   } & {
     algod: algosdk.Algodv2;
   } & ClaimAlgorandNft & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
