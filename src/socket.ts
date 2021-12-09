@@ -1,3 +1,4 @@
+import axios from "axios";
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
 import { ClaimNftInfo } from "./helpers/algorand";
 
@@ -43,7 +44,7 @@ export type TxnSocketHelper = {
 };
 
 export type AlgorandSocketHelper = {
-  waitAlgorandNft(sourceChain: number, action_id: string): Promise<ClaimNftInfo>;
+  waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
 };
 
 function pairAction(sourceChain: number, action_id: string): number {
@@ -128,6 +129,14 @@ async function waitSocketData<T>(
   return await dataP;
 }
 
+type DbClaimInfo = {
+  receiver: string;
+  app_id: string;
+  nft_id: string;
+  action_id: string;
+  inserted_at: Date;
+}
+
 /**
  * Create a [[SocketHelper]]
  *
@@ -141,6 +150,9 @@ export function socketHelper(
   const socket = io(uri, options);
   const txbuf: SocketResBuf<string> = socketResBuf();
   const algoBuf: SocketResBuf<ClaimNftInfo> = socketResBuf();
+  const dbApi = axios.create({
+    baseURL: uri
+  });
 
   socket.on(
     "tx_executed_event",
@@ -162,10 +174,18 @@ export function socketHelper(
     async waitTxHash(chain: number, action_id: string): Promise<string> {
       return await waitSocketData(txbuf, chain, action_id);
     },
-    async waitAlgorandNft(sourceChain: number, action_id: string): Promise<ClaimNftInfo> {
+    async waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo> {
       // Validator sends a an action paired with chain id
       // this is implementation dependent on validator
       const paired = pairAction(sourceChain, action_id).toString();
+      const dbData = await dbApi.get<Partial<DbClaimInfo>>(`/algorand_event/${receiver}/${paired}`);
+      if (dbData.data.app_id) {
+        return {
+          appId: parseInt(dbData.data.app_id!),
+          nftId: parseInt(dbData.data.nft_id!)
+        };
+      }
+
       return await waitSocketData(algoBuf, 15, paired);
     },
   };

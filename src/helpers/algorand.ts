@@ -267,7 +267,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     getNonce: () => args.nonce,
     claimNft,
     async claimAlgorandNft(signer, sourceChain, action, socket) {
-      const info = await socket.waitAlgorandNft(sourceChain, action);
+      const info = await socket.waitAlgorandNft(sourceChain, signer.address, action);
 
       return await claimNft(signer, info);
     },

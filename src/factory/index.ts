@@ -46,6 +46,7 @@ import {
   AlgorandHelper,
   AlgoSignerH,
   algoSignerWrapper,
+  ClaimNftInfo,
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
