@@ -191,6 +191,13 @@ export type ChainFactory = {
     claimer: AlgoSignerH
   ): Promise<string>;
   /**
+   * 
+   * @param claimer: the account which can claim the nfts
+   */
+  claimableAlgorandNfts(
+    claimer: string
+  ): Promise<ClaimNftInfo[]>
+  /**
    * Returns a raw txn (hopefully Typed JS Objects in all chains) which can be sent over the wire for signing and broadcasting.
    * @param from The chain from which the NFT is being sent.
    * @param toNonce The nonce of the chain to which the NFT is being sent.
@@ -561,6 +568,13 @@ export function ChainFactory(
         txSocket
       );
     },
+    claimableAlgorandNfts: async (claimer) => {
+      const algo: AlgorandHelper = await inner(Chain.ALGORAND);
+      return await algo.claimableNfts(
+        txSocket,
+        claimer
+      );
+    }
   };
 }
 /**
