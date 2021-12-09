@@ -185,11 +185,11 @@ export type ChainFactory = {
    * @param txn Transaction Hash of the original
    * @param claimer the account which can claim the nft
    */
-  claimAlgorandNft<Txn>(
+  waitAlgorandNft<Txn>(
     originChain: ExtractAction<Txn> & ChainNonceGet,
     txn: Txn,
     claimer: AlgoSignerH
-  ): Promise<string>;
+  ): Promise<ClaimNftInfo>;
   /**
    * 
    * @param claimer: the account which can claim the nfts
@@ -557,16 +557,10 @@ export function ChainFactory(
     ): Promise<string> => {
       return await chain.mintNft(owner, args);
     },
-    claimAlgorandNft: async (origin, hash, claimer) => {
+    waitAlgorandNft: async (origin, hash, claimer) => {
       const action = await origin.extractAction(hash);
-      const algo: AlgorandHelper = await inner(Chain.ALGORAND);
 
-      return await algo.claimAlgorandNft(
-        claimer,
-        origin.getNonce(),
-        action,
-        txSocket
-      );
+      return await txSocket.waitAlgorandNft(origin.getNonce(), claimer.address, action);
     },
     claimableAlgorandNfts: async (claimer) => {
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
