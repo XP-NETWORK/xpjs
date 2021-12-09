@@ -66,6 +66,7 @@ export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & 
 export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;
+    algoIndexer: string;
     algodPort: number | undefined;
     sendNftAppId: number;
     nonce: number;
