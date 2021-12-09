@@ -115,9 +115,9 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<Signer, string, BigNumber, TransactionResponse> &
-  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
+  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse, undefined> &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
+  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse, undefined> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &
@@ -126,7 +126,7 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo>, "preTransfer"> &
+  } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
   UnfreezeForeignNftUnsigned<
     string,
     BigNumber,

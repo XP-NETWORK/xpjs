@@ -58,14 +58,15 @@ export type CrossChainHelper =
 
 type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
-type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
+type FullChain<Signer, RawNft, Resp, ExtraArgs> = TransferNftForeign<
   Signer,
   string,
   BigNumber,
   RawNft,
-  Resp
+  Resp,
+  ExtraArgs
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
+  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp, ExtraArgs> &
   EstimateTxFees<BigNumber> &
   NftUriChain<RawNft> &
   ValidateAddress;
@@ -107,13 +108,14 @@ export type ChainFactory = {
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
    */
-  transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp, ExtraArgs>(
+    fromChain: FullChain<SignerF, RawNftF, Resp, ExtraArgs>,
+    toChain: FullChain<SignerT, RawNftT, Resp, ExtraArgs>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
-    fee?: BigNumber
+    args: ExtraArgs,
+    fee?: BigNumber,
   ): Promise<Resp>;
   /**
    * Mints an NFT on the chain.
@@ -142,9 +144,9 @@ export type ChainFactory = {
    * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
    * @param receiver: Address of the receiver of the NFT in raw string..
    */
-  estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp,ExtraArgs>(
+    fromChain: FullChain<SignerF, RawNftF, Resp, ExtraArgs>,
+    toChain: FullChain<SignerT, RawNftT, Resp, ExtraArgs>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ): Promise<BigNumber>;
@@ -337,9 +339,9 @@ export function ChainFactory(
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
-  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp, ExtraArgs>(
+    fromChain: FullChain<SignerF, RawNftF, Resp, ExtraArgs>,
+    toChain: FullChain<SignerT, RawNftT, Resp, ExtraArgs>,
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {
@@ -509,7 +511,7 @@ export function ChainFactory(
 
       return data;
     },
-    transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
+    transferNft: async (fromChain, toChain, nft, sender, receiver, args, fee ) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
       if (!fee) {
@@ -527,7 +529,9 @@ export function ChainFactory(
           sender,
           receiver,
           nft,
-          fee
+          fee,
+          args,
+          
         );
         return res;
       } else {
@@ -536,7 +540,9 @@ export function ChainFactory(
           toChain.getNonce(),
           receiver,
           nft,
-          fee
+          fee,
+          args,
+          
         );
         return res;
       }

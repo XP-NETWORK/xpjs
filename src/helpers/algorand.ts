@@ -1,4 +1,4 @@
-import algosdk from "algosdk";
+import algosdk, { SuggestedParams } from "algosdk";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { Base64 } from "js-base64";
@@ -7,6 +7,7 @@ import {
   ChainNonceGet,
   EstimateTxFees,
   NftInfo,
+  PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -118,14 +119,14 @@ export interface ClaimAlgorandNft {
 
 export type AlgorandHelper = ChainNonceGet &
   WrappedNftCheck<AlgoNft> &
-  TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
-  UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
+  TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string, SuggestedParams> &
+  UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string, SuggestedParams> &
   EstimateTxFees<BigNumber> &
   ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
   } & {
     algod: algosdk.Algodv2;
-  } & ClaimAlgorandNft;
+  } & ClaimAlgorandNft & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 
 export type AlgorandParams = {
   algodApiKey: string;
@@ -170,24 +171,9 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     chain_nonce: number,
     to: string,
     nft: NftInfo<AlgoNft>,
-    txFees: BigNumber
+    txFees: BigNumber,
+    suggested: SuggestedParams
   ) => {
-    const suggested = await algod.getTransactionParams().do();
-    const callTx = algosdk.makeApplicationNoOpTxnFromObject({
-      from: signer.address,
-      appIndex: args.sendNftAppId,
-      appArgs: [encoder.encode("opt_in_nft")],
-      foreignAssets: [nft.native.nftId],
-      suggestedParams: suggested,
-    });
-    const encodedTx = Base64.fromUint8Array(callTx.toByte());
-    const signedTxCall = await signer.algoSigner.signTxn([{ txn: encodedTx }]);
-    const res = await signer.algoSigner.send({
-      ledger: signer.ledger,
-      tx: signedTxCall[0].blob,
-    });
-    await waitTxnConfirm(res.txId);
-
     const feesTx = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from: signer.address,
       to: appAddr,
@@ -285,18 +271,44 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
 
       return await claimNft(signer, info);
     },
+    async preTransfer(sender, nft, _fee) {
+      const user = await algod.accountInformation(appAddr).do()
+      for (let i = 0; i < user["assets"].length; i++) {
+        if (user["assets"][i]["asset-id"] === nft.native.nftId) {
+          return undefined
+        }
+      }
+      const suggested = await algod.getTransactionParams().do();
+      const callTx = algosdk.makeApplicationNoOpTxnFromObject({
+        from: sender.address,
+        appIndex: args.sendNftAppId,
+        appArgs: [encoder.encode("opt_in_nft")],
+        foreignAssets: [nft.native.nftId],
+        suggestedParams: suggested,
+      });
+      const encodedTx = Base64.fromUint8Array(callTx.toByte());
+      const signedTxCall = await sender.algoSigner.signTxn([{ txn: encodedTx }]);
+      const res = await sender.algoSigner.send({
+        ledger: sender.ledger,
+        tx: signedTxCall[0].blob,
+      });
+      await waitTxnConfirm(res.txId);
+      return suggested
+    },
+
     isWrappedNft(nft) {
       return nft.native.creator === appAddr;
     },
     transferNftToForeign: transferNft,
-    unfreezeWrappedNft: async (signer, to, nft, txFees) => {
+    unfreezeWrappedNft: async (signer, to, nft, txFees, args) => {
       const nftMeta = await axios.get<MinWrappedNft>(nft.uri);
       return await transferNft(
         signer,
         parseInt(nftMeta.data.wrapped.origin),
         to,
         nft,
-        txFees
+        txFees,
+        args
       );
     },
     estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),

@@ -53,17 +53,17 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
 /**
  * Action to perform before transfer/unfreeze (if any)
  */
-export interface PreTransfer<Signer, Nft> {
+export interface PreTransfer<Signer, Nft, Ret> {
   preTransfer(
     sender: Signer,
     nft: NftInfo<Nft>,
     fee: BigNumber
-  ): Promise<string | undefined>;
+  ): Promise<Ret | undefined>;
   preUnfreeze(
     sender: Signer,
     nft: NftInfo<Nft>,
     fee: BigNumber
-  ): Promise<string | undefined>;
+  ): Promise<Ret | undefined>;
 }
 
 /**
@@ -81,14 +81,16 @@ export interface TransferNftForeign<
   ForeignAddr,
   Balance,
   RawNft,
-  Resp
+  Resp,
+  ExtraArgs
 > {
   transferNftToForeign(
     sender: Signer,
     chain_nonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
-    txFees: Balance
+    txFees: Balance,
+    args: ExtraArgs
   ): Promise<Resp>;
 }
 
@@ -122,13 +124,15 @@ export interface UnfreezeForeignNft<
   ForeignAddr,
   Balance,
   RawNft,
-  Resp
+  Resp,
+  ExtraArgs
 > {
   unfreezeWrappedNft(
     sender: Signer,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
-    txFees: Balance
+    txFees: Balance,
+    args: ExtraArgs
   ): Promise<Resp>;
 }
 
