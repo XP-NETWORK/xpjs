@@ -105,7 +105,7 @@ export interface ElrondRawUnsignedTxn {
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction, undefined> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction, undefined> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
 } & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<BigNumber> & TransferNftForeignUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & UnfreezeForeignNftUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & MintRawTxn<ElrondRawUnsignedTxn>;
 /**
