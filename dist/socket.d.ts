@@ -13,7 +13,7 @@ export declare type TxnSocketHelper = {
     waitTxHash(chain: number, action_id: string): Promise<string>;
 };
 export declare type AlgorandSocketHelper = {
-    waitAlgorandNft(sourceChain: number, action_id: string): Promise<ClaimNftInfo>;
+    waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
 };
 /**
  * Create a [[SocketHelper]]
