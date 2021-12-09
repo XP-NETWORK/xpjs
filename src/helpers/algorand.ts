@@ -108,15 +108,6 @@ export function algoSignerWrapper(
   };
 }
 
-export interface ClaimAlgorandNft {
-  claimAlgorandNft(
-    signer: AlgoSignerH,
-    sourceChain: number,
-    actionId: string,
-    socket: AlgorandSocketHelper
-  ): Promise<string>;
-}
-
 export type FullClaimNft = ClaimNftInfo & {
   name: string;
   uri: string;
@@ -130,9 +121,11 @@ export type AlgorandHelper = ChainNonceGet &
   ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
     claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
+    isOptIn(address: string, nftId: number): Promise<boolean>;
+    optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
   } & {
     algod: algosdk.Algodv2;
-  } & ClaimAlgorandNft & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
+  } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 
 export type AlgorandParams = {
   algodApiKey: string;
@@ -229,13 +222,28 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     return sendRes.txId as string;
   };
 
-  async function claimNft(signer: AlgoSignerH, info: ClaimNftInfo) {
+  async function isOptIn(addr: string, nftId: number) {
+    const user = await algod.accountInformation(addr).do()
+    for (let i = 0; i < user["assets"].length; i++) {
+      if (user["assets"][i]["asset-id"] === nftId) {
+        return true
+      }
+    }
+
+    return false;
+  }
+
+  async function optInNft(signer: AlgoSignerH, nft: ClaimNftInfo) {
+    if (await isOptIn(signer.address, nft.nftId)) {
+      return undefined;
+    }
+
     const suggested = await algod.getTransactionParams().do();
     const optIn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
       from: signer.address,
       to: signer.address,
       amount: 0,
-      assetIndex: info.nftId,
+      assetIndex: nft.nftId,
       suggestedParams: suggested,
     });
     const encodedTx = Base64.fromUint8Array(optIn.toByte());
@@ -245,6 +253,13 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       tx: signedTx[0].blob,
     });
     await waitTxnConfirm(res.txId);
+    return res.txId;
+  }
+
+  async function claimNft(signer: AlgoSignerH, info: ClaimNftInfo) {
+    await optInNft(signer, info);
+
+    const suggested = await algod.getTransactionParams().do();
 
     const callTxn = algosdk.makeApplicationNoOpTxnFromObject({
       from: signer.address,
@@ -272,18 +287,13 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     algod,
     getNonce: () => args.nonce,
     claimNft,
-    async claimAlgorandNft(signer, sourceChain, action, socket) {
-      const info = await socket.waitAlgorandNft(sourceChain, signer.address, action);
-
-      return await claimNft(signer, info);
-    },
+    optInNft,
+    isOptIn,
     async preTransfer(sender, nft, _fee) {
-      const user = await algod.accountInformation(appAddr).do()
-      for (let i = 0; i < user["assets"].length; i++) {
-        if (user["assets"][i]["asset-id"] === nft.native.nftId) {
-          return undefined
-        }
+      if (await isOptIn(appAddr, nft.native.nftId)) {
+        return undefined;
       }
+
       const suggested = await algod.getTransactionParams().do();
       const callTx = algosdk.makeApplicationNoOpTxnFromObject({
         from: sender.address,
