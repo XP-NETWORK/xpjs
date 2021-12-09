@@ -91,10 +91,10 @@ export type TronHelper = BaseTronHelper &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<TronSender, string, BigNumber, string> &
   // TODO: Use TX Fees
-  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string, undefined> &
+  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> &
   // TODO: Use TX Fees
   UnfreezeForeign<TronSender, string, string> &
-  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction, undefined> &
+  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &

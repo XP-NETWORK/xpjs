@@ -219,16 +219,14 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     string,
     BigNumber,
     EsdtNftInfo,
-    Transaction,
-    undefined
+    Transaction
   > &
   UnfreezeForeignNft<
     ElrondSigner,
     string,
     BigNumber,
     EsdtNftInfo,
-    Transaction,
-    undefined
+    Transaction
   > &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, string> & {

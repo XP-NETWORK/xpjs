@@ -115,9 +115,9 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<Signer, string, BigNumber, TransactionResponse> &
-  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse, undefined> &
+  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse, undefined> &
+  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber> &
   ChainNonceGet &

@@ -45,6 +45,7 @@ export type TxnSocketHelper = {
 
 export type AlgorandSocketHelper = {
   waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
+  claimNfts(receiver: string): Promise<ClaimNftInfo[]>;
 };
 
 function pairAction(sourceChain: number, action_id: string): number {
@@ -188,5 +189,9 @@ export function socketHelper(
 
       return await waitSocketData(algoBuf, 15, paired);
     },
+    async claimNfts(receiver: string): Promise<ClaimNftInfo[]> {
+      const dbData = await dbApi.get<DbClaimInfo[]>(`/algorand_event/${receiver}`);
+      return dbData.data.map((v) => ({ appId: parseInt(v.app_id), nftId: parseInt(v.nft_id) }));
+    }
   };
 }

@@ -119,11 +119,12 @@ export interface ClaimAlgorandNft {
 
 export type AlgorandHelper = ChainNonceGet &
   WrappedNftCheck<AlgoNft> &
-  TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string, SuggestedParams> &
-  UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string, SuggestedParams> &
+  TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
+  UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
   EstimateTxFees<BigNumber> &
   ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
+    claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<ClaimNftInfo[]>;
   } & {
     algod: algosdk.Algodv2;
   } & ClaimAlgorandNft & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
@@ -171,9 +172,9 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     chain_nonce: number,
     to: string,
     nft: NftInfo<AlgoNft>,
-    txFees: BigNumber,
-    suggested: SuggestedParams
+    txFees: BigNumber
   ) => {
+    const suggested = await algod.getTransactionParams().do();
     const feesTx = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from: signer.address,
       to: appAddr,
@@ -300,19 +301,32 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return nft.native.creator === appAddr;
     },
     transferNftToForeign: transferNft,
-    unfreezeWrappedNft: async (signer, to, nft, txFees, args) => {
+    unfreezeWrappedNft: async (signer, to, nft, txFees) => {
       const nftMeta = await axios.get<MinWrappedNft>(nft.uri);
       return await transferNft(
         signer,
         parseInt(nftMeta.data.wrapped.origin),
         to,
         nft,
-        txFees,
-        args
+        txFees
       );
     },
     estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),
     estimateValidateUnfreezeNft: () => Promise.resolve(MINT_NFT_COST),
     validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr)),
+    claimableNfts: async (txSocket: AlgorandSocketHelper, owner: string) => {
+      const claims = await txSocket.claimNfts(owner);
+      const nfts = new Set<number>();
+      const user = await algod.accountInformation(appAddr).do()
+      for (let i = 0; i < user["assets"].length; i++) {
+        if (user["assets"][i]["amount"].toString() === "1") {
+          nfts.add(user["assets"][i]["asset-id"]);
+        }
+      }
+
+      claims.filter((v) => !nfts.has(v.nftId));
+
+      return claims;
+    }
   };
 }
