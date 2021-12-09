@@ -6,7 +6,7 @@ export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, MintRawTxn, NftInfo, PreTransferRawTxn, TransactionStatus, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
 import { PopulatedTransaction } from "ethers";
-import { AlgorandParams, AlgorandHelper, AlgoSignerH } from "../helpers/algorand";
+import { AlgorandParams, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper | AlgorandHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
@@ -92,6 +92,11 @@ export declare type ChainFactory = {
      * @param claimer the account which can claim the nft
      */
     claimAlgorandNft<Txn>(originChain: ExtractAction<Txn> & ChainNonceGet, txn: Txn, claimer: AlgoSignerH): Promise<string>;
+    /**
+     *
+     * @param claimer: the account which can claim the nfts
+     */
+    claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
     /**
      * Returns a raw txn (hopefully Typed JS Objects in all chains) which can be sent over the wire for signing and broadcasting.
      * @param from The chain from which the NFT is being sent.
