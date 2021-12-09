@@ -54,6 +54,10 @@ export declare function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.A
 export interface ClaimAlgorandNft {
     claimAlgorandNft(signer: AlgoSignerH, sourceChain: number, actionId: string, socket: AlgorandSocketHelper): Promise<string>;
 }
+export declare type FullClaimNft = ClaimNftInfo & {
+    name: string;
+    uri: string;
+};
 export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
     claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<ClaimNftInfo[]>;
