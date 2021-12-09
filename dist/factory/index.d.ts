@@ -91,7 +91,7 @@ export declare type ChainFactory = {
      * @param txn Transaction Hash of the original
      * @param claimer the account which can claim the nft
      */
-    claimAlgorandNft<Txn>(originChain: ExtractAction<Txn> & ChainNonceGet, txn: Txn, claimer: AlgoSignerH): Promise<string>;
+    waitAlgorandNft<Txn>(originChain: ExtractAction<Txn> & ChainNonceGet, txn: Txn, claimer: AlgoSignerH): Promise<ClaimNftInfo>;
     /**
      *
      * @param claimer: the account which can claim the nfts

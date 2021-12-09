@@ -51,9 +51,6 @@ export declare type AlgoSignerH = {
  */
 export declare function typedAlgoSigner(): BrowserSigner;
 export declare function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): AlgoSignerH;
-export interface ClaimAlgorandNft {
-    claimAlgorandNft(signer: AlgoSignerH, sourceChain: number, actionId: string, socket: AlgorandSocketHelper): Promise<string>;
-}
 export declare type FullClaimNft = ClaimNftInfo & {
     name: string;
     uri: string;
@@ -61,9 +58,11 @@ export declare type FullClaimNft = ClaimNftInfo & {
 export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress & {
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
     claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
+    isOptIn(address: string, nftId: number): Promise<boolean>;
+    optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
 } & {
     algod: algosdk.Algodv2;
-} & ClaimAlgorandNft & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
+} & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;
