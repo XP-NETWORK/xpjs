@@ -36,9 +36,9 @@ export interface UnfreezeForeign<Signer, ForeignAddr, Balance> {
 /**
  * Action to perform before transfer/unfreeze (if any)
  */
-export interface PreTransfer<Signer, Nft> {
-    preTransfer(sender: Signer, nft: NftInfo<Nft>, fee: BigNumber): Promise<string | undefined>;
-    preUnfreeze(sender: Signer, nft: NftInfo<Nft>, fee: BigNumber): Promise<string | undefined>;
+export interface PreTransfer<Signer, Nft, Ret> {
+    preTransfer(sender: Signer, nft: NftInfo<Nft>, fee: BigNumber): Promise<Ret | undefined>;
+    preUnfreeze(sender: Signer, nft: NftInfo<Nft>, fee: BigNumber): Promise<Ret | undefined>;
 }
 /**
  * Transfer NFT to a foreign chain, freezing the original one
@@ -50,8 +50,8 @@ export interface PreTransfer<Signer, Nft> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft, Resp> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<Resp>;
+export interface TransferNftForeign<Signer, ForeignAddr, Balance, RawNft, Resp, ExtraArgs> {
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance, args: ExtraArgs): Promise<Resp>;
 }
 export interface TransferNftForeignUnsigned<ForeignAddr, Balance, RawNft, Resp> {
     transferNftToForeignTxn(chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance, senderAddress: string): Promise<Resp>;
@@ -66,8 +66,8 @@ export interface TransferNftForeignUnsigned<ForeignAddr, Balance, RawNft, Resp> 
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft, Resp> {
-    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance): Promise<Resp>;
+export interface UnfreezeForeignNft<Signer, ForeignAddr, Balance, RawNft, Resp, ExtraArgs> {
+    unfreezeWrappedNft(sender: Signer, to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance, args: ExtraArgs): Promise<Resp>;
 }
 export interface UnfreezeForeignNftUnsigned<ForeignAddr, Balance, RawNft, Resp> {
     unfreezeWrappedNftTxn(to: ForeignAddr, id: NftInfo<RawNft>, txFees: Balance, sender: string): Promise<Resp>;
