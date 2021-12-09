@@ -1,4 +1,4 @@
-import algosdk, { SuggestedParams } from "algosdk";
+import algosdk, { getApplicationAddress, SuggestedParams } from "algosdk";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { Base64 } from "js-base64";
@@ -130,6 +130,7 @@ export type AlgorandHelper = ChainNonceGet &
 export type AlgorandParams = {
   algodApiKey: string;
   algodUri: string;
+  algoIndexer: string;
   algodPort: number | undefined;
   sendNftAppId: number;
   nonce: number;
@@ -151,6 +152,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     args.algodUri,
     args.algodPort
   );
+  const indexer = new algosdk.Indexer({}, args.algoIndexer, 443);
 
   async function waitTxnConfirm(txId: string) {
     const status = await algod.status().do();
@@ -331,20 +333,20 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr)),
     claimableNfts: async (txSocket: AlgorandSocketHelper, owner: string) => {
       const claims = await txSocket.claimNfts(owner);
-      const nfts = new Set<number>();
-      const user = await algod.accountInformation(appAddr).do()
-      for (let i = 0; i < user["assets"].length; i++) {
-        if (user["assets"][i]["amount"].toString() === "1") {
-          nfts.add(user["assets"][i]["asset-id"]);
-        }
-      }
 
 
       const res = await Promise.all(claims.map(async v => {
         const appId = parseInt(v.app_id);
         const nftId = parseInt(v.nft_id);
         const assetInfo = await algod.getAssetByID(nftId).do();
-        if (nfts.has(nftId)) {
+        const ownerInfo = await indexer.lookupAssetBalances(
+          nftId
+        )
+        .currencyGreaterThan(0)
+        .do();
+        const appAddr = getApplicationAddress(appId);
+
+        if (ownerInfo.balances[0].address != appAddr) {
           return [];
         }
 

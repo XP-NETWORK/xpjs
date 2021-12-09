@@ -133,6 +133,7 @@ export namespace ChainFactoryConfigs {
       algodApiKey:
         "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
       algodUri: "https://algorand-node.xp.network/",
+      algoIndexer: "https://algoexplorerapi.io/idx2",
       nonce: Chain.ALGORAND,
       sendNftAppId: 458971166,
       algodPort: 443,
@@ -245,6 +246,7 @@ export namespace ChainFactoryConfigs {
       algodApiKey:
         "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
       algodUri: "https://algorand-node.xp.network/",
+      algoIndexer: "https://algoexplorerapi.io/idx2",
       nonce: Chain.ALGORAND,
       sendNftAppId: 458971166,
       algodPort: 443,
