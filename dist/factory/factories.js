@@ -141,7 +141,7 @@ var ChainFactoryConfigs;
     ChainFactoryConfigs.MainNet = () => ({
         elrondParams: {
             node_uri: consts_1.MainNetRpcUri.ELROND,
-            minter_address: "erd1qqqqqqqqqqqqqpgqe4hsht34ut085demqk2g2llcznankw84p7tqx5s9ce",
+            minter_address: "erd1qqqqqqqqqqqqqpgq98ufyktqukxqw79f7n22sr3u6n05u7d7p7tqmzhv32",
             esdt_swap_address: "erd1qqqqqqqqqqqqqpgqkkcsf8aky3vn057086cgnps768ann7nfp7tqxppx53",
             esdt: "XPNET-0e265d",
             esdt_nft: "XPNFT-9d19d5",
