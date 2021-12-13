@@ -145,11 +145,10 @@ export namespace ChainFactoryConfigs {
       node_uri: MainNetRpcUri.ELROND,
       minter_address:
         "erd1qqqqqqqqqqqqqpgq98ufyktqukxqw79f7n22sr3u6n05u7d7p7tqmzhv32",
-      esdt_swap_address:
-        "erd1qqqqqqqqqqqqqpgqkkcsf8aky3vn057086cgnps768ann7nfp7tqxppx53",
-      esdt: "XPNET-0e265d",
-      esdt_nft: "XPNFT-9d19d5",
-      esdt_swap: "WEGLD-6823c1",
+        esdt_swap_address: "erd1qqqqqqqqqqqqqpgqgc9vfqcdqw0ucu602elf0lt4tysfmxpep7tqhrrr9x",
+        esdt: "XPNET-738176",
+        esdt_nft: "XPNFT-676422",
+        esdt_swap: "WEGLD-071de0",
       validators: [
         "erd1lwyjz0adjd3vqpcjqs5rntw6sxzf9pvqussadygy2u76mz9ap7tquc0z5s",
         "erd1tzc9qltpntlgnpetrz58llqsg93dnxety54umln0kuq2k6dajf6qk796wh",
