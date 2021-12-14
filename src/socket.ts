@@ -46,6 +46,7 @@ export type TxnSocketHelper = {
 export type AlgorandSocketHelper = {
   waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
   claimNfts(receiver: string): Promise<DbClaimInfo[]>;
+  cleanNfts(owner: string): Promise<void>;
 };
 
 function pairAction(sourceChain: number, action_id: string): number {
@@ -192,6 +193,9 @@ export function socketHelper(
     async claimNfts(receiver: string): Promise<DbClaimInfo[]> {
       const dbData = await dbApi.get<{ result: DbClaimInfo[] }>(`/algorand_event/${receiver}`);
       return dbData.data.result;
+    },
+    async cleanNfts(owner: string): Promise<void> {
+      await dbApi.delete(`/algorand_event/${owner}`);
     }
   };
 }
