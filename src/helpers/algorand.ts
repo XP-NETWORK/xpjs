@@ -332,6 +332,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     estimateValidateUnfreezeNft: () => Promise.resolve(MINT_NFT_COST),
     validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr)),
     claimableNfts: async (txSocket: AlgorandSocketHelper, owner: string) => {
+      await txSocket.cleanNfts(owner);
       const claims = await txSocket.claimNfts(owner);
 
 
