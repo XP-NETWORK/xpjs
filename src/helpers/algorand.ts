@@ -130,7 +130,6 @@ export type AlgorandHelper = ChainNonceGet &
 export type AlgorandParams = {
   algodApiKey: string;
   algodUri: string;
-  algoIndexer: string;
   algodPort: number | undefined;
   sendNftAppId: number;
   nonce: number;
@@ -152,7 +151,6 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     args.algodUri,
     args.algodPort
   );
-  const indexer = new algosdk.Indexer({}, args.algoIndexer, 443);
 
   async function waitTxnConfirm(txId: string) {
     const status = await algod.status().do();
@@ -335,31 +333,20 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       await txSocket.cleanNfts(owner);
       const claims = await txSocket.claimNfts(owner);
 
-
       const res = await Promise.all(claims.map(async v => {
         const appId = parseInt(v.app_id);
         const nftId = parseInt(v.nft_id);
         const assetInfo = await algod.getAssetByID(nftId).do();
-        const ownerInfo = await indexer.lookupAssetBalances(
-          nftId
-        )
-        .currencyGreaterThan(0)
-        .do();
-        const appAddr = getApplicationAddress(appId);
 
-        if (ownerInfo.balances[0].address != appAddr) {
-          return [];
-        }
-
-        return [{
+        return {
           nftId,
           appId,
-          uri: assetInfo.params.url,
-          name: assetInfo.params.name || ''
-        }]
+          uri: assetInfo.params.url as string,
+          name: assetInfo.params.name as string || ''
+        }
       }));
 
-      return res.flat();
+      return res;
     }
   };
 }
