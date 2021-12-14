@@ -15,6 +15,7 @@ export declare type TxnSocketHelper = {
 export declare type AlgorandSocketHelper = {
     waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
     claimNfts(receiver: string): Promise<DbClaimInfo[]>;
+    cleanNfts(owner: string): Promise<void>;
 };
 declare type DbClaimInfo = {
     receiver: string;
