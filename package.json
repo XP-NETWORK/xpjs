@@ -26,6 +26,8 @@
   },
   "dependencies": {
     "@elrondnetwork/erdjs": "^8.0.1-alpha.8",
+    "@json-rpc-tools/utils": "^1.7.6",
+    "@walletconnect/client": "^1.7.0",
     "algosdk": "^1.12.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
