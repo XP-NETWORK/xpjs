@@ -1,7 +1,9 @@
-import algosdk, { getApplicationAddress, SuggestedParams } from "algosdk";
+import WalletConnect from "@walletconnect/client";
+import algosdk, {  SuggestedParams } from "algosdk";
+import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
-import { Base64 } from "js-base64";
+import { Base64, decode } from "js-base64";
 import {
   AlgorandSocketHelper,
   ChainNonceGet,
@@ -28,7 +30,7 @@ type AlgoNft = {
 };
 
 type SignedTxn = {
-  txID: string;
+  txID?: string;
   blob: string;
 };
 
@@ -119,12 +121,12 @@ export type AlgorandHelper = ChainNonceGet &
   UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
   EstimateTxFees<BigNumber> &
   ValidateAddress & {
+    algod: algosdk.Algodv2;
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
     claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
     isOptIn(address: string, nftId: number): Promise<boolean>;
     optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
-  } & {
-    algod: algosdk.Algodv2;
+    walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
   } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 
 export type AlgorandParams = {
@@ -347,6 +349,38 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       }));
 
       return res;
+    },
+    walletConnectSigner(
+      connector: WalletConnect,
+      address: string
+    ): AlgoSignerH {
+      const signer: BrowserSigner = {
+        accounts(_) {
+          return Promise.resolve(connector.accounts.map(s => ({ address: s })))
+        },
+        async signTxn(txns) {
+          const req = formatJsonRpcRequest(
+            "algo_signTxn",
+            [txns]
+          );
+          const signed: Array<string | null> = await connector.sendCustomRequest(req);
+          const decoded = signed.flatMap(e => e ? [{ blob: e }] : []);
+          if (decoded.length != txns.length) {
+            throw Error("Couldn't sign all transactions!");
+          }
+    
+          return decoded;
+        },
+        send(info: { tx: string}): Promise<TxResp> {
+          return algod.sendRawTransaction(Base64.toUint8Array(info.tx)).do();
+        }
+      }
+    
+      return {
+        algoSigner: signer,
+        address,
+        ledger: "any"
+      }
     }
   };
 }
