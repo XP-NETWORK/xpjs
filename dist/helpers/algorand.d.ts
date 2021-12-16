@@ -1,3 +1,4 @@
+import WalletConnect from "@walletconnect/client";
 import algosdk, { SuggestedParams } from "algosdk";
 import { BigNumber } from "bignumber.js";
 import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
@@ -13,7 +14,7 @@ declare type AlgoNft = {
     nftId: number;
 };
 declare type SignedTxn = {
-    txID: string;
+    txID?: string;
     blob: string;
 };
 declare type Ledger = "MainNet" | "TestNet" | "any";
@@ -56,12 +57,12 @@ export declare type FullClaimNft = ClaimNftInfo & {
     uri: string;
 };
 export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress & {
+    algod: algosdk.Algodv2;
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
     claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
     isOptIn(address: string, nftId: number): Promise<boolean>;
     optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
-} & {
-    algod: algosdk.Algodv2;
+    walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
 } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 export declare type AlgorandParams = {
     algodApiKey: string;
