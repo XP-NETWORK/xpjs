@@ -363,8 +363,8 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
             "algo_signTxn",
             [txns]
           );
-          const signed: Array<string | null> = await connector.sendCustomRequest(req);
-          const decoded = signed.flatMap(e => e ? [{ blob: e }] : []);
+          const signed: Array<Array<number> | null> = await connector.sendCustomRequest(req);
+          const decoded = signed.flatMap(e => e ? [{ blob: Base64.fromUint8Array(Uint8Array.from(e)) }] : []);
           if (decoded.length != txns.length) {
             throw Error("Couldn't sign all transactions!");
           }
