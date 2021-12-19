@@ -1,5 +1,5 @@
 import WalletConnect from "@walletconnect/client";
-import algosdk, {  SuggestedParams } from "algosdk";
+import algosdk, { SuggestedParams } from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
@@ -113,7 +113,7 @@ export function algoSignerWrapper(
 export type FullClaimNft = ClaimNftInfo & {
   name: string;
   uri: string;
-}
+};
 
 export type AlgorandHelper = ChainNonceGet &
   WrappedNftCheck<AlgoNft> &
@@ -123,9 +123,15 @@ export type AlgorandHelper = ChainNonceGet &
   ValidateAddress & {
     algod: algosdk.Algodv2;
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
-    claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
+    claimableNfts(
+      txSocket: AlgorandSocketHelper,
+      owner: string
+    ): Promise<FullClaimNft[]>;
     isOptIn(address: string, nftId: number): Promise<boolean>;
-    optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
+    optInNft(
+      signer: AlgoSignerH,
+      info: ClaimNftInfo
+    ): Promise<string | undefined>;
     walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
   } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 
@@ -225,10 +231,10 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   };
 
   async function isOptIn(addr: string, nftId: number) {
-    const user = await algod.accountInformation(addr).do()
+    const user = await algod.accountInformation(addr).do();
     for (let i = 0; i < user["assets"].length; i++) {
       if (user["assets"][i]["asset-id"] === nftId) {
-        return true
+        return true;
       }
     }
 
@@ -305,13 +311,15 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         suggestedParams: suggested,
       });
       const encodedTx = Base64.fromUint8Array(callTx.toByte());
-      const signedTxCall = await sender.algoSigner.signTxn([{ txn: encodedTx }]);
+      const signedTxCall = await sender.algoSigner.signTxn([
+        { txn: encodedTx },
+      ]);
       const res = await sender.algoSigner.send({
         ledger: sender.ledger,
         tx: signedTxCall[0].blob,
       });
       await waitTxnConfirm(res.txId);
-      return suggested
+      return suggested;
     },
 
     isWrappedNft(nft) {
@@ -335,18 +343,20 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       await txSocket.cleanNfts(owner);
       const claims = await txSocket.claimNfts(owner);
 
-      const res = await Promise.all(claims.map(async v => {
-        const appId = parseInt(v.app_id);
-        const nftId = parseInt(v.nft_id);
-        const assetInfo = await algod.getAssetByID(nftId).do();
+      const res = await Promise.all(
+        claims.map(async (v) => {
+          const appId = parseInt(v.app_id);
+          const nftId = parseInt(v.nft_id);
+          const assetInfo = await algod.getAssetByID(nftId).do();
 
-        return {
-          nftId,
-          appId,
-          uri: assetInfo.params.url as string,
-          name: assetInfo.params.name as string || ''
-        }
-      }));
+          return {
+            nftId,
+            appId,
+            uri: assetInfo.params.url as string,
+            name: (assetInfo.params.name as string) || "",
+          };
+        })
+      );
 
       return res;
     },
@@ -356,31 +366,35 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     ): AlgoSignerH {
       const signer: BrowserSigner = {
         accounts(_) {
-          return Promise.resolve(connector.accounts.map(s => ({ address: s })))
+          return Promise.resolve(
+            connector.accounts.map((s) => ({ address: s }))
+          );
         },
         async signTxn(txns) {
-          const req = formatJsonRpcRequest(
-            "algo_signTxn",
-            [txns]
-          );
-          const signed: Array<Array<number> | null> = await connector.sendCustomRequest(req);
-          const decoded = signed.flatMap(e => e ? [{ blob: Base64.fromUint8Array(Uint8Array.from(e)) }] : []);
+          const req = formatJsonRpcRequest("algo_signTxn", [txns]);
+          const signed: Array<string | null> =
+            await connector.sendCustomRequest(req);
+          const decoded = signed.map((s) => {
+            return {
+              blob: s ?? "",
+            } as SignedTxn;
+          });
           if (decoded.length != txns.length) {
             throw Error("Couldn't sign all transactions!");
           }
-    
+
           return decoded;
         },
-        send(info: { tx: string}): Promise<TxResp> {
+        send(info: { tx: string }): Promise<TxResp> {
           return algod.sendRawTransaction(Base64.toUint8Array(info.tx)).do();
-        }
-      }
-    
+        },
+      };
+
       return {
         algoSigner: signer,
         address,
-        ledger: "any"
-      }
-    }
+        ledger: "any",
+      };
+    },
   };
 }
