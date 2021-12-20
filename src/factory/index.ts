@@ -248,6 +248,7 @@ export interface ChainParams {
   ontologyParams: Web3Params;
   xDaiParams: Web3Params;
   algorandParams: AlgorandParams;
+  fuseParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
