@@ -15,6 +15,7 @@ import {
   ValidateAddress,
   WrappedNftCheck,
 } from "..";
+import MyAlgoConnect from "@randlabs/myalgo-connect";
 
 type TxResp = {
   txId: string;
@@ -133,6 +134,7 @@ export type AlgorandHelper = ChainNonceGet &
       info: ClaimNftInfo
     ): Promise<string | undefined>;
     walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
+    myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
   } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 
 export type AlgorandParams = {
@@ -396,5 +398,29 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         ledger: "any",
       };
     },
+    myAlgoSigner(myAlgo, address): AlgoSignerH {
+      const signer: BrowserSigner = {
+        async accounts(_) {
+          const accs = await myAlgo.connect()
+          return accs;
+        },
+        async signTxn(txns) {
+          const stxs = await myAlgo.signTransaction(txns.map(({ txn }) => txn));
+          return stxs.map(tx => ({
+            txID: tx.txID,
+            blob: Base64.fromUint8Array(tx.blob)
+          }));
+        },
+        send(info: { tx: string }): Promise<TxResp> {
+          return algod.sendRawTransaction(Base64.toUint8Array(info.tx)).do();
+        }
+      }
+
+      return {
+        algoSigner: signer,
+        address,
+        ledger: "any"
+      };
+    }
   };
 }
