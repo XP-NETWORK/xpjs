@@ -29,7 +29,8 @@ export declare enum MainNetRpcUri {
     TRON = "https://api.trongrid.io/",
     CELO = "https://forno.celo.org",
     HARMONY = "https://api.harmony.one",
-    XDAI = "https://rpc.xdaichain.com/"
+    XDAI = "https://rpc.xdaichain.com/",
+    FUSE = "https://rpc.fuse.io/"
 }
 export declare type ChainNonce<_, __> = number;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
@@ -49,6 +50,7 @@ export declare namespace Chain {
     const HARMONY: Web3Nonce;
     const XDAI: Web3Nonce;
     const ALGORAND: AlgoNonce;
+    const FUSE: Web3Nonce;
 }
 interface ChainData {
     name: string;
@@ -58,7 +60,6 @@ interface ChainData {
     blockExplorerUrl: string;
     chainId?: number;
     currency: SupportedCurrency;
-    validators: string[];
 }
 interface ChainInfo {
     [nonce: number]: ChainData;
