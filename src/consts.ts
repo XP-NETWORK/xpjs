@@ -28,6 +28,7 @@ export enum TestNetRpcUri {
   HARMONY = "https://api.s0.b.hmny.io",
   XDAI = "https://sokol.poa.network",
   // TODO: Algorand
+  // TODO: Fuse
 }
 
 export enum MainNetRpcUri {
@@ -42,6 +43,7 @@ export enum MainNetRpcUri {
   CELO = "https://forno.celo.org",
   HARMONY = "https://api.harmony.one",
   XDAI = "https://rpc.xdaichain.com/",
+  FUSE = "https://rpc.fuse.io/"
   // TODO: Algorand
 }
 
@@ -65,6 +67,7 @@ export namespace Chain {
   export const HARMONY: Web3Nonce = 0xc;
   export const XDAI: Web3Nonce = 0xe;
   export const ALGORAND: AlgoNonce = 0xf;
+  export const FUSE: Web3Nonce = 0x10;
 }
 
 interface ChainData {
@@ -77,7 +80,6 @@ interface ChainData {
   blockExplorerUrl: string;
   chainId?: number;
   currency: SupportedCurrency;
-  validators: string[];
 }
 
 interface ChainInfo {
@@ -92,9 +94,6 @@ export const CHAIN_INFO: ChainInfo = {
     constructor: (p) => elrondHelperFactory(p as ElrondParams),
     blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
     currency: SupportedCurrency.EGLD,
-    validators: [
-      "erd1qqqqqqqqqqqqqpgqx8dhqmvpnm4f0ylhazn7elwrx7gvmwnnk4asyp83t6",
-    ],
   },
   3: {
     name: "Heco",
@@ -104,7 +103,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://testnet.hecoinfo.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.HT,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   4: {
     name: "BSC",
@@ -114,7 +112,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://testnet.bscscan.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.BNB,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   5: {
     name: "Ropsten",
@@ -124,7 +121,6 @@ export const CHAIN_INFO: ChainInfo = {
     decimals: 1e18,
     blockExplorerUrl: "https://ropsten.etherscan.io/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   6: {
     name: "Avalanche",
@@ -134,7 +130,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://cchain.explorer.avax-test.network/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.AVAX,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   7: {
     name: "Polygon",
@@ -144,7 +139,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://mumbai.polygonscan.com/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.MATIC,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   8: {
     name: "Fantom",
@@ -154,7 +148,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://explorer.testnet.fantom.network/transactions",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.FTM,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   9: {
     name: "Tron",
@@ -163,7 +156,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://shasta.tronscan.org/#/transaction",
     constructor: (p) => tronHelperFactory(p as TronParams),
     currency: SupportedCurrency.TRX,
-    validators: ["TDESCaeTLQwvXv1GDz9Q1AKDMAmDk4AF6x"],
   },
   11: {
     name: "Celo",
@@ -173,7 +165,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.CELO,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   12: {
     name: "Harmony",
@@ -183,7 +174,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://explorer.pops.one/tx",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.CELO,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   // 13: {
   //   name: "Ontology",
@@ -203,7 +193,6 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.STAKE,
-    validators: ["0x0F7F9b1675174e5F62CE85D640A5c064BcdFf76c"],
   },
   15: {
     name: "Algorand",
@@ -212,9 +201,17 @@ export const CHAIN_INFO: ChainInfo = {
     chainId: undefined,
     blockExplorerUrl: "https://algoexplorer.io/tx",
     currency: SupportedCurrency.ALGO,
-    validators: ["BO4OK76FDVM4YUXLY4YPWBV4HDA6DBVS5RDDCGRNEXBQ2YQTCZPUBWY5Z4"],
     constructor: (p) => Promise.resolve(algorandHelper(p as AlgorandParams)),
   },
+  16: {
+    name: "FUSE",
+    nonce: 0x10,
+    decimals: 1e18,
+    chainId: undefined,
+    blockExplorerUrl: "https://explorer.fuse.io/tx",
+    currency: SupportedCurrency.FUSE,
+    constructor: (p) => web3HelperFactory(p as Web3Params)
+  }
 };
 
 export const Config: AppConfig = {

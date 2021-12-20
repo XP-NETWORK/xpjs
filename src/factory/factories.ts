@@ -250,5 +250,14 @@ export namespace ChainFactoryConfigs {
       sendNftAppId: 458971166,
       algodPort: 443,
     },
+    fuseParams: {
+      middleware_uri,
+      provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FUSE),
+      minter_addr: "0xb4A252B3b24AF2cA83fcfdd6c7Fac04Ff9d45A7D",
+      erc1155_addr: "0xAcE819D882CEEF314191DaD13D2Bf3731Df80988",
+      erc721_addr: "0xE773Be36b35e7B58a9b23007057b5e2D4f6686a1",
+      validators: EVM_VALIDATORS,
+      nonce: Chain.FUSE
+    }
   });
 }
