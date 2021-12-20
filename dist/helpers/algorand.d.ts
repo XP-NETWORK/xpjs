@@ -2,6 +2,7 @@ import WalletConnect from "@walletconnect/client";
 import algosdk, { SuggestedParams } from "algosdk";
 import { BigNumber } from "bignumber.js";
 import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import MyAlgoConnect from "@randlabs/myalgo-connect";
 declare type TxResp = {
     txId: string;
 };
@@ -63,6 +64,7 @@ export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & 
     isOptIn(address: string, nftId: number): Promise<boolean>;
     optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
     walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
+    myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
 } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
 export declare type AlgorandParams = {
     algodApiKey: string;
