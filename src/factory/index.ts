@@ -294,6 +294,7 @@ function mapNonceToParams(
   cToP.set(13, chainParams.ontologyParams);
   cToP.set(14, chainParams.xDaiParams);
   cToP.set(15, chainParams.algorandParams);
+  cToP.set(16, chainParams.fuseParams);
   return cToP;
 }
 /**
@@ -438,6 +439,12 @@ export function ChainFactory(
       }
       case 14: {
         return Chain.XDAI;
+      }
+      case 15: {
+        return Chain.ALGORAND
+      }
+      case 16: {
+        return Chain.FUSE
       }
       default: {
         throw Error(`unknown chain ${nonce}`);
