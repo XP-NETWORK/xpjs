@@ -114,7 +114,7 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
-    fee?: BigNumber,
+    fee?: BigNumber
   ): Promise<Resp>;
   /**
    * Mints an NFT on the chain.
@@ -191,12 +191,10 @@ export type ChainFactory = {
     claimer: AlgoSignerH
   ): Promise<ClaimNftInfo>;
   /**
-   * 
+   *
    * @param claimer: the account which can claim the nfts
    */
-  claimableAlgorandNfts(
-    claimer: string
-  ): Promise<ClaimNftInfo[]>
+  claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
   /**
    * Returns a raw txn (hopefully Typed JS Objects in all chains) which can be sent over the wire for signing and broadcasting.
    * @param from The chain from which the NFT is being sent.
@@ -249,6 +247,7 @@ export interface ChainParams {
   xDaiParams: Web3Params;
   algorandParams: AlgorandParams;
   fuseParams: Web3Params;
+  uniqueParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -295,6 +294,7 @@ function mapNonceToParams(
   cToP.set(14, chainParams.xDaiParams);
   cToP.set(15, chainParams.algorandParams);
   cToP.set(16, chainParams.fuseParams);
+  cToP.set(17, chainParams.uniqueParams);
   return cToP;
 }
 /**
@@ -441,10 +441,10 @@ export function ChainFactory(
         return Chain.XDAI;
       }
       case 15: {
-        return Chain.ALGORAND
+        return Chain.ALGORAND;
       }
       case 16: {
-        return Chain.FUSE
+        return Chain.FUSE;
       }
       default: {
         throw Error(`unknown chain ${nonce}`);
@@ -520,12 +520,12 @@ export function ChainFactory(
 
       const nonce = chain.getNonce();
       if (nonce != Chain.ALGORAND || nonce != Chain.ELROND) {
-        data = data.filter((v: any) => v.native.contractType != "ERC1155")
+        data = data.filter((v: any) => v.native.contractType != "ERC1155");
       }
 
       return data;
     },
-    transferNft: async (fromChain, toChain, nft, sender, receiver, fee ) => {
+    transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
       if (!fee) {
@@ -543,7 +543,7 @@ export function ChainFactory(
           sender,
           receiver,
           nft,
-          fee,
+          fee
         );
         return res;
       } else {
@@ -553,7 +553,6 @@ export function ChainFactory(
           receiver,
           nft,
           fee
-          
         );
         return res;
       }
@@ -568,15 +567,16 @@ export function ChainFactory(
     waitAlgorandNft: async (origin, hash, claimer) => {
       const action = await origin.extractAction(hash);
 
-      return await txSocket.waitAlgorandNft(origin.getNonce(), claimer.address, action);
+      return await txSocket.waitAlgorandNft(
+        origin.getNonce(),
+        claimer.address,
+        action
+      );
     },
     claimableAlgorandNfts: async (claimer) => {
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
-      return await algo.claimableNfts(
-        txSocket,
-        claimer
-      );
-    }
+      return await algo.claimableNfts(txSocket, claimer);
+    },
   };
 }
 /**

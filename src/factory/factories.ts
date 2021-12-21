@@ -138,6 +138,15 @@ export namespace ChainFactoryConfigs {
       sendNftAppId: 458971166,
       algodPort: 443,
     },
+    uniqueParams: {
+      provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.UNIQUE),
+      nonce: Chain.UNIQUE,
+      erc1155_addr: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
+      erc721_addr: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
+      minter_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
+      validators: EVM_TESTNET_VALIDATORS,
+      middleware_uri,
+    },
   });
 
   export const MainNet: () => Partial<ChainParams> = () => ({
@@ -257,7 +266,7 @@ export namespace ChainFactoryConfigs {
       erc1155_addr: "0xAcE819D882CEEF314191DaD13D2Bf3731Df80988",
       erc721_addr: "0xE773Be36b35e7B58a9b23007057b5e2D4f6686a1",
       validators: EVM_VALIDATORS,
-      nonce: Chain.FUSE
-    }
+      nonce: Chain.FUSE,
+    },
   });
 }

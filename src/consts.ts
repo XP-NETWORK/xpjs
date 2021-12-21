@@ -27,6 +27,7 @@ export enum TestNetRpcUri {
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
   XDAI = "https://sokol.poa.network",
+  UNIQUE = "https://rpc-opal.unique.network/",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -43,7 +44,7 @@ export enum MainNetRpcUri {
   CELO = "https://forno.celo.org",
   HARMONY = "https://api.harmony.one",
   XDAI = "https://rpc.xdaichain.com/",
-  FUSE = "https://rpc.fuse.io/"
+  FUSE = "https://rpc.fuse.io/",
   // TODO: Algorand
 }
 
@@ -68,6 +69,7 @@ export namespace Chain {
   export const XDAI: Web3Nonce = 0xe;
   export const ALGORAND: AlgoNonce = 0xf;
   export const FUSE: Web3Nonce = 0x10;
+  export const UNIQUE: Web3Nonce = 0x11;
 }
 
 interface ChainData {
@@ -210,8 +212,8 @@ export const CHAIN_INFO: ChainInfo = {
     chainId: undefined,
     blockExplorerUrl: "https://explorer.fuse.io/tx",
     currency: SupportedCurrency.FUSE,
-    constructor: (p) => web3HelperFactory(p as Web3Params)
-  }
+    constructor: (p) => web3HelperFactory(p as Web3Params),
+  },
 };
 
 export const Config: AppConfig = {
