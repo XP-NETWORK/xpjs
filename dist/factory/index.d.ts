@@ -128,6 +128,7 @@ export interface ChainParams {
     xDaiParams: Web3Params;
     algorandParams: AlgorandParams;
     fuseParams: Web3Params;
+    uniqueParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
