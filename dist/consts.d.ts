@@ -16,7 +16,8 @@ export declare enum TestNetRpcUri {
     TRON = "https://api.shasta.trongrid.io/",
     CELO = "https://alfajores-forno.celo-testnet.org",
     HARMONY = "https://api.s0.b.hmny.io",
-    XDAI = "https://sokol.poa.network"
+    XDAI = "https://sokol.poa.network",
+    UNIQUE = "https://rpc-opal.unique.network/"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -51,6 +52,7 @@ export declare namespace Chain {
     const XDAI: Web3Nonce;
     const ALGORAND: AlgoNonce;
     const FUSE: Web3Nonce;
+    const UNIQUE: Web3Nonce;
 }
 interface ChainData {
     name: string;
