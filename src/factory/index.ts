@@ -50,6 +50,7 @@ import {
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
+import { TezosParams } from "../helpers/tezos";
 
 export type CrossChainHelper =
   | ElrondHelper
@@ -248,6 +249,7 @@ export interface ChainParams {
   algorandParams: AlgorandParams;
   fuseParams: Web3Params;
   uniqueParams: Web3Params;
+  tezosParams: TezosParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -268,16 +270,18 @@ export interface AppConfig {
   tronScanUri: string;
 }
 
+type AllParams =
+  | Web3Params
+  | ElrondParams
+  | TronParams
+  | AlgorandParams
+  | TezosParams
+  | undefined;
+
 function mapNonceToParams(
   chainParams: Partial<ChainParams>
-): Map<
-  number,
-  Web3Params | ElrondParams | TronParams | AlgorandParams | undefined
-> {
-  const cToP = new Map<
-    number,
-    Web3Params | ElrondParams | TronParams | AlgorandParams | undefined
-  >();
+): Map<number, AllParams> {
+  const cToP = new Map<number, AllParams>();
 
   cToP.set(2, chainParams.elrondParams);
   cToP.set(3, chainParams.hecoParams);
@@ -295,6 +299,7 @@ function mapNonceToParams(
   cToP.set(15, chainParams.algorandParams);
   cToP.set(16, chainParams.fuseParams);
   cToP.set(17, chainParams.uniqueParams);
+  cToP.set(18, chainParams.tezosParams);
   return cToP;
 }
 /**

@@ -13,6 +13,7 @@ import {
   algorandHelper,
 } from "./helpers/algorand";
 import { AppConfig } from "./factory";
+import { TezosHelper, TezosParams } from "./helpers/tezos";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -28,6 +29,7 @@ export enum TestNetRpcUri {
   HARMONY = "https://api.s0.b.hmny.io",
   XDAI = "https://sokol.poa.network",
   UNIQUE = "https://rpc-opal.unique.network/",
+  TEZOS = "https://hangzhounet.smartpy.io",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -54,6 +56,7 @@ export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export type TronNonce = ChainNonce<TronHelper, TronParams>;
 export type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandParams>;
+export type TezosNonce = ChainNonce<TezosHelper, TezosParams>;
 
 export namespace Chain {
   export const ELROND: ElrondNonce = 2;
@@ -70,6 +73,7 @@ export namespace Chain {
   export const ALGORAND: AlgoNonce = 0xf;
   export const FUSE: Web3Nonce = 0x10;
   export const UNIQUE: Web3Nonce = 0x11;
+  export const TEZOS: TezosNonce = 0x12;
 }
 
 interface ChainData {
@@ -77,7 +81,12 @@ interface ChainData {
   nonce: number;
   decimals: number;
   constructor: (
-    params: Web3Params | TronParams | ElrondParams | AlgorandParams
+    params:
+      | Web3Params
+      | TronParams
+      | ElrondParams
+      | AlgorandParams
+      | TezosParams
   ) => Promise<CrossChainHelper>;
   blockExplorerUrl: string;
   chainId?: number;
@@ -213,6 +222,15 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "https://explorer.fuse.io/tx",
     currency: SupportedCurrency.FUSE,
     constructor: (p) => web3HelperFactory(p as Web3Params),
+  },
+  17: {
+    name: "Unique",
+    nonce: 0x11,
+    decimals: 1e18,
+    chainId: 8888,
+    blockExplorerUrl: "CANT FIND",
+    constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.OPL,
   },
 };
 

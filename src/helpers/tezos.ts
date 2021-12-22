@@ -41,18 +41,16 @@ export type TezosHelper = TransferNftForeign<
   EstimateTxFees<BigNumber>;
 
 export type TezosParams = {
-  rpc: string;
+  Tezos: TezosToolkit;
   xpnftAddress: string;
   bridgeAddress: string;
 };
 
 export async function tezosHelperFactory({
-  rpc,
+  Tezos,
   xpnftAddress,
   bridgeAddress,
 }: TezosParams): Promise<TezosHelper> {
-  const Tezos = new TezosToolkit(rpc);
-
   const bridge = await Tezos.contract.at(bridgeAddress);
   const xpnft = await Tezos.contract.at(xpnftAddress);
 
