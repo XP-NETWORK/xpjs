@@ -13,7 +13,7 @@ import {
   algorandHelper,
 } from "./helpers/algorand";
 import { AppConfig } from "./factory";
-import { TezosHelper, TezosParams } from "./helpers/tezos";
+import { TezosHelper, tezosHelperFactory, TezosParams } from "./helpers/tezos";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -231,6 +231,14 @@ export const CHAIN_INFO: ChainInfo = {
     blockExplorerUrl: "CANT FIND",
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.OPL,
+  },
+  18: {
+    name: "Tezos",
+    nonce: 0x12,
+    decimals: 1e6,
+    constructor: (p) => tezosHelperFactory(p as TezosParams),
+    currency: SupportedCurrency.XTZ,
+    blockExplorerUrl: "https://tezblock.io/transaction",
   },
 };
 
