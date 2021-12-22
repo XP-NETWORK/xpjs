@@ -152,6 +152,11 @@ export namespace ChainFactoryConfigs {
       bridgeAddress: "KT1MRYxBimYh1PUt3LBhEAmvr7YMK2L7kqCL",
       Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
       xpnftAddress: "KT1F7THd96y39MYKkTXmLyWkDZQ3H6QgubLh",
+      validators: [
+        "tz1e4QByQTYQyj98cBiM42hejkMWB2Pg6iXg",
+        "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+      ],
     },
   });
 
