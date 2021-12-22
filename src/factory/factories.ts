@@ -3,6 +3,7 @@ import { ChainParams } from ".";
 import TronWeb from "tronweb";
 import { Chain, MainNetRpcUri, TestNetRpcUri } from "../consts";
 import { ethers } from "ethers";
+import { TezosToolkit } from "@taquito/taquito";
 
 const EVM_VALIDATORS = [
   "0xadFF46B0064a490c1258506d91e4325A277B22aE",
@@ -146,6 +147,11 @@ export namespace ChainFactoryConfigs {
       minter_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
       validators: EVM_TESTNET_VALIDATORS,
       middleware_uri,
+    },
+    tezosParams: {
+      bridgeAddress: "KT1MRYxBimYh1PUt3LBhEAmvr7YMK2L7kqCL",
+      Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
+      xpnftAddress: "KT1F7THd96y39MYKkTXmLyWkDZQ3H6QgubLh",
     },
   });
 
