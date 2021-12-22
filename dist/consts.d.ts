@@ -5,6 +5,7 @@ import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { AppConfig } from "./factory";
+import { TezosHelper, TezosParams } from "./helpers/tezos";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -17,7 +18,8 @@ export declare enum TestNetRpcUri {
     CELO = "https://alfajores-forno.celo-testnet.org",
     HARMONY = "https://api.s0.b.hmny.io",
     XDAI = "https://sokol.poa.network",
-    UNIQUE = "https://rpc-opal.unique.network/"
+    UNIQUE = "https://rpc-opal.unique.network/",
+    TEZOS = "https://hangzhounet.smartpy.io"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -38,6 +40,7 @@ export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
 export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
 export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
 export declare type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandParams>;
+export declare type TezosNonce = ChainNonce<TezosHelper, TezosParams>;
 export declare namespace Chain {
     const ELROND: ElrondNonce;
     const HECO: Web3Nonce;
@@ -53,12 +56,13 @@ export declare namespace Chain {
     const ALGORAND: AlgoNonce;
     const FUSE: Web3Nonce;
     const UNIQUE: Web3Nonce;
+    const TEZOS: TezosNonce;
 }
 interface ChainData {
     name: string;
     nonce: number;
     decimals: number;
-    constructor: (params: Web3Params | TronParams | ElrondParams | AlgorandParams) => Promise<CrossChainHelper>;
+    constructor: (params: Web3Params | TronParams | ElrondParams | AlgorandParams | TezosParams) => Promise<CrossChainHelper>;
     blockExplorerUrl: string;
     chainId?: number;
     currency: SupportedCurrency;

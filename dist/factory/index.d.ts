@@ -7,6 +7,7 @@ import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft
 import BigNumber from "bignumber.js";
 import { PopulatedTransaction } from "ethers";
 import { AlgorandParams, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
+import { TezosParams } from "../helpers/tezos";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper | AlgorandHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber> & NftUriChain<RawNft> & ValidateAddress;
@@ -129,6 +130,7 @@ export interface ChainParams {
     algorandParams: AlgorandParams;
     fuseParams: Web3Params;
     uniqueParams: Web3Params;
+    tezosParams: TezosParams;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
