@@ -50,13 +50,14 @@ import {
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
-import { TezosParams } from "../helpers/tezos";
+import { TezosHelper, TezosParams } from "../helpers/tezos";
 
 export type CrossChainHelper =
   | ElrondHelper
   | Web3Helper
   | TronHelper
-  | AlgorandHelper;
+  | AlgorandHelper
+  | TezosHelper;
 
 type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
