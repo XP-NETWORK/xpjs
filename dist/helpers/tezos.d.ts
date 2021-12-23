@@ -13,5 +13,5 @@ export declare type TezosParams = {
     bridgeAddress: string;
     validators: string[];
 };
-export declare function tezosHelperFactory({ Tezos, xpnftAddress, bridgeAddress, }: TezosParams): Promise<TezosHelper>;
+export declare function tezosHelperFactory({ Tezos, xpnftAddress, bridgeAddress, validators, }: TezosParams): Promise<TezosHelper>;
 export {};
