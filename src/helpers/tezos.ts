@@ -9,9 +9,15 @@ import {
   ValidateAddress,
   WrappedNftCheck,
 } from "..";
-import { Signer, TezosToolkit, TransactionOperation } from "@taquito/taquito";
+import {
+  Signer,
+  TezosToolkit,
+  TransactionOperation,
+  TransferParams,
+} from "@taquito/taquito";
 import { validatePublicKey } from "@taquito/utils";
 import BigNumber from "bignumber.js";
+import axios from "axios";
 
 type TezosSigner = Signer;
 
@@ -19,6 +25,11 @@ type TezosNftInfo = {
   contract: string;
   id: string;
 };
+
+const randomAction = () =>
+  new BigNumber(
+    Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000))
+  );
 
 const NFT_TRANSFER_COST = new BigNumber(45000000);
 const NFT_UNFREEZE_COST = new BigNumber(45000000);
@@ -55,9 +66,22 @@ export async function tezosHelperFactory({
   Tezos,
   xpnftAddress,
   bridgeAddress,
+  validators,
 }: TezosParams): Promise<TezosHelper> {
   const bridge = await Tezos.contract.at(bridgeAddress);
   const xpnft = await Tezos.contract.at(xpnftAddress);
+
+  const estimateGas = async (validators: string[], op: TransferParams) => {
+    let fee = 0;
+
+    for (const [i, addr] of validators.entries()) {
+      op.source = addr;
+      let tf = (await Tezos.estimate.transfer(op)).totalCost;
+      if (i == validators.length - 1 && validators.length != 1) tf = tf * 2;
+      fee = fee + tf;
+    }
+    return new BigNumber(fee.toString());
+  };
 
   return {
     async transferNftToForeign(sender, chain, to, nft, fee) {
@@ -105,11 +129,21 @@ export async function tezosHelperFactory({
     getNonce() {
       return 0x11;
     },
-    async estimateValidateTransferNft(_to, _uri) {
-      return Promise.resolve(NFT_TRANSFER_COST);
+    async estimateValidateTransferNft(to, uri) {
+      const res = (await axios.get(uri)).data;
+      const { contract } = res;
+      const utx = bridge.methods
+        .validate_transfer_nft(randomAction(), to, res, contract)
+        .toTransferParams();
+      return estimateGas(validators, utx);
     },
-    async estimateValidateUnfreezeNft(_to, _uri) {
-      return Promise.resolve(NFT_UNFREEZE_COST);
+    async estimateValidateUnfreezeNft(to, uri) {
+      const res = (await axios.get(uri)).data;
+      const { contract, tokenId } = res;
+      const utx = bridge.methods
+        .validate_unfreeze_nft(randomAction(), to, tokenId, contract)
+        .toTransferParams();
+      return estimateGas(validators, utx);
     },
   };
 }
