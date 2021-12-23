@@ -236,7 +236,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &
-  EstimateTxFees<BigNumber> &
+  EstimateTxFees<BigNumber, string> &
   TransferNftForeignUnsigned<
     string,
     BigNumber,
@@ -848,7 +848,10 @@ export const elrondHelperFactory: (
     getNonce() {
       return elrondParams.nonce;
     },
-    async estimateValidateTransferNft(_toAddress: string, _nftUri: string) {
+    async estimateValidateTransferNft(
+      _toAddress: string,
+      _nftUri: NftInfo<string>
+    ) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
     async mintRawTxn(args, address) {
@@ -859,7 +862,7 @@ export const elrondHelperFactory: (
       return txu.toPlainObject();
     },
 
-    async estimateValidateUnfreezeNft(_to: string, _nftUri: string) {
+    async estimateValidateUnfreezeNft(_to: string, _nftUri: NftInfo<string>) {
       return estimateGas(NFT_UNFREEZE_COST, elrondParams.validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
     },
     wrapNftForTransfer(nft: NftInfo<EsdtNftInfo>) {
