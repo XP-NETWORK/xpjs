@@ -120,7 +120,7 @@ export type AlgorandHelper = ChainNonceGet &
   WrappedNftCheck<AlgoNft> &
   TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
   UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
-  EstimateTxFees<BigNumber> &
+  EstimateTxFees<BigNumber, AlgoNft> &
   ValidateAddress & {
     algod: algosdk.Algodv2;
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
@@ -401,26 +401,26 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     myAlgoSigner(myAlgo, address): AlgoSignerH {
       const signer: BrowserSigner = {
         async accounts(_) {
-          const accs = await myAlgo.connect()
+          const accs = await myAlgo.connect();
           return accs;
         },
         async signTxn(txns) {
           const stxs = await myAlgo.signTransaction(txns.map(({ txn }) => txn));
-          return stxs.map(tx => ({
+          return stxs.map((tx) => ({
             txID: tx.txID,
-            blob: Base64.fromUint8Array(tx.blob)
+            blob: Base64.fromUint8Array(tx.blob),
           }));
         },
         send(info: { tx: string }): Promise<TxResp> {
           return algod.sendRawTransaction(Base64.toUint8Array(info.tx)).do();
-        }
-      }
+        },
+      };
 
       return {
         algoSigner: signer,
         address,
-        ledger: "any"
+        ledger: "any",
       };
-    }
+    },
   };
 }

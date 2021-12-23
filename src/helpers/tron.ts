@@ -96,7 +96,7 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeign<TronSender, string, string> &
   UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
-  EstimateTxFees<BigNumber> &
+  EstimateTxFees<BigNumber, string> &
   ChainNonceGet &
   Approve<TronSender> &
   ValidateAddress &
@@ -588,7 +588,7 @@ export async function tronHelperFactory(
     },
     async estimateValidateTransferNft(
       to: string,
-      nftUri: string
+      nftUri: NftInfo<string>
     ): Promise<BigNumber> {
       return await estimateGas(
         tronParams.validators,
@@ -605,10 +605,10 @@ export async function tronHelperFactory(
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nftUri: string
+      nftUri: NftInfo<string>
     ): Promise<BigNumber> {
       const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-        nftUri
+        nftUri.uri
       );
       return await estimateGas(
         tronParams.validators,

@@ -198,14 +198,14 @@ export interface ValidateAddress {
   validateAddress(adr: string): Promise<boolean>;
 }
 
-export interface EstimateTxFees<Balance> {
+export interface EstimateTxFees<Balance, RawNftF> {
   estimateValidateTransferNft(
     to: string,
-    metadataUri: string
+    metadata: NftInfo<RawNftF>
   ): Promise<Balance>;
   estimateValidateUnfreezeNft(
     to: string,
-    metadataUri: string
+    metadata: NftInfo<RawNftF>
   ): Promise<Balance>;
 }
 

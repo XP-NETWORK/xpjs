@@ -22,10 +22,7 @@ import {
   ethers,
   VoidSigner,
 } from "ethers";
-import {
-  TransactionResponse,
-  Provider,
-} from "@ethersproject/providers";
+import { TransactionResponse, Provider } from "@ethersproject/providers";
 import {
   Minter__factory,
   UserNftMinter__factory,
@@ -115,11 +112,23 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedBalanceCheck<string, BigNumber> &
   BatchWrappedBalanceCheck<string, BigNumber> &
   TransferForeign<Signer, string, BigNumber, TransactionResponse> &
-  TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
+  TransferNftForeign<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    TransactionResponse
+  > &
   UnfreezeForeign<Signer, string, EasyBalance> &
-  UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse> &
+  UnfreezeForeignNft<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    TransactionResponse
+  > &
   WrappedNftCheck<EthNftInfo> &
-  EstimateTxFees<BigNumber> &
+  EstimateTxFees<BigNumber, string> &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
@@ -450,22 +459,22 @@ export async function web3HelperFactory(
     },
     async estimateValidateTransferNft(
       to: string,
-      nftUri: string
+      nftUri: NftInfo<string>
     ): Promise<BigNumber> {
       const utx = await minter.populateTransaction.validateTransferNft(
         randomAction(),
         to,
-        nftUri
+        nftUri.uri
       );
 
       return await estimateGas(params.validators, utx);
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nftUri: string
+      nftUri: NftInfo<string>
     ): Promise<BigNumber> {
       const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-        nftUri
+        nftUri.uri
       );
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),

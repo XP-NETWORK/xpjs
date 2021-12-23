@@ -51,7 +51,7 @@ export type TezosHelper = TransferNftForeign<
     TransactionOperation
   > &
   ValidateAddress &
-  EstimateTxFees<BigNumber> &
+  EstimateTxFees<BigNumber, TezosNftInfo> &
   ChainNonceGet &
   WrappedNftCheck<TezosNftInfo>;
 
@@ -129,19 +129,20 @@ export async function tezosHelperFactory({
     getNonce() {
       return 0x11;
     },
-    async estimateValidateTransferNft(to, uri) {
-      const res = (await axios.get(uri)).data;
-      const { contract } = res;
+    async estimateValidateTransferNft(to, meta) {
       const utx = bridge.methods
-        .validate_transfer_nft(randomAction(), to, res, contract)
+        .validate_transfer_nft(randomAction(), to, {}, meta.native.contract)
         .toTransferParams();
       return estimateGas(validators, utx);
     },
-    async estimateValidateUnfreezeNft(to, uri) {
-      const res = (await axios.get(uri)).data;
-      const { contract, tokenId } = res;
+    async estimateValidateUnfreezeNft(to, meta) {
       const utx = bridge.methods
-        .validate_unfreeze_nft(randomAction(), to, tokenId, contract)
+        .validate_unfreeze_nft(
+          randomAction(),
+          to,
+          meta.native.id,
+          meta.native.contract
+        )
         .toTransferParams();
       return estimateGas(validators, utx);
     },

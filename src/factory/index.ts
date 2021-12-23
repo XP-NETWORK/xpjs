@@ -69,7 +69,7 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Resp
 > &
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
-  EstimateTxFees<BigNumber> &
+  EstimateTxFees<BigNumber, RawNft> &
   NftUriChain<RawNft> &
   ValidateAddress;
 
@@ -362,7 +362,7 @@ export function ChainFactory(
     if (fromChain.isWrappedNft(nft)) {
       const estimate = await toChain.estimateValidateUnfreezeNft(
         receiver,
-        nft.uri
+        nft as unknown as NftInfo<RawNftT>
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
@@ -373,7 +373,7 @@ export function ChainFactory(
     } else {
       const estimate = await toChain.estimateValidateTransferNft(
         receiver,
-        "a".repeat(55) // approx size of uri
+        nft as unknown as NftInfo<RawNftT>
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
