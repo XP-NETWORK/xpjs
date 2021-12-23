@@ -115,9 +115,9 @@ export interface WrappedNftCheck<RawNft> {
 export interface ValidateAddress {
     validateAddress(adr: string): Promise<boolean>;
 }
-export interface EstimateTxFees<Balance> {
-    estimateValidateTransferNft(to: string, metadataUri: string): Promise<Balance>;
-    estimateValidateUnfreezeNft(to: string, metadataUri: string): Promise<Balance>;
+export interface EstimateTxFees<Balance, RawNftF> {
+    estimateValidateTransferNft(to: string, metadata: NftInfo<RawNftF>): Promise<Balance>;
+    estimateValidateUnfreezeNft(to: string, metadata: NftInfo<RawNftF>): Promise<Balance>;
 }
 export declare function ConcurrentSendError(): Error;
 export interface PreTransferRawTxn<NativeNft, Ret> {

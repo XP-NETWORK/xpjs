@@ -6,7 +6,7 @@ declare type TezosNftInfo = {
     contract: string;
     id: string;
 };
-export declare type TezosHelper = TransferNftForeign<TezosSigner, string, BigNumber, TezosNftInfo, TransactionOperation> & MintNft<TezosSigner, NftMintArgs, TransactionOperation> & BalanceCheck<string, BigNumber> & UnfreezeForeignNft<TezosSigner, string, BigNumber, TezosNftInfo, TransactionOperation> & ValidateAddress & EstimateTxFees<BigNumber> & ChainNonceGet & WrappedNftCheck<TezosNftInfo>;
+export declare type TezosHelper = TransferNftForeign<TezosSigner, string, BigNumber, TezosNftInfo, TransactionOperation> & MintNft<TezosSigner, NftMintArgs, TransactionOperation> & BalanceCheck<string, BigNumber> & UnfreezeForeignNft<TezosSigner, string, BigNumber, TezosNftInfo, TransactionOperation> & ValidateAddress & EstimateTxFees<BigNumber, TezosNftInfo> & ChainNonceGet & WrappedNftCheck<TezosNftInfo>;
 export declare type TezosParams = {
     Tezos: TezosToolkit;
     xpnftAddress: string;
