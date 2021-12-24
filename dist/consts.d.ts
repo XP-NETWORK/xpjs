@@ -19,7 +19,8 @@ export declare enum TestNetRpcUri {
     HARMONY = "https://api.s0.b.hmny.io",
     XDAI = "https://sokol.poa.network",
     UNIQUE = "https://rpc-opal.unique.network/",
-    TEZOS = "https://hangzhounet.smartpy.io"
+    TEZOS = "https://hangzhounet.smartpy.io",
+    VELAS = "https://explorer.testnet.velas.com/rpc"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -57,6 +58,7 @@ export declare namespace Chain {
     const FUSE: Web3Nonce;
     const UNIQUE: Web3Nonce;
     const TEZOS: TezosNonce;
+    const VELAS: Web3Nonce;
 }
 interface ChainData {
     name: string;
