@@ -251,6 +251,7 @@ export interface ChainParams {
   fuseParams: Web3Params;
   uniqueParams: Web3Params;
   tezosParams: TezosParams;
+  velasParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
