@@ -158,6 +158,15 @@ export namespace ChainFactoryConfigs {
         "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
       ],
     },
+    velasParams: {
+      middleware_uri,
+      erc1155_addr: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      erc721_addr: "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      minter_addr: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      validators: EVM_TESTNET_VALIDATORS,
+      nonce: Chain.VELAS,
+      provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.VELAS),
+    },
   });
 
   export const MainNet: () => Partial<ChainParams> = () => ({

@@ -30,6 +30,7 @@ export enum TestNetRpcUri {
   XDAI = "https://sokol.poa.network",
   UNIQUE = "https://rpc-opal.unique.network/",
   TEZOS = "https://hangzhounet.smartpy.io",
+  VELAS = "https://explorer.testnet.velas.com/rpc",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -74,6 +75,7 @@ export namespace Chain {
   export const FUSE: Web3Nonce = 0x10;
   export const UNIQUE: Web3Nonce = 0x11;
   export const TEZOS: TezosNonce = 0x12;
+  export const VELAS: Web3Nonce = 0x13;
 }
 
 interface ChainData {
@@ -239,6 +241,15 @@ export const CHAIN_INFO: ChainInfo = {
     constructor: (p) => tezosHelperFactory(p as TezosParams),
     currency: SupportedCurrency.XTZ,
     blockExplorerUrl: "https://tezblock.io/transaction",
+  },
+  19: {
+    name: "Velas",
+    blockExplorerUrl: "https://explorer.velas.com/tx",
+    nonce: 0x13,
+    decimals: 18,
+    constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.VLX,
+    chainId: 111,
   },
 };
 
