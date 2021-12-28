@@ -521,9 +521,15 @@ export function ChainFactory(
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
-      let data = await nftlistRest
-        .get<{ data: NftInfo<T>[] }>(`/nfts/${chain.getNonce()}/${owner}`)
-        .then((v) => v.data.data);
+      let res = await nftlistRest.get<{ data: NftInfo<T>[] }>(
+        `/nfts/${chain.getNonce()}/${owner}`
+      );
+
+      if (res.headers["Retry-After"]) {
+        await new Promise((r) => setTimeout(r, 30000));
+        return await this.nftList(chain, owner);
+      }
+      let data = res.data.data;
 
       const nonce = chain.getNonce();
       if (nonce != Chain.ALGORAND || nonce != Chain.ELROND) {
