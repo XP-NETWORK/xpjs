@@ -446,6 +446,7 @@ export const elrondHelperFactory: (
     address: Address,
     to: string,
     { tokenIdentifier, nonce }: EsdtNftInfo,
+    mintWith: string,
     tx_fees: BigNumber
   ) => {
     return new Transaction({
@@ -468,11 +469,13 @@ export const elrondHelperFactory: (
         .addArg(new BytesValue(Buffer.from("freezeSendNft", "ascii")))
         .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .addArg(new BytesValue(Buffer.from(mintWith, "ascii")))
         .build(),
     });
   };
 
   const unsignedUnfreezeNftTxn = (
+    chain_nonce: number,
     address: Address,
     to: string,
     id: number,
@@ -492,6 +495,7 @@ export const elrondHelperFactory: (
         .addArg(new U64Value(new BigNumber(0x0)))
         .addArg(new BigUIntValue(tx_fees))
         .addArg(new BytesValue(Buffer.from("withdrawNft", "ascii")))
+        .addArg(new U64Value(new BigNumber(chain_nonce)))
         .addArg(new BytesValue(Buffer.from(to, "ascii")))
         .build(),
     });
@@ -665,17 +669,19 @@ export const elrondHelperFactory: (
       return wallet.balance.valueOf();
     },
     balanceWrappedBatch,
-    async transferNftToForeignTxn(chain_nonce, to, nft, txFees, sender) {
+    async transferNftToForeignTxn(chain_nonce, to, nft, mintWith, txFees, sender) {
       return unsignedTransferNftTxn(
         chain_nonce,
         new Address(sender),
         to,
         nft.native,
+        mintWith,
         new BigNumber(txFees.toString())
       ).toPlainObject();
     },
-    async unfreezeWrappedNftTxn(to, nft, fee, sender) {
+    async unfreezeWrappedNftTxn(chain_nonce, to, nft, fee, sender) {
       const txu = unsignedUnfreezeNftTxn(
+        chain_nonce,
         new Address(sender),
         to,
         nft.native.nonce,
@@ -740,6 +746,7 @@ export const elrondHelperFactory: (
       chain_nonce: number,
       to: string,
       info: NftInfo<EsdtNftInfo>,
+      mintWith: string,
       txFees: EasyBalance
     ): Promise<Transaction> {
       const txu = unsignedTransferNftTxn(
@@ -747,6 +754,7 @@ export const elrondHelperFactory: (
         await getAddress(sender),
         to,
         info.native,
+        mintWith,
         new BigNumber(txFees.toString())
       );
       const tx = await signAndSend(sender, txu);
@@ -755,11 +763,13 @@ export const elrondHelperFactory: (
     },
     async unfreezeWrappedNft(
       sender: ElrondSigner,
+      chain_nonce: number,
       to: string,
       nft: NftInfo<EsdtNftInfo>,
       txFees: EasyBalance
     ): Promise<Transaction> {
       const txu = unsignedUnfreezeNftTxn(
+        chain_nonce,
         await getAddress(sender),
         to,
         nft.native.nonce,
@@ -896,7 +906,7 @@ function filterEventId(results: Array<ContractRes>): number {
 
     try {
       return parseInt(data[2], 16);
-    } catch (NumberFormatException) {
+    } catch (_) {
       continue;
     }
   }

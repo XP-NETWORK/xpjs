@@ -84,7 +84,7 @@ export async function tezosHelperFactory({
   };
 
   return {
-    async transferNftToForeign(sender, chain, to, nft, fee) {
+    async transferNftToForeign(sender, chain, to, nft, _, fee) {
       Tezos.setSignerProvider(sender);
       const response = await bridge.methods
         .freeze_fa2(nft.native.contract, nft.native.id, chain, to)
@@ -96,7 +96,7 @@ export async function tezosHelperFactory({
     async balance(address) {
       return Tezos.tz.getBalance(address);
     },
-    async unfreezeWrappedNft(sender, to, nft, fee) {
+    async unfreezeWrappedNft(sender, _, to, nft, fee) {
       Tezos.setSignerProvider(sender);
       const response = await bridge.methods
         .withdraw_nft(to, nft.native.id)

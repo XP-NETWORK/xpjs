@@ -34,6 +34,7 @@ import {
   IsApproved,
   MintRawTxn,
   NftMintArgs,
+  NFT_METHOD_MAP,
   PreTransfer,
   PreTransferRawTxn,
   TransactionStatus,
@@ -96,7 +97,7 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeign<TronSender, string, string> &
   UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
-  EstimateTxFees<BigNumber, string> &
+  EstimateTxFees<BigNumber, EthNftInfo> &
   ChainNonceGet &
   Approve<TronSender> &
   ValidateAddress &
@@ -326,8 +327,9 @@ export async function tronHelperFactory(
     id: NftInfo<EthNftInfo>,
     _sender: TronSender
   ) => {
+    // tODO: impl for erc115
     const erc = await provider.contract(
-      UserNftMinter__factory.abi,
+      NFT_METHOD_MAP[id.native.contractType].umt.abi,
       id.native.contract
     );
     const approvedAddress = await erc.getApproved(id.native.tokenId).call({
@@ -344,8 +346,9 @@ export async function tronHelperFactory(
     sender: TronSender | undefined
   ) => {
     await setSigner(sender);
+    // tODO: impl for erc115
     const erc = await provider.contract(
-      UserNftMinter__factory.abi,
+      NFT_METHOD_MAP[id.native.contractType].umt.abi,
       id.native.contract
     );
     const isApproved = await isApprovedForMinter(id, sender);
@@ -534,13 +537,14 @@ export async function tronHelperFactory(
     },
     async unfreezeWrappedNft(
       sender: TronSender,
+      chainNonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber
     ): Promise<Transaction> {
       setSigner(sender);
       const res = await minter
-        .withdrawNft(to, id.native.tokenId)
+        .withdrawNft(to, chainNonce, id.native.tokenId)
         .send({ callValue: EthBN.from(txFees.toString()) });
 
       await notifyValidator(res);
@@ -554,13 +558,15 @@ export async function tronHelperFactory(
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
+      mintWith: string,
       txFees: BigNumber
     ): Promise<string> {
       setSigner(sender);
       await approveForMinter(id, sender);
 
+      const method = NFT_METHOD_MAP[id.native.contractType].freeze;
       const txr = await minter
-        .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
+        [method](id.native.contract, id.native.tokenId, chain_nonce, to, mintWith)
         .send({ callValue: EthBN.from(txFees.toString()) });
 
       await notifyValidator(txr);
@@ -588,7 +594,8 @@ export async function tronHelperFactory(
     },
     async estimateValidateTransferNft(
       to: string,
-      nftUri: NftInfo<string>
+      nft: NftInfo<EthNftInfo>,
+      mintWith: string
     ): Promise<BigNumber> {
       return await estimateGas(
         tronParams.validators,
@@ -596,23 +603,23 @@ export async function tronHelperFactory(
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },
-          {
-            type: "string",
-            value: nftUri,
-          },
+          { type: "uint256", value: nft.native.tokenId },
+          { type: "address", value: mintWith },
+          { type: "bytes", value: [] }
         ]
       );
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nftUri: NftInfo<string>
+      nft: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
       const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-        nftUri.uri
+        nft.uri
       );
+      const unfreeze = NFT_METHOD_MAP[nft.native.contractType].validateUnfreeze
       return await estimateGas(
         tronParams.validators,
-        "validateUnfreezeNft(uint128,address,uint256,address)",
+        `${unfreeze}(uint128,address,uint256,address)`,
         [
           { type: "uint128", value: randomAction() },
           { type: "address", value: to },

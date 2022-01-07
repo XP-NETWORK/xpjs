@@ -88,6 +88,7 @@ export interface TransferNftForeign<
     chain_nonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
+    mintWith: string,
     txFees: Balance
   ): Promise<Resp>;
 }
@@ -102,6 +103,7 @@ export interface TransferNftForeignUnsigned<
     chain_nonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
+    mintWIth: string,
     txFees: Balance,
     senderAddress: string
   ): Promise<Resp>;
@@ -126,6 +128,7 @@ export interface UnfreezeForeignNft<
 > {
   unfreezeWrappedNft(
     sender: Signer,
+    chainNonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance
@@ -139,6 +142,7 @@ export interface UnfreezeForeignNftUnsigned<
   Resp
 > {
   unfreezeWrappedNftTxn(
+    chainNonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance,
@@ -201,7 +205,8 @@ export interface ValidateAddress {
 export interface EstimateTxFees<Balance, RawNftF> {
   estimateValidateTransferNft(
     to: string,
-    metadata: NftInfo<RawNftF>
+    metadata: NftInfo<RawNftF>,
+    mintWith: string
   ): Promise<Balance>;
   estimateValidateUnfreezeNft(
     to: string,

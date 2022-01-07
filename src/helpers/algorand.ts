@@ -180,6 +180,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     chain_nonce: number,
     to: string,
     nft: NftInfo<AlgoNft>,
+    _: string, // TODO: handle mintWith
     txFees: BigNumber
   ) => {
     const suggested = await algod.getTransactionParams().do();
@@ -328,13 +329,14 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return nft.native.creator === appAddr;
     },
     transferNftToForeign: transferNft,
-    unfreezeWrappedNft: async (signer, to, nft, txFees) => {
+    unfreezeWrappedNft: async (signer, _, to, nft, txFees) => {
       const nftMeta = await axios.get<MinWrappedNft>(nft.uri);
       return await transferNft(
         signer,
         parseInt(nftMeta.data.wrapped.origin),
         to,
         nft,
+        "",
         txFees
       );
     },

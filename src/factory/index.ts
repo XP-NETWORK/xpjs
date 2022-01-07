@@ -37,7 +37,7 @@ import BigNumber from "bignumber.js";
 
 import axios from "axios";
 import { exchangeRateRepo } from "./cons";
-import { UserSigner } from "@elrondnetwork/erdjs/out";
+import { Err, UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
 import { PopulatedTransaction } from "ethers";
@@ -108,6 +108,7 @@ export type ChainFactory = {
    * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the `nftList` method of the factory.
    * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
+   * @param mintWith address of the contract to mint this nft with (ignored when unfreezing the nft)
    * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
    */
   transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
@@ -116,6 +117,7 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
+    mintWith?: string,
     fee?: BigNumber
   ): Promise<Resp>;
   /**
@@ -144,12 +146,14 @@ export type ChainFactory = {
    * @param toChain: {@link FullChain} Chain to which the NFT must be sent. Can be obtained from the `inner` method on the factory.
    * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
    * @param receiver: Address of the receiver of the NFT in raw string..
+   * @param mintWith: Address of the contract to mint this nft with (ignored when unfreezing the nft)
    */
   estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
-    receiver: string
+    receiver: string,
+    mintWith?: string
   ): Promise<BigNumber>;
   /**
    *
@@ -358,7 +362,8 @@ export function ChainFactory(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
-    receiver: string
+    receiver: string,
+    mintWith?: string
   ) => {
     if (fromChain.isWrappedNft(nft)) {
       const estimate = await toChain.estimateValidateUnfreezeNft(
@@ -372,9 +377,13 @@ export function ChainFactory(
       );
       return conv;
     } else {
+      if (!mintWith) {
+        throw Error("mintWith required");
+      }
       const estimate = await toChain.estimateValidateTransferNft(
         receiver,
-        nft as unknown as NftInfo<RawNftT>
+        nft as unknown as NftInfo<RawNftT>,
+        mintWith
       );
       const conv = await calcExchangeFees(
         fromChain.getNonce(),
@@ -464,17 +473,18 @@ export function ChainFactory(
       return await from.preTransferRawTxn(nft, sender, fee);
     },
     async generateNftTxn(chain, toNonce, sender, receiver, nft, fee) {
-      if (chain.isWrappedNft(nft)) {
-        return chain.unfreezeWrappedNftTxn(receiver, nft, fee, sender);
-      } else {
-        return chain.transferNftToForeignTxn(
-          toNonce,
-          receiver,
-          nft,
-          fee,
-          sender
-        );
-      }
+      throw Error("TODO: impl")
+      // if (chain.isWrappedNft(nft)) {
+      //   return chain.unfreezeWrappedNftTxn(receiver, nft, fee, sender);
+      // } else {
+      //   return chain.transferNftToForeignTxn(
+      //     toNonce,
+      //     receiver,
+      //     nft,
+      //     fee,
+      //     sender
+      //   );
+      // }
     },
     async generateMintTxn(chain, sender, nft) {
       return await chain.mintRawTxn(nft, sender);
@@ -521,18 +531,13 @@ export function ChainFactory(
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
-      let data = await nftlistRest
+      const data = await nftlistRest
         .get<{ data: NftInfo<T>[] }>(`/nfts/${chain.getNonce()}/${owner}`)
         .then((v) => v.data.data);
 
-      const nonce = chain.getNonce();
-      if (nonce != Chain.ALGORAND || nonce != Chain.ELROND) {
-        data = data.filter((v: any) => v.native.contractType != "ERC1155");
-      }
-
       return data;
     },
-    transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
+    transferNft: async (fromChain, toChain, nft, sender, receiver, mintWith, fee) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
       if (!fee) {
@@ -542,23 +547,24 @@ export function ChainFactory(
         throw Error("invalid address");
       }
       if (fromChain.isWrappedNft(nft)) {
-        const meta = await axios.get<Erc721MetadataEx<unknown>>(nft.uri);
-        if (meta.data.wrapped.origin != toChain.getNonce().toString()) {
-          throw Error("trying to send wrapped nft to non-origin chain!!!");
-        }
         const res = await fromChain.unfreezeWrappedNft(
           sender,
+          toChain.getNonce(),
           receiver,
           nft,
           fee
         );
         return res;
       } else {
+        if  (!mintWith) {
+          throw Error("mint with required");
+        }
         const res = await fromChain.transferNftToForeign(
           sender,
           toChain.getNonce(),
           receiver,
           nft,
+          mintWith,
           fee
         );
         return res;
