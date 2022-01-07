@@ -1,8 +1,13 @@
+<center>
+
 # XP Network JS API
 
-### Work In Progress / Alpha Stage Library
+</center>
 
-Features Available :-
+### Work In Progress / Alpha Stage Library
+<br>
+Available Features:
+<br>
 
 - [x] Listing NFTs
 - [x] Transferring NFTs between chains
@@ -10,141 +15,252 @@ Features Available :-
 - [x] Estimating the TX fee
 - [ ] ... and More to come
 
-<hr/>
+<hr/><br><center>
 
 ## To list and transfer NFTs, follow the steps below:
+</center>
+<br>
 
-- Make sure [nodejs](https://nodejs.org/en/download/) is installed on your machine.
+Make sure [nodejs](https://nodejs.org/en/download/) is installed on your machine.<br>
+<br>
 
-### 1. Import xp.network package into your project with the following command:
+### 1. Install the libraries required for the project:
+<br>
 
-```
+```bash
 yarn add xp.network @elrondnetwork/erdjs ethers
 ```
 
 OR
 
-```
-npm install xp.network @elrondnetwork/erdjs ethers
+```bash
+npm i --save xp.network @elrondnetwork/erdjs ethers
 ```
 
-<hr/>
+To import the latest version of xp.network library:
 
-### 2. Import the dependencies
+```bash
+yarn add "git+https://github.com/xp-network/xpjs#master-dist"
+```
+
+<br>
+
+### 2. Import the dependencies<br><br>
 
 ```javascript
 import {
-  ChainFactoryConfigs,
-  ChainFactory,
-  ElrondHelper,
-  ElrondParams,
-  TronHelper,
-  TronParams,
-  Web3Helper,
-  Web3Params,
+  ChainFactoryConfigs,  ChainFactory,
+  ElrondHelper,         ElrondParams,
+  TronHelper,           TronParams,
+  Web3Helper,           Web3Params,
 } from "xp.network/dist";
-// EVM chains compatible wallet:
-import { Wallet } from "ethers";
+
 // Chanin name to chain nonce mapper:
 import { Chain, Config } from "xp.network/dist/consts";
-// Elrond provider:
-import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
 
-// Fetch the config for required networks i.e. Mainnet/Testnet
-// Networks from the ChainFactoryConfigs namespace. You can also mix
-// and match the configs to your heart's desire.
-const mainnetConfig = ChainFactoryConfigs.MainNet; // You can also call the ChainFactoryConfigs.MainNet
-
-// Instantiate the factory by populating the function call with the above objects.
-const factory = ChainFactory(Config, mainnetConfig());
+// Instantiate the chain factory for the
+// MAINNET
+const mainnetConfig = ChainFactoryConfigs.MainNet();
+const factory = ChainFactory(Config, mainnetConfig);
+// or
+// TESTNET
+const testnetConfig = ChainFactoryConfigs.TestNet();
+const factory = ChainFactory(Config, testnetConfig);
 ```
 
-<hr/>
+<hr/><br>
+<center>
 
-### 3. Getting the signer object
+## 3. Get the signer objects
+
+<br>
+
+| Chain | Parameters |
+|:-----:|:-----:|
+| Elrond | elrondParams |
+| BSC | bscParams |
+| Ethereum | ropstenParams |
+| Avalanche | avalancheParams |
+| Polygon | polygonParams |
+| Fantom | fantomParams |
+| Tron | tronParams |
+| xDai | xDaiParams |
+
+</center><br>
+
+### 3.1 Example of getting the signer object (for manual testing in the BE)
+
+<br>
 
 ```javascript
-// Dont forget to import Wallet from ethersjs.
+// EVM chains compatible wallet:
 import { Wallet } from "ethers";
+// EVM signer for testing in the BE
 const signer = new Wallet(
   "PRIVATE KEY HERE",
-  mainnetConfig().polygonParams?.provider
+  mainnetConfig.polygonParams?.provider
 );
+```
+<br>
+
+### 3.2 Example of getting the signer object (in the FE for web3):<br><br>
+
+```typescript
+// EVM chains compatible signer:
+import ethers from 'ethers';
+const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+```
+<br>
+
+### 3.3 Example of getting the signer object (in the FE for Elrond):<br><br>
+```typescript
+// ELROND provider:
+import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
+const elrondSigner = ExtensionProvider.getInstance();
+```
+<br>
+
+### 3.4 Example of getting the signer object (in the FE for Tron):<br><br>
+```typescript
+// Address is fetched from tronweb
+const addresses = await window.tronLink.tronWeb.request({
+  method: "tron_requestAccounts",
+});
+const tronSigner = addresses[0];
 ```
 
 <hr/>
 
-### 4. Getting the inner objects from this factory that can be used for transferring, minting, estimation of gas fees.
+For the ways of connecting the wallets in the FE check-out our [bridge repository](https://github.com/xp-network/bridge-interface/blob/components-reorder/src/components/ConnectWallet.jsx)
+
+<hr/>
+
+### 4. Getting the inner objects from this factory that can be used for transferring, minting, estimation of gas fees.<br><br>
 
 ```javascript
+// EVM-compatible chains:
 const ethereum  = await factory.inner<Web3Helper,     Web3Params>  (Chain.ETHEREUM);
 const bsc       = await factory.inner<Web3Helper,     Web3Params>  (Chain.BSC);
 const polygon   = await factory.inner<Web3Helper,     Web3Params>  (Chain.POLYGON);
 const avax      = await factory.inner<Web3Helper,     Web3Params>  (Chain.AVALANCHE);
 const fantom    = await factory.inner<Web3Helper,     Web3Params>  (Chain.FANTOM);
 const xdai      = await factory.inner<Web3Helper,     Web3Params>  (Chain.XDAI);
+
+// Non-EVM chains:
 const elrond    = await factory.inner<ElrondHelper,   ElrondParams>(Chain.ELROND);
 const tron      = await factory.inner<TronHelper,     TronParams>  (Chain.TRON);
 ```
 
-<hr/>
+<hr/><br>
 
-### 5. Listing NFTs Owned by the sender.
+### 5. Listing NFTs Owned by the sender.<br><br>
 
 This operation does not depend on a wallet, since reading operations are free and, therefore, do not require signing.
+<br>
 
 ```javascript
-// Since nftList returns a Promise it's a good idea to await it which requires an async function
 (async () => {
-  // Await the list of NFTs before trying to use it
-  const nfts = await factory.nftList(
-    polygon, // The chain of interest
-    "0x...." // The public key of the NFT owner
+
+  // EVM:
+  const web3Nfts = await factory.nftList(
+    polygon,     // The chain of interest
+    "0x...."     // The public key of the NFT owner in a web3 chain
   );
-  // Choosing an NFT to transfer:
-  const theChosenOne = nfts[0];
-  // Checking the selected NFT object
-  console.log("My NFT #1", theChosenOne);
+
+  // Elrond:
+  const elrondNfts = await factory.nftList(
+    elrond,     // The chain of interest
+    "erd1...."  // The public key of the NFT owner in Elrond
+  );
+
+  // Tron:
+  const tronNfts = await factory.nftList(
+    tron,      // The chain of interest
+    "TJuG..."  // The public key of the NFT owner in Tron
+  );
+
 })();
 ```
 
-<hr/>
+```javascript
+// Choosing an NFT to transfer:
+const web3ChosenOne     = web3Nfts[0];
+const elrondChosenOne   = elrondNfts[0];
+const tronChosenOne     = tronNfts[0];
 
-### 6. Approve accessing your NFT by the bridge smart contract
+// Checking the selected NFT object
+console.log("EVM Selected NFT:   ", web3ChosenOne);
+console.log("Elrond Selected NFT:", elrondChosenOne);
+console.log("tron Selected NFT:  ", tronChosenOne);
+```
+
+<hr/><br>
+
+### 6. Approve accessing your NFT by the bridge smart contract<br><br>
 
 ```javascript
-// Since approveForMinter returns a Promise it's a good idea to await it which requires an async function
+// EVM example
 (async () => {
-  // Await the result of the transaction before moving on to the next steps
-  const isApproved = await polygon.approveForMinter(theChosenOne, signer);
+  const isApproved = await polygon.approveForMinter(web3ChosenOne, signer);
+  console.log("Is Approved:", isApproved);
+
+// Elrond example
+  const isApproved = await elrond.approveForMinter(elrondChosenOne, elrondSigner);
+  console.log("Is Approved:", isApproved);
+
+// Tron example
+  const isApproved = await elrond.approveForMinter(tronChosenOne, tronSigner);
   console.log("Is Approved:", isApproved);
 })();
 ```
 
-<hr/>
+<hr/><br>
 
-### 7. Transferring an NFT
+### 7. Transferring an NFT<br><br>
 
 ```javascript
-// Since transferNft returns a Promise it's a good idea to await it which requires an async function
+// EVM compatible chains example:
 (async () => {
-  // Await the result of the transaction before trying to use it
-  const result = await factory.transferNft(
-    polygon, // The Source Chain.
-    bsc, // The Destination Chain.
-    theChosenOne, // Or the NFT you have chosen.
-    signer, // Or tronlink or maiar.
-    "ADDRESS OF THE RECEIVER" // The address who you are transferring the NFT to.
+  const web3Result = await factory.transferNft(
+    polygon,                    // The Source Chain.
+    bsc,                        // The Destination Chain.
+    theChosenOne,               // Or the NFT object you have chosen from the list.
+    signer,                     // The web3 signer object (see p. 3.2 above).
+    "ADDRESS OF THE RECEIVER"   // The address whom you are transferring the NFT to.
   );
-  console.log(result);
+  console.log(web3Result);
+
+// Elrond example:
+  const elrondResult = await factory.transferNft(
+    elrond,                     // The Source Chain.
+    tron,                       // The Destination Chain.
+    elrondChosenOne,            // Or the NFT object you have chosen from the list.
+    elrondSigner,               // The Elrond signer object (see p. 3.3 above).
+    "ADDRESS OF THE RECEIVER"   // The address whom you are transferring the NFT to.
+  );
+  console.log(elrondResult);
+
+// Tron example:
+  const tronRresult = await factory.transferNft(
+    tron,                       // The Source Chain.
+    elrond,                     // The Destination Chain.
+    tronChosenOne,              // Or the NFT object you have chosen from the list.
+    tronSigner,                 // The Tron signer object (see p. 3.4 above).
+    "ADDRESS OF THE RECEIVER"   // The address whom you are transferring the NFT to.
+  );
+  console.log(tronRresult);
 })();
 ```
 
-<hr/>
+<br><hr/><br><center>
 
 ## Minting NFTs on EVM chains, Elrond & Tron
+<br>
+</center>
 
 - Just call the mint function on the factory with suitable arguments.
+  
+<br>
 
   1. For Web3 Chains:
 
@@ -161,11 +277,12 @@ This operation does not depend on a wallet, since reading operations are free an
     contract: "Can be fetched from the mainnetConfig or testnetConfig",
   });
   ```
+<br>
 
-  2. For Elrond:
+  2. For Elrond:<br>
 
   ```javascript
-  const receipt = await factory.mint(elrond, ExtensionProvider.getInstance(), {
+  const receipt = await factory.mint(elrond, elrondSigner, {
     // Could be an IPFS URL or Any URL that points to a Metadata
     uris: [metadata.url],
     // Description of your NFT. Can be an object.
@@ -176,15 +293,12 @@ This operation does not depend on a wallet, since reading operations are free an
     identifier: "PANDA-eda5d0-c5",
   });
   ```
+<br>
 
   3.  For Tron:
 
   ```javascript
-  // Address is fetched from tronweb
-  const addresses = await window.tronLink.tronWeb.request({
-    method: "tron_requestAccounts",
-  });
-  const receipt = await factory.mint(avax, addresses[0], {
+  const receipt = await factory.mint(avax, tronSigner, {
     // Could be an IPFS URL or Any URL that points to a Metadata
     uris: [metadata.url],
     // Description of your NFT. Can be an object.
@@ -200,9 +314,9 @@ This operation does not depend on a wallet, since reading operations are free an
 
   P.S. The library is a work in progress. More features will be added soon.
 
- <hr/>
+ <hr/><br>
 
-## Troubleshooting
+## <center>Troubleshooting</center><br>
 
 - In case you're using the library in a console application and getting errors, go to:
 - node_modules/xpnet-nft-list/dist/nft-list/model/moralis/MoralisNftListService.js

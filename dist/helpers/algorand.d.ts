@@ -1,12 +1,21 @@
-import algosdk from "algosdk";
+import WalletConnect from "@walletconnect/client";
+import algosdk, { SuggestedParams } from "algosdk";
 import { BigNumber } from "bignumber.js";
-import { AlgoNft } from "xpnet-nft-list";
-import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import MyAlgoConnect from "@randlabs/myalgo-connect";
 declare type TxResp = {
     txId: string;
 };
+declare type AlgoNft = {
+    "metadata-hash"?: string;
+    name?: string;
+    "unit-name"?: string;
+    url: string;
+    creator: string;
+    nftId: number;
+};
 declare type SignedTxn = {
-    txID: string;
+    txID?: string;
     blob: string;
 };
 declare type Ledger = "MainNet" | "TestNet" | "any";
@@ -44,20 +53,25 @@ export declare type AlgoSignerH = {
  */
 export declare function typedAlgoSigner(): BrowserSigner;
 export declare function algoSignerWrapper(algod: algosdk.Algodv2, acc: algosdk.Account): AlgoSignerH;
-export interface ClaimAlgorandNft {
-    claimAlgorandNft(signer: AlgoSignerH, actionId: string, socket: AlgorandSocketHelper): Promise<string>;
-}
-export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber> & ValidateAddress & {
-    claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
-} & {
+export declare type FullClaimNft = ClaimNftInfo & {
+    name: string;
+    uri: string;
+};
+export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber, AlgoNft> & ValidateAddress & {
     algod: algosdk.Algodv2;
-} & ClaimAlgorandNft;
-export declare type AlgorandArgs = {
+    claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
+    claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
+    isOptIn(address: string, nftId: number): Promise<boolean>;
+    optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
+    walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
+    myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
+} & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
+export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;
     algodPort: number | undefined;
     sendNftAppId: number;
     nonce: number;
 };
-export declare function algorandHelper(args: AlgorandArgs): AlgorandHelper;
+export declare function algorandHelper(args: AlgorandParams): AlgorandHelper;
 export {};

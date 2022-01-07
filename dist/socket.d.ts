@@ -13,7 +13,16 @@ export declare type TxnSocketHelper = {
     waitTxHash(chain: number, action_id: string): Promise<string>;
 };
 export declare type AlgorandSocketHelper = {
-    waitAlgorandNft(action_id: string): Promise<ClaimNftInfo>;
+    waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
+    claimNfts(receiver: string): Promise<DbClaimInfo[]>;
+    cleanNfts(owner: string): Promise<void>;
+};
+declare type DbClaimInfo = {
+    receiver: string;
+    app_id: string;
+    nft_id: string;
+    action_id: string;
+    inserted_at: Date;
 };
 /**
  * Create a [[SocketHelper]]
@@ -22,3 +31,4 @@ export declare type AlgorandSocketHelper = {
  * @param options  socket.io options
  */
 export declare function socketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper & AlgorandSocketHelper;
+export {};
