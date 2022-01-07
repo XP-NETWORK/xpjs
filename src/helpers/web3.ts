@@ -34,6 +34,7 @@ import {
 import {
   ChainNonceGet,
   EstimateTxFees,
+  EstimateTxFeesBatch,
   ExtractAction,
   ExtractTxnStatus,
   MintRawTxn,
@@ -41,7 +42,9 @@ import {
   PreTransfer,
   PreTransferRawTxn,
   TransactionStatus,
+  TransferNftForeignBatch,
   TransferNftForeignUnsigned,
+  UnfreezeForeignNftBatch,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
@@ -52,7 +55,7 @@ import { isOpWithFee } from "@taquito/taquito/dist/types/operations/types";
 import { ContractTransaction } from "xpnet-web3-contracts/node_modules/ethers";
 
 
-type NftMethodVal<T, Sig, Tx> = {
+type NftMethodVal<T, Tx> = {
   freeze: "freezeErc1155" | "freezeErc721";
   validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
   umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
@@ -60,7 +63,7 @@ type NftMethodVal<T, Sig, Tx> = {
   approve: (umt: T, forAddr: string, tok: string) => Promise<Tx>;
 };
 
-type EthNftMethodVal<T> = NftMethodVal<T, Signer, ContractTransaction>
+type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>
 
 type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
 
@@ -172,8 +175,23 @@ export type Web3Helper = BaseWeb3Helper &
     EthNftInfo,
     TransactionResponse
   > &
+  TransferNftForeignBatch<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    TransactionResponse
+  > &
+  UnfreezeForeignNftBatch<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    TransactionResponse
+  > &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, EthNftInfo> &
+  EstimateTxFeesBatch<BigNumber, EthNftInfo> &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
@@ -540,5 +558,59 @@ export async function web3HelperFactory(
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
+    async unfreezeWrappedNftBatch(signer, chainNonce, to, nfts, txFees) {
+      const res = await minter
+        .connect(signer)
+        .withdrawNftBatch(to, chainNonce, nfts.map(nft => nft.native.tokenId), new Array(nfts.length).fill(1), nfts[0].native.contract, {
+          value: EthBN.from(txFees.toString()),
+        });
+
+      await notifyValidator(res.hash);
+
+      return res;
+    },
+    async transferNftBatchToForeign(signer, chainNonce, to, nfts, mintWith, txFees) {
+      const res = await minter
+        .connect(signer)
+        .freezeErc1155Batch(nfts[0].native.contract, nfts.map(nft => nft.native.tokenId), new Array(nfts.length).fill(1), chainNonce, to, mintWith, {
+          value: EthBN.from(txFees.toString()),
+        });
+
+        await notifyValidator(res.hash);
+
+        return res;
+    },
+    async estimateValidateTransferNftBatch(to, nfts, mintWith) {
+      const utx = await minter.populateTransaction.validateTransferNftBatch(
+        randomAction(),
+        to,
+        nfts.map(nft => nft.native.tokenId),
+        mintWith,
+        []
+      );
+
+      return await estimateGas(params.validators, utx);
+    },
+    async estimateValidateUnfreezeNftBatch(to, nfts) {
+      const metadatas = await Promise.all(nfts.map(nft => {
+        return axios.get<Erc721MetadataEx<Erc721WrappedData>>(nft.uri)
+      }));
+
+      const ids: string[] = [];
+      const contracts: string[] = [];
+
+      for (const metadata of metadatas) {
+        ids.push(metadata.data.wrapped.tokenId);
+        contracts.push(metadata.data.wrapped.contract);
+      }
+      const utx = await minter.populateTransaction.validateUnfreezeErc1155Batch(
+        randomAction(),
+        to,
+        ids,
+        contracts
+      );
+
+      return await estimateGas(params.validators, utx);
+    }
   };
 }

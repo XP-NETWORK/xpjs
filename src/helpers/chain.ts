@@ -109,6 +109,23 @@ export interface TransferNftForeignUnsigned<
   ): Promise<Resp>;
 }
 
+export interface TransferNftForeignBatch<
+  Signer,
+  ForeignAddr,
+  Balance,
+  RawNft,
+  Resp
+> {
+  transferNftBatchToForeign(
+    sender: Signer,
+    chain_nonce:number,
+    to: ForeignAddr,
+    id: NftInfo<RawNft>[],
+    mintWith: string,
+    txFees: Balance
+  ): Promise<Resp>
+}
+
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
  * chain_nonce is automatically derived
@@ -131,6 +148,22 @@ export interface UnfreezeForeignNft<
     chainNonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
+    txFees: Balance
+  ): Promise<Resp>;
+}
+
+export interface UnfreezeForeignNftBatch<
+  Signer,
+  ForeignAddr,
+  Balance,
+  RawNft,
+  Resp
+> {
+  unfreezeWrappedNftBatch(
+    sender: Signer,
+    chainNonce: number,
+    to: ForeignAddr,
+    nfts: NftInfo<RawNft>[],
     txFees: Balance
   ): Promise<Resp>;
 }
@@ -212,6 +245,18 @@ export interface EstimateTxFees<Balance, RawNftF> {
     to: string,
     metadata: NftInfo<RawNftF>
   ): Promise<Balance>;
+}
+
+export interface EstimateTxFeesBatch<Balance, RawNftF> {
+  estimateValidateTransferNftBatch(
+    to: string,
+    metadatas: NftInfo<RawNftF>[],
+    mintWith: string[]
+  ): Promise<Balance>;
+  estimateValidateUnfreezeNftBatch(
+    to: string,
+    metadatas: NftInfo<RawNftF>[]
+  ): Promise<Balance>
 }
 
 export function ConcurrentSendError(): Error {
