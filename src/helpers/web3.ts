@@ -24,8 +24,10 @@ import {
 } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import {
+  Erc1155Minter,
   Erc1155Minter__factory,
   Minter__factory,
+  UserNftMinter,
   UserNftMinter__factory,
   XPNet__factory,
 } from "xpnet-web3-contracts";
@@ -47,26 +49,43 @@ import { NftMintArgs } from "..";
 import axios from "axios";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 import { isOpWithFee } from "@taquito/taquito/dist/types/operations/types";
+import { ContractTransaction } from "xpnet-web3-contracts/node_modules/ethers";
 
 
-type NftMethodVal = {
+type NftMethodVal<T, Sig, Tx> = {
   freeze: "freezeErc1155" | "freezeErc721";
   validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
   umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
+  approved: (umt: T, sender: string, minterAddr: string, tok: string) => Promise<boolean>;
+  approve: (umt: T, forAddr: string, tok: string) => Promise<Tx>;
 };
 
-type NftMethodMap = Record<"ERC1155" | "ERC721", NftMethodVal>;
+type EthNftMethodVal<T> = NftMethodVal<T, Signer, ContractTransaction>
+
+type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
 
 export const NFT_METHOD_MAP: NftMethodMap = {
   "ERC1155": {
     "freeze": "freezeErc1155",
     "validateUnfreeze": "validateUnfreezeErc1155",
-    umt: Erc1155Minter__factory
+    umt: Erc1155Minter__factory,
+    approved: (umt: Erc1155Minter, sender: string, minterAddr: string) => {
+      return umt.isApprovedForAll(sender, minterAddr)
+    },
+    approve: (umt: Erc1155Minter, forAddr: string) => {
+      return umt.setApprovalForAll(forAddr, true)
+    }
   },
   "ERC721": {
     "freeze": "freezeErc721",
     "validateUnfreeze": "validateUnfreezeErc721",
-    umt: UserNftMinter__factory
+    umt: UserNftMinter__factory,
+    approved: async (umt: UserNftMinter, _: string, minterAddr: string, tok: string) => {
+      return await umt.getApproved(tok) == minterAddr;
+    },
+    approve: (umt: UserNftMinter, forAddr: string, tok: string) => {
+      return umt.approve(forAddr, tok);
+    }
   }
 }
 
@@ -290,22 +309,18 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     signer: Signer
   ) => {
-    const erc = UserNftMinter__factory.connect(id.native.contract, signer);
-    const approvedAddress = await erc.getApproved(id.native.tokenId);
-    if (approvedAddress === minter_addr) {
-      return true;
-    }
-    return false;
+    const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(id.native.contract, signer);
+    return await NFT_METHOD_MAP[id.native.contractType].approved(erc as any, await signer.getAddress(), minter_addr, id.native.tokenId);
   };
 
   const approveForMinter = async (id: NftInfo<EthNftInfo>, sender: Signer) => {
     const isApproved = await isApprovedForMinter(id, sender);
-    const erc = UserNftMinter__factory.connect(id.native.contract, sender);
     if (isApproved) {
       return undefined;
     }
+    const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(id.native.contract, sender);
 
-    const receipt = await erc.approve(minter_addr, id.native.tokenId);
+    const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(erc as any, minter_addr, id.native.tokenId);
     await receipt.wait();
     return receipt.hash;
   };
