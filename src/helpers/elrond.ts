@@ -174,7 +174,7 @@ export interface SetESDTRoles {
   unsignedSetESDTRoles(
     token: string,
     target: Address,
-    roles: [ESDTRole]
+    roles: ESDTRole[]
   ): Transaction;
 
   /**
@@ -188,7 +188,8 @@ export interface SetESDTRoles {
   setESDTRole(
     sender: ElrondSigner,
     token: string,
-    roles: [ESDTRole]
+    target: Address,
+    roles: ESDTRole[]
   ): Promise<void>;
 }
 
@@ -270,7 +271,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   > &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
   ExtractTxnStatus &
-  MintRawTxn<ElrondRawUnsignedTxn>;
+  MintRawTxn<ElrondRawUnsignedTxn> &
+  SetESDTRoles;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -864,6 +866,7 @@ export const elrondHelperFactory: (
       return undefined;
     },
     listNft,
+    unsignedSetESDTRoles,
     async setESDTRole(
       manager: ElrondSigner,
       token: string,
