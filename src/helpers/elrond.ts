@@ -22,6 +22,7 @@ import {
   Transaction,
   TransactionHash,
   TransactionPayload,
+  TypedValue,
   U64Value,
   WalletConnectProvider,
 } from "@elrondnetwork/erdjs";
@@ -42,13 +43,16 @@ import {
 import {
   ChainNonceGet,
   EstimateTxFees,
+  EstimateTxFeesBatch,
   ExtractAction,
   ExtractTxnStatus,
   MintRawTxn,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
+  TransferNftForeignBatch,
   TransferNftForeignUnsigned,
+  UnfreezeForeignNftBatch,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
@@ -228,6 +232,20 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
     EsdtNftInfo,
     Transaction
   > &
+  TransferNftForeignBatch<
+    ElrondSigner,
+    string,
+    BigNumber,
+    EsdtNftInfo,
+    Transaction
+  > &
+  UnfreezeForeignNftBatch<
+    ElrondSigner,
+    string,
+    BigNumber,
+    EsdtNftInfo,
+    Transaction
+  > &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
@@ -236,7 +254,8 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &
-  EstimateTxFees<BigNumber, string> &
+  EstimateTxFees<BigNumber, EsdtNftInfo> &
+  EstimateTxFeesBatch<BigNumber, EsdtNftInfo> &
   TransferNftForeignUnsigned<
     string,
     BigNumber,
@@ -860,7 +879,7 @@ export const elrondHelperFactory: (
     },
     async estimateValidateTransferNft(
       _toAddress: string,
-      _nftUri: NftInfo<string>
+      _nftUri
     ) {
       return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
     },
@@ -872,7 +891,7 @@ export const elrondHelperFactory: (
       return txu.toPlainObject();
     },
 
-    async estimateValidateUnfreezeNft(_to: string, _nftUri: NftInfo<string>) {
+    async estimateValidateUnfreezeNft(_to: string, _nftUri) {
       return estimateGas(NFT_UNFREEZE_COST, elrondParams.validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
     },
     wrapNftForTransfer(nft: NftInfo<EsdtNftInfo>) {
@@ -891,6 +910,73 @@ export const elrondHelperFactory: (
         return false;
       }
     },
+    async unfreezeWrappedNftBatch(sender, chainNonce, to, nfts, txFees) {
+      const txu = new Transaction({
+        receiver: await getAddress(sender),
+        gasLimit: new GasLimit(40000000+(5000000*nfts.length)), // TODO: better estimate
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+          .setArgs([
+            new AddressValue(mintContract),
+            new BigUIntValue(new BigNumber(nfts.length+1)),
+            ...nfts.flatMap(nft => [
+              new TokenIdentifierValue(esdtNftHex),
+              new U64Value(new BigNumber(nft.native.nonce)),
+              new BigUIntValue(new BigNumber(1))
+            ]),
+            new TokenIdentifierValue(esdtSwaphex),
+            new U64Value(new BigNumber(0x0)),
+            new BigUIntValue(txFees),
+            new BytesValue(Buffer.from("withdrawBatchNft", "ascii")),
+            new U64Value(new BigNumber(chainNonce)),
+            new BytesValue(Buffer.from(to, "ascii"))
+          ])
+          .build(),
+      });
+      const tx = await signAndSend(sender, txu);
+      return tx;
+    },
+    async transferNftBatchToForeign(sender, chainNonce, to, nfts, mintWith, txFees) {
+      const txu = new Transaction({
+        receiver: await getAddress(sender),
+        gasLimit: new GasLimit(50000000+(5000000*nfts.length)), // TODO: better estimate
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+          .setArgs([
+            new AddressValue(mintContract),
+            new BigUIntValue(new BigNumber(nfts.length+1)),
+            ...nfts.flatMap(nft => [
+              new TokenIdentifierValue(
+                Buffer.from(tokenIdentReal(nft.native.tokenIdentifier), "utf-8")
+              ),
+              new U64Value(new BigNumber(nft.native.nonce)),
+              new BigUIntValue(new BigNumber(1))
+            ]),
+            new TokenIdentifierValue(esdtSwaphex),
+            new U64Value(new BigNumber(0x0)),
+            new BigUIntValue(txFees),
+            new BytesValue(Buffer.from("freezeSendBatchNft", "ascii")),
+            new U64Value(new BigNumber(chainNonce)),
+            new BytesValue(Buffer.from(to, "ascii")),
+            new BytesValue(Buffer.from(mintWith, "ascii"))
+          ])
+          .build()
+      });
+      const tx = await signAndSend(sender, txu);
+      return tx;
+    },
+    async estimateValidateTransferNftBatch(_, nfts) {
+      return estimateGas(
+        new BigNumber(60000000+(5000000*nfts.length)),
+        elrondParams.validators.length
+      )
+    },
+    async estimateValidateUnfreezeNftBatch(_, nfts) {
+      return estimateGas(
+        new BigNumber(70000000+(5000000*nfts.length)),
+        elrondParams.validators.length
+      )
+    }
   };
 };
 
