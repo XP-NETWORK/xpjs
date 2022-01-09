@@ -302,6 +302,7 @@ function mapNonceToParams(
   cToP.set(16, chainParams.fuseParams);
   cToP.set(17, chainParams.uniqueParams);
   cToP.set(18, chainParams.tezosParams);
+  cToP.set(19, chainParams.velasParams);
   return cToP;
 }
 /**

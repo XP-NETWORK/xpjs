@@ -280,5 +280,14 @@ export namespace ChainFactoryConfigs {
       validators: EVM_VALIDATORS,
       nonce: Chain.FUSE,
     },
+    velasParams: {
+      middleware_uri,
+      provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
+      minter_addr: "0x2f156D07376476f799166964bb62598882744ce5",
+      erc1155_addr: "0xb83448C460197E2F591eAA3FC6Be2c4fF88d9e9C",
+      erc721_addr: "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
+      nonce: Chain.VELAS,
+      validators: EVM_VALIDATORS,
+    },
   });
 }
