@@ -48,6 +48,7 @@ export enum MainNetRpcUri {
   HARMONY = "https://api.harmony.one",
   XDAI = "https://rpc.xdaichain.com/",
   FUSE = "https://rpc.fuse.io/",
+  VELAS = "https://mainnet.velas.com/rpc",
   // TODO: Algorand
 }
 
