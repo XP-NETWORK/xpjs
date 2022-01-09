@@ -246,7 +246,7 @@ export const CHAIN_INFO: ChainInfo = {
     name: "Velas",
     blockExplorerUrl: "https://explorer.velas.com/tx",
     nonce: 0x13,
-    decimals: 18,
+    decimals: 1e18,
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.VLX,
     chainId: 111,
