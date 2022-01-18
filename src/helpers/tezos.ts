@@ -92,9 +92,7 @@ export async function tezosHelperFactory({
       const response = await bridge.methods
         .freeze_fa2(chain, nft.native.contract, to, parseInt(nft.native.id))
         .send({
-          amount: fee.toNumber(),
-          gasLimit: 800_000,
-          storageLimit: 60_000
+          amount: (fee.toNumber() / 1e6)
         });
       return response;
     },
@@ -106,7 +104,7 @@ export async function tezosHelperFactory({
       const response = await bridge.methods
         .withdraw_nft(to, parseInt(nft.native.id))
         .send({
-          amount: fee.toNumber(),
+          amount: (fee.toNumber() / 1e6),
         });
       return response;
     },
@@ -166,6 +164,7 @@ export async function tezosHelperFactory({
             token_id: nft.native.id
           }
         }]).send();
+      await response.confirmation();
       return response.hash;
     }
   };
