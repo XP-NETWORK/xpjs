@@ -23,6 +23,7 @@ import {
 import { validatePublicKey, char2Bytes } from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import axios from "axios";
+import { InMemorySigner } from "@taquito/signer";
 
 type TezosSigner = Signer;
 
@@ -84,11 +85,8 @@ export async function tezosHelperFactory({
     },
   });
 
-  const estimateGas = async (validators: string[], op: TransferParams) => {
-    op.source = validators[0];
-    const tf = (await Tezos.estimate.transfer(op)).totalCost;
-
-    return new BigNumber(tf * (validators.length + 1));
+  const estimateGas = (validators: string[], baseprice: number) => {
+    return new BigNumber(baseprice * (validators.length + 1));
   };
 
   async function isApproved(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
@@ -160,29 +158,11 @@ export async function tezosHelperFactory({
     getNonce() {
       return 0x12;
     },
-    async estimateValidateTransferNft(to, meta) {
-      const metadata = new MichelsonMap();
-      metadata.set("", char2Bytes(meta.uri));
-      const utx = bridge.methods
-        .validate_transfer_nft(
-          randomAction().toString(),
-          metadata,
-          xpnftAddress,
-          to
-        )
-        .toTransferParams();
-      return estimateGas(validators, utx);
+    async estimateValidateTransferNft() {
+      return estimateGas(validators, 1.2e5);
     },
-    async estimateValidateUnfreezeNft(to, meta) {
-      const utx = bridge.methods
-        .validate_unfreeze_nft(
-          randomAction().toString(),
-          meta.native.contract,
-          to,
-          parseInt(meta.native.id)
-        )
-        .toTransferParams();
-      return estimateGas(validators, utx);
+    async estimateValidateUnfreezeNft() {
+      return estimateGas(validators, 1.2e4);
     },
     isApproved,
     async preTransfer(signer, nft) {
