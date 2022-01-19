@@ -53,7 +53,12 @@ export type TezosHelper = TransferNftForeign<
   ChainNonceGet &
   WrappedNftCheck<TezosNftInfo> &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
-    isApproved(signer: Signer, nft: NftInfo<TezosNftInfo>): Promise<boolean>;
+    isApprovedForMinter(signer: Signer, nft: NftInfo<TezosNftInfo>): Promise<boolean>;
+  } & {
+    approveForMinter(
+      address: NftInfo<TezosNftInfo>,
+      sender: TezosSigner
+    ): Promise<string | undefined>;
   };
 
 export type TezosParams = {
@@ -84,7 +89,7 @@ export async function tezosHelperFactory({
     return new BigNumber(baseprice * (validators.length + 1));
   };
 
-  async function isApproved(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
+  async function isApprovedForMinter(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
     const contract = await Tezos.contract.at(nft.native.contract);
     const ownerAddr = await sender.publicKeyHash();
     const storage = await contract.storage<{ operators: BigMapAbstraction }>();
@@ -101,6 +106,27 @@ export async function tezosHelperFactory({
     await event_middleware.post("/tx/web3", {
       tx_hash: hash,
     });
+  }
+
+  async function preTransfer(signer: TezosSigner, nft: NftInfo<TezosNftInfo>) {
+    Tezos.setSignerProvider(signer);
+    if (await isApprovedForMinter(signer, nft)) {
+      return;
+    }
+    const contract = await Tezos.contract.at(nft.native.contract);
+    const response = await contract.methods
+      .update_operators([
+        {
+          add_operator: {
+            owner: await signer.publicKeyHash(),
+            operator: bridge.address,
+            token_id: nft.native.token_id,
+          },
+        },
+      ])
+      .send();
+    await response.confirmation();
+    return response.hash;
   }
 
   return {
@@ -159,26 +185,8 @@ export async function tezosHelperFactory({
     async estimateValidateUnfreezeNft() {
       return estimateGas(validators, 1.2e4);
     },
-    isApproved,
-    async preTransfer(signer, nft) {
-      Tezos.setSignerProvider(signer);
-      if (await isApproved(signer, nft)) {
-        return;
-      }
-      const contract = await Tezos.contract.at(nft.native.contract);
-      const response = await contract.methods
-        .update_operators([
-          {
-            add_operator: {
-              owner: await signer.publicKeyHash(),
-              operator: bridge.address,
-              token_id: nft.native.token_id,
-            },
-          },
-        ])
-        .send();
-      await response.confirmation();
-      return response.hash;
-    },
+    preTransfer,
+    isApprovedForMinter,
+    approveForMinter: (nft, sender) => preTransfer(sender, nft)
   };
 }
