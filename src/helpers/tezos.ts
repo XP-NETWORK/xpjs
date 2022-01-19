@@ -55,7 +55,7 @@ export type TezosHelper = TransferNftForeign<
   ChainNonceGet &
   WrappedNftCheck<TezosNftInfo> &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
-    isApproved(signer: Signer, nft: NftInfo<TezosNftInfo>): Promise<boolean>
+    isApproved(signer: Signer, nft: NftInfo<TezosNftInfo>): Promise<boolean>;
   };
 
 export type TezosParams = {
@@ -85,14 +85,20 @@ export async function tezosHelperFactory({
   const estimateGas = async (validators: string[], op: TransferParams) => {
     const tf = (await Tezos.estimate.transfer(op)).totalCost;
 
-    return new BigNumber(tf*(validators.length+1));
+    return new BigNumber(tf * (validators.length + 1));
   };
 
   async function isApproved(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
     const contract = await Tezos.contract.at(nft.native.contract);
     const ownerAddr = await sender.publicKeyHash();
     const storage = await contract.storage<{ operators: BigMapAbstraction }>();
-    return typeof (await storage.operators.get({owner: ownerAddr, operator: bridge.address, token_id: nft.native.id})) == "symbol";
+    return (
+      typeof (await storage.operators.get({
+        owner: ownerAddr,
+        operator: bridge.address,
+        token_id: nft.native.id,
+      })) == "symbol"
+    );
   }
 
   async function notifyValidator(hash: string): Promise<void> {
@@ -107,7 +113,7 @@ export async function tezosHelperFactory({
       const response = await bridge.methods
         .freeze_fa2(chain, nft.native.contract, to, parseInt(nft.native.id))
         .send({
-          amount: (fee.toNumber() / 1e6)
+          amount: fee.toNumber() / 1e6,
         });
       await response.confirmation();
       notifyValidator(response.hash);
@@ -121,7 +127,7 @@ export async function tezosHelperFactory({
       const response = await bridge.methods
         .withdraw_nft(to, parseInt(nft.native.id))
         .send({
-          amount: (fee.toNumber() / 1e6),
+          amount: fee.toNumber() / 1e6,
         });
       await response.confirmation();
       notifyValidator(response.hash);
@@ -149,7 +155,7 @@ export async function tezosHelperFactory({
       return nft.native.contract.toLowerCase() === xpnftAddress.toLowerCase();
     },
     getNonce() {
-      return 0x11;
+      return 0x12;
     },
     async estimateValidateTransferNft(to, meta) {
       const utx = bridge.methods
@@ -176,15 +182,18 @@ export async function tezosHelperFactory({
       }
       const contract = await Tezos.contract.at(nft.native.contract);
       const response = await contract.methods
-        .update_operators([{
-          add_operator: {
-            owner: await signer.publicKeyHash(),
-            operator: bridge.address,
-            token_id: nft.native.id
-          }
-        }]).send();
+        .update_operators([
+          {
+            add_operator: {
+              owner: await signer.publicKeyHash(),
+              operator: bridge.address,
+              token_id: nft.native.id,
+            },
+          },
+        ])
+        .send();
       await response.confirmation();
       return response.hash;
-    }
+    },
   };
 }
