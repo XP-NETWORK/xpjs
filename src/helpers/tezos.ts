@@ -85,6 +85,7 @@ export async function tezosHelperFactory({
   });
 
   const estimateGas = async (validators: string[], op: TransferParams) => {
+    op.source = validators[0];
     const tf = (await Tezos.estimate.transfer(op)).totalCost;
 
     return new BigNumber(tf * (validators.length + 1));
