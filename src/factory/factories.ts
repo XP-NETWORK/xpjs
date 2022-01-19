@@ -142,6 +142,7 @@ export namespace ChainFactoryConfigs {
     },
     tezosParams: {
       bridgeAddress: "KT1MRYxBimYh1PUt3LBhEAmvr7YMK2L7kqCL",
+      middlewareUri: middleware_uri,
       Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
       xpnftAddress: "KT1F7THd96y39MYKkTXmLyWkDZQ3H6QgubLh",
       validators: [
@@ -279,6 +280,17 @@ export namespace ChainFactoryConfigs {
       erc721_addr: "0xE773Be36b35e7B58a9b23007057b5e2D4f6686a1",
       validators: EVM_VALIDATORS,
       nonce: Chain.FUSE,
+    },
+    tezosParams: {
+      bridgeAddress: "KT1Lrn7Zymy29CAAxsf5SGAULo9ecSHZTczY",
+      middlewareUri: middleware_uri,
+      Tezos: new TezosToolkit(MainNetRpcUri.TEZOS),
+      xpnftAddress: "KT1EhmjL3Mau41gn8jCBvnwfMiy3eunfHHBc",
+      validators: [
+        "tz1e4QByQTYQyj98cBiM42hejkMWB2Pg6iXg",
+        "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+      ]
     },
     velasParams: {
       middleware_uri,
