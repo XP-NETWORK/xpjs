@@ -20,7 +20,7 @@ import {
   TransferParams,
 } from "@taquito/taquito";
 
-import { validatePublicKey, char2Bytes } from "@taquito/utils";
+import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import axios from "axios";
 import { InMemorySigner } from "@taquito/signer";
@@ -150,7 +150,7 @@ export async function tezosHelperFactory({
       return response;
     },
     async validateAddress(adr) {
-      return Promise.resolve(validatePublicKey(adr) === 3);
+      return Promise.resolve(utils.validateAddress(adr) === utils.ValidationResult.VALID);
     },
     isWrappedNft(nft) {
       return nft.native.contract.toLowerCase() === xpnftAddress.toLowerCase();
