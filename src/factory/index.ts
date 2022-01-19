@@ -533,7 +533,7 @@ export function ChainFactory(
       let data = res.data.data;
 
       const nonce = chain.getNonce();
-      if (nonce != Chain.ALGORAND || nonce != Chain.ELROND) {
+      if (nonce != Chain.ALGORAND || nonce != Chain.ELROND || nonce != Chain.TEZOS) {
         data = data.filter((v: any) => v.native.contractType != "ERC1155");
       }
 
