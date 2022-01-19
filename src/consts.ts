@@ -49,6 +49,7 @@ export enum MainNetRpcUri {
   XDAI = "https://rpc.xdaichain.com/",
   FUSE = "https://rpc.fuse.io/",
   VELAS = "https://mainnet.velas.com/rpc",
+  TEZOS = "https://mainnet.smartpy.io"
   // TODO: Algorand
 }
 
