@@ -29,13 +29,8 @@ type TezosSigner = Signer;
 
 type TezosNftInfo = {
   contract: string;
-  id: string;
+  token_id: string;
 };
-
-const randomAction = () =>
-  new BigNumber(
-    Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000))
-  );
 
 export type TezosHelper = TransferNftForeign<
   TezosSigner,
@@ -97,7 +92,7 @@ export async function tezosHelperFactory({
       typeof (await storage.operators.get({
         owner: ownerAddr,
         operator: bridge.address,
-        token_id: nft.native.id,
+        token_id: nft.native.token_id,
       })) == "symbol"
     );
   }
@@ -112,7 +107,7 @@ export async function tezosHelperFactory({
     async transferNftToForeign(sender, chain, to, nft, fee) {
       Tezos.setSignerProvider(sender);
       const response = await bridge.methods
-        .freeze_fa2(chain, nft.native.contract, to, parseInt(nft.native.id))
+        .freeze_fa2(chain, nft.native.contract, to, parseInt(nft.native.token_id))
         .send({
           amount: fee.toNumber() / 1e6,
         });
@@ -126,7 +121,7 @@ export async function tezosHelperFactory({
     async unfreezeWrappedNft(sender, to, nft, fee) {
       Tezos.setSignerProvider(sender);
       const response = await bridge.methods
-        .withdraw_nft(to, parseInt(nft.native.id))
+        .withdraw_nft(to, parseInt(nft.native.token_id))
         .send({
           amount: fee.toNumber() / 1e6,
         });
@@ -177,7 +172,7 @@ export async function tezosHelperFactory({
             add_operator: {
               owner: await signer.publicKeyHash(),
               operator: bridge.address,
-              token_id: nft.native.id,
+              token_id: nft.native.token_id,
             },
           },
         ])
