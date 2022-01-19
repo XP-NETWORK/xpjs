@@ -282,9 +282,9 @@ var ChainFactoryConfigs;
             Tezos: new taquito_1.TezosToolkit(consts_1.MainNetRpcUri.TEZOS),
             xpnftAddress: "KT1EhmjL3Mau41gn8jCBvnwfMiy3eunfHHBc",
             validators: [
-                "tz1e4QByQTYQyj98cBiM42hejkMWB2Pg6iXg",
-                "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                "tz1bxXSUcu1PqceWBw1zwc4zMRQuSLpbQ5VX",
+                "tz1VBF2LXnnnqKqKmTQqdESGx91kVLKyZMv4",
+                "tz1hMBJzUouzXYRk3mpdVi2QHY2gP594Kk2G",
             ]
         },
         velasParams: {
