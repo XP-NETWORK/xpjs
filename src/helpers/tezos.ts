@@ -13,12 +13,14 @@ import {
 } from "..";
 import {
   BigMapAbstraction,
+  MichelsonMap,
   Signer,
   TezosToolkit,
   TransactionOperation,
   TransferParams,
 } from "@taquito/taquito";
-import { validatePublicKey } from "@taquito/utils";
+
+import { validatePublicKey, char2Bytes } from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import axios from "axios";
 
@@ -158,18 +160,25 @@ export async function tezosHelperFactory({
       return 0x12;
     },
     async estimateValidateTransferNft(to, meta) {
+      const metadata = new MichelsonMap();
+      metadata.set("", char2Bytes(meta.uri));
       const utx = bridge.methods
-        .validate_transfer_nft(randomAction(), to, {}, meta.native.contract)
+        .validate_transfer_nft(
+          randomAction().toString(),
+          metadata,
+          xpnftAddress,
+          to
+        )
         .toTransferParams();
       return estimateGas(validators, utx);
     },
     async estimateValidateUnfreezeNft(to, meta) {
       const utx = bridge.methods
         .validate_unfreeze_nft(
-          randomAction(),
+          randomAction().toString(),
+          meta.native.contract,
           to,
-          meta.native.id,
-          meta.native.contract
+          parseInt(meta.native.id)
         )
         .toTransferParams();
       return estimateGas(validators, utx);
