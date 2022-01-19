@@ -35,7 +35,8 @@ export declare enum MainNetRpcUri {
     HARMONY = "https://api.harmony.one",
     XDAI = "https://rpc.xdaichain.com/",
     FUSE = "https://rpc.fuse.io/",
-    VELAS = "https://mainnet.velas.com/rpc"
+    VELAS = "https://mainnet.velas.com/rpc",
+    TEZOS = "https://mainnet.smartpy.io"
 }
 export declare type ChainNonce<_, __> = number;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;

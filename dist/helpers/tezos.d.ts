@@ -11,9 +11,10 @@ export declare type TezosHelper = TransferNftForeign<TezosSigner, string, BigNum
 };
 export declare type TezosParams = {
     Tezos: TezosToolkit;
+    middlewareUri: string;
     xpnftAddress: string;
     bridgeAddress: string;
     validators: string[];
 };
-export declare function tezosHelperFactory({ Tezos, xpnftAddress, bridgeAddress, validators, }: TezosParams): Promise<TezosHelper>;
+export declare function tezosHelperFactory({ Tezos, middlewareUri, xpnftAddress, bridgeAddress, validators, }: TezosParams): Promise<TezosHelper>;
 export {};
