@@ -18,14 +18,14 @@ import {
   TezosToolkit,
   TransactionOperation,
   TransferParams,
+  WalletProvider,
 } from "@taquito/taquito";
 
 import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import axios from "axios";
-import { InMemorySigner } from "@taquito/signer";
 
-type TezosSigner = Signer;
+type TezosSigner = WalletProvider | Signer;
 
 type TezosNftInfo = {
   contract: string;
@@ -89,9 +89,25 @@ export async function tezosHelperFactory({
     return new BigNumber(baseprice * (validators.length + 1));
   };
 
+  function setSigner(sender: TezosSigner) {
+    if ("publicKeyHash" in sender) {
+      Tezos.setSignerProvider(sender);
+    } else {
+      Tezos.setWalletProvider(sender);
+    }
+  }
+
+  function getAddress(sender: TezosSigner) {
+    if ("publicKeyHash" in sender) {
+      return sender.publicKeyHash();
+    } else {
+      return sender.getPKH();
+    }
+  }
+
   async function isApprovedForMinter(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
     const contract = await Tezos.contract.at(nft.native.contract);
-    const ownerAddr = await sender.publicKeyHash();
+    const ownerAddr = await getAddress(sender);
     const storage = await contract.storage<{ operators: BigMapAbstraction }>();
     return (
       typeof (await storage.operators.get({
@@ -109,7 +125,7 @@ export async function tezosHelperFactory({
   }
 
   async function preTransfer(signer: TezosSigner, nft: NftInfo<TezosNftInfo>) {
-    Tezos.setSignerProvider(signer);
+    setSigner(signer);
     if (await isApprovedForMinter(signer, nft)) {
       return;
     }
@@ -118,7 +134,7 @@ export async function tezosHelperFactory({
       .update_operators([
         {
           add_operator: {
-            owner: await signer.publicKeyHash(),
+            owner: getAddress(signer),
             operator: bridge.address,
             token_id: nft.native.token_id,
           },
@@ -131,7 +147,7 @@ export async function tezosHelperFactory({
 
   return {
     async transferNftToForeign(sender, chain, to, nft, fee) {
-      Tezos.setSignerProvider(sender);
+      setSigner(sender);
       const response = await bridge.methods
         .freeze_fa2(chain, nft.native.contract, to, parseInt(nft.native.token_id))
         .send({
@@ -145,7 +161,7 @@ export async function tezosHelperFactory({
       return Tezos.tz.getBalance(address);
     },
     async unfreezeWrappedNft(sender, to, nft, fee) {
-      Tezos.setSignerProvider(sender);
+      setSigner(sender);
       const response = await bridge.methods
         .withdraw_nft(to, parseInt(nft.native.token_id))
         .send({
@@ -156,7 +172,7 @@ export async function tezosHelperFactory({
       return response;
     },
     async mintNft(signer, { identifier, attrs, contract, uris }) {
-      Tezos.setSignerProvider(signer);
+      setSigner(signer);
       const response = xpnft.methods
         .mint({
           token_id: identifier,
