@@ -1,7 +1,7 @@
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, MintNft, NftInfo, NftMintArgs, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
-import { Signer, TezosToolkit, TransactionOperation } from "@taquito/taquito";
+import { Signer, TezosToolkit, TransactionOperation, WalletProvider } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
-declare type TezosSigner = Signer;
+declare type TezosSigner = WalletProvider | Signer;
 declare type TezosNftInfo = {
     contract: string;
     token_id: string;
