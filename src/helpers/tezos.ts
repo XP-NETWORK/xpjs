@@ -13,9 +13,16 @@ import {
 } from "..";
 import {
   BigMapAbstraction,
+  ContractAbstraction,
+  ContractMethod,
+  ContractProvider,
+  SendParams,
   Signer,
   TezosToolkit,
+  TransactionOperation,
+  TransactionWalletOperation,
   TransferParams,
+  Wallet,
   WalletProvider,
 } from "@taquito/taquito";
 
@@ -74,8 +81,6 @@ export async function tezosHelperFactory({
   bridgeAddress,
   validators,
 }: TezosParams): Promise<TezosHelper> {
-  const bridge = await Tezos.contract.at(bridgeAddress);
-  const xpnft = await Tezos.contract.at(xpnftAddress);
   const event_middleware = axios.create({
     baseURL: middlewareUri,
     headers: {
@@ -87,18 +92,26 @@ export async function tezosHelperFactory({
     return new BigNumber(baseprice * (validators.length + 1));
   };
 
-  async function sendTx(sender: TezosSigner, tx: TransferParams) {
+  async function withContract(sender: TezosSigner, contract: string, cb: (contract: ContractAbstraction<ContractProvider | Wallet>) => ContractMethod<ContractProvider | Wallet>, params?: Partial<SendParams>) {
     if ("publicKeyHash" in sender) {
       Tezos.setSignerProvider(sender);
-      const res = await Tezos.contract.transfer(tx);
-      await res.confirmation();
-      return res.hash;
+      const contractI = await Tezos.contract.at(contract);
+      const res = cb(contractI);
+      const tx = await res.send(params);
+      await tx.confirmation()
+      return (tx as TransactionOperation).hash;
     } else {
       Tezos.setWalletProvider(sender);
-      const res = await Tezos.wallet.transfer(tx).send();
-      await res.confirmation();
-      return res.opHash;
+      const contractI = await Tezos.wallet.at(contract);
+      const res = cb(contractI);
+      const tx = await res.send(params)
+      await tx.confirmation();
+      return (tx as TransactionWalletOperation).opHash;
     }
+  }
+
+  function withBridge(sender: TezosSigner, cb: (bridge: ContractAbstraction<ContractProvider | Wallet>) => ContractMethod<ContractProvider | Wallet>, params?: Partial<SendParams>) {
+    return withContract(sender, bridgeAddress, cb, params);
   }
 
   function getAddress(sender: TezosSigner) {
@@ -116,7 +129,7 @@ export async function tezosHelperFactory({
     return (
       typeof (await storage.operators.get({
         owner: ownerAddr,
-        operator: bridge.address,
+        operator: bridgeAddress,
         token_id: nft.native.token_id,
       })) == "symbol"
     );
@@ -132,28 +145,23 @@ export async function tezosHelperFactory({
     if (await isApprovedForMinter(signer, nft)) {
       return;
     }
-    const contract = await Tezos.contract.at(nft.native.contract);
-    const tx = contract.methods
-      .update_operators([
-        {
-          add_operator: {
-            owner: await getAddress(signer),
-            operator: bridge.address,
-            token_id: nft.native.token_id,
-          },
+    const owner = await getAddress(signer)
+    return await withContract(signer, nft.native.contract, (contract) => contract.methods.update_operators([
+      {
+        add_operator: {
+          owner,
+          operator: bridgeAddress,
+          token_id: nft.native.token_id,
         },
-      ])
-      .toTransferParams();
-    return await sendTx(signer, tx);
+      },
+    ]));
   }
 
   return {
     async transferNftToForeign(sender, chain, to, nft, fee) {
-      const tx = bridge.methods
-        .freeze_fa2(chain, nft.native.contract, to, parseInt(nft.native.token_id))
-        .toTransferParams();
-      tx.amount = fee.toNumber() / 1e6;
-      const hash = await sendTx(sender, tx);
+      const hash = await withBridge(sender, (bridge) => bridge.methods.freeze_fa2(
+        chain, nft.native.contract, to, parseInt(nft.native.token_id)
+      ), { amount: fee.toNumber() / 1e6 });
 
       notifyValidator(hash);
       return hash;
@@ -162,28 +170,23 @@ export async function tezosHelperFactory({
       return Tezos.tz.getBalance(address);
     },
     async unfreezeWrappedNft(sender, to, nft, fee) {
-      const tx = bridge.methods
-        .withdraw_nft(to, parseInt(nft.native.token_id))
-        .toTransferParams();
-      
-      tx.amount = fee.toNumber() / 1e6;
-      const hash = await sendTx(sender, tx);
+      const hash = await withBridge(sender, (bridge) => bridge.methods.withdraw_nft(
+        to, parseInt(nft.native.token_id)
+      ), { amount: fee.toNumber() / 1e6 });
+
       notifyValidator(hash);
       return hash;
     },
     async mintNft(signer, { identifier, attrs, contract, uris }) {
-      const tx = xpnft.methods
-        .mint({
-          token_id: identifier,
-          address: contract,
-          metadata: {
-            uri: uris[0],
-            attrs,
-          },
-          amount: 1,
-        })
-        .toTransferParams();
-      return await sendTx(signer, tx);
+      return await withContract(signer, xpnftAddress, (xpnft) => xpnft.methods.mint({
+        token_id: identifier,
+        address: contract,
+        metadata: {
+          uri: uris[0],
+          attrs,
+        },
+        amount: 1,
+      }));
     },
     async validateAddress(adr) {
       return Promise.resolve(utils.validateAddress(adr) === utils.ValidationResult.VALID);
