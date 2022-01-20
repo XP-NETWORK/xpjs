@@ -104,6 +104,12 @@ export async function tezosHelperFactory({
       Tezos.setWalletProvider(sender);
       const contractI = await Tezos.wallet.at(contract);
       const res = cb(contractI);
+      if (params) {
+        if (!params.storageLimit)
+          params.storageLimit = 60_000;
+      } else {
+        params = { storageLimit: 60_000 };
+      }
       const tx = await res.send(params)
       await tx.confirmation();
       return (tx as TransactionWalletOperation).opHash;
