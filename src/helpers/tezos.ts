@@ -134,7 +134,7 @@ export async function tezosHelperFactory({
       .update_operators([
         {
           add_operator: {
-            owner: getAddress(signer),
+            owner: await getAddress(signer),
             operator: bridge.address,
             token_id: nft.native.token_id,
           },
