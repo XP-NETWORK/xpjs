@@ -117,7 +117,7 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
-    fee?: BigNumber
+    fee?: BigNumber.Value
   ): Promise<Resp>;
   /**
    * Mints an NFT on the chain.
@@ -558,7 +558,7 @@ export function ChainFactory(
           sender,
           receiver,
           nft,
-          fee
+          new BigNumber(fee)
         );
         return res;
       } else {
@@ -567,7 +567,7 @@ export function ChainFactory(
           toChain.getNonce(),
           receiver,
           nft,
-          fee
+          new BigNumber(fee)
         );
         return res;
       }
