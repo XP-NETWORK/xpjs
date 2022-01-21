@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { NftMintArgs } from "..";
+import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 /**
  * NFT Info
  */
@@ -141,3 +142,4 @@ export declare enum TransactionStatus {
 export interface ExtractTxnStatus {
     extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
+export declare function extractWrappedMetadata(nft: NftInfo<any>): Promise<Erc721MetadataEx<Erc721WrappedData>>;
