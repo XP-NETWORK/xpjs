@@ -20,6 +20,7 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
+  extractWrappedMetadata,
   MintNft,
   MintRawTxn,
   NftInfo,
@@ -549,8 +550,8 @@ export function ChainFactory(
         throw Error("invalid address");
       }
       if (fromChain.isWrappedNft(nft)) {
-        const meta = await axios.get<Erc721MetadataEx<unknown>>(nft.uri);
-        if (meta.data.wrapped.origin != toChain.getNonce().toString()) {
+        const meta = await extractWrappedMetadata(nft);
+        if (meta.wrapped.origin != toChain.getNonce().toString()) {
           throw Error("trying to send wrapped nft to non-origin chain!!!");
         }
         const res = await fromChain.unfreezeWrappedNft(

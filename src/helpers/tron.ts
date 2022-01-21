@@ -31,6 +31,7 @@ import {
   Approve,
   ExtractAction,
   ExtractTxnStatus,
+  extractWrappedMetadata,
   IsApproved,
   MintRawTxn,
   NftMintArgs,
@@ -607,14 +608,8 @@ export async function tronHelperFactory(
       to: string,
       nft: NftInfo<any>
     ): Promise<BigNumber> {
-      let wrappedData: Erc721MetadataEx<Erc721WrappedData>;
-      if (nft.native.meta) {
-        wrappedData = nft.native.meta.token.metadata;
-      } else {
-        wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-          nft.uri
-        ).then(v => v.data); 
-      }
+      const wrappedData = await extractWrappedMetadata(nft);
+
       return await estimateGas(
         tronParams.validators,
         "validateUnfreezeNft(uint128,address,uint256,address)",
