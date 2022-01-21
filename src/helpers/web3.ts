@@ -248,15 +248,9 @@ export async function web3HelperFactory(
     addrs: string[],
     utx: PopulatedTransaction
   ): Promise<BigNumber> {
-    let fee = EthBN.from(0);
-
-    for (const [i, addr] of addrs.entries()) {
-      utx.from = addr;
-      let tf = await w3.estimateGas(utx);
-      if (i == addrs.length - 1 && addrs.length != 1) tf = tf.mul(2);
-      fee = fee.add(tf);
-    }
-    fee = fee.mul(await w3.getGasPrice());
+	utx.from = addrs[0];
+	let td = await w3.estimateGas(utx);
+	const fee = td.mul(addrs.length+1).mul(await w3.getGasPrice());
 
     return new BigNumber(fee.toString());
   }
@@ -471,16 +465,22 @@ export async function web3HelperFactory(
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nftUri: NftInfo<string>
+      nft: NftInfo<any>
     ): Promise<BigNumber> {
-      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-        nftUri.uri
-      );
+      let wrappedData: Erc721MetadataEx<Erc721WrappedData>;
+      if (nft.native.meta) {
+        wrappedData = nft.native.meta.token.metadata;
+      } else {
+        wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
+          nft.uri
+        ).then(v => v.data); 
+      }
+
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
         to,
-        EthBN.from(wrappedData.data.wrapped.tokenId),
-        wrappedData.data.wrapped.contract
+        EthBN.from(wrappedData.wrapped.tokenId),
+        wrappedData.wrapped.contract
       );
 
       return await estimateGas(params.validators, utx);

@@ -605,11 +605,16 @@ export async function tronHelperFactory(
     },
     async estimateValidateUnfreezeNft(
       to: string,
-      nftUri: NftInfo<string>
+      nft: NftInfo<any>
     ): Promise<BigNumber> {
-      const wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-        nftUri.uri
-      );
+      let wrappedData: Erc721MetadataEx<Erc721WrappedData>;
+      if (nft.native.meta) {
+        wrappedData = nft.native.meta.token.metadata;
+      } else {
+        wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
+          nft.uri
+        ).then(v => v.data); 
+      }
       return await estimateGas(
         tronParams.validators,
         "validateUnfreezeNft(uint128,address,uint256,address)",
@@ -618,9 +623,9 @@ export async function tronHelperFactory(
           { type: "address", value: to },
           {
             type: "uint256",
-            value: EthBN.from(wrappedData.data.wrapped.tokenId),
+            value: EthBN.from(wrappedData.wrapped.tokenId),
           },
-          { type: "address", value: wrappedData.data.wrapped.contract },
+          { type: "address", value: wrappedData.wrapped.contract },
         ]
       );
     },
