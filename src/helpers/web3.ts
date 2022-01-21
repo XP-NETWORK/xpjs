@@ -33,6 +33,7 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
+  extractWrappedMetadata,
   MintRawTxn,
   NftInfo,
   PreTransfer,
@@ -467,14 +468,7 @@ export async function web3HelperFactory(
       to: string,
       nft: NftInfo<any>
     ): Promise<BigNumber> {
-      let wrappedData: Erc721MetadataEx<Erc721WrappedData>;
-      if (nft.native.meta) {
-        wrappedData = nft.native.meta.token.metadata;
-      } else {
-        wrappedData = await axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-          nft.uri
-        ).then(v => v.data); 
-      }
+      const wrappedData = await extractWrappedMetadata(nft);
 
       const utx = await minter.populateTransaction.validateUnfreezeNft(
         randomAction(),
