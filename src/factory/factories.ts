@@ -282,10 +282,10 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.FUSE,
     },
     tezosParams: {
-      bridgeAddress: "KT1Lrn7Zymy29CAAxsf5SGAULo9ecSHZTczY",
+      bridgeAddress: "KT1QrrAEs8J2vmr2H7bvnjr5pdsU8ue86wH5",
       middlewareUri: middleware_uri,
       Tezos: new TezosToolkit(MainNetRpcUri.TEZOS),
-      xpnftAddress: "KT1EhmjL3Mau41gn8jCBvnwfMiy3eunfHHBc",
+      xpnftAddress: "KT1AQQMyuoNFYkGjNEcA8XQVSU2QSa1AKRv2",
       validators: [
         "tz1bxXSUcu1PqceWBw1zwc4zMRQuSLpbQ5VX",
         "tz1VBF2LXnnnqKqKmTQqdESGx91kVLKyZMv4",
