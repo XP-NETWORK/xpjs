@@ -142,7 +142,7 @@ export async function tezosHelperFactory({
   }
 
   async function notifyValidator(hash: string): Promise<void> {
-    await event_middleware.post("/tx/web3", {
+    await event_middleware.post("/tx/tezos", {
       tx_hash: hash,
     });
   }
