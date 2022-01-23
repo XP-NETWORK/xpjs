@@ -277,10 +277,10 @@ var ChainFactoryConfigs;
             nonce: consts_1.Chain.FUSE,
         },
         tezosParams: {
-            bridgeAddress: "KT1QrrAEs8J2vmr2H7bvnjr5pdsU8ue86wH5",
+            bridgeAddress: "KT1B2zBPLVe51oXeuBJ8c7p2vHhi37jGxGHR",
             middlewareUri: middleware_uri,
             Tezos: new taquito_1.TezosToolkit(consts_1.MainNetRpcUri.TEZOS),
-            xpnftAddress: "KT1AQQMyuoNFYkGjNEcA8XQVSU2QSa1AKRv2",
+            xpnftAddress: "KT1FxthB8GQvT7HnuczSp1qJk4w7dR5umKrx",
             validators: [
                 "tz1bxXSUcu1PqceWBw1zwc4zMRQuSLpbQ5VX",
                 "tz1VBF2LXnnnqKqKmTQqdESGx91kVLKyZMv4",
