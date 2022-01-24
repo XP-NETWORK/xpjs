@@ -131,9 +131,9 @@ export async function tezosHelperFactory({
   async function isApprovedForMinter(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
     const contract = await Tezos.contract.at(nft.native.contract);
     const ownerAddr = await getAddress(sender);
-    const storage = await contract.storage<{ operators: BigMapAbstraction }>();
+    const storage = await contract.storage<{ operator?: BigMapAbstraction, operators?: BigMapAbstraction }>();
     return (
-      typeof (await storage.operators.get({
+      typeof (await (storage.operator ? storage.operator : storage.operators!).get({
         owner: ownerAddr,
         operator: bridgeAddress,
         token_id: nft.native.token_id,
