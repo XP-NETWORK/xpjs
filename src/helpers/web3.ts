@@ -13,6 +13,7 @@ import {
   BatchWrappedBalanceCheck,
   MintNft,
   WrappedNftCheck,
+  GetProvider,
 } from "./chain";
 import {
   Signer,
@@ -21,6 +22,7 @@ import {
   Wallet,
   ethers,
   VoidSigner,
+  providers,
 } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import {
@@ -151,7 +153,8 @@ export type Web3Helper = BaseWeb3Helper &
   > &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
-  MintRawTxn<PopulatedTransaction>;
+  MintRawTxn<PopulatedTransaction> &
+  GetProvider<providers.Provider>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -249,9 +252,9 @@ export async function web3HelperFactory(
     addrs: string[],
     utx: PopulatedTransaction
   ): Promise<BigNumber> {
-	utx.from = addrs[0];
-	let td = await w3.estimateGas(utx);
-	const fee = td.mul(addrs.length+1).mul(await w3.getGasPrice());
+    utx.from = addrs[0];
+    let td = await w3.estimateGas(utx);
+    const fee = td.mul(addrs.length + 1).mul(await w3.getGasPrice());
 
     return new BigNumber(fee.toString());
   }
@@ -285,6 +288,7 @@ export async function web3HelperFactory(
   return {
     ...base,
     approveForMinter,
+    getProvider: () => provider,
     isApprovedForMinter,
     preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,

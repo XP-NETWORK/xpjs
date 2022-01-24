@@ -245,12 +245,18 @@ export interface ExtractTxnStatus {
   extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
 
-export function extractWrappedMetadata(nft: NftInfo<any>): Promise<Erc721MetadataEx<Erc721WrappedData>> {
+export function extractWrappedMetadata(
+  nft: NftInfo<any>
+): Promise<Erc721MetadataEx<Erc721WrappedData>> {
   if (nft.native.meta && nft.native.meta.token.metadata.wrapped) {
     return Promise.resolve(nft.native.meta.token.metadata);
   } else {
-    return axios.get<Erc721MetadataEx<Erc721WrappedData>>(
-      nft.uri
-    ).then(v => v.data); 
+    return axios
+      .get<Erc721MetadataEx<Erc721WrappedData>>(nft.uri)
+      .then((v) => v.data);
   }
+}
+
+export interface GetProvider<Provider> {
+  getProvider(): Provider;
 }
