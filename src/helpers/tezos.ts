@@ -132,12 +132,11 @@ export async function tezosHelperFactory({
   }
 
   async function isApprovedForMinter(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
-    const baseUrl = `https://better-call.dev/v1/contract/${net}/${nft.native.contract}/entrypoints/run_operation`;
+    const baseUrl = `https://api.better-call.dev/v1/contract/${net}/${nft.native.contract}/entrypoints/trace`;
     const owner = await getAddress(sender);
     const res = await axios.post(baseUrl, {
       name: "update_operators",
       source: owner,
-      cancelToken: { promise: {} },
       data: {
         update_operators: [      {
           "@or_29": {
@@ -156,7 +155,7 @@ export async function tezosHelperFactory({
     if (res == undefined) {
       return false;
     }
-    return res.data[0].status == "applied";
+    return res.data[0].status != "applied";
   }
 
   async function notifyValidator(hash: string): Promise<void> {
