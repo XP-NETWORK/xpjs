@@ -143,6 +143,3 @@ export interface ExtractTxnStatus {
     extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
 export declare function extractWrappedMetadata(nft: NftInfo<any>): Promise<Erc721MetadataEx<Erc721WrappedData>>;
-export interface GetProvider<T> {
-    getProvider(): T;
-}
