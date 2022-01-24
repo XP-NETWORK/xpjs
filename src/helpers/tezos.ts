@@ -13,6 +13,7 @@ import {
 } from "..";
 import {
   BigMapAbstraction,
+  ChainIds,
   ContractAbstraction,
   ContractMethod,
   ContractProvider,
@@ -92,6 +93,8 @@ export async function tezosHelperFactory({
     return new BigNumber(baseprice * (validators.length + 1));
   };
 
+  const net = await Tezos.rpc.getChainId() == ChainIds.MAINNET ? "mainnet" : "hangzhou2net";
+
   async function withContract(sender: TezosSigner, contract: string, cb: (contract: ContractAbstraction<ContractProvider | Wallet>) => ContractMethod<ContractProvider | Wallet>, params?: Partial<SendParams>) {
     if ("publicKeyHash" in sender) {
       Tezos.setSignerProvider(sender);
@@ -129,16 +132,31 @@ export async function tezosHelperFactory({
   }
 
   async function isApprovedForMinter(sender: TezosSigner, nft: NftInfo<TezosNftInfo>) {
-    const contract = await Tezos.contract.at(nft.native.contract);
-    const ownerAddr = await getAddress(sender);
-    const storage = await contract.storage<{ operator?: BigMapAbstraction, operators?: BigMapAbstraction }>();
-    return (
-      typeof (await (storage.operator ? storage.operator : storage.operators!).get({
-        owner: ownerAddr,
-        operator: bridgeAddress,
-        token_id: nft.native.token_id,
-      })) == "symbol"
-    );
+    const baseUrl = `https://better-call.dev/v1/contract/${net}/${nft.native.contract}/entrypoints/run_operation`;
+    const owner = await getAddress(sender);
+    const res = await axios.post(baseUrl, {
+      name: "update_operators",
+      source: owner,
+      cancelToken: { promise: {} },
+      data: {
+        update_operators: [      {
+          "@or_29": {
+            "add_operator": {
+              "@pair_32": {
+                "token_id": nft.native.token_id,
+                "operator": bridgeAddress
+              },
+              owner
+            },
+            "schemaKey": "L"
+          }
+        }]
+      }
+    }).catch(_ => undefined);
+    if (res == undefined) {
+      return false;
+    }
+    return res.data[0].status == "applied";
   }
 
   async function notifyValidator(hash: string): Promise<void> {
