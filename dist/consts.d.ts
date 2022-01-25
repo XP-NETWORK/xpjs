@@ -28,7 +28,7 @@ export declare enum MainNetRpcUri {
     BSC = "https://bsc-dataseed.binance.org/",
     ETHEREUM = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
     AVALANCHE = "https://api.avax.network/ext/bc/C/rpc",
-    POLYGON = "https://rpc-mainnet.matic.network",
+    POLYGON = "https://polygon-rpc.com",
     FANTOM = "https://rpc.ftm.tools/",
     TRON = "https://api.trongrid.io/",
     CELO = "https://forno.celo.org",
