@@ -345,7 +345,7 @@ export async function web3HelperFactory(
         to,
         id.native.tokenId,
         {
-          value: EthBN.from(txFees.toString()),
+          value: EthBN.from(txFees.toString(10)),
         }
       );
       return res;
@@ -382,8 +382,8 @@ export async function web3HelperFactory(
       value: BigNumber,
       txFees: BigNumber
     ): Promise<TransactionResponse> {
-      const val = EthBN.from(value.toString());
-      const totalVal = val.add(EthBN.from(txFees.toString()));
+      const val = EthBN.from(value.toString(10));
+      const totalVal = val.add(EthBN.from(txFees.toString(10)));
       const res = await minter.connect(sender).freeze(chain_nonce, to, val, {
         value: totalVal,
       });
@@ -402,7 +402,7 @@ export async function web3HelperFactory(
         chain_nonce,
         to,
         {
-          value: EthBN.from(txFees.toString()),
+          value: EthBN.from(txFees.toString(10)),
         }
       );
       return txr;
@@ -419,7 +419,7 @@ export async function web3HelperFactory(
       const txr = await minter
         .connect(sender)
         .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to, {
-          value: EthBN.from(txFees.toString()),
+          value: EthBN.from(txFees.toString(10)),
         });
 
       await notifyValidator(txr.hash);
@@ -435,7 +435,7 @@ export async function web3HelperFactory(
       const res = await minter
         .connect(sender)
         .withdraw(chain_nonce, to, value, {
-          value: EthBN.from(txFees.toString()),
+          value: EthBN.from(txFees.toString(10)),
         });
 
       return res.hash;
@@ -449,7 +449,7 @@ export async function web3HelperFactory(
       const res = await minter
         .connect(sender)
         .withdrawNft(to, id.native.tokenId, {
-          value: EthBN.from(txFees.toString()),
+          value: EthBN.from(txFees.toString(10)),
         });
 
       await notifyValidator(res.hash);

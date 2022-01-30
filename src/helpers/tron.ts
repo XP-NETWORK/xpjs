@@ -499,8 +499,8 @@ export async function tronHelperFactory(
     ): Promise<string> {
       setSigner(sender);
 
-      const val = EthBN.from(value.toString());
-      const totalVal = val.add(EthBN.from(txFees.toString()));
+      const val = EthBN.from(value.toString(10));
+      const totalVal = val.add(EthBN.from(txFees.toString(10)));
       let res = await minter
         .freeze(chain_nonce, to, val)
         .send({ callValue: totalVal });
@@ -542,7 +542,7 @@ export async function tronHelperFactory(
       setSigner(sender);
       const res = await minter
         .withdrawNft(to, id.native.tokenId)
-        .send({ callValue: EthBN.from(txFees.toString()) });
+        .send({ callValue: EthBN.from(txFees.toString(10)) });
 
       await notifyValidator(res);
       return res;
@@ -562,7 +562,7 @@ export async function tronHelperFactory(
 
       const txr = await minter
         .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
-        .send({ callValue: EthBN.from(txFees.toString()) });
+        .send({ callValue: EthBN.from(txFees.toString(10)) });
 
       await notifyValidator(txr);
       return txr;
