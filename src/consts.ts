@@ -31,6 +31,7 @@ export enum TestNetRpcUri {
   UNIQUE = "https://rpc-opal.unique.network/",
   TEZOS = "https://hangzhounet.smartpy.io",
   VELAS = "https://explorer.testnet.velas.com/rpc",
+  IOTEX = "https://babel-api.testnet.iotex.io",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -49,7 +50,8 @@ export enum MainNetRpcUri {
   XDAI = "https://rpc.xdaichain.com/",
   FUSE = "https://rpc.fuse.io/",
   VELAS = "https://mainnet.velas.com/rpc",
-  TEZOS = "https://mainnet.smartpy.io"
+  TEZOS = "https://mainnet.smartpy.io",
+  IOTEX = "https://babel-api.mainnet.iotex.io",
   // TODO: Algorand
 }
 
@@ -78,6 +80,7 @@ export namespace Chain {
   export const UNIQUE: Web3Nonce = 0x11;
   export const TEZOS: TezosNonce = 0x12;
   export const VELAS: Web3Nonce = 0x13;
+  export const IOTEX: Web3Nonce = 0x14;
 }
 
 interface ChainData {
@@ -251,6 +254,15 @@ export const CHAIN_INFO: ChainInfo = {
     constructor: (p) => web3HelperFactory(p as Web3Params),
     currency: SupportedCurrency.VLX,
     chainId: 111,
+  },
+  20: {
+    name: "IoTeX",
+    blockExplorerUrl: "https://iotexscan.io/tx",
+    nonce: 0x14,
+    decimals: 1e18,
+    constructor: (p) => web3HelperFactory(p as Web3Params),
+    currency: SupportedCurrency.IOTX,
+    chainId: 4689,
   },
 };
 

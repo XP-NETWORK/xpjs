@@ -253,6 +253,7 @@ export interface ChainParams {
   uniqueParams: Web3Params;
   tezosParams: TezosParams;
   velasParams: Web3Params;
+  iotexParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -304,6 +305,7 @@ function mapNonceToParams(
   cToP.set(17, chainParams.uniqueParams);
   cToP.set(18, chainParams.tezosParams);
   cToP.set(19, chainParams.velasParams);
+  cToP.set(20, chainParams.iotexParams);
   return cToP;
 }
 /**
@@ -534,7 +536,11 @@ export function ChainFactory(
       let data = res.data.data;
 
       const nonce = chain.getNonce();
-      if (nonce != Chain.ALGORAND || nonce != Chain.ELROND || nonce != Chain.TEZOS) {
+      if (
+        nonce != Chain.ALGORAND ||
+        nonce != Chain.ELROND ||
+        nonce != Chain.TEZOS
+      ) {
         data = data.filter((v: any) => v.native.contractType != "ERC1155");
       }
 
