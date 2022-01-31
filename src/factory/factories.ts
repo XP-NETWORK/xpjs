@@ -313,9 +313,9 @@ export namespace ChainFactoryConfigs {
     iotexParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.IOTEX),
-      minter_addr: "0x721729b81609D6a4BDE1b662cD683e133d3CF33d",
-      erc1155_addr: "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
-      erc721_addr: "0xAb61d15351d43A5e98c16D978d6F11dF9Ee5711e",
+      minter_addr: "0xd9dDB5d6c9D7d764B06E7C5aFF26AD316a4c227F",
+      erc1155_addr: "0xCEcc1544e90321b4AF0A33773d84e35c1b291cCa",
+      erc721_addr: "0xb4A252B3b24AF2cA83fcfdd6c7Fac04Ff9d45A7D",
       validators: EVM_VALIDATORS,
       nonce: Chain.IOTEX,
     },
