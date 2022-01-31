@@ -160,6 +160,15 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.VELAS,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.VELAS),
     },
+    iotexParams: {
+      middleware_uri,
+      provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.IOTEX),
+      minter_addr: "0x0000000000000000000000000000000000000000",
+      erc1155_addr: "0x0000000000000000000000000000000000000000",
+      erc721_addr: "0x0000000000000000000000000000000000000000",
+      validators: EVM_TESTNET_VALIDATORS,
+      nonce: Chain.IOTEX,
+    },
   });
 
   export const MainNet: () => Partial<ChainParams> = () => ({
@@ -290,7 +299,7 @@ export namespace ChainFactoryConfigs {
         "tz1bxXSUcu1PqceWBw1zwc4zMRQuSLpbQ5VX",
         "tz1VBF2LXnnnqKqKmTQqdESGx91kVLKyZMv4",
         "tz1hMBJzUouzXYRk3mpdVi2QHY2gP594Kk2G",
-      ]
+      ],
     },
     velasParams: {
       middleware_uri,
@@ -300,6 +309,15 @@ export namespace ChainFactoryConfigs {
       erc721_addr: "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
       nonce: Chain.VELAS,
       validators: EVM_VALIDATORS,
+    },
+    iotexParams: {
+      middleware_uri,
+      provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.IOTEX),
+      minter_addr: "0x721729b81609D6a4BDE1b662cD683e133d3CF33d",
+      erc1155_addr: "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
+      erc721_addr: "0xAb61d15351d43A5e98c16D978d6F11dF9Ee5711e",
+      validators: EVM_VALIDATORS,
+      nonce: Chain.IOTEX,
     },
   });
 }
