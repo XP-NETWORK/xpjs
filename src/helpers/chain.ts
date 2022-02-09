@@ -1,6 +1,7 @@
 import { Address } from "@elrondnetwork/erdjs/out";
 import axios from "axios";
 import BigNumber from "bignumber.js";
+import { BigNumberish } from "ethers";
 import { NftMintArgs } from "..";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 
@@ -90,7 +91,8 @@ export interface TransferNftForeign<
     chain_nonce: number,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
-    txFees: Balance
+    txFees: Balance,
+    mintWith: string
   ): Promise<Resp>;
 }
 
@@ -105,7 +107,8 @@ export interface TransferNftForeignUnsigned<
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance,
-    senderAddress: string
+    senderAddress: string,
+    mintWith: string
   ): Promise<Resp>;
 }
 
@@ -130,7 +133,8 @@ export interface UnfreezeForeignNft<
     sender: Signer,
     to: ForeignAddr,
     id: NftInfo<RawNft>,
-    txFees: Balance
+    txFees: Balance,
+    nonce: BigNumberish
   ): Promise<Resp>;
 }
 
@@ -144,7 +148,8 @@ export interface UnfreezeForeignNftUnsigned<
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance,
-    sender: string
+    sender: string,
+    nonce: BigNumberish
   ): Promise<Resp>;
 }
 
@@ -203,11 +208,8 @@ export interface ValidateAddress {
 export interface EstimateTxFees<Balance, RawNftF> {
   estimateValidateTransferNft(
     to: string,
-    metadata: NftInfo<RawNftF>
-  ): Promise<Balance>;
-  estimateValidateUnfreezeNft(
-    to: string,
-    metadata: NftInfo<RawNftF>
+    metadata: NftInfo<RawNftF>,
+    mintWith: string
   ): Promise<Balance>;
 }
 
