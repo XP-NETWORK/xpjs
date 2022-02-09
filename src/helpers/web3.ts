@@ -437,21 +437,12 @@ export async function web3HelperFactory(
       return res;
     },
     async estimateValidateTransferNft(
-      to: string,
-      nftUri: NftInfo<string>,
-      mintWith
+      _to: string,
+      _nftUri: NftInfo<string>,
+      _mintWith
     ): Promise<BigNumber> {
-      const utx = await minter.populateTransaction.validateTransferNft(
-        randomAction(),
-        to,
-        nftUri.uri,
-        mintWith,
-        "",
-        0,
-        ""
-      );
-
-      return await estimateGas(params.validators, utx);
+      const gas = await provider.getGasPrice();
+      return new BigNumber(gas.mul(150_000).toString());
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
