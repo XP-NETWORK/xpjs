@@ -216,7 +216,8 @@ export type ChainFactory = {
     to: string,
     nft: NftInfo<RawNftF>,
     fee: BigNumber,
-    mintWith: string
+    mintWith: string,
+    nonce: string
   ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 
   generatePreTransferTxn<RawNftF, Resp>(
@@ -458,7 +459,16 @@ export function ChainFactory(
     async generatePreTransferTxn(from, sender, nft, fee) {
       return await from.preTransferRawTxn(nft, sender, fee);
     },
-    async generateNftTxn(chain, toNonce, sender, receiver, nft, fee, mintWith) {
+    async generateNftTxn(
+      chain,
+      toNonce,
+      sender,
+      receiver,
+      nft,
+      fee,
+      mw,
+      nonce
+    ) {
       if (chain.isWrappedNft(nft)) {
         return chain.unfreezeWrappedNftTxn(
           receiver,
@@ -466,7 +476,7 @@ export function ChainFactory(
           fee,
           sender,
 
-          mintWith
+          nonce
         );
       } else {
         return chain.transferNftToForeignTxn(
@@ -475,7 +485,7 @@ export function ChainFactory(
           nft,
           fee,
           sender,
-          mintWith
+          mw
         );
       }
     },
@@ -573,8 +583,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          nonce,
-          mintWith
+          nonce.toString()
         );
         return res;
       } else {
