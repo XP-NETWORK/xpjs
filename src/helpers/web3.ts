@@ -285,6 +285,10 @@ export async function web3HelperFactory(
     ...base,
     approveForMinter,
     getProvider: () => provider,
+    async estimateValidateUnfreezeNft(_to, _id, _mW) {
+      const gas = await provider.getGasPrice();
+      return new BigNumber(gas.mul(150_000).toString());
+    },
     isApprovedForMinter,
     preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,

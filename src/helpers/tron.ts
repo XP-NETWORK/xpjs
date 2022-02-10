@@ -24,7 +24,7 @@ import { Base64 } from "js-base64";
 import {
   Minter__factory,
   UserNftMinter__factory,
-  XPNet__factory,
+  Erc1155Minter__factory,
   XPNft__factory,
 } from "xpnet-web3-contracts";
 import {
@@ -133,8 +133,8 @@ export async function baseTronHelperFactory(
     setSigner(owner);
 
     const contract = await provider.contract().new({
-      abi: XPNet__factory.abi,
-      bytecode: XPNet__factory.bytecode,
+      abi: Erc1155Minter__factory.abi,
+      bytecode: Erc1155Minter__factory.bytecode,
       feeLimit: 3000000000,
     });
 
@@ -248,7 +248,10 @@ export async function tronHelperFactory(
   const { provider, erc1155_addr, minter_addr } = tronParams;
   const station = new TronStation(provider);
   const base = await baseTronHelperFactory(provider);
-  const erc1155 = await provider.contract(XPNet__factory.abi, erc1155_addr);
+  const erc1155 = await provider.contract(
+    Erc1155Minter__factory.abi,
+    erc1155_addr
+  );
   const minter = await provider.contract(Minter__factory.abi, minter_addr);
   const event_middleware = axios.create({
     baseURL: tronParams.middleware_uri,
