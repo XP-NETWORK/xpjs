@@ -465,6 +465,7 @@ export function ChainFactory(
           nft,
           fee,
           sender,
+
           mintWith
         );
       } else {
@@ -572,7 +573,8 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          nonce
+          nonce,
+          mintWith
         );
         return res;
       } else {
