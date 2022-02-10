@@ -134,7 +134,8 @@ export interface UnfreezeForeignNft<
     to: ForeignAddr,
     id: NftInfo<RawNft>,
     txFees: Balance,
-    nonce: BigNumberish
+    nonce: BigNumberish,
+    mintWith: string
   ): Promise<Resp>;
 }
 
@@ -149,7 +150,7 @@ export interface UnfreezeForeignNftUnsigned<
     id: NftInfo<RawNft>,
     txFees: Balance,
     sender: string,
-    nonce: BigNumberish
+    mintWith: string
   ): Promise<Resp>;
 }
 
