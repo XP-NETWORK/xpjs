@@ -211,6 +211,11 @@ export interface EstimateTxFees<Balance, RawNftF> {
     metadata: NftInfo<RawNftF>,
     mintWith: string
   ): Promise<Balance>;
+  estimateValidateUnfreezeNft(
+    to: string,
+    metadata: NftInfo<RawNftF>,
+    mintWith: string
+  ): Promise<Balance>;
 }
 
 export function ConcurrentSendError(): Error {

@@ -41,7 +41,7 @@ import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
-import { PopulatedTransaction } from "ethers";
+import { BigNumberish, PopulatedTransaction } from "ethers";
 import {
   AlgorandParams,
   AlgorandHelper,
@@ -117,6 +117,8 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
+    nonce: BigNumberish,
+    mintWith: string,
     fee?: BigNumber.Value
   ): Promise<Resp>;
   /**
@@ -213,7 +215,8 @@ export type ChainFactory = {
     sender: string,
     to: string,
     nft: NftInfo<RawNftF>,
-    fee: BigNumber
+    fee: BigNumber,
+    mintWith: string
   ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 
   generatePreTransferTxn<RawNftF, Resp>(
@@ -364,29 +367,17 @@ export function ChainFactory(
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {
-    if (fromChain.isWrappedNft(nft)) {
-      const estimate = await toChain.estimateValidateUnfreezeNft(
-        receiver,
-        nft as unknown as NftInfo<RawNftT>
-      );
-      const conv = await calcExchangeFees(
-        fromChain.getNonce(),
-        toChain.getNonce(),
-        estimate
-      );
-      return conv;
-    } else {
-      const estimate = await toChain.estimateValidateTransferNft(
-        receiver,
-        nft as unknown as NftInfo<RawNftT>
-      );
-      const conv = await calcExchangeFees(
-        fromChain.getNonce(),
-        toChain.getNonce(),
-        estimate
-      );
-      return conv;
-    }
+    const estimate = await fromChain.estimateValidateTransferNft(
+      receiver,
+      nft,
+      ""
+    );
+    const conv = await calcExchangeFees(
+      fromChain.getNonce(),
+      toChain.getNonce(),
+      estimate
+    );
+    return conv;
   };
 
   async function bridgeStatus(): Promise<{ [x: number]: "alive" | "dead" }> {
@@ -467,16 +458,23 @@ export function ChainFactory(
     async generatePreTransferTxn(from, sender, nft, fee) {
       return await from.preTransferRawTxn(nft, sender, fee);
     },
-    async generateNftTxn(chain, toNonce, sender, receiver, nft, fee) {
+    async generateNftTxn(chain, toNonce, sender, receiver, nft, fee, mintWith) {
       if (chain.isWrappedNft(nft)) {
-        return chain.unfreezeWrappedNftTxn(receiver, nft, fee, sender);
+        return chain.unfreezeWrappedNftTxn(
+          receiver,
+          nft,
+          fee,
+          sender,
+          mintWith
+        );
       } else {
         return chain.transferNftToForeignTxn(
           toNonce,
           receiver,
           nft,
           fee,
-          sender
+          sender,
+          mintWith
         );
       }
     },
@@ -546,7 +544,16 @@ export function ChainFactory(
 
       return data;
     },
-    transferNft: async (fromChain, toChain, nft, sender, receiver, fee) => {
+    transferNft: async (
+      fromChain,
+      toChain,
+      nft,
+      sender,
+      receiver,
+      nonce,
+      mintWith,
+      fee
+    ) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
       if (!fee) {
@@ -564,7 +571,8 @@ export function ChainFactory(
           sender,
           receiver,
           nft,
-          new BigNumber(fee)
+          new BigNumber(fee),
+          nonce
         );
         return res;
       } else {
@@ -573,7 +581,8 @@ export function ChainFactory(
           toChain.getNonce(),
           receiver,
           nft,
-          new BigNumber(fee)
+          new BigNumber(fee),
+          mintWith
         );
         return res;
       }
