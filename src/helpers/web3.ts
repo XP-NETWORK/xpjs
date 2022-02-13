@@ -150,7 +150,7 @@ export type Web3Helper = BaseWeb3Helper &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
   MintRawTxn<PopulatedTransaction> &
-  GetProvider<providers.Provider>;
+  GetProvider<providers.Provider> & { XpNft: string };
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -283,6 +283,7 @@ export async function web3HelperFactory(
 
   return {
     ...base,
+    XpNft: params.erc721_addr,
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
