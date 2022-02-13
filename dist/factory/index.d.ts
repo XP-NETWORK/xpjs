@@ -5,7 +5,7 @@ import { ChainNonce, ElrondNonce, TronNonce, Web3Nonce } from "../consts";
 export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, MintRawTxn, NftInfo, PreTransferRawTxn, TransactionStatus, TransferNftForeign, TransferNftForeignUnsigned, UnfreezeForeignNft, UnfreezeForeignNftUnsigned, ValidateAddress, WrappedNftCheck } from "..";
 import BigNumber from "bignumber.js";
-import { PopulatedTransaction } from "ethers";
+import { BigNumberish, PopulatedTransaction } from "ethers";
 import { AlgorandParams, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosHelper, TezosParams } from "../helpers/tezos";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper | AlgorandHelper | TezosHelper;
@@ -39,10 +39,9 @@ export declare type ChainFactory = {
      * @param nft {@link NftInfo} the nft to be transferred. Can be fetched from the `nftList` method of the factory.
      * @param sender {@link Sender} The owner of the NFT.
      * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
-     * @param mintWith address of the contract to mint this nft with (ignored when unfreezing the nft)
      * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
      */
-    transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, mintWith?: string, fee?: BigNumber): Promise<Resp>;
+    transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, nonce: BigNumberish, mintWith: string, fee?: BigNumber.Value): Promise<Resp>;
     /**
      * Mints an NFT on the chain.
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -62,9 +61,8 @@ export declare type ChainFactory = {
      * @param toChain: {@link FullChain} Chain to which the NFT must be sent. Can be obtained from the `inner` method on the factory.
      * @param nft: {@link NftInfo} The NFT that has to be transferred. Generally comes from the `nftList` method of the factory.
      * @param receiver: Address of the receiver of the NFT in raw string..
-     * @param mintWith: Address of the contract to mint this nft with (ignored when unfreezing the nft)
      */
-    estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string, mintWith?: string): Promise<BigNumber>;
+    estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
     /**
      *
      * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
@@ -109,7 +107,7 @@ export declare type ChainFactory = {
      * @param nft the NFT to be transferred.
      * @param fee the fee to be paid for the transaction.
      */
-    generateNftTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, toNonce: number, sender: string, to: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
+    generateNftTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, toNonce: number, sender: string, to: string, nft: NftInfo<RawNftF>, fee: BigNumber, mintWith: string, nonce: string): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
     generatePreTransferTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn | undefined>;
     generateMintTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftMintArgs): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 };
@@ -134,6 +132,7 @@ export interface ChainParams {
     uniqueParams: Web3Params;
     tezosParams: TezosParams;
     velasParams: Web3Params;
+    iotexParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**

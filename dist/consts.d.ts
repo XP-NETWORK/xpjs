@@ -20,7 +20,8 @@ export declare enum TestNetRpcUri {
     XDAI = "https://sokol.poa.network",
     UNIQUE = "https://rpc-opal.unique.network/",
     TEZOS = "https://hangzhounet.smartpy.io",
-    VELAS = "https://explorer.testnet.velas.com/rpc"
+    VELAS = "https://explorer.testnet.velas.com/rpc",
+    IOTEX = "https://babel-api.testnet.iotex.io"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -28,13 +29,16 @@ export declare enum MainNetRpcUri {
     BSC = "https://bsc-dataseed.binance.org/",
     ETHEREUM = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
     AVALANCHE = "https://api.avax.network/ext/bc/C/rpc",
-    POLYGON = "https://rpc-mainnet.matic.network",
+    POLYGON = "https://polygon-rpc.com",
     FANTOM = "https://rpc.ftm.tools/",
     TRON = "https://api.trongrid.io/",
     CELO = "https://forno.celo.org",
     HARMONY = "https://api.harmony.one",
     XDAI = "https://rpc.xdaichain.com/",
-    FUSE = "https://rpc.fuse.io/"
+    FUSE = "https://rpc.fuse.io/",
+    VELAS = "https://mainnet.velas.com/rpc",
+    TEZOS = "https://mainnet.smartpy.io",
+    IOTEX = "https://babel-api.mainnet.iotex.io"
 }
 export declare type ChainNonce<_, __> = number;
 export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
@@ -59,6 +63,7 @@ export declare namespace Chain {
     const UNIQUE: Web3Nonce;
     const TEZOS: TezosNonce;
     const VELAS: Web3Nonce;
+    const IOTEX: Web3Nonce;
 }
 interface ChainData {
     name: string;
