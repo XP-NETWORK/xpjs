@@ -72,7 +72,7 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
   EstimateTxFees<BigNumber, RawNft> &
   NftUriChain<RawNft> &
-  ValidateAddress;
+  ValidateAddress & { XpNft?: string };
 
 type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
   string,
@@ -117,9 +117,8 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
-    nonce: BigNumberish,
-    mintWith: string,
-    fee?: BigNumber.Value
+    fee?: BigNumber.Value,
+    mintWith?: string
   ): Promise<Resp>;
   /**
    * Mints an NFT on the chain.
@@ -561,9 +560,8 @@ export function ChainFactory(
       nft,
       sender,
       receiver,
-      nonce,
-      mintWith,
-      fee
+      fee,
+      mintWith
     ) => {
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
@@ -575,15 +573,12 @@ export function ChainFactory(
       }
       if (fromChain.isWrappedNft(nft)) {
         const meta = await extractWrappedMetadata(nft);
-        if (meta.wrapped.origin != toChain.getNonce().toString()) {
-          throw Error("trying to send wrapped nft to non-origin chain!!!");
-        }
         const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,
           nft,
           new BigNumber(fee),
-          nonce.toString()
+          toChain.getNonce().toString()
         );
         return res;
       } else {
@@ -593,7 +588,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          mintWith
+          mintWith || toChain.XpNft || ""
         );
         return res;
       }
