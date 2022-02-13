@@ -52,6 +52,11 @@ import {
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
 import { TezosHelper, TezosParams } from "../helpers/tezos";
+import {
+  EstimateTxFeesBatch,
+  TransferNftForeignBatch,
+  UnfreezeForeignNftBatch,
+} from "../helpers/chain";
 
 export type CrossChainHelper =
   | ElrondHelper
@@ -72,7 +77,12 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
   EstimateTxFees<BigNumber, RawNft> &
   NftUriChain<RawNft> &
-  ValidateAddress & { XpNft?: string };
+  ValidateAddress & { XpNft?: string } & EstimateTxFeesBatch<
+    BigNumber,
+    RawNft
+  > &
+  TransferNftForeignBatch<Signer, string, BigNumber, RawNft, Resp> &
+  UnfreezeForeignNftBatch<Signer, string, BigNumber, RawNft, Resp>;
 
 type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
   string,
@@ -120,6 +130,16 @@ export type ChainFactory = {
     fee?: BigNumber.Value,
     mintWith?: string
   ): Promise<Resp>;
+
+  transferBatchNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<RawNftF>[],
+    sender: SignerF,
+    receiver: string,
+    fee?: BigNumber.Value,
+    mintWith?: string
+  ): Promise<Resp[]>;
   /**
    * Mints an NFT on the chain.
    * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -151,6 +171,13 @@ export type ChainFactory = {
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
+    receiver: string
+  ): Promise<BigNumber>;
+
+  estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<RawNftF>[],
     receiver: string
   ): Promise<BigNumber>;
   /**
@@ -390,6 +417,25 @@ export function ChainFactory(
     );
   }
 
+  async function estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<RawNftF>[],
+    receiver: string
+  ): Promise<BigNumber> {
+    const estimate = await fromChain.estimateValidateTransferNftBatch(
+      receiver,
+      nft,
+      new Array(nft.length).fill(toChain.XpNft)
+    );
+    const conv = await calcExchangeFees(
+      fromChain.getNonce(),
+      toChain.getNonce(),
+      estimate.times(nft.length)
+    );
+    return conv;
+  }
+
   async function requireBridge(chains: number[]): Promise<void> {
     const status = await heartbeatRepo.status();
     let deadChain: number | undefined;
@@ -488,6 +534,54 @@ export function ChainFactory(
         );
       }
     },
+    async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
+      type Result = ReturnType<typeof to.transferNftBatchToForeign>;
+      let result: Result[] = [];
+      await requireBridge([from.getNonce(), to.getNonce()]);
+
+      if (!fee) {
+        fee = await estimateBatchFees(from, to, nfts, receiver);
+      }
+      if (!(await to.validateAddress(receiver))) {
+        throw Error("invalid address");
+      }
+      const wrapped: NftInfo<any>[] = [];
+      const unwrapped: NftInfo<any>[] = [];
+      nfts.forEach((e) => {
+        // @ts-ignore
+        if (e.native.contractType && e.native.contractType === "ERC721") {
+          throw new Error(`ERC721 is not supported`);
+        }
+        if (from.isWrappedNft(e)) {
+          wrapped.push(e);
+        } else {
+          unwrapped.push(e);
+        }
+      });
+      wrapped.length &&
+        result.push(
+          from.transferNftBatchToForeign(
+            signer,
+            to.getNonce(),
+            receiver,
+            unwrapped,
+            mw || to.XpNft || "",
+            new BigNumber(fee)
+          )
+        );
+      unwrapped.length &&
+        result.push(
+          from.unfreezeWrappedNftBatch(
+            signer,
+            to.getNonce(),
+            receiver,
+            wrapped,
+            new BigNumber(fee)
+          )
+        );
+      return await Promise.all(result);
+    },
+    estimateBatchFees,
     async generateMintTxn(chain, sender, nft) {
       return await chain.mintRawTxn(nft, sender);
     },
