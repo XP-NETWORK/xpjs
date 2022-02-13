@@ -12,6 +12,9 @@ import {
   MintNft,
   WrappedNftCheck,
   GetProvider,
+  TransferNftForeignBatch,
+  UnfreezeForeignNftBatch,
+  EstimateTxFeesBatch,
 } from "./chain";
 import {
   Signer,
@@ -126,8 +129,23 @@ export type Web3Helper = BaseWeb3Helper &
     EthNftInfo,
     TransactionResponse
   > &
+  TransferNftForeignBatch<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    TransactionResponse
+  > &
+  UnfreezeForeignNftBatch<
+    Signer,
+    string,
+    BigNumber,
+    EthNftInfo,
+    TransactionResponse
+  > &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
+  EstimateTxFeesBatch<BigNumber, EthNftInfo> &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
@@ -352,6 +370,56 @@ export async function web3HelperFactory(
         }
       );
       return res;
+    },
+    async unfreezeWrappedNftBatch(signer, chainNonce, to, nfts, txFees) {
+      const res = await minter.connect(signer).withdrawNftBatch(
+        to,
+        chainNonce,
+        nfts.map((nft) => nft.native.tokenId),
+        new Array(nfts.length).fill(1),
+        nfts[0].native.contract,
+        {
+          value: EthBN.from(txFees.toString()),
+        }
+      );
+
+      await notifyValidator(res.hash);
+
+      return res;
+    },
+    async transferNftBatchToForeign(
+      signer,
+      chainNonce,
+      to,
+      nfts,
+      mintWith,
+      txFees
+    ) {
+      const res = await minter.connect(signer).freezeErc1155Batch(
+        nfts[0].native.contract,
+        nfts.map((nft) => nft.native.tokenId),
+        new Array(nfts.length).fill(1),
+        chainNonce,
+        to,
+        mintWith,
+        {
+          value: EthBN.from(txFees.toString()),
+        }
+      );
+
+      await notifyValidator(res.hash);
+
+      return res;
+    },
+    async estimateValidateTransferNftBatch(_to, nfts, _mintWith) {
+      const gasPrice = await w3.getGasPrice();
+      const gas = 40_000 + 60_000 * nfts.length;
+      return new BigNumber(gasPrice.mul(gas).toString());
+    },
+    async estimateValidateUnfreezeNftBatch(_to, nfts) {
+      const gasPrice = await w3.getGasPrice();
+      const gas = 40_000 + 60_000 * nfts.length;
+      return new BigNumber(gasPrice.mul(gas).toString());
     },
     createWallet(privateKey: string): Wallet {
       return new Wallet(privateKey, provider);
