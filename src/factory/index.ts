@@ -541,18 +541,7 @@ export function ChainFactory(
         await new Promise((r) => setTimeout(r, 30000));
         return await this.nftList(chain, owner);
       }
-      let data = res.data.data;
-
-      const nonce = chain.getNonce();
-      if (
-        nonce != Chain.ALGORAND ||
-        nonce != Chain.ELROND ||
-        nonce != Chain.TEZOS
-      ) {
-        data = data.filter((v: any) => v.native.contractType != "ERC1155");
-      }
-
-      return data;
+      return res.data.data;
     },
     transferNft: async (
       fromChain,
