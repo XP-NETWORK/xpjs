@@ -225,11 +225,11 @@ export namespace ChainFactoryConfigs {
     polygonParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
-      erc721Minter: "0xCE12589cB48E579F3cA419b70096fb34235ff7CF",
-      erc1155Minter: "0xCc64e1fFC33D7B99013AAb5D71E34886310040a0",
-      erc1155_addr: "0x3a1AF9034449A8C0375aF7027F1BEA5ecfb604AF",
-      erc721_addr: "0x4aC987d7f0f247173b76d8181a6dF5e809b404D6",
-      minter_addr: "0x05DfF05a33aca5D190F8F78A47aeBaa002f55d31",
+      erc721Minter: "0xFEeD85607C1fbc2f30EAc13281480ED6265e121E",
+      erc1155Minter: "0xDcAA2b071c1851D8Da43f85a34a5A57d4Fa93A1A",
+      erc1155_addr: "0x1358844f14feEf4D99Bc218C9577d1c7e0Cb2E89",
+      erc721_addr: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
+      minter_addr: "0xF03d628aD8Ae53919A3E65A0cB85dD8765963C56",
       nonce: Chain.POLYGON,
     },
     fantomParams: {
