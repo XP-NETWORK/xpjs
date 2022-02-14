@@ -324,8 +324,8 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return suggested;
     },
 
-    isWrappedNft(nft) {
-      return nft.native.creator === appAddr;
+    async isWrappedNft(nft, _prefix) {
+      return Promise.resolve(nft.native.creator === appAddr);
     },
     transferNftToForeign: transferNft,
     unfreezeWrappedNft: async (signer, to, nft, txFees) => {

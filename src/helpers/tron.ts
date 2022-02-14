@@ -486,10 +486,10 @@ export async function tronHelperFactory(
       }
       return addMinToExpirationTime(transaction, 15);
     },
-    isWrappedNft(nft) {
-      return (
+    async isWrappedNft(nft, _prefix) {
+      return Promise.resolve(
         nft.native.contract.toLowerCase() ===
-        tronParams.erc721_addr.toLowerCase()
+          tronParams.erc721_addr.toLowerCase()
       );
     },
     isApprovedForMinter,
