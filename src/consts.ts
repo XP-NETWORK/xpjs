@@ -271,7 +271,7 @@ export const Config: AppConfig = {
   nftListUri: "https://indexnft.herokuapp.com",
   nftListAuthToken:
     "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTYzODk2MjMzOCwiZXhwIjoxNjQ2NzM4MzM4fQ.9eQMNMtt-P6myPlji7nBC9PAwTftd0qQvwnIZSt4ycM4E45NpzCF0URsdYj_YN_xqQKQpcHiZu1o4EXjJa_-Zw",
-  txSocketUri: "https://sockettx.herokuapp.com",
+  txSocketUri: "transaction-socket.xp.network",
   tronScanUri: "https://apilist.tronscan.org/api/",
   heartbeatUri: "https://xpheartbeat.herokuapp.com",
 };

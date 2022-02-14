@@ -223,7 +223,8 @@ export interface Web3Params {
   minter_addr: string;
   erc1155_addr: string;
   erc721_addr: string;
-  validators: string[];
+  erc721Minter: string;
+  erc1155Minter: string;
   nonce: number;
 }
 
