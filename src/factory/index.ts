@@ -533,7 +533,7 @@ export function ChainFactory(
     tc: number
   ): Promise<string[]> {
     const res = await axios.get<{ data: { to: string }[] }>(
-      `https://https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}`
+      `https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}`
     );
     return res.data.data.map((r) => r.to);
   }
