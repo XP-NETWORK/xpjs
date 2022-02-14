@@ -41,7 +41,7 @@ import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
-import { BigNumberish, PopulatedTransaction } from "ethers";
+import { BigNumberish, PopulatedTransaction, utils } from "ethers";
 import {
   AlgorandParams,
   AlgorandHelper,
@@ -670,7 +670,7 @@ export function ChainFactory(
       //@ts-ignore
       if (nft.native.contract) {
         //@ts-ignore
-        checkNotOldWrappedNft(nft.native.contract);
+        checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
       }
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
