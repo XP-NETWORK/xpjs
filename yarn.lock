@@ -4995,6 +4995,12 @@ xhr2-cookies@^1.1.0:
   dependencies:
     cookiejar "^2.1.1"
 
+"xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#c351870fb44fede7c98f6fae00e408b86a39f5a3":
+  version "0.1.0"
+  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#c351870fb44fede7c98f6fae00e408b86a39f5a3"
+  dependencies:
+    ethers "^5.5.4"
+
 "xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#dist-erc1155":
   version "0.1.0"
   resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#c96891f1f007f0b6dfa87f262073bab37838fce2"
