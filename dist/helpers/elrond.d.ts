@@ -6,7 +6,7 @@
  */
 import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck } from "./chain";
+import { BalanceCheck, BatchWrappedBalanceCheck, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedNftCheck, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch } from "./chain";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintRawTxn, PreTransfer, PreTransferRawTxn, TransferNftForeignUnsigned, UnfreezeForeignNftUnsigned, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
@@ -105,9 +105,9 @@ export interface ElrondRawUnsignedTxn {
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
+export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & TransferNftForeignBatch<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNftBatch<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<BigNumber, string> & TransferNftForeignUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & UnfreezeForeignNftUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & MintRawTxn<ElrondRawUnsignedTxn>;
+} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<BigNumber, string> & EstimateTxFeesBatch<BigNumber, EsdtNftInfo> & TransferNftForeignUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & UnfreezeForeignNftUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & MintRawTxn<ElrondRawUnsignedTxn>;
 /**
  * Create an object implementing cross chain utilities for elrond
  *

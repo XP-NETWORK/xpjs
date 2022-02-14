@@ -3,9 +3,10 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck, GetProvider } from "./chain";
-import { Signer, PopulatedTransaction, Wallet, providers } from "ethers";
+import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, WrappedBalanceCheck, BatchWrappedBalanceCheck, MintNft, WrappedNftCheck, GetProvider, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch } from "./chain";
+import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
+import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftMinter } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintRawTxn, NftInfo, PreTransfer, PreTransferRawTxn, TransferNftForeignUnsigned, UnfreezeForeignNftUnsigned, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 /**
@@ -17,6 +18,7 @@ export declare type EthNftInfo = {
     owner: string;
     uri: string;
     contract: string;
+    contractType: "ERC721" | "ERC1155";
 };
 /**
  * Arguments required for minting a new nft
@@ -59,7 +61,7 @@ MintNft<Signer, NftMintArgs, string> & {
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber, string> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
+export declare type Web3Helper = BaseWeb3Helper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferNftForeign<Signer, string, BigNumber, EthNftInfo, TransactionResponse> & UnfreezeForeignNft<Signer, string, BigNumber, EthNftInfo, TransactionResponse> & TransferNftForeignBatch<Signer, string, BigNumber, EthNftInfo, TransactionResponse> & UnfreezeForeignNftBatch<Signer, string, BigNumber, EthNftInfo, TransactionResponse> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber, string> & EstimateTxFeesBatch<BigNumber, EthNftInfo> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
 } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> & UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, PopulatedTransaction> & TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, PopulatedTransaction> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & MintRawTxn<PopulatedTransaction> & GetProvider<providers.Provider> & {
     XpNft: string;
@@ -83,7 +85,19 @@ export interface Web3Params {
     minter_addr: string;
     erc1155_addr: string;
     erc721_addr: string;
-    validators: string[];
+    erc721Minter: string;
+    erc1155Minter: string;
     nonce: number;
 }
+declare type NftMethodVal<T, Tx> = {
+    freeze: "freezeErc1155" | "freezeErc721";
+    validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
+    umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
+    approved: (umt: T, sender: string, minterAddr: string, tok: string) => Promise<boolean>;
+    approve: (umt: T, forAddr: string, tok: string) => Promise<Tx>;
+};
+declare type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
+declare type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
+export declare const NFT_METHOD_MAP: NftMethodMap;
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
+export {};

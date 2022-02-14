@@ -142,6 +142,16 @@ export declare enum TransactionStatus {
 export interface ExtractTxnStatus {
     extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
+export interface TransferNftForeignBatch<Signer, ForeignAddr, Balance, RawNft, Resp> {
+    transferNftBatchToForeign(sender: Signer, chain_nonce: number, to: ForeignAddr, id: NftInfo<RawNft>[], mintWith: string, txFees: Balance): Promise<Resp>;
+}
+export interface UnfreezeForeignNftBatch<Signer, ForeignAddr, Balance, RawNft, Resp> {
+    unfreezeWrappedNftBatch(sender: Signer, chainNonce: number, to: ForeignAddr, nfts: NftInfo<RawNft>[], txFees: Balance): Promise<Resp>;
+}
+export interface EstimateTxFeesBatch<Balance, RawNftF> {
+    estimateValidateTransferNftBatch(to: string, metadatas: NftInfo<RawNftF>[], mintWith: string[]): Promise<Balance>;
+    estimateValidateUnfreezeNftBatch(to: string, metadatas: NftInfo<RawNftF>[]): Promise<Balance>;
+}
 export declare function extractWrappedMetadata(nft: NftInfo<any>): Promise<Erc721MetadataEx<Erc721WrappedData>>;
 export interface GetProvider<Provider> {
     getProvider(): Provider;

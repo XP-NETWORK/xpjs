@@ -8,11 +8,12 @@ import BigNumber from "bignumber.js";
 import { PopulatedTransaction } from "ethers";
 import { AlgorandParams, AlgorandHelper, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosHelper, TezosParams } from "../helpers/tezos";
+import { EstimateTxFeesBatch, TransferNftForeignBatch, UnfreezeForeignNftBatch } from "../helpers/chain";
 export declare type CrossChainHelper = ElrondHelper | Web3Helper | TronHelper | AlgorandHelper | TezosHelper;
 declare type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> & EstimateTxFees<BigNumber, RawNft> & NftUriChain<RawNft> & ValidateAddress & {
     XpNft?: string;
-};
+} & EstimateTxFeesBatch<BigNumber, RawNft> & TransferNftForeignBatch<Signer, string, BigNumber, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, string, BigNumber, RawNft, Resp>;
 declare type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<string, BigNumber, RawNft, Resp> & UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> & WrappedNftCheck<RawNft> & PreTransferRawTxn<RawNft, Resp> & MintRawTxn<Resp>;
 /**
  * A type representing a chain factory.
@@ -44,6 +45,7 @@ export declare type ChainFactory = {
      * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
      */
     transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp>;
+    transferBatchNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>[], sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
     /**
      * Mints an NFT on the chain.
      * @param chain: {@link MintNft} Chain to mint the nft on. Can be obtained from the `inner` method on the factory.
@@ -65,6 +67,7 @@ export declare type ChainFactory = {
      * @param receiver: Address of the receiver of the NFT in raw string..
      */
     estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
+    estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>[], receiver: string): Promise<BigNumber>;
     /**
      *
      * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
