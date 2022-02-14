@@ -473,7 +473,7 @@ export function ChainFactory(
   }
 
   function checkMintWith(mw: string, contracts: string[]) {
-    return contracts.findIndex((x) => x.toLowerCase() === mw.toLowerCase().trim()) !== -1;
+    return contracts.find((x) => x.toLowerCase() === mw.toLowerCase().trim()) != undefined;
   }
 
   function nonceToChainNonce(
@@ -698,7 +698,7 @@ export function ChainFactory(
         checkMintWith(
           mintWith,
           //@ts-ignore
-          await getVerifiedContracts(nft.native.contract, toChain.getNonce())
+          await getVerifiedContracts(nft.native.contract.toLowerCase(), toChain.getNonce())
         )
           ? mintWith
           : toChain.XpNft;
