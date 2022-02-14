@@ -154,6 +154,7 @@ export interface AppConfig {
     nftListUri: string;
     nftListAuthToken: string;
     tronScanUri: string;
+    wrappedNftPrefix: string;
 }
 /**
  * This function is the basic entry point to use this package as a library.
