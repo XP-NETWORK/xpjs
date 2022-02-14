@@ -287,7 +287,6 @@ export interface ElrondParams {
   esdt: string;
   esdt_nft: string;
   esdt_swap: string;
-  validators: string[];
   nonce: number;
 }
 
@@ -653,8 +652,8 @@ export const elrondHelperFactory: (
     return id.toString();
   }
 
-  function estimateGas(base_fees: BigNumber, cnt: number) {
-    return base_fees.times((cnt + 1) * gasPriceModif); // assume execution takes about twice as much gas fees
+  function estimateGas(base_fees: BigNumber) {
+    return base_fees.multipliedBy(gasPriceModif); // assume execution takes about twice as much gas fees
   }
 
   async function getAddress(sender: ElrondSigner): Promise<Address> {
@@ -887,7 +886,7 @@ export const elrondHelperFactory: (
       _toAddress: string,
       _nftUri: NftInfo<string>
     ) {
-      return estimateGas(NFT_TRANSFER_COST, elrondParams.validators.length); // TODO: properly estimate NFT_TRANSFER_COST
+      return estimateGas(NFT_TRANSFER_COST); // TODO: properly estimate NFT_TRANSFER_COST
     },
     async mintRawTxn(args, address) {
       const txu = unsignedMintNftTxn(
@@ -898,7 +897,7 @@ export const elrondHelperFactory: (
     },
 
     async estimateValidateUnfreezeNft(_to: string, _nftUri: NftInfo<string>) {
-      return estimateGas(NFT_UNFREEZE_COST, elrondParams.validators.length); // TODO: properly estimate NFT_UNFREEZE_COST
+      return estimateGas(NFT_UNFREEZE_COST); // TODO: properly estimate NFT_UNFREEZE_COST
     },
     async unfreezeWrappedNftBatch(sender, chainNonce, to, nfts, txFees) {
       const txu = new Transaction({
@@ -963,16 +962,10 @@ export const elrondHelperFactory: (
       return tx;
     },
     async estimateValidateTransferNftBatch(_, nfts) {
-      return estimateGas(
-        new BigNumber(60000000 + 5000000 * nfts.length),
-        elrondParams.validators.length
-      );
+      return estimateGas(new BigNumber(60000000 + 5000000 * nfts.length));
     },
     async estimateValidateUnfreezeNftBatch(_, nfts) {
-      return estimateGas(
-        new BigNumber(70000000 + 5000000 * nfts.length),
-        elrondParams.validators.length
-      );
+      return estimateGas(new BigNumber(70000000 + 5000000 * nfts.length));
     },
     wrapNftForTransfer(nft: NftInfo<EsdtNftInfo>) {
       // Approximation for wrapping this nft
