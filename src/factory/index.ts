@@ -41,7 +41,7 @@ import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
-import { BigNumberish, PopulatedTransaction, utils } from "ethers";
+import { BigNumberish, ethers, PopulatedTransaction, utils } from "ethers";
 import {
   AlgorandParams,
   AlgorandHelper,
@@ -473,10 +473,7 @@ export function ChainFactory(
   }
 
   function checkMintWith(mw: string, contracts: string[]) {
-    if (contracts.findIndex((x) => x === mw) !== -1) {
-      return true;
-    }
-    return false;
+    return contracts.findIndex((x) => x.toLowerCase() === mw.toLowerCase().trim()) !== -1;
   }
 
   function nonceToChainNonce(
@@ -704,7 +701,7 @@ export function ChainFactory(
           await getVerifiedContracts(nft.native.contract, toChain.getNonce())
         )
           ? mintWith
-          : fromChain.XpNft;
+          : toChain.XpNft;
 
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
