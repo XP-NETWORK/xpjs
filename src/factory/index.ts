@@ -260,6 +260,8 @@ export type ChainFactory = {
     sender: string,
     nft: NftMintArgs
   ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
+
+  getVerifiedContracts(from: string, targetChain: number): Promise<string[]>;
 };
 
 /**
@@ -470,6 +472,13 @@ export function ChainFactory(
     }
   }
 
+  function checkMintWith(mw: string, contracts: string[]) {
+    if (contracts.findIndex((x) => x === mw) !== -1) {
+      return true;
+    }
+    return false;
+  }
+
   function nonceToChainNonce(
     nonce: number
   ): ElrondNonce | Web3Nonce | TronNonce {
@@ -519,10 +528,21 @@ export function ChainFactory(
     }
   }
 
+  async function getVerifiedContracts(
+    from: string,
+    tc: number
+  ): Promise<string[]> {
+    const res = await axios.get<{ data: { to: string }[] }>(
+      `https://https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}`
+    );
+    return res.data.data.map((r) => r.to);
+  }
+
   return {
     async generatePreTransferTxn(from, sender, nft, fee) {
       return await from.preTransferRawTxn(nft, sender, fee);
     },
+    getVerifiedContracts,
     async generateNftTxn(
       chain,
       toNonce,
@@ -553,6 +573,7 @@ export function ChainFactory(
         );
       }
     },
+
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
       type Result = ReturnType<typeof to.transferNftBatchToForeign>;
       let result: Result[] = [];
@@ -672,6 +693,19 @@ export function ChainFactory(
         //@ts-ignore
         checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
       }
+
+      const mw =
+        //@ts-ignore
+        nft.native.contract &&
+        mintWith &&
+        checkMintWith(
+          mintWith,
+          //@ts-ignore
+          await getVerifiedContracts(nft.native.contract, toChain.getNonce())
+        )
+          ? mintWith
+          : fromChain.XpNft;
+
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
       if (!fee) {
@@ -697,7 +731,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          mintWith || toChain.XpNft || ""
+          mw || ""
         );
         return res;
       }
