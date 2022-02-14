@@ -115,6 +115,7 @@ export declare type ChainFactory = {
     generateNftTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, toNonce: number, sender: string, to: string, nft: NftInfo<RawNftF>, fee: BigNumber, mintWith: string, nonce: string): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
     generatePreTransferTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftInfo<RawNftF>, fee: BigNumber): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn | undefined>;
     generateMintTxn<RawNftF, Resp>(from: RawTxnBuiladableChain<RawNftF, Resp>, sender: string, nft: NftMintArgs): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
+    getVerifiedContracts(from: string, targetChain: number): Promise<string[]>;
 };
 /**
  * A type representing all the supported chain params.

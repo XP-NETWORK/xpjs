@@ -124,7 +124,6 @@ export interface ElrondParams {
     esdt: string;
     esdt_nft: string;
     esdt_swap: string;
-    validators: string[];
     nonce: number;
 }
 export declare const elrondHelperFactory: (elrondParams: ElrondParams) => Promise<ElrondHelper>;
