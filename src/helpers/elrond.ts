@@ -841,8 +841,8 @@ export const elrondHelperFactory: (
 
       return res.data["data"]["tokens"];
     },
-    isWrappedNft(nft) {
-      return (
+    async isWrappedNft(nft, _prefix) {
+      return Promise.resolve(
         tokenIdentReal(nft.native.tokenIdentifier) === elrondParams.esdt_nft
       );
     },

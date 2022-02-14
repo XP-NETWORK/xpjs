@@ -302,6 +302,7 @@ export interface AppConfig {
   nftListUri: string;
   nftListAuthToken: string;
   tronScanUri: string;
+  wrappedNftPrefix: string;
 }
 
 type AllParams =
@@ -514,7 +515,7 @@ export function ChainFactory(
       mw,
       nonce
     ) {
-      if (chain.isWrappedNft(nft)) {
+      if (await chain.isWrappedNft(nft, appConfig.wrappedNftPrefix)) {
         return chain.unfreezeWrappedNftTxn(
           receiver,
           nft,
@@ -547,17 +548,19 @@ export function ChainFactory(
       }
       const wrapped: NftInfo<any>[] = [];
       const unwrapped: NftInfo<any>[] = [];
-      nfts.forEach((e) => {
-        // @ts-ignore
-        if (e.native.contractType && e.native.contractType === "ERC721") {
-          throw new Error(`ERC721 is not supported`);
-        }
-        if (from.isWrappedNft(e)) {
-          wrapped.push(e);
-        } else {
-          unwrapped.push(e);
-        }
-      });
+      await Promise.all(
+        nfts.map(async (e) => {
+          // @ts-ignore
+          if (e.native.contractType && e.native.contractType === "ERC721") {
+            throw new Error(`ERC721 is not supported`);
+          }
+          if (await from.isWrappedNft(e, appConfig.wrappedNftPrefix)) {
+            wrapped.push(e);
+          } else {
+            unwrapped.push(e);
+          }
+        })
+      );
       wrapped.length &&
         result.push(
           from.transferNftBatchToForeign(
@@ -654,7 +657,7 @@ export function ChainFactory(
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
       }
-      if (fromChain.isWrappedNft(nft)) {
+      if (await fromChain.isWrappedNft(nft, appConfig.wrappedNftPrefix)) {
         const meta = await extractWrappedMetadata(nft);
         const res = await fromChain.unfreezeWrappedNft(
           sender,

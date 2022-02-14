@@ -274,4 +274,5 @@ export const Config: AppConfig = {
   txSocketUri: "transaction-socket.xp.network",
   tronScanUri: "https://apilist.tronscan.org/api/",
   heartbeatUri: "https://xpheartbeat.herokuapp.com",
+  wrappedNftPrefix: "https://nft.xp.network/w/",
 };

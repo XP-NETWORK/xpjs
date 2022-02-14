@@ -198,7 +198,7 @@ export interface MintNft<Signer, Args, Identifier> {
  * @returns bool
  */
 export interface WrappedNftCheck<RawNft> {
-  isWrappedNft(nft: NftInfo<RawNft>): boolean;
+  isWrappedNft(nft: NftInfo<RawNft>, prefix: string): Promise<boolean>;
 }
 
 export interface ValidateAddress {
