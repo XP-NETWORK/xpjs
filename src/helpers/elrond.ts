@@ -678,7 +678,7 @@ export const elrondHelperFactory: (
   }
 
   return {
-	XpNft: elrondParams.esdt_nft,
+    XpNft: elrondParams.esdt_nft,
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
 
@@ -842,7 +842,7 @@ export const elrondHelperFactory: (
       return res.data["data"]["tokens"];
     },
     async isWrappedNft(nft) {
-      return typeof (await axios.get(nft.uri)).data.wrapped === "undefined";
+      return typeof (await axios.get(nft.uri)).data.wrapped !== "undefined";
     },
     async preTransferRawTxn(id, address, value) {
       if (!address || !value) {
