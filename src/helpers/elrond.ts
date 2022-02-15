@@ -678,6 +678,7 @@ export const elrondHelperFactory: (
   }
 
   return {
+	XpNft: elrondParams.esdt_nft,
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
 
