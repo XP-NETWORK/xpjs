@@ -261,7 +261,11 @@ export type ChainFactory = {
     nft: NftMintArgs
   ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 
-  getVerifiedContracts(from: string, targetChain: number): Promise<string[]>;
+  getVerifiedContracts(
+    from: string,
+    targetChain: number,
+    fc: number
+  ): Promise<string[]>;
 };
 
 /**
@@ -473,7 +477,10 @@ export function ChainFactory(
   }
 
   function checkMintWith(mw: string, contracts: string[]) {
-    return contracts.find((x) => x.toLowerCase() === mw.toLowerCase().trim()) != undefined;
+    return (
+      contracts.find((x) => x.toLowerCase() === mw.toLowerCase().trim()) !=
+      undefined
+    );
   }
 
   function nonceToChainNonce(
@@ -527,10 +534,11 @@ export function ChainFactory(
 
   async function getVerifiedContracts(
     from: string,
-    tc: number
+    tc: number,
+    fc: number
   ): Promise<string[]> {
     const res = await axios.get<{ data: { to: string }[] }>(
-      `https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}`
+      `https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);
   }
@@ -698,7 +706,12 @@ export function ChainFactory(
         checkMintWith(
           mintWith,
           //@ts-ignore
-          await getVerifiedContracts(nft.native.contract.toLowerCase(), toChain.getNonce())
+          await getVerifiedContracts(
+            //@ts-ignore
+            nft.native.contract.toLowerCase(),
+            toChain.getNonce(),
+            fromChain.getNonce()
+          )
         )
           ? mintWith
           : toChain.XpNft;
