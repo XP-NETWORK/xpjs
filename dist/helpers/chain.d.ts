@@ -7,6 +7,7 @@ import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 export declare type NftInfo<Raw> = {
     readonly uri: string;
     readonly native: Raw;
+    readonly collectionIdent: string;
 };
 /**
  * Transfer Liquidity to a foregin chain, freezing the original liquidity
