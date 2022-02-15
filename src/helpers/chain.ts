@@ -11,6 +11,7 @@ import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 export type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
+  readonly collectionIdent: string;
 };
 
 /**
