@@ -177,12 +177,12 @@ export namespace ChainFactoryConfigs {
     elrondParams: {
       node_uri: MainNetRpcUri.ELROND,
       minter_address:
-        "erd1qqqqqqqqqqqqqpgq98ufyktqukxqw79f7n22sr3u6n05u7d7p7tqmzhv32",
+        "erd1qqqqqqqqqqqqqpgq3y98dyjdp72lwzvd35yt4f9ua2a3n70v0drsfycvu8",
       esdt_swap_address:
-        "erd1qqqqqqqqqqqqqpgqgc9vfqcdqw0ucu602elf0lt4tysfmxpep7tqhrrr9x",
+        "erd1qqqqqqqqqqqqqpgq5vuvac70kn36yk4rvf9scr6p8tlu23220drsfgszfy",
       esdt: "XPNET-738176",
-      esdt_nft: "XPNFT-676422",
-      esdt_swap: "WEGLD-071de0",
+      esdt_nft: "XPNFT-cb7482",
+      esdt_swap: "WEGLD-5f1f8d",
       nonce: Chain.ELROND,
     },
     tronParams: {
