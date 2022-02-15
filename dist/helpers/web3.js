@@ -131,7 +131,7 @@ async function web3HelperFactory(params) {
             return approvetxn;
         },
         async isWrappedNft(nft) {
-            return typeof (await axios_1.default.get(nft.uri)).data.wrapped === "undefined";
+            return typeof (await axios_1.default.get(nft.uri)).data.wrapped !== "undefined";
         },
         async extractTxnStatus(txn) {
             const status = (await (await provider.getTransaction(txn)).wait()).status;
