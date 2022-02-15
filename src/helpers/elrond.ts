@@ -840,9 +840,10 @@ export const elrondHelperFactory: (
 
       return res.data["data"]["tokens"];
     },
-    async isWrappedNft(nft, _prefix) {
-      return Promise.resolve(
-        tokenIdentReal(nft.native.tokenIdentifier) === elrondParams.esdt_nft
+    async isWrappedNft(nft, prefix) {
+      return (
+        nft.uri.startsWith(prefix) &&
+        (await axios.get<{ wrapped?: {} }>(nft.uri)).data.wrapped !== undefined
       );
     },
     async preTransferRawTxn(id, address, value) {
