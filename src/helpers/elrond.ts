@@ -168,15 +168,6 @@ export type ESDTRole =
  */
 export interface SetESDTRoles {
   /**
-   * Unsigned Transaction for [[setESDTRole]]
-   */
-  unsignedSetESDTRoles(
-    token: string,
-    target: Address,
-    roles: [ESDTRole]
-  ): Transaction;
-
-  /**
    *
    * Set the roles for a given account for an esdt
    *
@@ -187,8 +178,14 @@ export interface SetESDTRoles {
   setESDTRole(
     sender: ElrondSigner,
     token: string,
-    roles: [ESDTRole]
-  ): Promise<void>;
+    target: Address,
+    roles: ESDTRole[]
+  ): Promise<Transaction>;
+  transferESDTOwnership(
+    sender: ElrondSigner,
+    token: string,
+    target: Address
+  ): Promise<Transaction>;
 }
 
 /**
@@ -269,7 +266,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   > &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
   ExtractTxnStatus &
-  MintRawTxn<ElrondRawUnsignedTxn>;
+  MintRawTxn<ElrondRawUnsignedTxn> & SetESDTRoles;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -619,7 +616,7 @@ export const elrondHelperFactory: (
   const unsignedSetESDTRoles = (
     token: string,
     target: Address,
-    roles: [ESDTRole]
+    roles: ESDTRole[]
   ) => {
     let baseArgs = TransactionPayload.contractCall()
       .setFunction(new ContractFunction("setSpecialRole"))
@@ -872,11 +869,24 @@ export const elrondHelperFactory: (
       manager: ElrondSigner,
       token: string,
       target: Address,
-      roles: [ESDTRole]
-    ): Promise<void> {
+      roles: ESDTRole[]
+    ): Promise<Transaction> {
       const txu = unsignedSetESDTRoles(token, target, roles);
 
-      await signAndSend(manager, txu);
+      return await signAndSend(manager, txu);
+    },
+    async transferESDTOwnership(sender, token, target): Promise<Transaction> {
+      const txu = new Transaction({
+        receiver: new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
+        gasLimit: new GasLimit(60000000),
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("transferOwnership"))
+          .addArg(new TokenIdentifierValue(Buffer.from(token, "utf-8")))
+          .addArg(new AddressValue(target))
+          .build(),
+      });
+
+      return await signAndSend(sender, txu);
     },
     getNonce() {
       return elrondParams.nonce;
