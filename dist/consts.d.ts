@@ -79,4 +79,8 @@ interface ChainInfo {
 }
 export declare const CHAIN_INFO: ChainInfo;
 export declare const Config: AppConfig;
+export declare const FEE_MARGIN: {
+    min: number;
+    max: number;
+};
 export {};

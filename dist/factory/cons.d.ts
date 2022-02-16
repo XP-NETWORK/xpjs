@@ -1,2 +1,2 @@
-import { ExchangeRateRepo } from "crypto-exchange-rate";
-export declare function exchangeRateRepo(baseUrl: string): ExchangeRateRepo;
+import { BatchExchangeRateRepo, ExchangeRateRepo } from "crypto-exchange-rate";
+export declare function exchangeRateRepo(baseUrl: string): ExchangeRateRepo & BatchExchangeRateRepo;
