@@ -306,11 +306,11 @@ export namespace ChainFactoryConfigs {
     velasParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
-      erc721Minter: "0x7bf2924985CAA6192D721B2B9e1109919aC6ff58",
-      erc1155Minter: "0xC254a8D4eF5f825FD31561bDc69551ed2b8db134",
-      erc1155_addr: "0x14CAB7829B03D075c4ae1aCF4f9156235ce99405",
-      erc721_addr: "0x2496b44516c8639dA00E8D12ccE64862e3760190",
-      minter_addr: "0x93239b1CF8CAd847f387735876EdBa7D75ae4f7A",
+      erc721Minter: "0x3F888c0Ee72943a3Fb1c169684A9d1e8DEB9f537",
+      erc1155Minter: "0x0cC5F00e673B0bcd1F780602CeC6553aec1A57F0",
+      erc1155_addr: "0x0B7ED039DFF2b91Eb4746830EaDAE6A0436fC4CB",
+      erc721_addr: "0x9e5761f7A1360E8B3E9d30Ed9dd3161E8b75d4E8",
+      minter_addr: "0x40d8160A0Df3D9aad75b9208070CFFa9387bc051",
       nonce: Chain.VELAS,
     },
     iotexParams: {
