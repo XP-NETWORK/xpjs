@@ -31,6 +31,7 @@
     "@taquito/signer": "^11.1.0",
     "@taquito/taquito": "^11.1.0",
     "@taquito/tzip12": "^11.1.0",
+    "@vechain/ethers": "^4.0.27-5",
     "@walletconnect/client": "^1.7.0",
     "algosdk": "^1.12.0",
     "axios": "^0.21.1",

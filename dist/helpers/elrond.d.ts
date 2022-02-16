@@ -76,10 +76,6 @@ export declare type ESDTRole = "ESDTRoleNFTCreate" | "ESDTRoleNFTBurn" | "ESDTRo
  */
 export interface SetESDTRoles {
     /**
-     * Unsigned Transaction for [[setESDTRole]]
-     */
-    unsignedSetESDTRoles(token: string, target: Address, roles: [ESDTRole]): Transaction;
-    /**
      *
      * Set the roles for a given account for an esdt
      *
@@ -87,7 +83,8 @@ export interface SetESDTRoles {
      * @param token  ESDT Identifier
      * @param roles  Roles to set
      */
-    setESDTRole(sender: ElrondSigner, token: string, roles: [ESDTRole]): Promise<void>;
+    setESDTRole(sender: ElrondSigner, token: string, target: Address, roles: ESDTRole[]): Promise<Transaction>;
+    transferESDTOwnership(sender: ElrondSigner, token: string, target: Address): Promise<Transaction>;
 }
 export interface ElrondRawUnsignedTxn {
     readonly nonce: number;
@@ -107,7 +104,7 @@ export interface ElrondRawUnsignedTxn {
  */
 export declare type ElrondHelper = BalanceCheck<string | Address, BigNumber> & BatchWrappedBalanceCheck<string | Address, BigNumber> & TransferForeign<ElrondSigner, string, BigNumber, Transaction> & UnfreezeForeign<ElrondSigner, string, BigNumber> & TransferNftForeign<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & TransferNftForeignBatch<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & UnfreezeForeignNftBatch<ElrondSigner, string, BigNumber, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<BigNumber, string> & EstimateTxFeesBatch<BigNumber, EsdtNftInfo> & TransferNftForeignUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & UnfreezeForeignNftUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & MintRawTxn<ElrondRawUnsignedTxn>;
+} & WrappedNftCheck<EsdtNftInfo> & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<BigNumber, string> & EstimateTxFeesBatch<BigNumber, EsdtNftInfo> & TransferNftForeignUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & UnfreezeForeignNftUnsigned<string, BigNumber, EsdtNftInfo, ElrondRawUnsignedTxn> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & MintRawTxn<ElrondRawUnsignedTxn> & SetESDTRoles;
 /**
  * Create an object implementing cross chain utilities for elrond
  *

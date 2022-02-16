@@ -139,6 +139,7 @@ export interface ChainParams {
     tezosParams: TezosParams;
     velasParams: Web3Params;
     iotexParams: Web3Params;
+    vechainParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
