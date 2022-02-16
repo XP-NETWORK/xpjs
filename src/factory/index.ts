@@ -10,6 +10,7 @@ import {
   ChainNonce,
   CHAIN_INFO,
   ElrondNonce,
+  FEE_MARGIN,
   TronNonce,
   Web3Nonce,
 } from "../consts";
@@ -384,15 +385,20 @@ export function ChainFactory(
     toChain: number,
     val: BigNumber
   ): Promise<BigNumber> {
-    const exrate = await remoteExchangeRate.getExchangeRate(
+    const rate = await remoteExchangeRate.getBatchedRate([
       CHAIN_INFO[toChain].currency,
       CHAIN_INFO[fromChain].currency
-    );
+    ]);
+    const feeR = val.dividedBy(CHAIN_INFO[toChain].decimals);
+    const fromExRate = rate.get(CHAIN_INFO[fromChain].currency)!;
+    const toExRate = rate.get(CHAIN_INFO[toChain].currency)!;
+    const usdFee = Math.min(Math.max(FEE_MARGIN.min, feeR.times(toExRate*1.1).toNumber()), FEE_MARGIN.max)
+    const feeProfit = usdFee / fromExRate;
 
-    return val
-      .dividedBy(CHAIN_INFO[toChain].decimals)
-      .times(exrate * 1.05)
+    return feeR
+      .times(toExRate / fromExRate)
       .times(CHAIN_INFO[fromChain].decimals)
+      .plus(feeProfit)
       .integerValue(BigNumber.ROUND_CEIL);
   }
   const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
