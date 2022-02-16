@@ -397,8 +397,8 @@ export function ChainFactory(
 
     return feeR
       .times(toExRate / fromExRate)
+	  .plus(feeProfit)
       .times(CHAIN_INFO[fromChain].decimals)
-      .plus(feeProfit)
       .integerValue(BigNumber.ROUND_CEIL);
   }
   const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
