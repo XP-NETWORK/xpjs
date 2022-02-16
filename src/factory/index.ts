@@ -392,7 +392,7 @@ export function ChainFactory(
     const feeR = val.dividedBy(CHAIN_INFO[toChain].decimals);
     const fromExRate = rate.get(CHAIN_INFO[fromChain].currency)!;
     const toExRate = rate.get(CHAIN_INFO[toChain].currency)!;
-    const usdFee = Math.min(Math.max(FEE_MARGIN.min, feeR.times(toExRate*1.1).toNumber()), FEE_MARGIN.max)
+    const usdFee = Math.min(Math.max(FEE_MARGIN.min, feeR.times(toExRate*0.1).toNumber()), FEE_MARGIN.max)
     const feeProfit = usdFee / fromExRate;
 
     return feeR
