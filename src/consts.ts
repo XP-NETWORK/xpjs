@@ -276,3 +276,5 @@ export const Config: AppConfig = {
   heartbeatUri: "https://xpheartbeat.herokuapp.com",
   wrappedNftPrefix: "https://nft.xp.network/w/",
 };
+
+export const FEE_MARGIN = { min: 0.5, max: 5 }
