@@ -81,7 +81,7 @@ function ChainFactory(appConfig, chainParams) {
         const feeR = val.dividedBy(consts_1.CHAIN_INFO[toChain].decimals);
         const fromExRate = rate.get(consts_1.CHAIN_INFO[fromChain].currency);
         const toExRate = rate.get(consts_1.CHAIN_INFO[toChain].currency);
-        const usdFee = Math.min(Math.max(consts_1.FEE_MARGIN.min, feeR.times(toExRate * 1.1).toNumber()), consts_1.FEE_MARGIN.max);
+        const usdFee = Math.min(Math.max(consts_1.FEE_MARGIN.min, feeR.times(toExRate * 0.1).toNumber()), consts_1.FEE_MARGIN.max);
         const feeProfit = usdFee / fromExRate;
         return feeR
             .times(toExRate / fromExRate)
