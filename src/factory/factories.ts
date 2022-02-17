@@ -18,6 +18,7 @@ const EVM_VALIDATORS = [
 const EVM_TESTNET_VALIDATORS = ["0x63A0bC7286e80A3a46D5113e1C059e7a1e14e0fc"];
 
 const middleware_uri = "https://notifierrest.herokuapp.com";
+const testnet_middleware_uri = "https://testnet-notifier-rest.herokuapp.com/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Partial<ChainParams> = () => ({
@@ -43,7 +44,7 @@ export namespace ChainFactoryConfigs {
     },
     tronParams: {
       provider: new TronWeb({ fullHost: TestNetRpcUri.TRON }),
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       erc1155_addr: "41b9bd4547c91cb23ba546bcdc958d4807e2179c7c",
       minter_addr: "41cecf8ffbed6433c1cae2fe196925109aebc726f2",
       erc721_addr: "41226a324faa855cf0e4774c682c9d772b72dd811e",
@@ -51,7 +52,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.TRON,
     },
     avalancheParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AVALANCHE),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -60,7 +61,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.AVALANCHE,
     },
     polygonParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.POLYGON),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -69,7 +70,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.POLYGON,
     },
     fantomParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FANTOM),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -78,7 +79,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.FANTOM,
     },
     bscParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BSC),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -87,7 +88,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.BSC,
     },
     celoParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.CELO),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -96,7 +97,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.CELO,
     },
     harmonyParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HARMONY),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -105,7 +106,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.HARMONY,
     },
     ropstenParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ROPSTEN),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -114,7 +115,7 @@ export namespace ChainFactoryConfigs {
       nonce: Chain.ETHEREUM,
     },
     xDaiParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
       minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
@@ -138,11 +139,11 @@ export namespace ChainFactoryConfigs {
       erc721_addr: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
       minter_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
       validators: EVM_TESTNET_VALIDATORS,
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
     },
     tezosParams: {
       bridgeAddress: "KT1MRYxBimYh1PUt3LBhEAmvr7YMK2L7kqCL",
-      middlewareUri: middleware_uri,
+      middlewareUri:testnet_middleware_uri,
       Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
       xpnftAddress: "KT1F7THd96y39MYKkTXmLyWkDZQ3H6QgubLh",
       validators: [
@@ -152,7 +153,7 @@ export namespace ChainFactoryConfigs {
       ],
     },
     velasParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       erc1155_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
       erc721_addr: "0x80653c90614155633252d32698164DBbBC421782",
       minter_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
@@ -161,7 +162,7 @@ export namespace ChainFactoryConfigs {
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.VELAS),
     },
     iotexParams: {
-      middleware_uri,
+      middleware_uri:testnet_middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.IOTEX),
       minter_addr: "0x0000000000000000000000000000000000000000",
       erc1155_addr: "0x0000000000000000000000000000000000000000",
