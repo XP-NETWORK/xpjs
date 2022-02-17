@@ -873,7 +873,9 @@ export const elrondHelperFactory: (
     ): Promise<Transaction> {
       const txu = unsignedSetESDTRoles(token, target, roles);
 
-      return await signAndSend(manager, txu);
+      const tx = await signAndSend(manager, txu);
+	  await transactionResult(tx.getHash());
+	  return tx;
     },
     async transferESDTOwnership(sender, token, target): Promise<Transaction> {
       const txu = new Transaction({
