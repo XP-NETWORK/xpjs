@@ -388,17 +388,20 @@ export function ChainFactory(
   ): Promise<BigNumber> {
     const rate = await remoteExchangeRate.getBatchedRate([
       CHAIN_INFO[toChain].currency,
-      CHAIN_INFO[fromChain].currency
+      CHAIN_INFO[fromChain].currency,
     ]);
     const feeR = val.dividedBy(CHAIN_INFO[toChain].decimals);
     const fromExRate = rate.get(CHAIN_INFO[fromChain].currency)!;
     const toExRate = rate.get(CHAIN_INFO[toChain].currency)!;
-    const usdFee = Math.min(Math.max(FEE_MARGIN.min, feeR.times(toExRate*0.1).toNumber()), FEE_MARGIN.max)
+    const usdFee = Math.min(
+      Math.max(FEE_MARGIN.min, feeR.times(toExRate * 0.1).toNumber()),
+      FEE_MARGIN.max
+    );
     const feeProfit = usdFee / fromExRate;
 
     return feeR
       .times(toExRate / fromExRate)
-	  .plus(feeProfit)
+      .plus(feeProfit)
       .times(CHAIN_INFO[fromChain].decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
@@ -790,3 +793,6 @@ export interface NftMintArgs {
   readonly hash?: string | undefined;
   readonly attrs: string | undefined;
 }
+
+export * from "./factories";
+export * from "./cons";
