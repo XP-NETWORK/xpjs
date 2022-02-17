@@ -592,7 +592,7 @@ export const elrondHelperFactory: (
     if (canTransferNFTCreateRole !== undefined) {
       baseArgs = baseArgs
         .addArg(
-          new BytesValue(Buffer.from("canTransferNFTCreateRole", "ascii"))
+          new BytesValue(Buffer.from("canChangeOwner", "ascii"))
         )
         .addArg(
           new BytesValue(
