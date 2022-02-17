@@ -247,11 +247,11 @@ export namespace ChainFactoryConfigs {
     harmonyParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HARMONY),
-      minter_addr: "string",
-      erc1155_addr: "string",
-      erc721_addr: "string",
-      erc1155Minter: "string",
-      erc721Minter: "string",
+      minter_addr: "0xCbA56d441da86dEfe31d3AdDeEc2bA04f7e27d9e",
+      erc1155_addr: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
+      erc721_addr: "0x0AA29baB4F811A9f3dcf6a0F9cAEa9bE18ECED78",
+      erc1155Minter: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
+      erc721Minter: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
       nonce: Chain.HARMONY,
     },
     ropstenParams: {
