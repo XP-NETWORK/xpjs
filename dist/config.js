@@ -1,0 +1,29 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AppConfigs = void 0;
+var AppConfigs;
+(function (AppConfigs) {
+    AppConfigs.MainNet = () => {
+        return {
+            exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+            nftListUri: "https://indexnft.herokuapp.com",
+            nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTYzODk2MjMzOCwiZXhwIjoxNjQ2NzM4MzM4fQ.9eQMNMtt-P6myPlji7nBC9PAwTftd0qQvwnIZSt4ycM4E45NpzCF0URsdYj_YN_xqQKQpcHiZu1o4EXjJa_-Zw",
+            txSocketUri: "transaction-socket.xp.network",
+            tronScanUri: "https://apilist.tronscan.org/api/",
+            heartbeatUri: "https://xpheartbeat.herokuapp.com",
+            wrappedNftPrefix: "https://nft.xp.network/w/",
+        };
+    };
+    AppConfigs.TestNet = () => {
+        return {
+            exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+            nftListUri: "https://testing-nft-index.herokuapp.com",
+            nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY0NDIzMDE0NiwiZXhwIjoxNjUyMDA2MTQ2fQ.gX6Auj4hFLdpem5Pk2kAnH71I19iGXfBYjmQrXylMFX_R1yzDEbylVAOLW6kABH9VjnLbAnCRdQvLaQIFmMUpw",
+            txSocketUri: "https://testnet-tx-socket.herokuapp.com",
+            tronScanUri: "https://apilist.tronscan.org/api/",
+            heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
+            wrappedNftPrefix: "https://testnet-w-nft-api.herokuapp.com/",
+        };
+    };
+})(AppConfigs = exports.AppConfigs || (exports.AppConfigs = {}));
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2NvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFFQSxJQUFpQixVQUFVLENBeUIxQjtBQXpCRCxXQUFpQixVQUFVO0lBQ1osa0JBQU8sR0FBb0IsR0FBRyxFQUFFO1FBQzNDLE9BQU87WUFDTCxlQUFlLEVBQUUsNkNBQTZDO1lBQzlELFVBQVUsRUFBRSxnQ0FBZ0M7WUFDNUMsZ0JBQWdCLEVBQ2QsZ0xBQWdMO1lBQ2xMLFdBQVcsRUFBRSwrQkFBK0I7WUFDNUMsV0FBVyxFQUFFLG1DQUFtQztZQUNoRCxZQUFZLEVBQUUsbUNBQW1DO1lBQ2pELGdCQUFnQixFQUFFLDJCQUEyQjtTQUM5QyxDQUFDO0lBQ0osQ0FBQyxDQUFDO0lBQ1csa0JBQU8sR0FBb0IsR0FBRyxFQUFFO1FBQzNDLE9BQU87WUFDTCxlQUFlLEVBQUUsNkNBQTZDO1lBQzlELFVBQVUsRUFBRSx5Q0FBeUM7WUFDckQsZ0JBQWdCLEVBQ2QsZ0xBQWdMO1lBQ2xMLFdBQVcsRUFBRSx5Q0FBeUM7WUFDdEQsV0FBVyxFQUFFLG1DQUFtQztZQUNoRCxZQUFZLEVBQUUsaURBQWlEO1lBQy9ELGdCQUFnQixFQUFFLDBDQUEwQztTQUM3RCxDQUFDO0lBQ0osQ0FBQyxDQUFDO0FBQ0osQ0FBQyxFQXpCZ0IsVUFBVSxHQUFWLGtCQUFVLEtBQVYsa0JBQVUsUUF5QjFCIn0=
