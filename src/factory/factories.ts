@@ -15,7 +15,11 @@ const EVM_VALIDATORS = [
   "0xc2a29b4e9fa71e9033a52611544403241c56ac5e",
 ];
 
-const EVM_TESTNET_VALIDATORS = ["0x63A0bC7286e80A3a46D5113e1C059e7a1e14e0fc"];
+const EVM_TESTNET_VALIDATORS = [
+  "0x50aCEC08ce70aa4f2a8ab2F45d8dCd1903ea4E14",
+  "0xae87208a5204B6606d3AB177Be5fdf62267Cd499",
+  "0x5002258315873AdCbdEF25a8E71C715A4f701dF5"
+];
 
 const middleware_uri = "https://notifier.xp.network";
 
@@ -24,12 +28,12 @@ export namespace ChainFactoryConfigs {
     elrondParams: {
       node_uri: TestNetRpcUri.ELROND,
       minter_address:
-        "erd1qqqqqqqqqqqqqpgq3y98dyjdp72lwzvd35yt4f9ua2a3n70v0drsfycvu8",
+        "erd1qqqqqqqqqqqqqpgqzses02wme3gsx320dpja2p2kk3rckgcfksmsj8grdk",
       esdt_swap_address:
-        "erd1qqqqqqqqqqqqqpgq5vuvac70kn36yk4rvf9scr6p8tlu23220drsfgszfy",
+        "erd1qqqqqqqqqqqqqpgqwu3ulmuxppa2e537ajst468wplkxxsqyksms9az8at",
       esdt: "XPNET-738176",
-      esdt_nft: "XPNFT-cb7482",
-      esdt_swap: "WEGLD-5f1f8d",
+      esdt_nft: "XPNFT-aca910",
+      esdt_swap: "WEGLD-f8dc4c",
       nonce: 2,
     },
     tronParams: {
@@ -44,11 +48,11 @@ export namespace ChainFactoryConfigs {
     avalancheParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AVALANCHE),
-      minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
-      erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
-      erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
-      erc1155Minter: "string",
-      erc721Minter: "string",
+      minter_addr: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+      erc1155_addr: "0xd023739a76Df4cC6260A1Ba25e8BEbCe8389D60D",
+      erc721_addr: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
+      erc1155Minter: "0x10E3EE8526Cc7610393E2f6e25dEee0bD38d057e",
+      erc721Minter: "0x1F71E80E1E785dbDB34c69909C11b71bAd8D9802",
       nonce: Chain.AVALANCHE,
     },
     polygonParams: {
@@ -104,11 +108,11 @@ export namespace ChainFactoryConfigs {
     ropstenParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ROPSTEN),
-      minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
-      erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
-      erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
-      erc1155Minter: "string",
-      erc721Minter: "string",
+      minter_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
+      erc1155_addr: "0xaB9eD7b9734471249255B4d969B32995015116d9",
+      erc721_addr: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
+      erc1155Minter: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+      erc721Minter: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
       nonce: Chain.ETHEREUM,
     },
     xDaiParams: {
@@ -164,11 +168,11 @@ export namespace ChainFactoryConfigs {
     iotexParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.IOTEX),
-      minter_addr: "0x0000000000000000000000000000000000000000",
-      erc1155_addr: "0x0000000000000000000000000000000000000000",
-      erc721_addr: "0x0000000000000000000000000000000000000000",
-      erc1155Minter: "string",
-      erc721Minter: "string",
+      minter_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
+      erc1155_addr: "0xaB9eD7b9734471249255B4d969B32995015116d9",
+      erc721_addr: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
+      erc1155Minter: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+      erc721Minter: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
       nonce: Chain.IOTEX,
     },
   });
