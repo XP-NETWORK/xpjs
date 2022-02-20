@@ -377,6 +377,7 @@ export function ChainFactory(
     let helper = map.get(chain);
     if (helper === undefined) {
       helper = await CHAIN_INFO[chain].constructor(cToP.get(chain)!);
+      map.set(chain, helper)
     }
     return helper! as any as T;
   };
