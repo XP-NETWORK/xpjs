@@ -15,6 +15,7 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
+  isWrappedNft,
 } from "./chain";
 import {
   Signer,
@@ -408,9 +409,7 @@ export async function web3HelperFactory(
 
       return approvetxn;
     },
-    async isWrappedNft(nft) {
-      return typeof (await axios.get(nft.uri)).data.wrapped !== "undefined";
-    },
+	isWrappedNft: isWrappedNft,
     async extractTxnStatus(txn) {
       const status = (await (await provider.getTransaction(txn)).wait()).status;
       if (status === undefined) {
