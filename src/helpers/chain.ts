@@ -313,3 +313,7 @@ export function extractWrappedMetadata(
 export interface GetProvider<Provider> {
   getProvider(): Provider;
 }
+
+export async function isWrappedNft(nft: NftInfo<unknown>) {
+   return typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !== "undefined";
+}

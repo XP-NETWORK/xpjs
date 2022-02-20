@@ -3,6 +3,7 @@ import {
   BalanceCheck,
   BatchWrappedBalanceCheck,
   EstimateTxFees,
+  isWrappedNft,
   MintNft,
   TransferForeign,
   TransferNftForeign,
@@ -486,12 +487,7 @@ export async function tronHelperFactory(
       }
       return addMinToExpirationTime(transaction, 15);
     },
-    async isWrappedNft(nft, _prefix) {
-      return Promise.resolve(
-        nft.native.contract.toLowerCase() ===
-          tronParams.erc721_addr.toLowerCase()
-      );
-    },
+	isWrappedNft: isWrappedNft,
     isApprovedForMinter,
     async transferNativeToForeign(
       sender: TronSender,
