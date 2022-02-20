@@ -53,9 +53,9 @@ var ChainFactoryConfigs;
         avalancheParams: {
             middleware_uri,
             provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.TestNetRpcUri.AVALANCHE),
-            minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
-            erc1155_addr: "0x80653c90614155633252d32698164DBbBC421782",
-            erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
+            minter_addr: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+            erc1155_addr: "0xd023739a76Df4cC6260A1Ba25e8BEbCe8389D60D",
+            erc721_addr: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
             validators: EVM_TESTNET_VALIDATORS,
             nonce: consts_1.Chain.AVALANCHE,
         },
