@@ -411,9 +411,9 @@ export function ChainFactory(
     nft: NftInfo<RawNftF>,
     receiver: string
   ) => {
-    const estimate = await fromChain.estimateValidateTransferNft(
+    const estimate = await toChain.estimateValidateTransferNft(
       receiver,
-      nft,
+      nft as any,
       ""
     );
     const conv = await calcExchangeFees(
@@ -440,9 +440,9 @@ export function ChainFactory(
     nft: NftInfo<RawNftF>[],
     receiver: string
   ): Promise<BigNumber> {
-    const estimate = await fromChain.estimateValidateTransferNftBatch(
+    const estimate = await toChain.estimateValidateTransferNftBatch(
       receiver,
-      nft,
+      nft as any,
       new Array(nft.length).fill(toChain.XpNft)
     );
     const conv = await calcExchangeFees(
