@@ -491,7 +491,7 @@ export const elrondHelperFactory: (
   const unsignedUnfreezeNftTxn = (
     address: Address,
     to: string,
-    id: number,
+	{ tokenIdentifier, nonce }: EsdtNftInfo,
     tx_fees: BigNumber,
     chain_nonce: string
   ) => {
@@ -502,8 +502,10 @@ export const elrondHelperFactory: (
         .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
         .addArg(new AddressValue(mintContract))
         .addArg(new BigUIntValue(new BigNumber(2)))
-        .addArg(new TokenIdentifierValue(esdtNftHex))
-        .addArg(new U64Value(new BigNumber(id)))
+		.addArg(new TokenIdentifierValue(
+			Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")
+		))
+        .addArg(new U64Value(new BigNumber(nonce)))
         .addArg(new BigUIntValue(new BigNumber(1)))
         .addArg(new TokenIdentifierValue(esdtSwaphex))
         .addArg(new U64Value(new BigNumber(0x0)))
@@ -705,7 +707,7 @@ export const elrondHelperFactory: (
       const txu = unsignedUnfreezeNftTxn(
         new Address(sender),
         to,
-        nft.native.nonce,
+        nft.native,
         new BigNumber(fee.toString()),
         nonce
       );
@@ -793,7 +795,7 @@ export const elrondHelperFactory: (
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,
-        nft.native.nonce,
+        nft.native,
         new BigNumber(txFees.toString()),
         nonce
       );
