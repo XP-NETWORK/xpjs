@@ -157,3 +157,4 @@ export declare function extractWrappedMetadata(nft: NftInfo<any>): Promise<Erc72
 export interface GetProvider<Provider> {
     getProvider(): Provider;
 }
+export declare function isWrappedNft(nft: NftInfo<unknown>): Promise<boolean>;
