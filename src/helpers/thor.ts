@@ -4,15 +4,10 @@
  */
 import BigNumber from "bignumber.js";
 import {
-  TransferForeign,
-  UnfreezeForeign,
   UnfreezeForeignNft,
   BalanceCheck,
   TransferNftForeign,
-  WrappedBalanceCheck,
-  BatchWrappedBalanceCheck,
   MintNft,
-  WrappedNftCheck,
   GetProvider,
 } from "./chain";
 import {
@@ -92,7 +87,7 @@ export interface Approve<Sender> {
 /**
  * Base util traits
  */
-export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
+export type BaseWeb3Helper = BalanceCheck &
   /**
    * Mint an nft in the given ERC1155 smart contract
    *
@@ -114,26 +109,17 @@ export type BaseWeb3Helper = BalanceCheck<string, BigNumber> &
  * Traits implemented by this module
  */
 export type Web3Helper = BaseWeb3Helper &
-  WrappedBalanceCheck<string, BigNumber> &
-  BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<Signer, string, BigNumber, TransactionResponse> &
   TransferNftForeign<
     Signer,
-    string,
-    BigNumber,
     EthNftInfo,
     TransactionResponse
   > &
-  UnfreezeForeign<Signer, string, EasyBalance> &
   UnfreezeForeignNft<
     Signer,
-    string,
-    BigNumber,
     EthNftInfo,
     TransactionResponse
   > &
-  WrappedNftCheck<EthNftInfo> &
-  EstimateTxFees<BigNumber, string> &
+  EstimateTxFees<EthNftInfo> &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
@@ -141,8 +127,8 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
   } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
-  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, Transaction> &
-  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, Transaction> &
+  UnfreezeForeignNftUnsigned<EthNftInfo, Transaction> &
+  TransferNftForeignUnsigned<EthNftInfo, Transaction> &
   PreTransferRawTxn<EthNftInfo, Transaction> &
   ExtractTxnStatus &
   MintRawTxn<Transaction> &
@@ -302,14 +288,6 @@ export async function web3HelperFactory(
     extractAction,
     // TODO
     getNonce: () => params.nonce as any,
-    async balanceWrapped(
-      address: string,
-      chain_nonce: number
-    ): Promise<BigNumber> {
-      const bal = await erc1155.balanceOf(address, chain_nonce);
-
-      return new BigNumber(bal.toString());
-    },
     async preTransferRawTxn(id, address, _value) {
       const isApproved = await isApprovedForMinter(
         id,
@@ -332,9 +310,6 @@ export async function web3HelperFactory(
       );
 
       return approvetxn;
-    },
-    async isWrappedNft(nft) {
-      return typeof (await axios.get(nft.uri)).data.wrapped !== "undefined";
     },
     async extractTxnStatus(txn) {
       const status = (await (await provider.getTransaction(txn)).wait()).status;
@@ -361,19 +336,6 @@ export async function web3HelperFactory(
     createWallet(privateKey: string): Wallet {
       return new Wallet(privateKey, provider);
     },
-    async balanceWrappedBatch(
-      address: string,
-      chain_nonces: number[]
-    ): Promise<Map<number, BigNumber>> {
-      const bals: BigNumber[] = await erc1155.balanceOfBatch(
-        Array(chain_nonces.length).fill(address),
-        chain_nonces
-      );
-
-      return new Map(
-        bals.map((v, i) => [chain_nonces[i], new BigNumber(v.toString())])
-      );
-    },
     async mintRawTxn(nft, sender) {
       const erc721 = new Contract(
         nft.contract!,
@@ -383,20 +345,6 @@ export async function web3HelperFactory(
 
       const txm = await erc721.populateTransaction.mint(nft.uris[0]);
       return txm;
-    },
-    async transferNativeToForeign(
-      sender: Signer,
-      chain_nonce: number,
-      to: string,
-      value: BigNumber,
-      txFees: BigNumber
-    ): Promise<TransactionResponse> {
-      const val = EthBN.from(value.toString(10));
-      const totalVal = val.add(EthBN.from(txFees.toString(10)));
-      const res = await minter.connect(sender).freeze(chain_nonce, to, val, {
-        value: totalVal,
-      });
-      return res;
     },
     async transferNftToForeignTxn(
       chain_nonce: number,
@@ -434,21 +382,6 @@ export async function web3HelperFactory(
       await notifyValidator(txr.hash);
       return txr;
     },
-    async unfreezeWrapped(
-      sender: Signer,
-      chain_nonce: number,
-      to: string,
-      value: EasyBalance,
-      txFees: EasyBalance
-    ): Promise<string> {
-      const res = await minter
-        .connect(sender)
-        .withdraw(chain_nonce, to, value, {
-          value: EthBN.from(txFees.toString(10)),
-        });
-
-      return res.hash;
-    },
     async unfreezeWrappedNft(
       sender: Signer,
       to: string,
@@ -467,7 +400,7 @@ export async function web3HelperFactory(
     },
     async estimateValidateTransferNft(
       to: string,
-      nftUri: NftInfo<string>
+      nftUri: NftInfo<unknown>
     ): Promise<BigNumber> {
       const utx = await minter.populateTransaction.validateTransferNft(
         randomAction(),

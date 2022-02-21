@@ -29,19 +29,14 @@ import axios from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
-  BatchWrappedBalanceCheck,
   ConcurrentSendError,
   MintNft,
-  TransferForeign,
   TransferNftForeign,
-  UnfreezeForeign,
   UnfreezeForeignNft,
-  WrappedNftCheck,
   TransactionStatus,
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
-  isWrappedNft,
 } from "./chain";
 import {
   Chain,
@@ -212,63 +207,48 @@ export interface ElrondRawUnsignedTxn {
 /**
  * Traits implemented by this module
  */
-export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
-  BatchWrappedBalanceCheck<string | Address, BigNumber> &
-  TransferForeign<ElrondSigner, string, BigNumber, Transaction> &
-  UnfreezeForeign<ElrondSigner, string, BigNumber> &
+export type ElrondHelper = BalanceCheck &
   TransferNftForeign<
     ElrondSigner,
-    string,
-    BigNumber,
     EsdtNftInfo,
     Transaction
   > &
   UnfreezeForeignNft<
     ElrondSigner,
-    string,
-    BigNumber,
     EsdtNftInfo,
     Transaction
   > &
   TransferNftForeignBatch<
     ElrondSigner,
-    string,
-    BigNumber,
     EsdtNftInfo,
     Transaction
   > &
   UnfreezeForeignNftBatch<
     ElrondSigner,
-    string,
-    BigNumber,
     EsdtNftInfo,
     Transaction
   > &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-  } & WrappedNftCheck<EsdtNftInfo> &
+  } &
   ChainNonceGet &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &
-  EstimateTxFees<BigNumber, string> &
-  EstimateTxFeesBatch<BigNumber, EsdtNftInfo> &
+  EstimateTxFees<EsdtNftInfo> &
+  EstimateTxFeesBatch<EsdtNftInfo> &
   TransferNftForeignUnsigned<
-    string,
-    BigNumber,
     EsdtNftInfo,
     ElrondRawUnsignedTxn
   > &
   UnfreezeForeignNftUnsigned<
-    string,
-    BigNumber,
     EsdtNftInfo,
     ElrondRawUnsignedTxn
   > &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
   ExtractTxnStatus &
-  MintRawTxn<ElrondRawUnsignedTxn> & SetESDTRoles;
+  MintRawTxn<ElrondRawUnsignedTxn> & SetESDTRoles & { XpNft: string };
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -288,9 +268,9 @@ export interface ElrondParams {
   esdt_swap: string;
 }
 
-export const elrondHelperFactory: (
+export async function elrondHelperFactory(
   elrondParams: ElrondParams
-) => Promise<ElrondHelper> = async (elrondParams: ElrondParams) => {
+): Promise<ElrondHelper> {
   const provider = new ProxyProvider(elrondParams.node_uri);
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(elrondParams.minter_address);
@@ -686,7 +666,6 @@ export const elrondHelperFactory: (
 
       return wallet.balance.valueOf();
     },
-    balanceWrappedBatch,
     async transferNftToForeignTxn(
       chain_nonce,
       to,
@@ -729,39 +708,6 @@ export const elrondHelperFactory: (
         return TransactionStatus.FAILURE;
       }
       return TransactionStatus.UNKNOWN;
-    },
-    async transferNativeToForeign(
-      sender: ElrondSigner,
-      chain_nonce: number,
-      to: string,
-      value: EasyBalance,
-      txFees: EasyBalance
-    ): Promise<Transaction> {
-      const txu = unsignedTransferTxn(
-        chain_nonce,
-        to,
-        new BigNumber(value.toString()).plus(txFees.toString())
-      );
-      const tx = await signAndSend(sender, txu);
-
-      return tx;
-    },
-    async unfreezeWrapped(
-      sender: ElrondSigner,
-      chain_nonce: number,
-      to: string,
-      value: EasyBalance,
-      _txFees: EasyBalance
-    ): Promise<string> {
-      const txu = unsignedUnfreezeTxn(
-        chain_nonce,
-        await getAddress(sender),
-        to,
-        value
-      );
-      const tx = await signAndSend(sender, txu);
-
-      return tx.getHash().toString();
     },
     preTransfer: doEgldSwap,
     preUnfreeze: doEgldSwap,
@@ -841,7 +787,6 @@ export const elrondHelperFactory: (
 
       return res.data["data"]["tokens"];
     },
-	isWrappedNft: isWrappedNft,
 	async preTransferRawTxn(id, address, value) {
       if (!address || !value) {
         throw new Error("address and value is required for elrond egld swap");
@@ -865,7 +810,6 @@ export const elrondHelperFactory: (
       }
       return undefined;
     },
-    listNft,
     async setESDTRole(
       manager: ElrondSigner,
       token: string,
@@ -896,7 +840,7 @@ export const elrondHelperFactory: (
     },
     async estimateValidateTransferNft(
       _toAddress: string,
-      _nftUri: NftInfo<string>
+      _nftUri: NftInfo<unknown>
     ) {
       return estimateGas(NFT_TRANSFER_COST); // TODO: properly estimate NFT_TRANSFER_COST
     },
@@ -908,7 +852,7 @@ export const elrondHelperFactory: (
       return txu.toPlainObject();
     },
 
-    async estimateValidateUnfreezeNft(_to: string, _nftUri: NftInfo<string>) {
+    async estimateValidateUnfreezeNft(_to: string, _nftUri: NftInfo<unknown>) {
       return estimateGas(NFT_UNFREEZE_COST); // TODO: properly estimate NFT_UNFREEZE_COST
     },
     async unfreezeWrappedNftBatch(sender, chainNonce, to, nfts, txFees) {
@@ -978,11 +922,6 @@ export const elrondHelperFactory: (
     },
     async estimateValidateUnfreezeNftBatch(_, nfts) {
       return estimateGas(new BigNumber(70000000 + 5000000 * nfts.length));
-    },
-    wrapNftForTransfer(nft: NftInfo<EsdtNftInfo>) {
-      // Approximation for wrapping this nft
-      const dataLen = 4 + tokenIdentReal(nft.native.tokenIdentifier).length + 4;
-      return new Uint8Array(dataLen);
     },
     async validateAddress(adr: string) {
       try {
