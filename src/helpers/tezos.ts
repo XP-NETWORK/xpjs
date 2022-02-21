@@ -10,7 +10,6 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
-  WrappedNftCheck,
 } from "..";
 import {
   BigMapAbstraction,
@@ -41,18 +40,15 @@ type TezosNftInfo = {
 
 export type TezosHelper = TransferNftForeign<
   TezosSigner,
-  string,
-  BigNumber,
   TezosNftInfo,
   string
 > &
   MintNft<TezosSigner, NftMintArgs, string> &
-  BalanceCheck<string, BigNumber> &
-  UnfreezeForeignNft<TezosSigner, string, BigNumber, TezosNftInfo, string> &
+  BalanceCheck &
+  UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> &
   ValidateAddress &
-  EstimateTxFees<BigNumber, TezosNftInfo> &
+  EstimateTxFees<TezosNftInfo> &
   ChainNonceGet &
-  WrappedNftCheck<TezosNftInfo> &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
     isApprovedForMinter(
       signer: Signer,
@@ -249,11 +245,6 @@ export async function tezosHelperFactory({
     async validateAddress(adr) {
       return Promise.resolve(
         utils.validateAddress(adr) === utils.ValidationResult.VALID
-      );
-    },
-    async isWrappedNft(nft, _prefix) {
-      return Promise.resolve(
-        nft.native.contract.toLowerCase() === xpnftAddress.toLowerCase()
       );
     },
     getNonce() {

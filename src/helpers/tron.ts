@@ -1,16 +1,11 @@
 import { BigNumber } from "bignumber.js";
 import {
   BalanceCheck,
-  BatchWrappedBalanceCheck,
   EstimateTxFees,
   isWrappedNft,
   MintNft,
-  TransferForeign,
   TransferNftForeign,
-  UnfreezeForeign,
   UnfreezeForeignNft,
-  WrappedBalanceCheck,
-  WrappedNftCheck,
 } from "./chain";
 
 import axios from "axios";
@@ -63,7 +58,7 @@ export type MinterRes = {
   whitelist: string[];
 };
 
-export type BaseTronHelper = BalanceCheck<string, BigNumber> &
+export type BaseTronHelper = BalanceCheck &
   MintNft<TronSender, NftMintArgs, string> & {
     /**
      *
@@ -90,16 +85,9 @@ export type BaseTronHelper = BalanceCheck<string, BigNumber> &
   };
 
 export type TronHelper = BaseTronHelper &
-  WrappedBalanceCheck<string, BigNumber> &
-  BatchWrappedBalanceCheck<string, BigNumber> &
-  TransferForeign<TronSender, string, BigNumber, string> &
-  // TODO: Use TX Fees
-  TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> &
-  // TODO: Use TX Fees
-  UnfreezeForeign<TronSender, string, string> &
-  UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
-  WrappedNftCheck<EthNftInfo> &
-  EstimateTxFees<BigNumber, string> &
+  TransferNftForeign<TronSender, EthNftInfo, string> &
+  UnfreezeForeignNft<TronSender, EthNftInfo, Transaction> &
+  EstimateTxFees<EthNftInfo> &
   ChainNonceGet &
   Approve<TronSender> &
   ValidateAddress &
@@ -107,8 +95,8 @@ export type TronHelper = BaseTronHelper &
   ExtractAction<string> &
   Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, TronRawTxn> &
-  UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> &
-  TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> &
+  UnfreezeForeignNftUnsigned<EthNftInfo, TronRawTxn> &
+  TransferNftForeignUnsigned<EthNftInfo, TronRawTxn> &
   ExtractTxnStatus &
   MintRawTxn<TronRawTxn>;
 
@@ -487,26 +475,7 @@ export async function tronHelperFactory(
       }
       return addMinToExpirationTime(transaction, 15);
     },
-	isWrappedNft: isWrappedNft,
     isApprovedForMinter,
-    async transferNativeToForeign(
-      sender: TronSender,
-      chain_nonce: number,
-      to: string,
-      value: BigNumber,
-      txFees: BigNumber
-    ): Promise<string> {
-      setSigner(sender);
-
-      const val = EthBN.from(value.toString(10));
-      const totalVal = val.add(EthBN.from(txFees.toString(10)));
-      let res = await minter
-        .freeze(chain_nonce, to, val)
-        .send({ callValue: totalVal });
-
-      await notifyValidator(res);
-      return res;
-    },
     async extractTxnStatus(txnHash) {
       const txn = await provider.trx.getConfirmedTransaction(txnHash);
       const status = txn["ret"][0]["contractRet"];
@@ -516,21 +485,6 @@ export async function tronHelperFactory(
         return TransactionStatus.FAILURE;
       }
       return TransactionStatus.PENDING;
-    },
-    async unfreezeWrapped(
-      sender: TronSender,
-      chain_nonce: number,
-      to: string,
-      value: string,
-      txFees: string
-    ): Promise<string> {
-      setSigner(sender);
-      const res = await minter
-        .withdraw(chain_nonce, to, value)
-        .send({ callValue: EthBN.from(txFees.toString()) });
-
-      await notifyValidator(res);
-      return res;
     },
     async unfreezeWrappedNft(
       sender: TronSender,
@@ -566,29 +520,9 @@ export async function tronHelperFactory(
       await notifyValidator(txr);
       return txr;
     },
-    async balanceWrappedBatch(
-      address: string,
-      chain_nonces: number[]
-    ): Promise<Map<number, BigNumber>> {
-      const res = new Map<number, BigNumber>();
-      const balance = await erc1155
-        .balanceOfBatch(Array(chain_nonces.length).fill(address), chain_nonces)
-        .call();
-      balance.map((e: any, i: any) => {
-        res.set(chain_nonces[i], new BigNumber(e.toString()));
-      });
-      return res;
-    },
-    async balanceWrapped(
-      address: string,
-      chain_nonce: number
-    ): Promise<BigNumber> {
-      const bal = await erc1155.balanceOf(address, chain_nonce).call();
-      return new BigNumber(bal.toString());
-    },
     async estimateValidateTransferNft(
       to: string,
-      nftUri: NftInfo<string>
+      nftUri: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
       return await estimateGas(
         tronParams.validators,

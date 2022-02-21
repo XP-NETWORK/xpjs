@@ -17,7 +17,6 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
-  extractWrappedMetadata,
   MintNft,
   MintRawTxn,
   NftInfo,
@@ -29,7 +28,6 @@ import {
   UnfreezeForeignNft,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
-  WrappedNftCheck,
 } from "..";
 import BigNumber from "bignumber.js";
 
@@ -63,33 +61,28 @@ export type CrossChainHelper =
   | AlgorandHelper
   | TezosHelper;
 
-type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
+type NftUriChain = ChainNonceGet;
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
-  string,
-  BigNumber,
   RawNft,
   Resp
 > &
-  UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
-  EstimateTxFees<BigNumber, RawNft> &
-  NftUriChain<RawNft> &
+  UnfreezeForeignNft<Signer, RawNft, Resp> &
+  EstimateTxFees<RawNft> &
+  ChainNonceGet &
   ValidateAddress & { XpNft?: string };
 
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
-  TransferNftForeignBatch<Signer, string, BigNumber, RawNft, Resp> &
-  UnfreezeForeignNftBatch<Signer, string, BigNumber, RawNft, Resp> &
-  EstimateTxFeesBatch<BigNumber, RawNft>;
+  TransferNftForeignBatch<Signer, RawNft, Resp> &
+  UnfreezeForeignNftBatch<Signer, RawNft, Resp> &
+  EstimateTxFeesBatch<RawNft>;
 
 type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
-  string,
-  BigNumber,
   RawNft,
   Resp
 > &
-  UnfreezeForeignNftUnsigned<string, BigNumber, RawNft, Resp> &
-  WrappedNftCheck<RawNft> &
+  UnfreezeForeignNftUnsigned<RawNft, Resp> &
   PreTransferRawTxn<RawNft, Resp> &
   MintRawTxn<Resp>;
 /**
@@ -155,7 +148,7 @@ export type ChainFactory = {
    * @param owner: Address of the owner of the NFT as a raw string.
    */
   nftList<RawNft>(
-    chain: NftUriChain<RawNft>,
+    chain: ChainNonceGet,
     owner: string
   ): Promise<NftInfo<RawNft>[]>;
   /**
@@ -482,6 +475,10 @@ export function ChainFactory(
     );
   }
 
+  async function isWrappedNft(nft: NftInfo<unknown>) {
+    return (typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !== "undefined");
+  }
+
   async function getVerifiedContracts(
     from: string,
     tc: number,
@@ -508,7 +505,7 @@ export function ChainFactory(
       mw,
       nonce
     ) {
-      if (await chain.isWrappedNft(nft, appConfig.wrappedNftPrefix)) {
+      if (await isWrappedNft(nft)) {
         return chain.unfreezeWrappedNftTxn(
           receiver,
           nft,
@@ -548,7 +545,7 @@ export function ChainFactory(
           if (e.native.contractType && e.native.contractType === "ERC721") {
             throw new Error(`ERC721 is not supported`);
           }
-          if (await from.isWrappedNft(e, appConfig.wrappedNftPrefix)) {
+          if (await isWrappedNft(e)) {
             wrapped.push(e);
           } else {
             unwrapped.push(e);
@@ -621,7 +618,7 @@ export function ChainFactory(
       helpers.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },
-    async nftList<T>(chain: NftUriChain<T>, owner: string) {
+    async nftList<T>(chain: ChainNonceGet, owner: string) {
       let res = await nftlistRest.get<{ data: NftInfo<T>[] }>(
         `/nfts/${chain.getNonce()}/${owner}`
       );
@@ -672,7 +669,7 @@ export function ChainFactory(
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
       }
-      if (await fromChain.isWrappedNft(nft, appConfig.wrappedNftPrefix)) {
+      if (await isWrappedNft(nft)) {
         const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,

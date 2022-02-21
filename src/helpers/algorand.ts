@@ -14,7 +14,6 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
-  WrappedNftCheck,
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
 
@@ -118,10 +117,9 @@ export type FullClaimNft = ClaimNftInfo & {
 };
 
 export type AlgorandHelper = ChainNonceGet &
-  WrappedNftCheck<AlgoNft> &
-  TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
-  UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
-  EstimateTxFees<BigNumber, AlgoNft> &
+  TransferNftForeign<AlgoSignerH, AlgoNft, string> &
+  UnfreezeForeignNft<AlgoSignerH, AlgoNft, string> &
+  EstimateTxFees<AlgoNft> &
   ValidateAddress & {
     algod: algosdk.Algodv2;
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
@@ -322,10 +320,6 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       });
       await waitTxnConfirm(res.txId);
       return suggested;
-    },
-
-    async isWrappedNft(nft, _prefix) {
-      return Promise.resolve(nft.native.creator === appAddr);
     },
     transferNftToForeign: transferNft,
     unfreezeWrappedNft: async (signer, to, nft, txFees) => {

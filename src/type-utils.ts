@@ -1,6 +1,6 @@
 import { Chain, MetaMap, TransferNftForeign } from ".";
 
-type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, any, any, RawNft, Resp>;
+type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp>;
 
 export type ChainNonce = keyof MetaMap;
 
