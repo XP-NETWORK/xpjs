@@ -1,8 +1,7 @@
 import {
   ElrondParams,
-  ElrondRawUnsignedTxn,
 } from "../helpers/elrond";
-import { TronParams, TronRawTxn } from "../helpers/tron";
+import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
 import {
   Chain,
@@ -17,15 +16,11 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   MintNft,
-  MintRawTxn,
   NftInfo,
-  PreTransferRawTxn,
   socketHelper,
   TransactionStatus,
   TransferNftForeign,
-  TransferNftForeignUnsigned,
   UnfreezeForeignNft,
-  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import BigNumber from "bignumber.js";
@@ -34,7 +29,7 @@ import axios from "axios";
 import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
-import { PopulatedTransaction, utils } from "ethers";
+import { utils } from "ethers";
 import {
   AlgorandParams,
   AlgorandHelper,
@@ -67,13 +62,6 @@ type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   UnfreezeForeignNftBatch<Signer, RawNft, Resp> &
   EstimateTxFeesBatch<RawNft>;
 
-type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
-  RawNft,
-  Resp
-> &
-  UnfreezeForeignNftUnsigned<RawNft, Resp> &
-  PreTransferRawTxn<RawNft, Resp> &
-  MintRawTxn<Resp>;
 /**
  * A type representing a chain factory.
  *
@@ -205,40 +193,6 @@ export type ChainFactory = {
    * @param claimer: the account which can claim the nfts
    */
   claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
-  /**
-   * Returns a raw txn (hopefully Typed JS Objects in all chains) which can be sent over the wire for signing and broadcasting.
-   * @param from The chain from which the NFT is being sent.
-   * @param toNonce The nonce of the chain to which the NFT is being sent.
-   * @param sender the address of the sender of the NFT.
-   * @param to the address of the receiver of the NFT.
-   * @param nft the NFT to be transferred.
-   * @param fee the fee to be paid for the transaction.
-   */
-  generateNftTxn<RawNftF, Resp>(
-    from: RawTxnBuiladableChain<RawNftF, Resp>,
-    toNonce: number,
-    sender: string,
-    to: string,
-    nft: NftInfo<RawNftF>,
-    fee: BigNumber,
-    mintWith: string,
-    nonce: string
-  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
-
-  generatePreTransferTxn<RawNftF, Resp>(
-    from: RawTxnBuiladableChain<RawNftF, Resp>,
-    sender: string,
-    nft: NftInfo<RawNftF>,
-    fee: BigNumber
-  ): Promise<
-    PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn | undefined
-  >;
-
-  generateMintTxn<RawNftF, Resp>(
-    from: RawTxnBuiladableChain<RawNftF, Resp>,
-    sender: string,
-    nft: NftMintArgs
-  ): Promise<PopulatedTransaction | ElrondRawUnsignedTxn | TronRawTxn>;
 
   getVerifiedContracts(
     from: string,
@@ -480,41 +434,7 @@ export function ChainFactory(
   }
 
   return {
-    async generatePreTransferTxn(from, sender, nft, fee) {
-      return await from.preTransferRawTxn(nft, sender, fee);
-    },
     getVerifiedContracts,
-    async generateNftTxn(
-      chain,
-      toNonce,
-      sender,
-      receiver,
-      nft,
-      fee,
-      mw,
-      nonce
-    ) {
-      if (await isWrappedNft(nft)) {
-        return chain.unfreezeWrappedNftTxn(
-          receiver,
-          nft,
-          fee,
-          sender,
-
-          nonce
-        );
-      } else {
-        return chain.transferNftToForeignTxn(
-          toNonce,
-          receiver,
-          nft,
-          fee,
-          sender,
-          mw
-        );
-      }
-    },
-
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
       type Result = ReturnType<typeof to.transferNftBatchToForeign>;
       let result: Result[] = [];
@@ -565,9 +485,6 @@ export function ChainFactory(
       return await Promise.all(result);
     },
     estimateBatchFees,
-    async generateMintTxn(chain, sender, nft) {
-      return await chain.mintRawTxn(nft, sender);
-    },
     async getDestinationTransaction<T>(
       chain: ExtractAction<T> & ExtractTxnStatus,
       targetNonce: number,

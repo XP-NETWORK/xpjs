@@ -1,6 +1,5 @@
 import axios from "axios";
 import BigNumber from "bignumber.js";
-import { NftMintArgs } from "..";
 import { ChainNonce } from "../type-utils";
 
 /**
@@ -53,20 +52,6 @@ export interface TransferNftForeign<
   ): Promise<Resp>;
 }
 
-export interface TransferNftForeignUnsigned<
-  RawNft,
-  Resp
-> {
-  transferNftToForeignTxn(
-    chain_nonce: number,
-    to: string,
-    id: NftInfo<RawNft>,
-    txFees: BigNumber,
-    senderAddress: string,
-    mintWith: string
-  ): Promise<Resp>;
-}
-
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
  * chain_nonce is automatically derived
@@ -87,19 +72,6 @@ export interface UnfreezeForeignNft<
     to: string,
     id: NftInfo<RawNft>,
     txFees: BigNumber,
-    nonce: string
-  ): Promise<Resp>;
-}
-
-export interface UnfreezeForeignNftUnsigned<
-  RawNft,
-  Resp
-> {
-  unfreezeWrappedNftTxn(
-    to: string,
-    id: NftInfo<RawNft>,
-    txFees: BigNumber,
-    sender: string,
     nonce: string
   ): Promise<Resp>;
 }
@@ -147,10 +119,6 @@ export interface PreTransferRawTxn<NativeNft, Ret> {
     address: string,
     value?: BigNumber
   ): Promise<Ret | undefined>;
-}
-
-export interface MintRawTxn<Ret> {
-  mintRawTxn(id: NftMintArgs, address: string, value?: BigNumber): Promise<Ret>;
 }
 
 export interface ChainNonceGet {

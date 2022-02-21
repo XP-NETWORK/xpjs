@@ -30,13 +30,10 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
-  MintRawTxn,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
   TransactionStatus,
-  TransferNftForeignUnsigned,
-  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -124,11 +121,8 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
   } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
-  UnfreezeForeignNftUnsigned<EthNftInfo, Transaction> &
-  TransferNftForeignUnsigned<EthNftInfo, Transaction> &
   PreTransferRawTxn<EthNftInfo, Transaction> &
   ExtractTxnStatus &
-  MintRawTxn<Transaction> &
   GetProvider<providers.Provider>;
 
 /**
@@ -314,46 +308,8 @@ export async function web3HelperFactory(
       }
       return TransactionStatus.UNKNOWN;
     },
-    async unfreezeWrappedNftTxn(to, id, txFees, _sender) {
-      const res = await minter.populateTransaction.withdrawNft(
-        to,
-        id.native.tokenId,
-        {
-          value: new BigNumber(txFees.toString(10)),
-        }
-      );
-      return res;
-    },
     createWallet(privateKey: string): Wallet {
       return new Wallet(privateKey, provider);
-    },
-    async mintRawTxn(nft, sender) {
-      const erc721 = new Contract(
-        nft.contract!,
-        UserNftMinter__factory.abi,
-        new VoidSigner(sender, provider)
-      );
-
-      const txm = await erc721.populateTransaction.mint(nft.uris[0]);
-      return txm;
-    },
-    async transferNftToForeignTxn(
-      chain_nonce: number,
-      to: string,
-      id: NftInfo<EthNftInfo>,
-      txFees: BigNumber,
-      _sender
-    ) {
-      const txr = await minter.populateTransaction.freezeErc721(
-        id.native.contract,
-        id.native.tokenId,
-        chain_nonce,
-        to,
-        {
-          value: EthBN.from(txFees.toString(10)),
-        }
-      );
-      return txr;
     },
     async transferNftToForeign(
       sender: Signer,

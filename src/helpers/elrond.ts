@@ -44,12 +44,9 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
-  MintRawTxn,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
-  TransferNftForeignUnsigned,
-  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -111,17 +108,6 @@ export type NftIssueArgs = {
  * Utility for issuing ESDT which supports NFT minting
  */
 export interface IssueESDTNFT {
-  /**
-   * Unsigned Transaction for [[issueESDTNft]]
-   */
-  unsignedIssueESDTNft(
-    name: string,
-    ticker: string,
-    canFreeze: boolean | undefined,
-    canWipe: boolean | undefined,
-    canTransferNFTCreateRole: boolean | undefined
-  ): Transaction;
-
   /**
    * Issue a new ESDT supporting NFTs
    *
@@ -229,17 +215,9 @@ export type ElrondHelper = BalanceCheck &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &
   EstimateTxFees<EsdtNftInfo> &
   EstimateTxFeesBatch<EsdtNftInfo> &
-  TransferNftForeignUnsigned<
-    EsdtNftInfo,
-    ElrondRawUnsignedTxn
-  > &
-  UnfreezeForeignNftUnsigned<
-    EsdtNftInfo,
-    ElrondRawUnsignedTxn
-  > &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
   ExtractTxnStatus &
-  MintRawTxn<ElrondRawUnsignedTxn> & SetESDTRoles & { XpNft: string };
+  SetESDTRoles & { XpNft: string };
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -574,34 +552,6 @@ export async function elrondHelperFactory(
 
       return wallet.balance.valueOf();
     },
-    async transferNftToForeignTxn(
-      chain_nonce,
-      to,
-      nft,
-      txFees,
-      sender,
-      mintWith
-    ) {
-      return unsignedTransferNftTxn(
-        chain_nonce,
-        new Address(sender),
-        to,
-        nft.native,
-        new BigNumber(txFees.toString()),
-        mintWith
-      ).toPlainObject();
-    },
-    async unfreezeWrappedNftTxn(to, nft, fee, sender, nonce) {
-      const txu = unsignedUnfreezeNftTxn(
-        new Address(sender),
-        to,
-        nft.native,
-        new BigNumber(fee.toString()),
-        nonce
-      );
-      txu.getSignature().hex();
-      return txu.toPlainObject();
-    },
     async extractTxnStatus(txn) {
       const status = await provider.getTransactionStatus(
         new TransactionHash(txn)
@@ -658,7 +608,6 @@ export async function elrondHelperFactory(
 
       return tx;
     },
-    unsignedIssueESDTNft,
     async issueESDTNft(
       sender: ElrondSigner,
       name: string,
@@ -752,14 +701,6 @@ export async function elrondHelperFactory(
     ) {
       return estimateGas(NFT_TRANSFER_COST); // TODO: properly estimate NFT_TRANSFER_COST
     },
-    async mintRawTxn(args, address) {
-      const txu = unsignedMintNftTxn(
-        new Address(address),
-        args as NftIssueArgs
-      );
-      return txu.toPlainObject();
-    },
-
     async estimateValidateUnfreezeNft(_to: string, _nftUri: NftInfo<unknown>) {
       return estimateGas(NFT_UNFREEZE_COST); // TODO: properly estimate NFT_UNFREEZE_COST
     },
