@@ -32,6 +32,7 @@ import {
   PreTransferRawTxn,
   TransactionStatus,
   ValidateAddress,
+  WhitelistCheck,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
 import { Transaction } from "ethers";
@@ -87,7 +88,8 @@ export type TronHelper = BaseTronHelper &
   ExtractAction<string> &
   Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, TronRawTxn> &
-  ExtractTxnStatus;
+  ExtractTxnStatus &
+  WhitelistCheck<EthNftInfo>;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -450,5 +452,10 @@ export async function tronHelperFactory(
     async validateAddress(adr: string): Promise<boolean> {
       return provider.isAddress(adr);
     },
+    isNftWhitelisted(nft) {
+      return minter.nftWhitelist(nft.native.contract).call({
+       from: tronParams.provider.defaultAddress.base58 
+      });
+    }
   };
 }

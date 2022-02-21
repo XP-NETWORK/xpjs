@@ -44,6 +44,7 @@ import {
   EstimateTxFeesBatch,
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
+  WhitelistCheck
 } from "../helpers/chain";
 import { ChainNonce, HelperMap, InferChainH, InferChainParam, InferSigner, ParamMap } from "../type-utils";
 
@@ -199,6 +200,11 @@ export type ChainFactory = {
     targetChain: number,
     fc: number
   ): Promise<string[]>;
+
+  checkWhitelist<RawNft>(
+    chain: Partial<WhitelistCheck<RawNft>>,
+    nft: NftInfo<RawNft>
+  ): Promise<boolean>
 };
 
 /**
@@ -616,6 +622,9 @@ export function ChainFactory(
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
       return await algo.claimableNfts(txSocket, claimer);
     },
+    checkWhitelist(chain, nft) {
+      return chain.isNftWhitelisted ? chain.isNftWhitelisted(nft) : Promise.resolve(true);
+    }
   };
 }
 /**

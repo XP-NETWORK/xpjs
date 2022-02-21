@@ -180,6 +180,10 @@ export interface EstimateTxFeesBatch<RawNftF> {
   ): Promise<BigNumber>;
 }
 
+export type WhitelistCheck<RawNft> = {
+  isNftWhitelisted(nft: NftInfo<RawNft>): Promise<boolean>;
+}
+
 export interface GetProvider<Provider> {
   getProvider(): Provider;
 }

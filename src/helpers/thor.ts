@@ -35,6 +35,7 @@ import {
   PreTransferRawTxn,
   TransactionStatus,
   ValidateAddress,
+  WhitelistCheck,
 } from "..";
 import { NftMintArgs } from "..";
 import { BigNumber as EthBN } from "ethers";
@@ -123,7 +124,8 @@ export type Web3Helper = BaseWeb3Helper &
   } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, Transaction> &
   ExtractTxnStatus &
-  GetProvider<providers.Provider>;
+  GetProvider<providers.Provider> &
+  WhitelistCheck<EthNftInfo>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -367,5 +369,8 @@ export async function web3HelperFactory(
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.getAddress(adr) !== undefined);
     },
+    isNftWhitelisted(nft) {
+      return minter.nftWhitelist(nft.native.contract)
+    }
   };
 }
