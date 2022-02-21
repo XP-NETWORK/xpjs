@@ -1,7 +1,6 @@
 import WalletConnect from "@walletconnect/client";
 import algosdk, { SuggestedParams } from "algosdk";
-import { BigNumber } from "bignumber.js";
-import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WrappedNftCheck } from "..";
+import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
 declare type TxResp = {
     txId: string;
@@ -57,7 +56,7 @@ export declare type FullClaimNft = ClaimNftInfo & {
     name: string;
     uri: string;
 };
-export declare type AlgorandHelper = ChainNonceGet & WrappedNftCheck<AlgoNft> & TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> & EstimateTxFees<BigNumber, AlgoNft> & ValidateAddress & {
+export declare type AlgorandHelper = ChainNonceGet & TransferNftForeign<AlgoSignerH, AlgoNft, string> & UnfreezeForeignNft<AlgoSignerH, AlgoNft, string> & EstimateTxFees<AlgoNft> & ValidateAddress & {
     algod: algosdk.Algodv2;
     claimNft(claimer: AlgoSignerH, info: ClaimNftInfo): Promise<string>;
     claimableNfts(txSocket: AlgorandSocketHelper, owner: string): Promise<FullClaimNft[]>;
@@ -71,7 +70,6 @@ export declare type AlgorandParams = {
     algodUri: string;
     algodPort: number | undefined;
     sendNftAppId: number;
-    nonce: number;
 };
 export declare function algorandHelper(args: AlgorandParams): AlgorandHelper;
 export {};

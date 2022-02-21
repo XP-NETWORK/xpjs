@@ -1,4 +1,3 @@
-import { CrossChainHelper } from ".";
 import { ElrondParams, ElrondHelper } from "./helpers/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
@@ -6,6 +5,7 @@ import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { AppConfig } from "./factory";
 import { TezosHelper, TezosParams } from "./helpers/tezos";
+import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -40,43 +40,67 @@ export declare enum MainNetRpcUri {
     TEZOS = "https://mainnet.smartpy.io",
     IOTEX = "https://babel-api.mainnet.iotex.io"
 }
-export declare type ChainNonce<_, __> = number;
-export declare type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
-export declare type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
-export declare type TronNonce = ChainNonce<TronHelper, TronParams>;
-export declare type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandParams>;
-export declare type TezosNonce = ChainNonce<TezosHelper, TezosParams>;
+declare type ElrondMeta = [ElrondHelper, ElrondParams];
+declare type Web3Meta = [Web3Helper, Web3Params];
+declare type TronMeta = [TronHelper, TronParams];
+declare type AlgoMeta = [AlgorandHelper, AlgorandParams];
+declare type TezosMeta = [TezosHelper, TezosParams];
+declare type MetaMapAssert = {
+    [idx in typeof Chain[keyof typeof Chain]]: unknown;
+};
+export declare type MetaMap = {
+    2: ElrondMeta;
+    3: Web3Meta;
+    4: Web3Meta;
+    5: Web3Meta;
+    6: Web3Meta;
+    7: Web3Meta;
+    8: Web3Meta;
+    9: TronMeta;
+    0xb: Web3Meta;
+    0xc: Web3Meta;
+    0xd: Web3Meta;
+    0xe: Web3Meta;
+    0xf: AlgoMeta;
+    0x10: Web3Meta;
+    0x11: Web3Meta;
+    0x12: TezosMeta;
+    0x13: Web3Meta;
+    0x14: Web3Meta;
+} & MetaMapAssert;
 export declare namespace Chain {
-    const ELROND: ElrondNonce;
-    const HECO: Web3Nonce;
-    const BSC: Web3Nonce;
-    const ETHEREUM: Web3Nonce;
-    const AVALANCHE: Web3Nonce;
-    const POLYGON: Web3Nonce;
-    const FANTOM: Web3Nonce;
-    const TRON: TronNonce;
-    const CELO: Web3Nonce;
-    const HARMONY: Web3Nonce;
-    const XDAI: Web3Nonce;
-    const ALGORAND: AlgoNonce;
-    const FUSE: Web3Nonce;
-    const UNIQUE: Web3Nonce;
-    const TEZOS: TezosNonce;
-    const VELAS: Web3Nonce;
-    const IOTEX: Web3Nonce;
+    const ELROND = 2;
+    const HECO = 3;
+    const BSC = 4;
+    const ETHEREUM = 5;
+    const AVALANCHE = 6;
+    const POLYGON = 7;
+    const FANTOM = 8;
+    const TRON = 9;
+    const CELO = 11;
+    const HARMONY = 12;
+    const ONT = 13;
+    const XDAI = 14;
+    const ALGORAND = 15;
+    const FUSE = 16;
+    const UNIQUE = 17;
+    const TEZOS = 18;
+    const VELAS = 19;
+    const IOTEX = 20;
 }
-interface ChainData {
+interface ChainData<T extends ChainNonce> {
     name: string;
     nonce: number;
     decimals: number;
-    constructor: (params: Web3Params | TronParams | ElrondParams | AlgorandParams | TezosParams) => Promise<CrossChainHelper>;
+    constructor: (p: InferChainParam<T>) => Promise<InferChainH<T>>;
     blockExplorerUrl: string;
     chainId?: number;
     currency: SupportedCurrency;
 }
-interface ChainInfo {
-    [nonce: number]: ChainData;
-}
+declare type ChainInfo = {
+    set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
+    get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
+};
 export declare const CHAIN_INFO: ChainInfo;
 export declare const Config: AppConfig;
 export declare const FEE_MARGIN: {

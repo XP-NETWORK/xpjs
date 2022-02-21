@@ -1,8 +1,7 @@
-import { BigNumber } from "bignumber.js";
-import { BalanceCheck, BatchWrappedBalanceCheck, EstimateTxFees, MintNft, TransferForeign, TransferNftForeign, UnfreezeForeign, UnfreezeForeignNft, WrappedBalanceCheck, WrappedNftCheck } from "./chain";
+import { BalanceCheck, EstimateTxFees, MintNft, TransferNftForeign, UnfreezeForeignNft } from "./chain";
 import { TronWeb } from "tronweb";
 import { EthNftInfo } from "./web3";
-import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, MintRawTxn, NftMintArgs, PreTransfer, PreTransferRawTxn, TransferNftForeignUnsigned, UnfreezeForeignNftUnsigned, ValidateAddress } from "..";
+import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, NftMintArgs, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonceGet } from "..";
 import { Transaction } from "ethers";
 declare type TronSender = string | undefined;
@@ -12,7 +11,7 @@ export declare type MinterRes = {
     xpnet: string;
     whitelist: string[];
 };
-export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<TronSender, NftMintArgs, string> & {
+export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract
@@ -31,16 +30,14 @@ export declare type BaseTronHelper = BalanceCheck<string, BigNumber> & MintNft<T
      */
     deployMinter(deployer: TronSender, validators: string[], threshold: number, whitelist: string[] | undefined): Promise<MinterRes>;
 };
-export declare type TronHelper = BaseTronHelper & WrappedBalanceCheck<string, BigNumber> & BatchWrappedBalanceCheck<string, BigNumber> & TransferForeign<TronSender, string, BigNumber, string> & TransferNftForeign<TronSender, string, BigNumber, EthNftInfo, string> & UnfreezeForeign<TronSender, string, string> & UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> & WrappedNftCheck<EthNftInfo> & EstimateTxFees<BigNumber, string> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & UnfreezeForeignNftUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> & TransferNftForeignUnsigned<string, BigNumber, EthNftInfo, TronRawTxn> & ExtractTxnStatus & MintRawTxn<TronRawTxn>;
+export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, Transaction> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo>;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
     middleware_uri: string;
-    erc1155_addr: string;
     minter_addr: string;
     erc721_addr: string;
     validators: string[];
-    nonce: number;
 }
 export interface TronRawTxn {
     readonly visible: boolean;
