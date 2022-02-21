@@ -41,7 +41,6 @@ import {
   PreTransferRawTxn,
   TransactionStatus,
   TransferNftForeignUnsigned,
-  TronNonce,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
@@ -101,7 +100,7 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
-  ChainNonceGet<TronNonce> &
+  ChainNonceGet &
   Approve<TronSender> &
   ValidateAddress &
   IsApproved<TronSender> &

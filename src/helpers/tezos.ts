@@ -7,7 +7,6 @@ import {
   NftInfo,
   NftMintArgs,
   PreTransfer,
-  TezosNonce,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -52,7 +51,7 @@ export type TezosHelper = TransferNftForeign<
   UnfreezeForeignNft<TezosSigner, string, BigNumber, TezosNftInfo, string> &
   ValidateAddress &
   EstimateTxFees<BigNumber, TezosNftInfo> &
-  ChainNonceGet<TezosNonce> &
+  ChainNonceGet &
   WrappedNftCheck<TezosNftInfo> &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
     isApprovedForMinter(

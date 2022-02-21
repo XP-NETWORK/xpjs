@@ -36,7 +36,6 @@ import {
   UserNftMinter,
 } from "xpnet-web3-contracts";
 import {
-  ChainNonce,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
@@ -50,11 +49,11 @@ import {
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
-  Web3Nonce,
 } from "..";
 import { NftMintArgs } from "..";
 import axios from "axios";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
+import { ChainNonce } from "../type-utils";
 type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
@@ -153,7 +152,7 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
   EstimateTxFeesBatch<BigNumber, EthNftInfo> &
-  ChainNonceGet<ChainNonce<Web3Helper, Web3Params>> &
+  ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
   ValidateAddress &
@@ -228,7 +227,7 @@ export interface Web3Params {
   erc721_addr: string;
   erc721Minter: string;
   erc1155Minter: string;
-  nonce: Web3Nonce;
+  nonce: ChainNonce;
 }
 
 type NftMethodVal<T, Tx> = {

@@ -46,7 +46,6 @@ import {
 import {
   Chain,
   ChainNonceGet,
-  ElrondNonce,
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
@@ -249,7 +248,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
   } & WrappedNftCheck<EsdtNftInfo> &
-  ChainNonceGet<ElrondNonce> &
+  ChainNonceGet &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &

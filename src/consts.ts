@@ -14,7 +14,7 @@ import {
 } from "./helpers/algorand";
 import { AppConfig } from "./factory";
 import { TezosHelper, tezosHelperFactory, TezosParams } from "./helpers/tezos";
-import { ChainV, InferChainH, InferChainParam } from "./type-utils";
+import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -56,36 +56,58 @@ export enum MainNetRpcUri {
   // TODO: Algorand
 }
 
-// WARN: __helper and __params are markers
-export type ChainNonce<H, P> = number & { __helper: H, __params: P };
-export type ElrondNonce = ChainNonce<ElrondHelper, ElrondParams>;
-export type Web3Nonce = ChainNonce<Web3Helper, Web3Params>;
-export type TronNonce = ChainNonce<TronHelper, TronParams>;
-export type AlgoNonce = ChainNonce<AlgorandHelper, AlgorandParams>;
-export type TezosNonce = ChainNonce<TezosHelper, TezosParams>;
+type ElrondMeta = [ElrondHelper, ElrondParams];
+type Web3Meta = [Web3Helper, Web3Params];
+type TronMeta = [TronHelper, TronParams];
+type AlgoMeta = [AlgorandHelper, AlgorandParams];
+type TezosMeta = [TezosHelper, TezosParams];
+
+// Static Assert to Ensure all values of Chain are in MetaMap
+type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown }
+
+export type MetaMap = {
+  2: ElrondMeta,
+  3: Web3Meta,
+  4: Web3Meta,
+  5: Web3Meta,
+  6: Web3Meta,
+  7: Web3Meta,
+  8: Web3Meta,
+  9: TronMeta,
+  0xb: Web3Meta,
+  0xc: Web3Meta,
+  0xd: Web3Meta,
+  0xe: Web3Meta,
+  0xf: AlgoMeta,
+  0x10: Web3Meta,
+  0x11: Web3Meta,
+  0x12: TezosMeta,
+  0x13: Web3Meta,
+  0x14: Web3Meta
+} & MetaMapAssert;
 
 export namespace Chain {
-  export const ELROND = 2 as ElrondNonce;
-  export const HECO = 3 as Web3Nonce;
-  export const BSC = 4 as Web3Nonce;
-  export const ETHEREUM = 5 as Web3Nonce;
-  export const AVALANCHE = 6 as Web3Nonce;
-  export const POLYGON = 7 as Web3Nonce;
-  export const FANTOM = 8 as Web3Nonce;
-  export const TRON = 9 as TronNonce;
-  export const CELO = 0xb as Web3Nonce;
-  export const HARMONY = 0xc as Web3Nonce;
-  export const ONT = 0xd as Web3Nonce;
-  export const XDAI = 0xe as Web3Nonce;
-  export const ALGORAND = 0xf as AlgoNonce;
-  export const FUSE = 0x10 as Web3Nonce;
-  export const UNIQUE = 0x11 as Web3Nonce;
-  export const TEZOS = 0x12 as TezosNonce;
-  export const VELAS = 0x13 as Web3Nonce;
-  export const IOTEX = 0x14 as Web3Nonce;
+  export const ELROND = 2;
+  export const HECO = 3;
+  export const BSC = 4;
+  export const ETHEREUM = 5;
+  export const AVALANCHE = 0x6;
+  export const POLYGON = 7;
+  export const FANTOM = 8;
+  export const TRON = 9;
+  export const CELO = 0xb;
+  export const HARMONY = 0xc;
+  export const ONT = 0xd;
+  export const XDAI = 0xe;
+  export const ALGORAND = 0xf;
+  export const FUSE = 0x10;
+  export const UNIQUE = 0x11;
+  export const TEZOS = 0x12;
+  export const VELAS = 0x13;
+  export const IOTEX = 0x14;
 }
 
-interface ChainData<T extends ChainV> {
+interface ChainData<T extends ChainNonce> {
   name: string;
   nonce: number;
   decimals: number;
@@ -96,8 +118,8 @@ interface ChainData<T extends ChainV> {
 }
 
 type ChainInfo = {
-  set<T extends ChainV>(k: T, v: ChainData<T> | undefined): void;
-  get<T extends ChainV>(k: T): ChainData<T> | undefined;
+  set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
+  get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
 }
 
 export const CHAIN_INFO: ChainInfo = new Map();
