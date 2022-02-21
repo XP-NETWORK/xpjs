@@ -44,7 +44,9 @@ import {
   isWrappedNft,
 } from "./chain";
 import {
+  Chain,
   ChainNonceGet,
+  ElrondNonce,
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
@@ -247,7 +249,7 @@ export type ElrondHelper = BalanceCheck<string | Address, BigNumber> &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
   } & WrappedNftCheck<EsdtNftInfo> &
-  ChainNonceGet &
+  ChainNonceGet<ElrondNonce> &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &
@@ -285,7 +287,6 @@ export interface ElrondParams {
   esdt: string;
   esdt_nft: string;
   esdt_swap: string;
-  nonce: number;
 }
 
 export const elrondHelperFactory: (
@@ -892,7 +893,7 @@ export const elrondHelperFactory: (
       return await signAndSend(sender, txu);
     },
     getNonce() {
-      return elrondParams.nonce;
+      return Chain.ELROND;
     },
     async estimateValidateTransferNft(
       _toAddress: string,

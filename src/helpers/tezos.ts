@@ -1,11 +1,13 @@
 import {
   BalanceCheck,
+  Chain,
   ChainNonceGet,
   EstimateTxFees,
   MintNft,
   NftInfo,
   NftMintArgs,
   PreTransfer,
+  TezosNonce,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -50,7 +52,7 @@ export type TezosHelper = TransferNftForeign<
   UnfreezeForeignNft<TezosSigner, string, BigNumber, TezosNftInfo, string> &
   ValidateAddress &
   EstimateTxFees<BigNumber, TezosNftInfo> &
-  ChainNonceGet &
+  ChainNonceGet<TezosNonce> &
   WrappedNftCheck<TezosNftInfo> &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
     isApprovedForMinter(
@@ -256,7 +258,7 @@ export async function tezosHelperFactory({
       );
     },
     getNonce() {
-      return 0x12;
+      return Chain.TEZOS;
     },
     async estimateValidateTransferNft() {
       return estimateGas(validators, 1.2e5);

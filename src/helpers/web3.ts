@@ -36,6 +36,7 @@ import {
   UserNftMinter,
 } from "xpnet-web3-contracts";
 import {
+  ChainNonce,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
@@ -49,6 +50,7 @@ import {
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
+  Web3Nonce,
 } from "..";
 import { NftMintArgs } from "..";
 import axios from "axios";
@@ -151,7 +153,7 @@ export type Web3Helper = BaseWeb3Helper &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
   EstimateTxFeesBatch<BigNumber, EthNftInfo> &
-  ChainNonceGet &
+  ChainNonceGet<ChainNonce<Web3Helper, Web3Params>> &
   IsApproved<Signer> &
   Approve<Signer> &
   ValidateAddress &
@@ -226,7 +228,7 @@ export interface Web3Params {
   erc721_addr: string;
   erc721Minter: string;
   erc1155Minter: string;
-  nonce: number;
+  nonce: Web3Nonce;
 }
 
 type NftMethodVal<T, Tx> = {

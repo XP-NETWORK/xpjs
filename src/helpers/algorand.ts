@@ -5,7 +5,9 @@ import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { Base64, decode } from "js-base64";
 import {
+  AlgoNonce,
   AlgorandSocketHelper,
+  Chain,
   ChainNonceGet,
   EstimateTxFees,
   NftInfo,
@@ -116,7 +118,7 @@ export type FullClaimNft = ClaimNftInfo & {
   uri: string;
 };
 
-export type AlgorandHelper = ChainNonceGet &
+export type AlgorandHelper = ChainNonceGet<AlgoNonce> &
   WrappedNftCheck<AlgoNft> &
   TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
   UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &
@@ -142,7 +144,6 @@ export type AlgorandParams = {
   algodUri: string;
   algodPort: number | undefined;
   sendNftAppId: number;
-  nonce: number;
 };
 
 type MinWrappedNft = {
@@ -295,7 +296,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
 
   return {
     algod,
-    getNonce: () => args.nonce,
+    getNonce: () => Chain.ALGORAND,
     claimNft,
     optInNft,
     isOptIn,

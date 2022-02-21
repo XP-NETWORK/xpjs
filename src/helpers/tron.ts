@@ -30,6 +30,7 @@ import {
 } from "xpnet-web3-contracts";
 import {
   Approve,
+  Chain,
   ExtractAction,
   ExtractTxnStatus,
   extractWrappedMetadata,
@@ -40,6 +41,7 @@ import {
   PreTransferRawTxn,
   TransactionStatus,
   TransferNftForeignUnsigned,
+  TronNonce,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
@@ -99,7 +101,7 @@ export type TronHelper = BaseTronHelper &
   UnfreezeForeignNft<TronSender, string, BigNumber, EthNftInfo, Transaction> &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
-  ChainNonceGet &
+  ChainNonceGet<TronNonce> &
   Approve<TronSender> &
   ValidateAddress &
   IsApproved<TronSender> &
@@ -216,7 +218,6 @@ export interface TronParams {
   minter_addr: string;
   erc721_addr: string;
   validators: string[];
-  nonce: number;
 }
 
 export interface TronRawTxn {
@@ -547,7 +548,7 @@ export async function tronHelperFactory(
       return res;
     },
     getNonce() {
-      return tronParams.nonce;
+      return Chain.TRON;
     },
     async transferNftToForeign(
       sender: TronSender,
