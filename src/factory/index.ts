@@ -9,10 +9,7 @@ import {
   Chain,
   ChainNonce,
   CHAIN_INFO,
-  ElrondNonce,
   FEE_MARGIN,
-  TronNonce,
-  Web3Nonce,
 } from "../consts";
 export * from "./factories";
 
@@ -58,6 +55,7 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
 } from "../helpers/chain";
+import { ChainV, HelperMap, InferChainH, InferChainParam, InferSigner, ParamMap } from "../type-utils";
 
 export type CrossChainHelper =
   | ElrondHelper
@@ -66,7 +64,7 @@ export type CrossChainHelper =
   | AlgorandHelper
   | TezosHelper;
 
-type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
+type NftUriChain<RawNft> = ChainNonceGet<ChainV> & WrappedNftCheck<RawNft>;
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -78,12 +76,12 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   UnfreezeForeignNft<Signer, string, BigNumber, RawNft, Resp> &
   EstimateTxFees<BigNumber, RawNft> &
   NftUriChain<RawNft> &
-  ValidateAddress & { XpNft?: string } & EstimateTxFeesBatch<
-    BigNumber,
-    RawNft
-  > &
+  ValidateAddress & { XpNft?: string };
+
+type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   TransferNftForeignBatch<Signer, string, BigNumber, RawNft, Resp> &
-  UnfreezeForeignNftBatch<Signer, string, BigNumber, RawNft, Resp>;
+  UnfreezeForeignNftBatch<Signer, string, BigNumber, RawNft, Resp> &
+  EstimateTxFeesBatch<BigNumber, RawNft>;
 
 type RawTxnBuiladableChain<RawNft, Resp> = TransferNftForeignUnsigned<
   string,
@@ -106,7 +104,7 @@ export type ChainFactory = {
    * @type P: Either {@link ElrondParams} | {@link Web3Params} | {@link TronParams} as required.
    * @param chain: {@link Chain} to create the helper for.
    */
-  inner<T, P>(chain: ChainNonce<T, P>): Promise<T>;
+  inner<T extends ChainV>(chain: T): Promise<InferChainH<T>>;
   /**
    * Whether or not the bridge is alive for a given chain
    * this is checked regardless before using any bridge related function(e.g transferNft) is called
@@ -122,9 +120,9 @@ export type ChainFactory = {
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
    */
-  transferNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+  transferNft<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+    toChain: FullChain<never, unknown, unknown>,
     nft: NftInfo<RawNftF>,
     sender: SignerF,
     receiver: string,
@@ -132,9 +130,9 @@ export type ChainFactory = {
     mintWith?: string
   ): Promise<Resp>;
 
-  transferBatchNft<SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+  transferBatchNft<SignerF, RawNftF, Resp>(
+    fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
+    toChain: FullChainBatch<never, unknown, unknown>,
     nft: NftInfo<RawNftF>[],
     sender: SignerF,
     receiver: string,
@@ -186,12 +184,12 @@ export type ChainFactory = {
    * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
    * @param params : New Params to be set.
    */
-  updateParams<T, TP>(nonce: ChainNonce<T, TP>, params: TP): void;
-  nonceToChainNonce(nonce: number): ElrondNonce | TronNonce | Web3Nonce;
-  pkeyToSigner<S>(
-    nonce: ChainNonce<WrappedNftCheck<S>, unknown>,
+  updateParams<T extends ChainV>(nonce: T, params: InferChainParam<T>): void;
+  nonceToChainNonce(nonce: number): ChainV;
+  pkeyToSigner<S extends ChainV>(
+    nonce: S,
     key: string
-  ): Promise<S>;
+  ): Promise<InferSigner<InferChainH<S>>>;
   /**
    *
    * Get transaction in the destination chain
@@ -218,7 +216,7 @@ export type ChainFactory = {
    * @param claimer the account which can claim the nft
    */
   waitAlgorandNft<Txn>(
-    originChain: ExtractAction<Txn> & ChainNonceGet,
+    originChain: ExtractAction<Txn> & ChainNonceGet<never>,
     txn: Txn,
     claimer: AlgoSignerH
   ): Promise<ClaimNftInfo>;
@@ -313,38 +311,30 @@ export interface AppConfig {
   wrappedNftPrefix: string;
 }
 
-type AllParams =
-  | Web3Params
-  | ElrondParams
-  | TronParams
-  | AlgorandParams
-  | TezosParams
-  | undefined;
 
 function mapNonceToParams(
   chainParams: Partial<ChainParams>
-): Map<number, AllParams> {
-  const cToP = new Map<number, AllParams>();
+): ParamMap {
+  const cToP: ParamMap = new Map();
+  cToP.set(Chain.ELROND, chainParams.elrondParams);
+  cToP.set(Chain.HECO, chainParams.hecoParams);
+  cToP.set(Chain.BSC, chainParams.bscParams);
+  cToP.set(Chain.ETHEREUM, chainParams.ropstenParams);
+  cToP.set(Chain.AVALANCHE, chainParams.avalancheParams);
+  cToP.set(Chain.POLYGON, chainParams.polygonParams);
+  cToP.set(Chain.FANTOM, chainParams.fantomParams);
+  cToP.set(Chain.TRON, chainParams.tronParams);
+  cToP.set(Chain.CELO, chainParams.celoParams!);
+  cToP.set(Chain.HARMONY, chainParams.harmonyParams);
+  cToP.set(Chain.ONT, chainParams.ontologyParams);
+  cToP.set(Chain.XDAI, chainParams.xDaiParams);
+  cToP.set(Chain.ALGORAND, chainParams.algorandParams);
+  cToP.set(Chain.FUSE, chainParams.fuseParams);
+  cToP.set(Chain.UNIQUE, chainParams.uniqueParams);
+  cToP.set(Chain.TEZOS, chainParams.tezosParams);
+  cToP.set(Chain.VELAS, chainParams.velasParams);
+  cToP.set(Chain.IOTEX, chainParams.iotexParams);
 
-  cToP.set(2, chainParams.elrondParams);
-  cToP.set(3, chainParams.hecoParams);
-  cToP.set(4, chainParams.bscParams);
-  cToP.set(5, chainParams.ropstenParams);
-  cToP.set(6, chainParams.avalancheParams);
-  cToP.set(7, chainParams.polygonParams);
-  cToP.set(8, chainParams.fantomParams);
-  cToP.set(9, chainParams.tronParams);
-
-  cToP.set(11, chainParams.celoParams);
-  cToP.set(12, chainParams.harmonyParams);
-  cToP.set(13, chainParams.ontologyParams);
-  cToP.set(14, chainParams.xDaiParams);
-  cToP.set(15, chainParams.algorandParams);
-  cToP.set(16, chainParams.fuseParams);
-  cToP.set(17, chainParams.uniqueParams);
-  cToP.set(18, chainParams.tezosParams);
-  cToP.set(19, chainParams.velasParams);
-  cToP.set(20, chainParams.iotexParams);
   return cToP;
 }
 /**
@@ -357,7 +347,7 @@ export function ChainFactory(
   appConfig: AppConfig,
   chainParams: Partial<ChainParams>
 ): ChainFactory {
-  let map = new Map<number, CrossChainHelper>();
+  let helpers: HelperMap<ChainV> = new Map();
   let cToP = mapNonceToParams(chainParams);
 
   const heartbeatRepo = bridgeHeartbeat(appConfig.heartbeatUri);
@@ -373,27 +363,27 @@ export function ChainFactory(
     },
   });
 
-  const inner = async <T, P>(chain: ChainNonce<T, P>): Promise<T> => {
-    let helper = map.get(chain);
+  const inner = async <T extends ChainV>(chain: T): Promise<InferChainH<T>> => {
+    let helper = helpers.get(chain);
     if (helper === undefined) {
-      helper = await CHAIN_INFO[chain].constructor(cToP.get(chain)!);
-      map.set(chain, helper)
+      helper = await CHAIN_INFO.get(chain)!.constructor(cToP.get(chain)!);
+      helpers.set(chain, helper)
     }
-    return helper! as any as T;
+    return helper! as any;
   };
 
-  async function calcExchangeFees(
-    fromChain: number,
-    toChain: number,
+  async function calcExchangeFees<T extends ChainV>(
+    fromChain: T,
+    toChain: T,
     val: BigNumber
   ): Promise<BigNumber> {
     const rate = await remoteExchangeRate.getBatchedRate([
-      CHAIN_INFO[toChain].currency,
-      CHAIN_INFO[fromChain].currency,
+      CHAIN_INFO.get(toChain)!.currency,
+      CHAIN_INFO.get(fromChain)!.currency,
     ]);
-    const feeR = val.dividedBy(CHAIN_INFO[toChain].decimals);
-    const fromExRate = rate.get(CHAIN_INFO[fromChain].currency)!;
-    const toExRate = rate.get(CHAIN_INFO[toChain].currency)!;
+    const feeR = val.dividedBy(CHAIN_INFO.get(toChain)!.decimals);
+    const fromExRate = rate.get(CHAIN_INFO.get(fromChain)!.currency)!;
+    const toExRate = rate.get(CHAIN_INFO.get(toChain)!.currency)!;
     const usdFee = Math.min(
       Math.max(FEE_MARGIN.min, feeR.times(toExRate * 0.1).toNumber()),
       FEE_MARGIN.max
@@ -403,7 +393,7 @@ export function ChainFactory(
     return feeR
       .times(toExRate / fromExRate)
       .plus(feeProfit)
-      .times(CHAIN_INFO[fromChain].decimals)
+      .times(CHAIN_INFO.get(fromChain)!.decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
   const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
@@ -436,8 +426,8 @@ export function ChainFactory(
   }
 
   async function estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
+    fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
+    toChain: FullChainBatch<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>[],
     receiver: string
   ): Promise<BigNumber> {
@@ -496,7 +486,7 @@ export function ChainFactory(
 
   function nonceToChainNonce(
     nonce: number
-  ): ElrondNonce | Web3Nonce | TronNonce {
+  ): ChainV {
     switch (nonce) {
       case 2: {
         return Chain.ELROND;
@@ -654,34 +644,34 @@ export function ChainFactory(
       return [hash, status];
     },
     nonceToChainNonce,
-    async pkeyToSigner<S>(nonce: ChainNonce<S, unknown>, key: string) {
+    async pkeyToSigner<T extends ChainV>(nonce: T, key: string) {
       let chain = nonceToChainNonce(nonce);
       switch (chain) {
         case Chain.ELROND: {
-          return UserSigner.fromPem(key) as unknown as S;
+          return UserSigner.fromPem(key);
         }
         case Chain.TRON: {
-          return key as unknown as S;
+          return key;
         }
         case Chain.ALGORAND: {
-          const algo: AlgorandHelper = await inner(Chain.ALGORAND);
+          const algo = await inner(Chain.ALGORAND);
           const mnem = algosdk.secretKeyToMnemonic(Base64.toUint8Array(key));
           return algoSignerWrapper(
             algo.algod,
             algosdk.mnemonicToSecretKey(mnem)
-          ) as unknown as S;
+          );
         }
         default: {
-          const chainH = await inner<Web3Helper, Web3Nonce>(chain);
-          return chainH.createWallet(key) as unknown as S;
+          const chainH = await inner(chain) as any;
+          return chainH.createWallet(key);
         }
       }
     },
     estimateFees,
     inner,
     bridgeStatus,
-    updateParams<T, TP>(chainNonce: ChainNonce<T, TP>, params: TP) {
-      map.delete(chainNonce);
+    updateParams<T extends ChainV>(chainNonce: T, params: InferChainParam<T>) {
+      helpers.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },
     async nftList<T>(chain: NftUriChain<T>, owner: string) {
@@ -736,7 +726,6 @@ export function ChainFactory(
         throw Error("invalid address");
       }
       if (await fromChain.isWrappedNft(nft, appConfig.wrappedNftPrefix)) {
-        const meta = await extractWrappedMetadata(nft);
         const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,

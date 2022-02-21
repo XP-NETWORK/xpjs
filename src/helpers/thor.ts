@@ -45,6 +45,7 @@ import {
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
+  Web3Nonce,
 } from "..";
 import { NftMintArgs } from "..";
 import { BigNumber as EthBN } from "ethers";
@@ -134,7 +135,7 @@ export type Web3Helper = BaseWeb3Helper &
   > &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
-  ChainNonceGet &
+  ChainNonceGet<Web3Nonce> &
   IsApproved<Signer> &
   Approve<Signer> &
   ValidateAddress &
@@ -300,7 +301,8 @@ export async function web3HelperFactory(
     isApprovedForMinter,
     preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,
-    getNonce: () => params.nonce,
+    // TODO
+    getNonce: () => params.nonce as any,
     async balanceWrapped(
       address: string,
       chain_nonce: number
