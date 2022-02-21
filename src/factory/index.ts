@@ -7,7 +7,6 @@ import { TronHelper, TronParams, TronRawTxn } from "../helpers/tron";
 import { Web3Helper, Web3Params } from "../helpers/web3";
 import {
   Chain,
-  ChainNonce,
   CHAIN_INFO,
   FEE_MARGIN,
 } from "../consts";
@@ -55,7 +54,7 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
 } from "../helpers/chain";
-import { ChainV, HelperMap, InferChainH, InferChainParam, InferSigner, ParamMap } from "../type-utils";
+import { ChainNonce, HelperMap, InferChainH, InferChainParam, InferSigner, ParamMap } from "../type-utils";
 
 export type CrossChainHelper =
   | ElrondHelper
@@ -64,7 +63,7 @@ export type CrossChainHelper =
   | AlgorandHelper
   | TezosHelper;
 
-type NftUriChain<RawNft> = ChainNonceGet<ChainV> & WrappedNftCheck<RawNft>;
+type NftUriChain<RawNft> = ChainNonceGet & WrappedNftCheck<RawNft>;
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -104,7 +103,7 @@ export type ChainFactory = {
    * @type P: Either {@link ElrondParams} | {@link Web3Params} | {@link TronParams} as required.
    * @param chain: {@link Chain} to create the helper for.
    */
-  inner<T extends ChainV>(chain: T): Promise<InferChainH<T>>;
+  inner<T extends ChainNonce>(chain: T): Promise<InferChainH<T>>;
   /**
    * Whether or not the bridge is alive for a given chain
    * this is checked regardless before using any bridge related function(e.g transferNft) is called
@@ -184,9 +183,8 @@ export type ChainFactory = {
    * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
    * @param params : New Params to be set.
    */
-  updateParams<T extends ChainV>(nonce: T, params: InferChainParam<T>): void;
-  nonceToChainNonce(nonce: number): ChainV;
-  pkeyToSigner<S extends ChainV>(
+  updateParams<T extends ChainNonce>(nonce: T, params: InferChainParam<T>): void;
+  pkeyToSigner<S extends ChainNonce>(
     nonce: S,
     key: string
   ): Promise<InferSigner<InferChainH<S>>>;
@@ -216,7 +214,7 @@ export type ChainFactory = {
    * @param claimer the account which can claim the nft
    */
   waitAlgorandNft<Txn>(
-    originChain: ExtractAction<Txn> & ChainNonceGet<never>,
+    originChain: ExtractAction<Txn> & ChainNonceGet,
     txn: Txn,
     claimer: AlgoSignerH
   ): Promise<ClaimNftInfo>;
@@ -347,7 +345,7 @@ export function ChainFactory(
   appConfig: AppConfig,
   chainParams: Partial<ChainParams>
 ): ChainFactory {
-  let helpers: HelperMap<ChainV> = new Map();
+  let helpers: HelperMap<ChainNonce> = new Map();
   let cToP = mapNonceToParams(chainParams);
 
   const heartbeatRepo = bridgeHeartbeat(appConfig.heartbeatUri);
@@ -363,16 +361,16 @@ export function ChainFactory(
     },
   });
 
-  const inner = async <T extends ChainV>(chain: T): Promise<InferChainH<T>> => {
+  const inner = async <T extends ChainNonce>(chain: T): Promise<InferChainH<T>> => {
     let helper = helpers.get(chain);
     if (helper === undefined) {
       helper = await CHAIN_INFO.get(chain)!.constructor(cToP.get(chain)!);
       helpers.set(chain, helper)
     }
-    return helper! as any;
+    return helper!;
   };
 
-  async function calcExchangeFees<T extends ChainV>(
+  async function calcExchangeFees<T extends ChainNonce>(
     fromChain: T,
     toChain: T,
     val: BigNumber
@@ -482,55 +480,6 @@ export function ChainFactory(
       contracts.find((x) => x.toLowerCase() === mw.toLowerCase().trim()) !=
       undefined
     );
-  }
-
-  function nonceToChainNonce(
-    nonce: number
-  ): ChainV {
-    switch (nonce) {
-      case 2: {
-        return Chain.ELROND;
-      }
-      case 3: {
-        return Chain.HECO;
-      }
-      case 4: {
-        return Chain.BSC;
-      }
-      case 5: {
-        return Chain.ETHEREUM;
-      }
-      case 6: {
-        return Chain.AVALANCHE;
-      }
-      case 7: {
-        return Chain.POLYGON;
-      }
-      case 8: {
-        return Chain.FANTOM;
-      }
-      case 9: {
-        return Chain.TRON;
-      }
-      case 11: {
-        return Chain.CELO;
-      }
-      case 12: {
-        return Chain.HARMONY;
-      }
-      case 14: {
-        return Chain.XDAI;
-      }
-      case 15: {
-        return Chain.ALGORAND;
-      }
-      case 16: {
-        return Chain.FUSE;
-      }
-      default: {
-        throw Error(`unknown chain ${nonce}`);
-      }
-    }
   }
 
   async function getVerifiedContracts(
@@ -643,10 +592,8 @@ export function ChainFactory(
       const status = await chain.extractTxnStatus(hash);
       return [hash, status];
     },
-    nonceToChainNonce,
-    async pkeyToSigner<T extends ChainV>(nonce: T, key: string) {
-      let chain = nonceToChainNonce(nonce);
-      switch (chain) {
+    async pkeyToSigner<T extends ChainNonce>(nonce: T, key: string) {
+      switch (nonce) {
         case Chain.ELROND: {
           return UserSigner.fromPem(key);
         }
@@ -662,7 +609,7 @@ export function ChainFactory(
           );
         }
         default: {
-          const chainH = await inner(chain) as any;
+          const chainH = await inner(nonce) as any;
           return chainH.createWallet(key);
         }
       }
@@ -670,7 +617,7 @@ export function ChainFactory(
     estimateFees,
     inner,
     bridgeStatus,
-    updateParams<T extends ChainV>(chainNonce: T, params: InferChainParam<T>) {
+    updateParams<T extends ChainNonce>(chainNonce: T, params: InferChainParam<T>) {
       helpers.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },

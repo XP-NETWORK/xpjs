@@ -45,7 +45,6 @@ import {
   TransferNftForeignUnsigned,
   UnfreezeForeignNftUnsigned,
   ValidateAddress,
-  Web3Nonce,
 } from "..";
 import { NftMintArgs } from "..";
 import { BigNumber as EthBN } from "ethers";
@@ -135,7 +134,7 @@ export type Web3Helper = BaseWeb3Helper &
   > &
   WrappedNftCheck<EthNftInfo> &
   EstimateTxFees<BigNumber, string> &
-  ChainNonceGet<Web3Nonce> &
+  ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
   ValidateAddress &

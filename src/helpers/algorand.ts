@@ -5,7 +5,6 @@ import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { Base64, decode } from "js-base64";
 import {
-  AlgoNonce,
   AlgorandSocketHelper,
   Chain,
   ChainNonceGet,
@@ -118,7 +117,7 @@ export type FullClaimNft = ClaimNftInfo & {
   uri: string;
 };
 
-export type AlgorandHelper = ChainNonceGet<AlgoNonce> &
+export type AlgorandHelper = ChainNonceGet &
   WrappedNftCheck<AlgoNft> &
   TransferNftForeign<AlgoSignerH, string, BigNumber, AlgoNft, string> &
   UnfreezeForeignNft<AlgoSignerH, string, BigNumber, AlgoNft, string> &

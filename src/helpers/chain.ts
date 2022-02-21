@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { BigNumberish } from "ethers";
 import { NftMintArgs } from "..";
 import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
-import { ChainV } from "../type-utils";
+import { ChainNonce } from "../type-utils";
 
 /**
  * NFT Info
@@ -236,8 +236,8 @@ export interface MintRawTxn<Ret> {
   mintRawTxn(id: NftMintArgs, address: string, value?: BigNumber): Promise<Ret>;
 }
 
-export interface ChainNonceGet<T extends ChainV> {
-  getNonce(): T;
+export interface ChainNonceGet {
+  getNonce(): ChainNonce;
 }
 
 export interface ExtractAction<Txn> {

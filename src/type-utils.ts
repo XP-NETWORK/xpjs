@@ -1,15 +1,16 @@
-import { Chain, ChainNonce, TransferNftForeign } from ".";
+import { Chain, MetaMap, TransferNftForeign } from ".";
 
 type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, any, any, RawNft, Resp>;
 
-export type ChainV = typeof Chain[keyof typeof Chain];
-export type InferChainParam<K extends ChainV> = K extends ChainNonce<unknown, infer Param> ? Param : never;
-export type InferChainH<K extends ChainV> = K extends ChainNonce<infer Helper, unknown> ? Helper : never;
+export type ChainNonce = keyof MetaMap;
+
+export type InferChainParam<K extends ChainNonce> = MetaMap[K][1];
+export type InferChainH<K extends ChainNonce> = MetaMap[K][0];
 export type InferSigner<K extends TransferNftChain<any, any, any>> = K extends TransferNftChain<infer S, unknown, unknown> ? S : never;
 
 export type ParamMap = {
-  set<T extends ChainV>(k: T, v: InferChainParam<T> | undefined): void;
-  get<T extends ChainV>(k: T): InferChainParam<T> | undefined;
+  set<T extends ChainNonce>(k: T, v: InferChainParam<T> | undefined): void;
+  get<T extends ChainNonce>(k: T): InferChainParam<T> | undefined;
 };
 
-export type HelperMap<K extends ChainV> = Map<K, InferChainH<K> | undefined>;
+export type HelperMap<K extends ChainNonce> = Map<K, InferChainH<K> | undefined>;
