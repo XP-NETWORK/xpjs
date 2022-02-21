@@ -12,7 +12,6 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
-  isWrappedNft,
 } from "./chain";
 import {
   Signer,
@@ -37,7 +36,6 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
-  extractWrappedMetadata,
   MintRawTxn,
   NftInfo,
   PreTransfer,
@@ -49,9 +47,7 @@ import {
 } from "..";
 import { NftMintArgs } from "..";
 import axios from "axios";
-import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 import { ChainNonce } from "../type-utils";
-type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -205,7 +201,6 @@ export interface Web3Params {
   provider: Provider;
   middleware_uri: string;
   minter_addr: string;
-  erc1155_addr: string;
   erc721_addr: string;
   erc721Minter: string;
   erc1155Minter: string;
@@ -266,9 +261,8 @@ export async function web3HelperFactory(
   params: Web3Params
 ): Promise<Web3Helper> {
   const w3 = params.provider;
-  const { minter_addr, provider, erc1155_addr } = params;
+  const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
-  const erc1155 = Erc1155Minter__factory.connect(erc1155_addr, provider);
 
   const event_middleware = axios.create({
     baseURL: params.middleware_uri,
@@ -294,22 +288,6 @@ export async function web3HelperFactory(
     const evdat = minter.interface.parseLog(log);
     const action_id: string = evdat.args[0].toString();
     return action_id;
-  }
-
-  const randomAction = () =>
-    EthBN.from(
-      Math.floor(Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000))
-    );
-
-  async function estimateGas(
-    addrs: string[],
-    utx: PopulatedTransaction
-  ): Promise<BigNumber> {
-    utx.from = addrs[0];
-    let td = await w3.estimateGas(utx);
-    const fee = td.mul(addrs.length + 1).mul(await w3.getGasPrice());
-
-    return new BigNumber(fee.toString());
   }
 
   const isApprovedForMinter = async (

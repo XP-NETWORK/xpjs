@@ -22,7 +22,6 @@ import {
 import { Transaction } from "@vechain/ethers/utils";
 import { TransactionResponse, Provider } from "@vechain/ethers/providers";
 import {
-  Erc1155Minter__factory,
   Minter__factory,
   UserNftMinter__factory,
 } from "xpnet-web3-contracts";
@@ -31,7 +30,6 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
-  extractWrappedMetadata,
   MintRawTxn,
   NftInfo,
   PreTransfer,
@@ -45,7 +43,6 @@ import { NftMintArgs } from "..";
 import { BigNumber as EthBN } from "ethers";
 import axios from "axios";
 
-type EasyBalance = string | number | EthBN;
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -185,7 +182,6 @@ export interface Web3Params {
   provider: Provider;
   middleware_uri: string;
   minter_addr: string;
-  erc1155_addr: string;
   erc721_addr: string;
   validators: string[];
   nonce: number;
@@ -195,13 +191,8 @@ export async function web3HelperFactory(
   params: Web3Params
 ): Promise<Web3Helper> {
   const w3 = params.provider;
-  const { minter_addr, provider, erc1155_addr } = params;
+  const { minter_addr, provider } = params;
   const minter = new Contract(minter_addr, Minter__factory.abi, provider);
-  const erc1155 = new Contract(
-    erc1155_addr,
-    Erc1155Minter__factory.abi,
-    provider
-  );
 
   const event_middleware = axios.create({
     baseURL: params.middleware_uri,
@@ -411,19 +402,11 @@ export async function web3HelperFactory(
       return await estimateGas(params.validators, utx);
     },
     async estimateValidateUnfreezeNft(
-      to: string,
-      nft: NftInfo<any>
+      _to: string,
+      _nft: NftInfo<any>
     ): Promise<BigNumber> {
-      const wrappedData = await extractWrappedMetadata(nft);
-
-      const utx = await minter.populateTransaction.validateUnfreezeNft(
-        randomAction(),
-        to,
-        EthBN.from(wrappedData.wrapped.tokenId),
-        wrappedData.wrapped.contract
-      );
-
-      return await estimateGas(params.validators, utx);
+      // TODO
+      return new BigNumber(0);
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.getAddress(adr) !== undefined);

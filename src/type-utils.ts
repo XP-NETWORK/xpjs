@@ -1,4 +1,4 @@
-import { Chain, MetaMap, TransferNftForeign } from ".";
+import { MetaMap, TransferNftForeign } from ".";
 
 type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp>;
 
