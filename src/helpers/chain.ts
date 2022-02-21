@@ -1,9 +1,6 @@
-import { Address } from "@elrondnetwork/erdjs/out";
 import axios from "axios";
 import BigNumber from "bignumber.js";
-import { BigNumberish } from "ethers";
 import { NftMintArgs } from "..";
-import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 import { ChainNonce } from "../type-utils";
 
 /**
@@ -213,18 +210,6 @@ export interface EstimateTxFeesBatch<RawNftF> {
     to: string,
     metadatas: NftInfo<RawNftF>[]
   ): Promise<BigNumber>;
-}
-
-export function extractWrappedMetadata(
-  nft: NftInfo<any>
-): Promise<Erc721MetadataEx<Erc721WrappedData>> {
-  if (nft.native.meta && nft.native.meta.token.metadata.wrapped) {
-    return Promise.resolve(nft.native.meta.token.metadata);
-  } else {
-    return axios
-      .get<Erc721MetadataEx<Erc721WrappedData>>(nft.uri)
-      .then((v) => v.data);
-  }
 }
 
 export interface GetProvider<Provider> {

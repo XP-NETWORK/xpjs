@@ -34,9 +34,8 @@ import BigNumber from "bignumber.js";
 import axios from "axios";
 import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
-import { Erc721MetadataEx } from "../erc721_metadata";
 import { bridgeHeartbeat } from "../heartbeat";
-import { BigNumberish, ethers, PopulatedTransaction, utils } from "ethers";
+import { PopulatedTransaction, utils } from "ethers";
 import {
   AlgorandParams,
   AlgorandHelper,
@@ -60,8 +59,6 @@ export type CrossChainHelper =
   | TronHelper
   | AlgorandHelper
   | TezosHelper;
-
-type NftUriChain = ChainNonceGet;
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,

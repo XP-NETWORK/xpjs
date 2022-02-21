@@ -94,10 +94,6 @@ type MaybeEsdtNftInfo = EsdtTokenInfo & (BEsdtNftInfo | undefined);
  */
 export type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
 
-function isEsdtNftInfo(maybe: MaybeEsdtNftInfo): maybe is EsdtNftInfo {
-  return maybe.creator != undefined && maybe.balance == "1";
-}
-
 /**
  * arguments required to issue an NFT
  */
@@ -185,11 +181,6 @@ export interface SetESDTRoles {
   ): Promise<Transaction>;
 }
 
-/**
- * Identifier for tracking a given action
- */
-type EventIdent = string;
-
 export interface ElrondRawUnsignedTxn {
   readonly nonce: number;
   readonly value: string;
@@ -256,14 +247,12 @@ export type ElrondHelper = BalanceCheck &
  * @param node_uri  URI of the elrond node
  * @param minter_address  Address of the minter smart contract
  * @param middleware_uri  REST API of elrond-event-middleware
- * @param esdt  Identifier of the ESDT Wrapper
  * @param esdt_nft  Identifier of the ESDT NFT Wrapper
  */
 export interface ElrondParams {
   node_uri: string;
   minter_address: string;
   esdt_swap_address: string;
-  esdt: string;
   esdt_nft: string;
   esdt_swap: string;
 }
@@ -278,10 +267,8 @@ export async function elrondHelperFactory(
   const providerRest = axios.create({
     baseURL: elrondParams.node_uri,
   });
-  const esdtHex = Buffer.from(elrondParams.esdt, "utf-8");
   const esdtNftHex = Buffer.from(elrondParams.esdt_nft, "utf-8");
   const esdtSwaphex = Buffer.from(elrondParams.esdt_swap, "utf-8");
-  const decoder = new TextDecoder();
   const networkConfig = await provider.getNetworkConfig();
   const gasPriceModif =
     networkConfig.MinGasPrice.valueOf() *
@@ -381,27 +368,6 @@ export async function elrondHelperFactory(
     return undefined;
   };
 
-  const unsignedTransferTxn = (
-    chain_nonce: number,
-    to: string,
-    value: EasyBalance
-  ) => {
-    return new Transaction({
-      receiver: mintContract,
-      gasLimit: new GasLimit(50000000),
-      value: new Balance(
-        Egld.getToken(),
-        Egld.getNonce(),
-        new BigNumber(value.toString())
-      ),
-      data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("freezeSend"))
-        .addArg(new U64Value(new BigNumber(chain_nonce)))
-        .addArg(new BytesValue(Buffer.from(to, "ascii")))
-        .build(),
-    });
-  };
-
   const unsignedMintNftTxn = (
     owner: Address,
     { identifier, quantity, name, royalties, hash, attrs, uris }: NftIssueArgs
@@ -498,53 +464,12 @@ export async function elrondHelperFactory(
     });
   };
 
-  const unsignedUnfreezeTxn = (
-    chain_nonce: number,
-    address: Address,
-    to: string,
-    value: EasyBalance
-  ) => {
-    return new Transaction({
-      receiver: address,
-      gasLimit: new GasLimit(50000000),
-      data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("ESDTNFTTransfer"))
-        .addArg(new TokenIdentifierValue(esdtHex))
-        .addArg(new U64Value(new BigNumber(chain_nonce)))
-        .addArg(new BigUIntValue(new BigNumber(value)))
-        .addArg(new AddressValue(mintContract))
-        .addArg(new BytesValue(Buffer.from("withdraw", "ascii")))
-        .addArg(new BytesValue(Buffer.from(to, "ascii")))
-        .build(),
-    });
-  };
-
   const listEsdt = async (owner: string) => {
     const raw = await providerRest(`/address/${owner}/esdt`);
     const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
 
     return dat;
   };
-
-  async function listNft(owner: string): Promise<Map<string, EsdtNftInfo>> {
-    const ents: [string, MaybeEsdtNftInfo][] = Object.entries(
-      await listEsdt(owner)
-    );
-
-    const fmapCb: (
-      tok: [string, MaybeEsdtNftInfo]
-    ) => [] | [[string, EsdtNftInfo]] = ([tok, info]) => {
-      if (!isEsdtNftInfo(info)) {
-        return [];
-      }
-
-      let sp = tok.split("-");
-      let nonce = sp.pop() ?? "";
-      return [[`${sp.join("-")}-${parseInt(nonce, 16).toString()}`, info]];
-    };
-
-    return new Map(ents.flatMap(fmapCb));
-  }
 
   const unsignedIssueESDTNft = (
     name: string,
@@ -638,23 +563,6 @@ export async function elrondHelperFactory(
 
   async function getAddress(sender: ElrondSigner): Promise<Address> {
     return new Address(await sender.getAddress());
-  }
-
-  async function balanceWrappedBatch(
-    address: string | Address,
-    chain_nonces: number[]
-  ): Promise<Map<number, BigNumber>> {
-    const esdts = Object.values(await listEsdt(address.toString()));
-
-    const res = new Map(chain_nonces.map((v) => [v, new BigNumber(0)]));
-
-    for (const esdt of esdts) {
-      esdt.nonce &&
-        esdt.tokenIdentifier.startsWith(esdt.tokenIdentifier) &&
-        res.set(esdt.nonce, new BigNumber(esdt.balance));
-    }
-
-    return res;
   }
 
   return {

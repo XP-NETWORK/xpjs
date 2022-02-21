@@ -2,7 +2,6 @@ import { BigNumber } from "bignumber.js";
 import {
   BalanceCheck,
   EstimateTxFees,
-  isWrappedNft,
   MintNft,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -13,9 +12,8 @@ import axios from "axios";
 import { TronWeb } from "tronweb";
 // @ts-expect-error no types cope
 import TronStation from "tronstation";
-import { EthNftInfo, MintArgs } from "./web3";
+import { EthNftInfo } from "./web3";
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
-import { Base64 } from "js-base64";
 
 import {
   Minter__factory,
@@ -28,7 +26,6 @@ import {
   Chain,
   ExtractAction,
   ExtractTxnStatus,
-  extractWrappedMetadata,
   IsApproved,
   MintRawTxn,
   NftMintArgs,
@@ -40,9 +37,7 @@ import {
   ValidateAddress,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
-import { Erc721MetadataEx, Erc721WrappedData } from "../erc721_metadata";
 import { Transaction } from "ethers";
-import { UnfreezeNftEvent } from "xpnet-web3-contracts/dist/Minter";
 
 // Uses default private key in provider if sender is undefinedd
 type TronSender = string | undefined;
@@ -201,7 +196,6 @@ export async function baseTronHelperFactory(
 export interface TronParams {
   provider: TronWeb;
   middleware_uri: string;
-  erc1155_addr: string;
   minter_addr: string;
   erc721_addr: string;
   validators: string[];
@@ -234,13 +228,9 @@ export interface TronRawTxn {
 export async function tronHelperFactory(
   tronParams: TronParams
 ): Promise<TronHelper> {
-  const { provider, erc1155_addr, minter_addr } = tronParams;
+  const { provider, minter_addr } = tronParams;
   const station = new TronStation(provider);
   const base = await baseTronHelperFactory(provider);
-  const erc1155 = await provider.contract(
-    Erc1155Minter__factory.abi,
-    erc1155_addr
-  );
   const minter = await provider.contract(Minter__factory.abi, minter_addr);
   const event_middleware = axios.create({
     baseURL: tronParams.middleware_uri,
@@ -538,24 +528,10 @@ export async function tronHelperFactory(
       );
     },
     async estimateValidateUnfreezeNft(
-      to: string,
-      nft: NftInfo<any>
+      _to: string,
+      _nft: NftInfo<any>
     ): Promise<BigNumber> {
-      const wrappedData = await extractWrappedMetadata(nft);
-
-      return await estimateGas(
-        tronParams.validators,
-        "validateUnfreezeNft(uint128,address,uint256,address)",
-        [
-          { type: "uint128", value: randomAction() },
-          { type: "address", value: to },
-          {
-            type: "uint256",
-            value: EthBN.from(wrappedData.wrapped.tokenId),
-          },
-          { type: "address", value: wrappedData.wrapped.contract },
-        ]
-      );
+      return new BigNumber(0) // TODO 
     },
     async validateAddress(adr: string): Promise<boolean> {
       return provider.isAddress(adr);

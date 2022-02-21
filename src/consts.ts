@@ -1,4 +1,3 @@
-import { CrossChainHelper } from ".";
 import {
   elrondHelperFactory,
   ElrondParams,

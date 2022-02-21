@@ -3,7 +3,7 @@ import algosdk, { SuggestedParams } from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
-import { Base64, decode } from "js-base64";
+import { Base64 } from "js-base64";
 import {
   AlgorandSocketHelper,
   Chain,

@@ -12,7 +12,6 @@ import {
   ValidateAddress,
 } from "..";
 import {
-  BigMapAbstraction,
   ChainIds,
   ContractAbstraction,
   ContractMethod,
@@ -22,7 +21,6 @@ import {
   TezosToolkit,
   TransactionOperation,
   TransactionWalletOperation,
-  TransferParams,
   Wallet,
   WalletProvider,
 } from "@taquito/taquito";
