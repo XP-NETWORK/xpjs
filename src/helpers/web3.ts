@@ -41,6 +41,7 @@ import {
   PreTransferRawTxn,
   TransactionStatus,
   ValidateAddress,
+  WhitelistCheck,
 } from "..";
 import { NftMintArgs } from "..";
 import axios from "axios";
@@ -140,7 +141,8 @@ export type Web3Helper = BaseWeb3Helper &
   } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
-  GetProvider<providers.Provider> & { XpNft: string };
+  GetProvider<providers.Provider> & { XpNft: string } &
+  WhitelistCheck<EthNftInfo>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -470,5 +472,8 @@ export async function web3HelperFactory(
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
+    isNftWhitelisted(nft) {
+      return minter.nftWhitelist(nft.native.contract);
+    }
   };
 }
