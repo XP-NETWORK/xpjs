@@ -36,13 +36,10 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
-  MintRawTxn,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
   TransactionStatus,
-  TransferNftForeignUnsigned,
-  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
@@ -141,17 +138,8 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
   } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
-  UnfreezeForeignNftUnsigned<
-    EthNftInfo,
-    PopulatedTransaction
-  > &
-  TransferNftForeignUnsigned<
-    EthNftInfo,
-    PopulatedTransaction
-  > &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
-  MintRawTxn<PopulatedTransaction> &
   GetProvider<providers.Provider> & { XpNft: string };
 
 /**
@@ -374,18 +362,6 @@ export async function web3HelperFactory(
       }
       return TransactionStatus.UNKNOWN;
     },
-    async unfreezeWrappedNftTxn(to, id, txFees, _sender, nonce) {
-      const res = await minter.populateTransaction.withdrawNft(
-        to,
-        nonce,
-        id.native.tokenId,
-        id.native.contract,
-        {
-          value: EthBN.from(txFees.toString(10)),
-        }
-      );
-      return res;
-    },
     async unfreezeWrappedNftBatch(signer, chainNonce, to, nfts, txFees) {
       const res = await minter.connect(signer).withdrawNftBatch(
         to,
@@ -438,36 +414,6 @@ export async function web3HelperFactory(
     },
     createWallet(privateKey: string): Wallet {
       return new Wallet(privateKey, provider);
-    },
-    async mintRawTxn(nft, sender) {
-      const erc721 = UserNftMinter__factory.connect(
-        nft.contract!,
-        new VoidSigner(sender)
-      );
-
-      const txm = await erc721.populateTransaction.mint(nft.uris[0]);
-      return txm;
-    },
-    async transferNftToForeignTxn(
-      chain_nonce: number,
-      to: string,
-      id: NftInfo<EthNftInfo>,
-      txFees: BigNumber,
-      _sender,
-      mintWith
-    ) {
-      const method = NFT_METHOD_MAP[id.native.contractType].freeze;
-      const txr = await minter.populateTransaction[method](
-        id.native.contract,
-        id.native.tokenId,
-        chain_nonce,
-        to,
-        mintWith,
-        {
-          value: EthBN.from(txFees.toString(10)),
-        }
-      );
-      return txr;
     },
     async transferNftToForeign(
       sender: Signer,

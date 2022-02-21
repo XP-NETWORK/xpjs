@@ -27,13 +27,10 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   IsApproved,
-  MintRawTxn,
   NftMintArgs,
   PreTransfer,
   PreTransferRawTxn,
   TransactionStatus,
-  TransferNftForeignUnsigned,
-  UnfreezeForeignNftUnsigned,
   ValidateAddress,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
@@ -90,10 +87,7 @@ export type TronHelper = BaseTronHelper &
   ExtractAction<string> &
   Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, TronRawTxn> &
-  UnfreezeForeignNftUnsigned<EthNftInfo, TronRawTxn> &
-  TransferNftForeignUnsigned<EthNftInfo, TronRawTxn> &
-  ExtractTxnStatus &
-  MintRawTxn<TronRawTxn>;
+  ExtractTxnStatus;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -379,86 +373,6 @@ export async function tronHelperFactory(
             },
           ],
           address
-        );
-      if (!result.result) {
-        throw new Error(result.toString());
-      }
-      return addMinToExpirationTime(transaction, 15);
-    },
-    async mintRawTxn(args, sender) {
-      const { transaction, result } =
-        await provider.transactionBuilder.triggerSmartContract(
-          args.contract,
-          "mint(string)",
-          {
-            feeLimit: 1_000_000,
-            callValue: 0,
-          },
-          [
-            {
-              type: "string",
-              value: args.uris[0],
-            },
-          ],
-          sender
-        );
-      if (!result.result) {
-        throw new Error(result.toString());
-      }
-      return addMinToExpirationTime(transaction, 15);
-    },
-    async transferNftToForeignTxn(nonce, to, id, _fee, sender) {
-      const { transaction, result } =
-        await provider.transactionBuilder.triggerSmartContract(
-          "freezeErc721(address,uint256,uint64,string)",
-          {
-            feeLimit: 1_000_000,
-            callValue: 0,
-          },
-          [
-            {
-              type: "address",
-              value: id.native.contract,
-            },
-            {
-              type: "uint256",
-              value: id.native.tokenId,
-            },
-            {
-              type: "uint64",
-              value: nonce,
-            },
-            {
-              type: "string",
-              value: to,
-            },
-          ],
-          sender
-        );
-      if (!result.result) {
-        throw new Error(result.toString());
-      }
-      return addMinToExpirationTime(transaction, 15);
-    },
-    async unfreezeWrappedNftTxn(to, id, _fee, sender) {
-      const { transaction, result } =
-        await provider.transactionBuilder.triggerSmartContract(
-          "withdrawNft(string,uint256)",
-          {
-            feeLimit: 1_000_000,
-            callValue: 0,
-          },
-          [
-            {
-              type: "string",
-              value: to,
-            },
-            {
-              type: "uint256",
-              value: id,
-            },
-          ],
-          sender
         );
       if (!result.result) {
         throw new Error(result.toString());
