@@ -1,10 +1,9 @@
 import {
-  ElrondHelper,
   ElrondParams,
   ElrondRawUnsignedTxn,
 } from "../helpers/elrond";
-import { TronHelper, TronParams, TronRawTxn } from "../helpers/tron";
-import { Web3Helper, Web3Params } from "../helpers/web3";
+import { TronParams, TronRawTxn } from "../helpers/tron";
+import { Web3Params } from "../helpers/web3";
 import {
   Chain,
   CHAIN_INFO,
@@ -45,20 +44,13 @@ import {
 } from "../helpers/algorand";
 import algosdk from "algosdk";
 import { Base64 } from "js-base64";
-import { TezosHelper, TezosParams } from "../helpers/tezos";
+import { TezosParams } from "../helpers/tezos";
 import {
   EstimateTxFeesBatch,
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
 } from "../helpers/chain";
 import { ChainNonce, HelperMap, InferChainH, InferChainParam, InferSigner, ParamMap } from "../type-utils";
-
-export type CrossChainHelper =
-  | ElrondHelper
-  | Web3Helper
-  | TronHelper
-  | AlgorandHelper
-  | TezosHelper;
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
