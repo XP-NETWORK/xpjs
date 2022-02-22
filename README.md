@@ -98,6 +98,7 @@ const factory = ChainFactory(Config, testnetConfig);
 | Fantom | fantomParams |
 | Tron | tronParams |
 | xDai | xDaiParams |
+| Harmony | harmonyParams |
 
 </center><br/>
 
@@ -182,6 +183,7 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
   const fantom    = await factory.inner<Web3Helper,     Web3Params>    (Chain.FANTOM);
   const velas     = await factory.inner<Web3Helper,     Web3Params>    (Chain.VELAS);
   const gnosis    = await factory.inner<Web3Helper,     Web3Params>    (Chain.XDAI);
+  const harmony    = await factory.inner<Web3Helper,     Web3Params>    (Chain.HARMONY);
 
   // Non-EVM chains:
   // Inner Object ==================== Chain Helper === Chain Params === Chain Nonce ==
@@ -204,7 +206,7 @@ This operation does not depend on a wallet since reading operations are free and
 
   // EVM:
   const web3Nfts = await factory.nftList(
-    polygon,     // The chain of interest
+    harmony,     // The chain of interest
     "0x...."     // The public key of the NFT owner in a web3 chain
   );
 
@@ -416,7 +418,7 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 ```javascript
 (async () => {
   // EVM example
-  const isApprovedEVM = await polygon.approveForMinter(web3ChosenOne, signer);
+  const isApprovedEVM = await harmony.approveForMinter(web3ChosenOne, signer);
   console.log("Is Approved in an EVM:", isApprovedEVM);
 
   // Elrond example
@@ -445,7 +447,7 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 (async () => {
   // EVM compatible chains example:
   const web3Result = await factory.transferNft(
-    polygon,                    // The Source Chain.
+    harmony,                    // The Source Chain.
     bsc,                        // The Destination Chain.
     theChosenOne,               // The NFT object you have chosen from the list.
     signer,                     // The web3 signer object (see p. 3.2 above).
