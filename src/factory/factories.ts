@@ -109,10 +109,10 @@ export namespace ChainFactoryConfigs {
     xDaiParams: {
       middleware_uri,
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
-      minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
-      erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
-      erc1155Minter: "string",
-      erc721Minter: "string",
+      minter_addr: "0x90d38996B210D45bDF2FD54d091C6061dff0dA9F",
+      erc721_addr: "0x0e02b55e1D0ec9023A04f1278F39685B53739010",
+      erc1155Minter: "0x0AA29baB4F811A9f3dcf6a0F9cAEa9bE18ECED78",
+      erc721Minter: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
       nonce: Chain.XDAI,
     },
     algorandParams: {
