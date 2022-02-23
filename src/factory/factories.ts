@@ -124,6 +124,15 @@ export namespace ChainFactoryConfigs {
       sendNftAppId: 458971166,
       algodPort: 443,
     },
+    auroraParams: {
+      middleware_uri,
+      provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AURORA),
+      erc721_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
+      minter_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
+      erc1155Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
+      erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
+      nonce: Chain.AURORA,
+    },
     uniqueParams: {
       provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.UNIQUE),
       nonce: Chain.UNIQUE,

@@ -32,6 +32,7 @@ export enum TestNetRpcUri {
   TEZOS = "https://hangzhounet.smartpy.io",
   VELAS = "https://explorer.testnet.velas.com/rpc",
   IOTEX = "https://babel-api.testnet.iotex.io",
+  AURORA = "https://testnet.aurora.dev/",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -94,16 +95,17 @@ export namespace Chain {
   export const POLYGON = 7;
   export const FANTOM = 8;
   export const TRON = 9;
-  export const CELO = 0xb;
-  export const HARMONY = 0xc;
-  export const ONT = 0xd;
-  export const XDAI = 0xe;
-  export const ALGORAND = 0xf;
-  export const FUSE = 0x10;
-  export const UNIQUE = 0x11;
-  export const TEZOS = 0x12;
-  export const VELAS = 0x13;
-  export const IOTEX = 0x14;
+  export const CELO = 0xb;    //11
+  export const HARMONY = 0xc; //12
+  export const ONT = 0xd;     //13
+  export const XDAI = 0xe;    //14
+  export const ALGORAND = 0xf;//15
+  export const FUSE = 0x10;   // 16
+  export const UNIQUE = 0x11; // 17
+  export const TEZOS = 0x12;  // 18
+  export const VELAS = 0x13;  // 19
+  export const IOTEX = 0x14;  // 20
+  export const AURORA = 0x15; // 21
 }
 
 interface ChainData<T extends ChainNonce> {
