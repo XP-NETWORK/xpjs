@@ -175,22 +175,22 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 ```javascript
 (async () => {
   // EVM-compatible chains:
-  // Inner Object ==================== Chain Helper === Chain Params === Chain Nonce ==
-  const ethereum  = await factory.inner<Web3Helper,     Web3Params>    (Chain.ETHEREUM);
-  const bsc       = await factory.inner<Web3Helper,     Web3Params>    (Chain.BSC);
-  const polygon   = await factory.inner<Web3Helper,     Web3Params>    (Chain.POLYGON);
-  const avax      = await factory.inner<Web3Helper,     Web3Params>    (Chain.AVALANCHE);
-  const fantom    = await factory.inner<Web3Helper,     Web3Params>    (Chain.FANTOM);
-  const velas     = await factory.inner<Web3Helper,     Web3Params>    (Chain.VELAS);
-  const gnosis    = await factory.inner<Web3Helper,     Web3Params>    (Chain.XDAI);
-  const harmony    = await factory.inner<Web3Helper,     Web3Params>    (Chain.HARMONY);
+  // Inner Object ====================== Chain Nonce ==
+  const ethereum  = await factory.inner(Chain.ETHEREUM);
+  const bsc       = await factory.inner(Chain.BSC);
+  const polygon   = await factory.inner(Chain.POLYGON);
+  const avax      = await factory.inner(Chain.AVALANCHE);
+  const fantom    = await factory.inner(Chain.FANTOM);
+  const velas     = await factory.inner(Chain.VELAS);
+  const gnosis    = await factory.inner(Chain.XDAI);
+  const harmony    = await factory.inner(Chain.HARMONY);
 
   // Non-EVM chains:
-  // Inner Object ==================== Chain Helper === Chain Params === Chain Nonce ==
-  const algorand  = await factory.inner<AlgorandHelper, AlgorandParams>(Chain.ALGORAND);
-  const elrond    = await factory.inner<ElrondHelper,   ElrondParams>  (Chain.ELROND);
-  const tezos     = await factory.inner<TezosHelper,    TezosParams>   (Chain.TEZOS);
-  const tron      = await factory.inner<TronHelper,     TronParams>    (Chain.TRON);
+  // Inner Object ====================== Chain Nonce ==
+  const algorand  = await factory.inner(Chain.ALGORAND);
+  const elrond    = await factory.inner(Chain.ELROND);
+  const tezos     = await factory.inner(Chain.TEZOS);
+  const tron      = await factory.inner(Chain.TRON);
 })();
 ```
 
