@@ -290,10 +290,10 @@ var ChainFactoryConfigs;
         iotexParams: {
             middleware_uri,
             provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.MainNetRpcUri.IOTEX),
-            minter_addr: "0xD6939f722B977afd7DD934A31bc94d08d4ea4336",
-            erc721_addr: "0xc45759e51CdDBa46db4D1becC8B8Bcbe5d4a9bB4",
+            minter_addr: "0x0E99a77fedf8D1Eb783078D1Aa84160a5CBE96D7",
+            erc721_addr: "0xF03d628aD8Ae53919A3E65A0cB85dD8765963C56",
             erc721Minter: "0xD87755CCeaab0edb28b3f0CD7D6405E1bB827B65",
-            erc1155Minter: "0xF5e792c1e8E626a4496D580b8c2b4d51bF80eFB7",
+            erc1155Minter: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
             nonce: consts_1.Chain.IOTEX,
         },
     });

@@ -98,6 +98,7 @@ const factory = ChainFactory(Config, testnetConfig);
 | Fantom | fantomParams |
 | Tron | tronParams |
 | xDai | xDaiParams |
+| Harmony | harmonyParams |
 
 </center><br/>
 
@@ -174,21 +175,22 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 ```javascript
 (async () => {
   // EVM-compatible chains:
-  // Inner Object ==================== Chain Helper === Chain Params === Chain Nonce ==
-  const ethereum  = await factory.inner<Web3Helper,     Web3Params>    (Chain.ETHEREUM);
-  const bsc       = await factory.inner<Web3Helper,     Web3Params>    (Chain.BSC);
-  const polygon   = await factory.inner<Web3Helper,     Web3Params>    (Chain.POLYGON);
-  const avax      = await factory.inner<Web3Helper,     Web3Params>    (Chain.AVALANCHE);
-  const fantom    = await factory.inner<Web3Helper,     Web3Params>    (Chain.FANTOM);
-  const velas     = await factory.inner<Web3Helper,     Web3Params>    (Chain.VELAS);
-  const gnosis    = await factory.inner<Web3Helper,     Web3Params>    (Chain.XDAI);
+  // Inner Object ====================== Chain Nonce ==
+  const ethereum  = await factory.inner(Chain.ETHEREUM);
+  const bsc       = await factory.inner(Chain.BSC);
+  const polygon   = await factory.inner(Chain.POLYGON);
+  const avax      = await factory.inner(Chain.AVALANCHE);
+  const fantom    = await factory.inner(Chain.FANTOM);
+  const velas     = await factory.inner(Chain.VELAS);
+  const gnosis    = await factory.inner(Chain.XDAI);
+  const harmony    = await factory.inner(Chain.HARMONY);
 
   // Non-EVM chains:
-  // Inner Object ==================== Chain Helper === Chain Params === Chain Nonce ==
-  const algorand  = await factory.inner<AlgorandHelper, AlgorandParams>(Chain.ALGORAND);
-  const elrond    = await factory.inner<ElrondHelper,   ElrondParams>  (Chain.ELROND);
-  const tezos     = await factory.inner<TezosHelper,    TezosParams>   (Chain.TEZOS);
-  const tron      = await factory.inner<TronHelper,     TronParams>    (Chain.TRON);
+  // Inner Object ====================== Chain Nonce ==
+  const algorand  = await factory.inner(Chain.ALGORAND);
+  const elrond    = await factory.inner(Chain.ELROND);
+  const tezos     = await factory.inner(Chain.TEZOS);
+  const tron      = await factory.inner(Chain.TRON);
 })();
 ```
 
@@ -204,7 +206,7 @@ This operation does not depend on a wallet since reading operations are free and
 
   // EVM:
   const web3Nfts = await factory.nftList(
-    polygon,     // The chain of interest
+    harmony,     // The chain of interest
     "0x...."     // The public key of the NFT owner in a web3 chain
   );
 
@@ -416,7 +418,7 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 ```javascript
 (async () => {
   // EVM example
-  const isApprovedEVM = await polygon.approveForMinter(web3ChosenOne, signer);
+  const isApprovedEVM = await harmony.approveForMinter(web3ChosenOne, signer);
   console.log("Is Approved in an EVM:", isApprovedEVM);
 
   // Elrond example
@@ -445,7 +447,7 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 (async () => {
   // EVM compatible chains example:
   const web3Result = await factory.transferNft(
-    polygon,                    // The Source Chain.
+    harmony,                    // The Source Chain.
     bsc,                        // The Destination Chain.
     theChosenOne,               // The NFT object you have chosen from the list.
     signer,                     // The web3 signer object (see p. 3.2 above).
