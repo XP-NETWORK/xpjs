@@ -126,12 +126,12 @@ CHAIN_INFO.set(Chain.ELROND, {
   name: "Elrond",
   nonce: 2,
   decimals: 1e18,
-  constructor: elrondHelperFactory as any,
+  constructor: elrondHelperFactory,
   blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
   currency: SupportedCurrency.EGLD
 });
 CHAIN_INFO.set(Chain.HECO, {
-  name: "Heco",
+  name: "HECO",
   nonce: 3,
   chainId: 256,
   decimals: 1e18,
@@ -149,7 +149,7 @@ CHAIN_INFO.set(Chain.BSC, {
   currency: SupportedCurrency.BNB,
 });
 CHAIN_INFO.set(Chain.ETHEREUM, {
-  name: "Ropsten",
+  name: "Ethereum",
   nonce: 5,
   currency: SupportedCurrency.ETH,
   chainId: 3,
