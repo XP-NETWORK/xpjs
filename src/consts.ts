@@ -274,6 +274,15 @@ CHAIN_INFO.set(Chain.VELAS, {
     constructor: web3HelperFactory,
     currency: SupportedCurrency.VLX,
     chainId: 111,
+});
+CHAIN_INFO.set(Chain.AURORA, {
+    name: "Aurora",
+    blockExplorerUrl: "https://testnet.aurorascan.dev/tx",
+    nonce: Chain.AURORA,
+    decimals: 1e18,
+    constructor: web3HelperFactory,
+    currency: SupportedCurrency.AURORA,
+    chainId: 1313161555
 })
 CHAIN_INFO.set(Chain.IOTEX, {
     name: "IoTeX",
