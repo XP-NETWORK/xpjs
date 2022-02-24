@@ -83,7 +83,8 @@ export type MetaMap = {
   0x11: Web3Meta,
   0x12: TezosMeta,
   0x13: Web3Meta,
-  0x14: Web3Meta
+  0x14: Web3Meta,
+  0x15: Web3Meta
 } & MetaMapAssert;
 
 export namespace Chain {
