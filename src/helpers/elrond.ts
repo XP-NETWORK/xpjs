@@ -50,6 +50,7 @@ import {
   ValidateAddress,
 } from "..";
 import { NftMintArgs } from "..";
+import { EvNotifier } from "../notifier";
 
 type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 
@@ -229,6 +230,7 @@ export type ElrondHelper = BalanceCheck &
  */
 export interface ElrondParams {
   node_uri: string;
+  notifier: EvNotifier;
   minter_address: string;
   esdt_swap_address: string;
   esdt_nft: string;
@@ -251,6 +253,10 @@ export async function elrondHelperFactory(
   const gasPriceModif =
     networkConfig.MinGasPrice.valueOf() *
     networkConfig.GasPriceModifier.valueOf();
+
+  async function notifyValidator(hash: TransactionHash) {
+    await elrondParams.notifier.notifyElrond(hash.toString());
+  }
 
   const syncAccount = async (signer: ElrondSigner) => {
     const account = new Account(await getAddress(signer));
@@ -587,6 +593,8 @@ export async function elrondHelperFactory(
         mintWith
       );
       const tx = await signAndSend(sender, txu);
+      transactionResult(tx.getHash())
+        .then(() => notifyValidator(tx.getHash()))
 
       return tx;
     },
@@ -605,6 +613,8 @@ export async function elrondHelperFactory(
         nonce
       );
       const tx = await signAndSend(sender, txu);
+      transactionResult(tx.getHash())
+        .then(() => notifyValidator(tx.getHash()))
 
       return tx;
     },
@@ -728,6 +738,9 @@ export async function elrondHelperFactory(
           .build(),
       });
       const tx = await signAndSend(sender, txu);
+      transactionResult(tx.getHash())
+        .then(() => notifyValidator(tx.getHash()))
+
       return tx;
     },
     async transferNftBatchToForeign(
@@ -764,6 +777,9 @@ export async function elrondHelperFactory(
           .build(),
       });
       const tx = await signAndSend(sender, txu);
+      transactionResult(tx.getHash())
+        .then(() => notifyValidator(tx.getHash()))
+
       return tx;
     },
     async estimateValidateTransferNftBatch(_, nfts) {

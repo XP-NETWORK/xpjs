@@ -70,9 +70,7 @@ type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
 export type ChainFactory = {
   /**
    * Creates an helper factory for a given chain
-   * @type T: Either {@link ElrondHelper} | {@link Web3Helper} | {@link TronHelper} as required.
-   * @type P: Either {@link ElrondParams} | {@link Web3Params} | {@link TronParams} as required.
-   * @param chain: {@link Chain} to create the helper for.
+   * @param chain: {@link ChainNonce} to create the helper for.
    */
   inner<T extends ChainNonce>(chain: T): Promise<InferChainH<T>>;
   /**

@@ -44,8 +44,8 @@ import {
   WhitelistCheck,
 } from "..";
 import { NftMintArgs } from "..";
-import axios from "axios";
 import { ChainNonce } from "../type-utils";
+import { EvNotifier } from "../notifier";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -189,7 +189,7 @@ export async function baseWeb3HelperFactory(
  */
 export interface Web3Params {
   provider: Provider;
-  middleware_uri: string;
+  notifier: EvNotifier;
   minter_addr: string;
   erc721_addr: string;
   erc721Minter: string;
@@ -254,18 +254,8 @@ export async function web3HelperFactory(
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
 
-  const event_middleware = axios.create({
-    baseURL: params.middleware_uri,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
   async function notifyValidator(hash: string): Promise<void> {
-    await event_middleware.post("/tx/web3", {
-      chain_nonce: params.nonce,
-      tx_hash: hash,
-    });
+    await params.notifier.notifyWeb3(params.nonce, hash);
   }
 
   async function extractAction(txr: TransactionResponse): Promise<string> {

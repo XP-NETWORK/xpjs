@@ -7,7 +7,6 @@ import {
   UnfreezeForeignNft,
 } from "./chain";
 
-import axios from "axios";
 // @ts-expect-error no types cope
 import { TronWeb } from "tronweb";
 // @ts-expect-error no types cope
@@ -36,6 +35,7 @@ import {
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
 import { Transaction } from "ethers";
+import { EvNotifier } from "../notifier";
 
 // Uses default private key in provider if sender is undefinedd
 type TronSender = string | undefined;
@@ -191,7 +191,7 @@ export async function baseTronHelperFactory(
 
 export interface TronParams {
   provider: TronWeb;
-  middleware_uri: string;
+  notifier: EvNotifier;
   minter_addr: string;
   erc721_addr: string;
   validators: string[];
@@ -228,19 +228,13 @@ export async function tronHelperFactory(
   const station = new TronStation(provider);
   const base = await baseTronHelperFactory(provider);
   const minter = await provider.contract(Minter__factory.abi, minter_addr);
-  const event_middleware = axios.create({
-    baseURL: tronParams.middleware_uri,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
 
   const setSigner = (signer: TronSender) => {
     return signer && provider.setPrivateKey(signer);
   };
 
   async function notifyValidator(hash: string): Promise<void> {
-    await event_middleware.post("/tx/tron", { tx_hash: hash });
+    await tronParams.notifier.notifyTron(hash);
   }
 
   async function extractAction(hash: string): Promise<string> {
