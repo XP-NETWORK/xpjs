@@ -593,8 +593,8 @@ export async function elrondHelperFactory(
         mintWith
       );
       const tx = await signAndSend(sender, txu);
-      transactionResult(tx.getHash())
-        .then(() => notifyValidator(tx.getHash()))
+      await transactionResult(tx.getHash());
+      await notifyValidator(tx.getHash());
 
       return tx;
     },
@@ -613,8 +613,8 @@ export async function elrondHelperFactory(
         nonce
       );
       const tx = await signAndSend(sender, txu);
-      transactionResult(tx.getHash())
-        .then(() => notifyValidator(tx.getHash()))
+      await transactionResult(tx.getHash());
+      await notifyValidator(tx.getHash());
 
       return tx;
     },
@@ -738,8 +738,8 @@ export async function elrondHelperFactory(
           .build(),
       });
       const tx = await signAndSend(sender, txu);
-      transactionResult(tx.getHash())
-        .then(() => notifyValidator(tx.getHash()))
+      await transactionResult(tx.getHash());
+      await notifyValidator(tx.getHash());
 
       return tx;
     },
@@ -777,8 +777,8 @@ export async function elrondHelperFactory(
           .build(),
       });
       const tx = await signAndSend(sender, txu);
-      transactionResult(tx.getHash())
-        .then(() => notifyValidator(tx.getHash()))
+      await transactionResult(tx.getHash());
+      await notifyValidator(tx.getHash());
 
       return tx;
     },
