@@ -254,8 +254,10 @@ export async function elrondHelperFactory(
     networkConfig.MinGasPrice.valueOf() *
     networkConfig.GasPriceModifier.valueOf();
 
-  async function notifyValidator(hash: TransactionHash) {
-    await elrondParams.notifier.notifyElrond(hash.toString());
+  async function notifyValidator(txn: Transaction) {
+	await transactionResult(txn.getHash());
+	await txn.awaitNotarized(provider)
+    await elrondParams.notifier.notifyElrond(txn.getHash().toString());
   }
 
   const syncAccount = async (signer: ElrondSigner) => {
@@ -593,8 +595,7 @@ export async function elrondHelperFactory(
         mintWith
       );
       const tx = await signAndSend(sender, txu);
-      await transactionResult(tx.getHash());
-      await notifyValidator(tx.getHash());
+      await notifyValidator(tx);
 
       return tx;
     },
@@ -613,8 +614,7 @@ export async function elrondHelperFactory(
         nonce
       );
       const tx = await signAndSend(sender, txu);
-      await transactionResult(tx.getHash());
-      await notifyValidator(tx.getHash());
+      await notifyValidator(tx);
 
       return tx;
     },
@@ -738,8 +738,7 @@ export async function elrondHelperFactory(
           .build(),
       });
       const tx = await signAndSend(sender, txu);
-      await transactionResult(tx.getHash());
-      await notifyValidator(tx.getHash());
+      await notifyValidator(tx);
 
       return tx;
     },
@@ -777,8 +776,7 @@ export async function elrondHelperFactory(
           .build(),
       });
       const tx = await signAndSend(sender, txu);
-      await transactionResult(tx.getHash());
-      await notifyValidator(tx.getHash());
+      await notifyValidator(tx);
 
       return tx;
     },
