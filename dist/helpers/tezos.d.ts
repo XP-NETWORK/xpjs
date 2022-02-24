@@ -1,5 +1,6 @@
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, MintNft, NftInfo, NftMintArgs, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import { Signer, TezosToolkit, WalletProvider } from "@taquito/taquito";
+import { EvNotifier } from "../notifier";
 declare type TezosSigner = WalletProvider | Signer;
 declare type TezosNftInfo = {
     contract: string;
@@ -12,10 +13,10 @@ export declare type TezosHelper = TransferNftForeign<TezosSigner, TezosNftInfo, 
 };
 export declare type TezosParams = {
     Tezos: TezosToolkit;
-    middlewareUri: string;
+    notifier: EvNotifier;
     xpnftAddress: string;
     bridgeAddress: string;
     validators: string[];
 };
-export declare function tezosHelperFactory({ Tezos, middlewareUri, xpnftAddress, bridgeAddress, validators, }: TezosParams): Promise<TezosHelper>;
+export declare function tezosHelperFactory({ Tezos, notifier, xpnftAddress, bridgeAddress, validators, }: TezosParams): Promise<TezosHelper>;
 export {};

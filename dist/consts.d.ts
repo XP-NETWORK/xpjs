@@ -21,7 +21,8 @@ export declare enum TestNetRpcUri {
     UNIQUE = "https://rpc-opal.unique.network/",
     TEZOS = "https://hangzhounet.smartpy.io",
     VELAS = "https://explorer.testnet.velas.com/rpc",
-    IOTEX = "https://babel-api.testnet.iotex.io"
+    IOTEX = "https://babel-api.testnet.iotex.io",
+    AURORA = "https://testnet.aurora.dev/"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -67,6 +68,7 @@ export declare type MetaMap = {
     0x12: TezosMeta;
     0x13: Web3Meta;
     0x14: Web3Meta;
+    0x15: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -87,6 +89,7 @@ export declare namespace Chain {
     const TEZOS = 18;
     const VELAS = 19;
     const IOTEX = 20;
+    const AURORA = 21;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;

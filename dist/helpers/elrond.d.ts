@@ -8,6 +8,7 @@ import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider
 import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch } from "./chain";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
+import { EvNotifier } from "../notifier";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 /**
  * Information associated with an ESDT Token
@@ -112,6 +113,7 @@ export declare type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigne
  */
 export interface ElrondParams {
     node_uri: string;
+    notifier: EvNotifier;
     minter_address: string;
     esdt_swap_address: string;
     esdt_nft: string;

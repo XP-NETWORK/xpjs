@@ -4,6 +4,7 @@ import { Transaction } from "@vechain/ethers/utils";
 import { TransactionResponse, Provider } from "@vechain/ethers/providers";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { NftMintArgs } from "..";
+import { EvNotifier } from "../notifier";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -73,7 +74,7 @@ export declare function baseWeb3HelperFactory(provider: Provider): Promise<BaseW
  */
 export interface Web3Params {
     provider: Provider;
-    middleware_uri: string;
+    notifier: EvNotifier;
     minter_addr: string;
     erc721_addr: string;
     validators: string[];

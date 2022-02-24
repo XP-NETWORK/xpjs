@@ -4,6 +4,7 @@ import { EthNftInfo } from "./web3";
 import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, NftMintArgs, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonceGet } from "..";
 import { Transaction } from "ethers";
+import { EvNotifier } from "../notifier";
 declare type TronSender = string | undefined;
 export declare type MinterRes = {
     minter: string;
@@ -34,7 +35,7 @@ export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender,
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
-    middleware_uri: string;
+    notifier: EvNotifier;
     minter_addr: string;
     erc721_addr: string;
     validators: string[];

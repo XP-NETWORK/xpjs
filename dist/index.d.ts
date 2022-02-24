@@ -6,3 +6,4 @@ export * from "./socket";
 export * from "./factory";
 export * from "./consts";
 export * from "./config";
+export { ChainNonce } from "./type-utils";

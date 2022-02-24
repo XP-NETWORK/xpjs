@@ -5,6 +5,7 @@ import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftM
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { NftMintArgs } from "..";
 import { ChainNonce } from "../type-utils";
+import { EvNotifier } from "../notifier";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -77,7 +78,7 @@ export declare function baseWeb3HelperFactory(provider: Provider): Promise<BaseW
  */
 export interface Web3Params {
     provider: Provider;
-    middleware_uri: string;
+    notifier: EvNotifier;
     minter_addr: string;
     erc721_addr: string;
     erc721Minter: string;
