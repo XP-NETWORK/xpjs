@@ -255,8 +255,6 @@ export async function elrondHelperFactory(
     networkConfig.GasPriceModifier.valueOf();
 
   async function notifyValidator(txn: Transaction) {
-	await transactionResult(txn.getHash());
-	await txn.awaitNotarized(provider)
     await elrondParams.notifier.notifyElrond(txn.getHash().toString());
   }
 
