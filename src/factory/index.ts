@@ -620,8 +620,12 @@ export function ChainFactory(
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
       return await algo.claimableNfts(txSocket, claimer);
     },
-    checkWhitelist(chain, nft) {
-      return chain.isNftWhitelisted ? chain.isNftWhitelisted(nft) : Promise.resolve(true);
+    async checkWhitelist(chain, nft) {
+      if (!chain.isNftWhitelisted || await isWrappedNft(nft)) {
+        return true;
+      }
+
+      return await chain.isNftWhitelisted(nft);
     }
   };
 }
