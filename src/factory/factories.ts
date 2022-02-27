@@ -245,6 +245,7 @@ export namespace ChainFactoryConfigs {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HARMONY),
         minter_addr: "0x041AE550CB0e76a3d048cc2a4017BbCB74756b43",
         erc721_addr: "0xca8E2a118d7674080d71762a783b0729AadadD42",
+        erc1155_addr: "0xF547002799955812378137FA30C21039E69deF05",
         erc1155Minter: "0xF547002799955812378137FA30C21039E69deF05",
         erc721Minter: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
         nonce: Chain.HARMONY,
