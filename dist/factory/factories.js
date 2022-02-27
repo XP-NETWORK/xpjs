@@ -244,9 +244,9 @@ var ChainFactoryConfigs;
             harmonyParams: {
                 notifier,
                 provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.MainNetRpcUri.HARMONY),
-                minter_addr: "0xCbA56d441da86dEfe31d3AdDeEc2bA04f7e27d9e",
-                erc721_addr: "0x0AA29baB4F811A9f3dcf6a0F9cAEa9bE18ECED78",
-                erc1155Minter: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
+                minter_addr: "0x041AE550CB0e76a3d048cc2a4017BbCB74756b43",
+                erc721_addr: "0xca8E2a118d7674080d71762a783b0729AadadD42",
+                erc1155Minter: "0xF547002799955812378137FA30C21039E69deF05",
                 erc721Minter: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
                 nonce: consts_1.Chain.HARMONY,
             },
