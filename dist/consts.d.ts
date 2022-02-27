@@ -34,7 +34,7 @@ export declare enum MainNetRpcUri {
     FANTOM = "https://rpc.ftm.tools/",
     TRON = "https://api.trongrid.io/",
     CELO = "https://forno.celo.org",
-    HARMONY = "https://api.harmony.one",
+    HARMONY = "https://rpc.s0.t.hmny.io",
     XDAI = "https://rpc.xdaichain.com/",
     FUSE = "https://rpc.fuse.io/",
     VELAS = "https://mainnet.velas.com/rpc",
