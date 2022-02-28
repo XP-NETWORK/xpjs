@@ -37,11 +37,7 @@ export interface PreTransfer<Signer, Nft, Ret> {
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface TransferNftForeign<
-  Signer,
-  RawNft,
-  Resp
-> {
+export interface TransferNftForeign<Signer, RawNft, Resp> {
   transferNftToForeign(
     sender: Signer,
     chain_nonce: number,
@@ -62,11 +58,7 @@ export interface TransferNftForeign<
  *
  * @returns Transaction and the Identifier of this action to track the status
  */
-export interface UnfreezeForeignNft<
-  Signer,
-  RawNft,
-  Resp
-> {
+export interface UnfreezeForeignNft<Signer, RawNft, Resp> {
   unfreezeWrappedNft(
     sender: Signer,
     to: string,
@@ -139,32 +131,24 @@ export interface ExtractTxnStatus {
   extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
 
-export interface TransferNftForeignBatch<
-  Signer,
-  RawNft,
-  Resp
-> {
+export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
   transferNftBatchToForeign(
     sender: Signer,
     chain_nonce: number,
     to: string,
     id: NftInfo<RawNft>[],
     mintWith: string,
-    txFees: BigNumber 
+    txFees: BigNumber
   ): Promise<Resp>;
 }
 
-export interface UnfreezeForeignNftBatch<
-  Signer,
-  RawNft,
-  Resp
-> {
+export interface UnfreezeForeignNftBatch<Signer, RawNft, Resp> {
   unfreezeWrappedNftBatch(
     sender: Signer,
     chainNonce: number,
     to: string,
     nfts: NftInfo<RawNft>[],
-    txFees: BigNumber 
+    txFees: BigNumber
   ): Promise<Resp>;
 }
 
@@ -182,12 +166,15 @@ export interface EstimateTxFeesBatch<RawNftF> {
 
 export type WhitelistCheck<RawNft> = {
   isNftWhitelisted(nft: NftInfo<RawNft>): Promise<boolean>;
-}
+};
 
 export interface GetProvider<Provider> {
   getProvider(): Provider;
 }
 
 export async function isWrappedNft(nft: NftInfo<unknown>) {
-   return typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !== "undefined";
+  return (
+    typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
+    "undefined"
+  );
 }

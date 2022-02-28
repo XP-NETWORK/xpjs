@@ -63,28 +63,28 @@ type AlgoMeta = [AlgorandHelper, AlgorandParams];
 type TezosMeta = [TezosHelper, TezosParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
-type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown }
+type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
 
 export type MetaMap = {
-  2: ElrondMeta,
-  3: Web3Meta,
-  4: Web3Meta,
-  5: Web3Meta,
-  6: Web3Meta,
-  7: Web3Meta,
-  8: Web3Meta,
-  9: TronMeta,
-  0xb: Web3Meta,
-  0xc: Web3Meta,
-  0xd: Web3Meta,
-  0xe: Web3Meta,
-  0xf: AlgoMeta,
-  0x10: Web3Meta,
-  0x11: Web3Meta,
-  0x12: TezosMeta,
-  0x13: Web3Meta,
-  0x14: Web3Meta,
-  0x15: Web3Meta
+  2: ElrondMeta;
+  3: Web3Meta;
+  4: Web3Meta;
+  5: Web3Meta;
+  6: Web3Meta;
+  7: Web3Meta;
+  8: Web3Meta;
+  9: TronMeta;
+  0xb: Web3Meta;
+  0xc: Web3Meta;
+  0xd: Web3Meta;
+  0xe: Web3Meta;
+  0xf: AlgoMeta;
+  0x10: Web3Meta;
+  0x11: Web3Meta;
+  0x12: TezosMeta;
+  0x13: Web3Meta;
+  0x14: Web3Meta;
+  0x15: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -96,16 +96,16 @@ export namespace Chain {
   export const POLYGON = 7;
   export const FANTOM = 8;
   export const TRON = 9;
-  export const CELO = 0xb;    //11
+  export const CELO = 0xb; //11
   export const HARMONY = 0xc; //12
-  export const ONT = 0xd;     //13
-  export const XDAI = 0xe;    //14
-  export const ALGORAND = 0xf;//15
-  export const FUSE = 0x10;   // 16
+  export const ONT = 0xd; //13
+  export const XDAI = 0xe; //14
+  export const ALGORAND = 0xf; //15
+  export const FUSE = 0x10; // 16
   export const UNIQUE = 0x11; // 17
-  export const TEZOS = 0x12;  // 18
-  export const VELAS = 0x13;  // 19
-  export const IOTEX = 0x14;  // 20
+  export const TEZOS = 0x12; // 18
+  export const VELAS = 0x13; // 19
+  export const IOTEX = 0x14; // 20
   export const AURORA = 0x15; // 21
 }
 
@@ -122,7 +122,7 @@ interface ChainData<T extends ChainNonce> {
 type ChainInfo = {
   set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
   get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
-}
+};
 
 export const CHAIN_INFO: ChainInfo = new Map();
 CHAIN_INFO.set(Chain.ELROND, {
@@ -131,7 +131,7 @@ CHAIN_INFO.set(Chain.ELROND, {
   decimals: 1e18,
   constructor: elrondHelperFactory,
   blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
-  currency: SupportedCurrency.EGLD
+  currency: SupportedCurrency.EGLD,
 });
 CHAIN_INFO.set(Chain.HECO, {
   name: "HECO",
@@ -186,7 +186,7 @@ CHAIN_INFO.set(Chain.FANTOM, {
   blockExplorerUrl: "https://explorer.testnet.fantom.network/transactions",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.FTM,
-})
+});
 CHAIN_INFO.set(Chain.TRON, {
   name: "Tron",
   nonce: 0x9,
@@ -196,102 +196,102 @@ CHAIN_INFO.set(Chain.TRON, {
   currency: SupportedCurrency.TRX,
 });
 CHAIN_INFO.set(Chain.CELO, {
-    name: "Celo",
-    nonce: 0xb,
-    decimals: 1e18,
-    chainId: 44787,
-    blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.CELO,
-})
+  name: "Celo",
+  nonce: 0xb,
+  decimals: 1e18,
+  chainId: 44787,
+  blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.CELO,
+});
 CHAIN_INFO.set(Chain.HARMONY, {
-    name: "Harmony",
-    nonce: 0xc,
-    decimals: 1e18,
-    chainId: 1666700000,
-    blockExplorerUrl: "https://explorer.pops.one/tx",
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.ONE
-})
+  name: "Harmony",
+  nonce: 0xc,
+  decimals: 1e18,
+  chainId: 1666700000,
+  blockExplorerUrl: "https://explorer.pops.one/tx",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ONE,
+});
 CHAIN_INFO.set(Chain.ONT, {
-    name: "Ontology",
-    nonce: 0xd,
-    decimals: 1e18,
-    chainId: 1666700000,
-    blockExplorerUrl: "https://explorer.pops.one/tx",
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.ONT,
-})
+  name: "Ontology",
+  nonce: 0xd,
+  decimals: 1e18,
+  chainId: 1666700000,
+  blockExplorerUrl: "https://explorer.pops.one/tx",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ONT,
+});
 CHAIN_INFO.set(Chain.XDAI, {
-    name: "xDai",
-    nonce: 0xe,
-    decimals: 1e18,
-    chainId: 0x64,
-    blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.STAKE
-})
+  name: "xDai",
+  nonce: 0xe,
+  decimals: 1e18,
+  chainId: 0x64,
+  blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.STAKE,
+});
 CHAIN_INFO.set(Chain.ALGORAND, {
-    name: "Algorand",
-    nonce: 0xf,
-    decimals: 1e6,
-    chainId: undefined,
-    blockExplorerUrl: "https://algoexplorer.io/tx",
-    currency: SupportedCurrency.ALGO,
-    constructor: (p) => Promise.resolve(algorandHelper(p)),
+  name: "Algorand",
+  nonce: 0xf,
+  decimals: 1e6,
+  chainId: undefined,
+  blockExplorerUrl: "https://algoexplorer.io/tx",
+  currency: SupportedCurrency.ALGO,
+  constructor: (p) => Promise.resolve(algorandHelper(p)),
 });
 CHAIN_INFO.set(Chain.FUSE, {
-    name: "FUSE",
-    nonce: 0x10,
-    decimals: 1e18,
-    chainId: undefined,
-    blockExplorerUrl: "https://explorer.fuse.io/tx",
-    currency: SupportedCurrency.FUSE,
-    constructor: web3HelperFactory,
-})
+  name: "FUSE",
+  nonce: 0x10,
+  decimals: 1e18,
+  chainId: undefined,
+  blockExplorerUrl: "https://explorer.fuse.io/tx",
+  currency: SupportedCurrency.FUSE,
+  constructor: web3HelperFactory,
+});
 CHAIN_INFO.set(Chain.UNIQUE, {
-    name: "Unique",
-    nonce: 0x11,
-    decimals: 1e18,
-    chainId: 8888,
-    blockExplorerUrl: "CANT FIND",
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.OPL,
-})
+  name: "Unique",
+  nonce: 0x11,
+  decimals: 1e18,
+  chainId: 8888,
+  blockExplorerUrl: "CANT FIND",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.OPL,
+});
 CHAIN_INFO.set(Chain.TEZOS, {
-    name: "Tezos",
-    nonce: 0x12,
-    decimals: 1e6,
-    constructor: tezosHelperFactory,
-    currency: SupportedCurrency.XTZ,
-    blockExplorerUrl: "https://tezblock.io/transaction",
-})
+  name: "Tezos",
+  nonce: 0x12,
+  decimals: 1e6,
+  constructor: tezosHelperFactory,
+  currency: SupportedCurrency.XTZ,
+  blockExplorerUrl: "https://tezblock.io/transaction",
+});
 CHAIN_INFO.set(Chain.VELAS, {
-    name: "Velas",
-    blockExplorerUrl: "https://explorer.velas.com/tx",
-    nonce: 0x13,
-    decimals: 1e18,
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.VLX,
-    chainId: 111,
+  name: "Velas",
+  blockExplorerUrl: "https://explorer.velas.com/tx",
+  nonce: 0x13,
+  decimals: 1e18,
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.VLX,
+  chainId: 111,
 });
 CHAIN_INFO.set(Chain.AURORA, {
-    name: "Aurora",
-    blockExplorerUrl: "https://testnet.aurorascan.dev/tx",
-    nonce: Chain.AURORA,
-    decimals: 1e18,
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.AURORA,
-    chainId: 1313161555
-})
+  name: "Aurora",
+  blockExplorerUrl: "https://testnet.aurorascan.dev/tx",
+  nonce: Chain.AURORA,
+  decimals: 1e18,
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.AURORA,
+  chainId: 1313161555,
+});
 CHAIN_INFO.set(Chain.IOTEX, {
-    name: "IoTeX",
-    blockExplorerUrl: "https://iotexscan.io/tx",
-    nonce: 0x14,
-    decimals: 1e18,
-    constructor: web3HelperFactory,
-    currency: SupportedCurrency.IOTX,
-    chainId: 4689,
+  name: "IoTeX",
+  blockExplorerUrl: "https://iotexscan.io/tx",
+  nonce: 0x14,
+  decimals: 1e18,
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.IOTX,
+  chainId: 4689,
 });
 
 export const Config: AppConfig = {
@@ -305,4 +305,4 @@ export const Config: AppConfig = {
   wrappedNftPrefix: "https://nft.xp.network/w/",
 };
 
-export const FEE_MARGIN = { min: 0.5, max: 5 }
+export const FEE_MARGIN = { min: 0.5, max: 5 };

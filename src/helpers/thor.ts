@@ -21,10 +21,7 @@ import {
 } from "@vechain/ethers";
 import { Transaction } from "@vechain/ethers/utils";
 import { TransactionResponse, Provider } from "@vechain/ethers/providers";
-import {
-  Minter__factory,
-  UserNftMinter__factory,
-} from "xpnet-web3-contracts";
+import { Minter__factory, UserNftMinter__factory } from "xpnet-web3-contracts";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -104,16 +101,8 @@ export type BaseWeb3Helper = BalanceCheck &
  * Traits implemented by this module
  */
 export type Web3Helper = BaseWeb3Helper &
-  TransferNftForeign<
-    Signer,
-    EthNftInfo,
-    TransactionResponse
-  > &
-  UnfreezeForeignNft<
-    Signer,
-    EthNftInfo,
-    TransactionResponse
-  > &
+  TransferNftForeign<Signer, EthNftInfo, TransactionResponse> &
+  UnfreezeForeignNft<Signer, EthNftInfo, TransactionResponse> &
   EstimateTxFees<EthNftInfo> &
   ChainNonceGet &
   IsApproved<Signer> &
@@ -360,7 +349,7 @@ export async function web3HelperFactory(
       return Promise.resolve(ethers.utils.getAddress(adr) !== undefined);
     },
     isNftWhitelisted(nft) {
-      return minter.nftWhitelist(nft.native.contract)
-    }
+      return minter.nftWhitelist(nft.native.contract);
+    },
   };
 }

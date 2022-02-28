@@ -1,13 +1,7 @@
-import {
-  ElrondParams,
-} from "../helpers/elrond";
+import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
-import {
-  Chain,
-  CHAIN_INFO,
-  FEE_MARGIN,
-} from "../consts";
+import { Chain, CHAIN_INFO, FEE_MARGIN } from "../consts";
 export * from "./factories";
 
 import {
@@ -44,9 +38,16 @@ import {
   EstimateTxFeesBatch,
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
-  WhitelistCheck
+  WhitelistCheck,
 } from "../helpers/chain";
-import { ChainNonce, HelperMap, InferChainH, InferChainParam, InferSigner, ParamMap } from "../type-utils";
+import {
+  ChainNonce,
+  HelperMap,
+  InferChainH,
+  InferChainParam,
+  InferSigner,
+  ParamMap,
+} from "../type-utils";
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -152,7 +153,10 @@ export type ChainFactory = {
    * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
    * @param params : New Params to be set.
    */
-  updateParams<T extends ChainNonce>(nonce: T, params: InferChainParam<T>): void;
+  updateParams<T extends ChainNonce>(
+    nonce: T,
+    params: InferChainParam<T>
+  ): void;
   pkeyToSigner<S extends ChainNonce>(
     nonce: S,
     key: string
@@ -202,7 +206,7 @@ export type ChainFactory = {
   checkWhitelist<RawNft>(
     chain: Partial<WhitelistCheck<RawNft>>,
     nft: NftInfo<RawNft>
-  ): Promise<boolean>
+  ): Promise<boolean>;
 };
 
 /**
@@ -249,10 +253,7 @@ export interface AppConfig {
   wrappedNftPrefix: string;
 }
 
-
-function mapNonceToParams(
-  chainParams: Partial<ChainParams>
-): ParamMap {
+function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   const cToP: ParamMap = new Map();
   cToP.set(Chain.ELROND, chainParams.elrondParams);
   cToP.set(Chain.HECO, chainParams.hecoParams);
@@ -301,11 +302,13 @@ export function ChainFactory(
     },
   });
 
-  const inner = async <T extends ChainNonce>(chain: T): Promise<InferChainH<T>> => {
+  const inner = async <T extends ChainNonce>(
+    chain: T
+  ): Promise<InferChainH<T>> => {
     let helper = helpers.get(chain);
     if (helper === undefined) {
       helper = await CHAIN_INFO.get(chain)!.constructor(cToP.get(chain)!);
-      helpers.set(chain, helper)
+      helpers.set(chain, helper);
     }
     return helper!;
   };
@@ -423,7 +426,10 @@ export function ChainFactory(
   }
 
   async function isWrappedNft(nft: NftInfo<unknown>) {
-    return (typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !== "undefined");
+    return (
+      typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
+      "undefined"
+    );
   }
 
   async function getVerifiedContracts(
@@ -516,7 +522,7 @@ export function ChainFactory(
           );
         }
         default: {
-          const chainH = await inner(nonce) as any;
+          const chainH = (await inner(nonce)) as any;
           return chainH.createWallet(key);
         }
       }
@@ -524,7 +530,10 @@ export function ChainFactory(
     estimateFees,
     inner,
     bridgeStatus,
-    updateParams<T extends ChainNonce>(chainNonce: T, params: InferChainParam<T>) {
+    updateParams<T extends ChainNonce>(
+      chainNonce: T,
+      params: InferChainParam<T>
+    ) {
       helpers.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },
@@ -621,12 +630,12 @@ export function ChainFactory(
       return await algo.claimableNfts(txSocket, claimer);
     },
     async checkWhitelist(chain, nft) {
-      if (!chain.isNftWhitelisted || await isWrappedNft(nft)) {
+      if (!chain.isNftWhitelisted || (await isWrappedNft(nft))) {
         return true;
       }
 
       return await chain.isNftWhitelisted(nft);
-    }
+    },
   };
 }
 /**
