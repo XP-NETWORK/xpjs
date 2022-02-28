@@ -110,27 +110,11 @@ export type BaseWeb3Helper = BalanceCheck &
  * Traits implemented by this module
  */
 export type Web3Helper = BaseWeb3Helper &
-  TransferNftForeign<
-    Signer,
-    EthNftInfo,
-    TransactionResponse
-  > &
-  UnfreezeForeignNft<
-    Signer,
-    EthNftInfo,
-    TransactionResponse
-  > &
-  TransferNftForeignBatch<
-    Signer,
-    EthNftInfo,
-    TransactionResponse
-  > &
-  UnfreezeForeignNftBatch<
-    Signer,
-    EthNftInfo,
-    TransactionResponse
-  > &
-  EstimateTxFees<string> &
+  TransferNftForeign<Signer, EthNftInfo, TransactionResponse> &
+  UnfreezeForeignNft<Signer, EthNftInfo, TransactionResponse> &
+  TransferNftForeignBatch<Signer, EthNftInfo, TransactionResponse> &
+  UnfreezeForeignNftBatch<Signer, EthNftInfo, TransactionResponse> &
+  EstimateTxFees<EthNftInfo> &
   EstimateTxFeesBatch<EthNftInfo> &
   ChainNonceGet &
   IsApproved<Signer> &
@@ -141,8 +125,9 @@ export type Web3Helper = BaseWeb3Helper &
   } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
-  GetProvider<providers.Provider> & { XpNft: string } &
-  WhitelistCheck<EthNftInfo>;
+  GetProvider<providers.Provider> & {
+    XpNft: string;
+  } & WhitelistCheck<EthNftInfo>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -453,7 +438,7 @@ export async function web3HelperFactory(
     },
     async estimateValidateTransferNft(
       _to: string,
-      _nftUri: NftInfo<string>,
+      _nftUri: NftInfo<EthNftInfo>,
       _mintWith
     ): Promise<BigNumber> {
       const gas = await provider.getGasPrice();
@@ -464,6 +449,6 @@ export async function web3HelperFactory(
     },
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
-    }
+    },
   };
 }
