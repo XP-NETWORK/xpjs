@@ -441,15 +441,15 @@ export async function tronHelperFactory(
       _to: string,
       _nft: NftInfo<any>
     ): Promise<BigNumber> {
-      return new BigNumber(0) // TODO 
+      return new BigNumber(0); // TODO
     },
     async validateAddress(adr: string): Promise<boolean> {
       return provider.isAddress(adr);
     },
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract).call({
-       from: tronParams.provider.defaultAddress.base58 
+        from: tronParams.provider.defaultAddress.base58,
       });
-    }
+    },
   };
 }

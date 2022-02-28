@@ -19,7 +19,7 @@ const EVM_VALIDATORS = [
 const EVM_TESTNET_VALIDATORS = [
   "0x50aCEC08ce70aa4f2a8ab2F45d8dCd1903ea4E14",
   "0xae87208a5204B6606d3AB177Be5fdf62267Cd499",
-  "0x5002258315873AdCbdEF25a8E71C715A4f701dF5"
+  "0x5002258315873AdCbdEF25a8E71C715A4f701dF5",
 ];
 
 const middleware_uri = "https://notifier.xp.network";
@@ -30,8 +30,10 @@ export namespace ChainFactoryConfigs {
     return {
       elrondParams: {
         node_uri: TestNetRpcUri.ELROND,
-        minter_address: "erd1qqqqqqqqqqqqqpgqzses02wme3gsx320dpja2p2kk3rckgcfksmsj8grdk",
-        esdt_swap_address: "erd1qqqqqqqqqqqqqpgqwu3ulmuxppa2e537ajst468wplkxxsqyksms9az8at",
+        minter_address:
+          "erd1qqqqqqqqqqqqqpgqzses02wme3gsx320dpja2p2kk3rckgcfksmsj8grdk",
+        esdt_swap_address:
+          "erd1qqqqqqqqqqqqqpgqwu3ulmuxppa2e537ajst468wplkxxsqyksms9az8at",
         esdt_nft: "XPNFT-aca910",
         esdt_swap: "WEGLD-f8dc4c",
         notifier,
@@ -118,7 +120,8 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.XDAI,
       },
       algorandParams: {
-        algodApiKey: "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
+        algodApiKey:
+          "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
         algodUri: "https://algorand-node.xp.network/",
         algoIndexer: "https://algoexplorerapi.io/idx2",
         nonce: Chain.ALGORAND,
@@ -176,12 +179,14 @@ export namespace ChainFactoryConfigs {
   };
 
   export const MainNet: () => Partial<ChainParams> = () => {
-    const notifier = evNotifier(middleware_uri)
+    const notifier = evNotifier(middleware_uri);
     return {
       elrondParams: {
         node_uri: MainNetRpcUri.ELROND,
-        minter_address: "erd1qqqqqqqqqqqqqpgq3y98dyjdp72lwzvd35yt4f9ua2a3n70v0drsfycvu8",
-        esdt_swap_address: "erd1qqqqqqqqqqqqqpgq5vuvac70kn36yk4rvf9scr6p8tlu23220drsfgszfy",
+        minter_address:
+          "erd1qqqqqqqqqqqqqpgq3y98dyjdp72lwzvd35yt4f9ua2a3n70v0drsfycvu8",
+        esdt_swap_address:
+          "erd1qqqqqqqqqqqqqpgq5vuvac70kn36yk4rvf9scr6p8tlu23220drsfgszfy",
         esdt_nft: "XPNFT-cb7482",
         esdt_swap: "WEGLD-5f1f8d",
         notifier,
@@ -269,7 +274,8 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.XDAI,
       },
       algorandParams: {
-        algodApiKey: "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
+        algodApiKey:
+          "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
         algodUri: "https://algorand-node.xp.network/",
         nonce: Chain.ALGORAND,
         sendNftAppId: 458971166,

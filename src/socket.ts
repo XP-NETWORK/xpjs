@@ -44,14 +44,20 @@ export type TxnSocketHelper = {
 };
 
 export type AlgorandSocketHelper = {
-  waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
+  waitAlgorandNft(
+    sourceChain: number,
+    receiver: string,
+    action_id: string
+  ): Promise<ClaimNftInfo>;
   claimNfts(receiver: string): Promise<DbClaimInfo[]>;
   cleanNfts(owner: string): Promise<void>;
 };
 
 function pairAction(sourceChain: number, action_id: string): number {
   const numId = parseInt(action_id);
-  return numId >= sourceChain ? numId * numId + sourceChain + numId : numId + sourceChain * sourceChain;
+  return numId >= sourceChain
+    ? numId * numId + sourceChain + numId
+    : numId + sourceChain * sourceChain;
 }
 
 function socketResBuf<T>(): SocketResBuf<T> {
@@ -137,7 +143,7 @@ type DbClaimInfo = {
   nft_id: string;
   action_id: string;
   inserted_at: Date;
-}
+};
 
 /**
  * Create a [[SocketHelper]]
@@ -153,7 +159,7 @@ export function socketHelper(
   const txbuf: SocketResBuf<string> = socketResBuf();
   const algoBuf: SocketResBuf<ClaimNftInfo> = socketResBuf();
   const dbApi = axios.create({
-    baseURL: uri
+    baseURL: uri,
   });
 
   socket.on(
@@ -176,26 +182,34 @@ export function socketHelper(
     async waitTxHash(chain: number, action_id: string): Promise<string> {
       return await waitSocketData(txbuf, chain, action_id);
     },
-    async waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo> {
+    async waitAlgorandNft(
+      sourceChain: number,
+      receiver: string,
+      action_id: string
+    ): Promise<ClaimNftInfo> {
       // Validator sends a an action paired with chain id
       // this is implementation dependent on validator
       const paired = pairAction(sourceChain, action_id).toString();
-      const dbData = await dbApi.get<Partial<DbClaimInfo>>(`/algorand_event/${receiver}/${paired}`);
+      const dbData = await dbApi.get<Partial<DbClaimInfo>>(
+        `/algorand_event/${receiver}/${paired}`
+      );
       if (dbData.data.app_id) {
         return {
           appId: parseInt(dbData.data.app_id!),
-          nftId: parseInt(dbData.data.nft_id!)
+          nftId: parseInt(dbData.data.nft_id!),
         };
       }
 
       return await waitSocketData(algoBuf, 15, paired);
     },
     async claimNfts(receiver: string): Promise<DbClaimInfo[]> {
-      const dbData = await dbApi.get<{ result: DbClaimInfo[] }>(`/algorand_event/${receiver}`);
+      const dbData = await dbApi.get<{ result: DbClaimInfo[] }>(
+        `/algorand_event/${receiver}`
+      );
       return dbData.data.result;
     },
     async cleanNfts(owner: string): Promise<void> {
       await dbApi.delete(`/algorand_event/${owner}`);
-    }
+    },
   };
 }

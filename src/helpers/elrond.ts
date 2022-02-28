@@ -186,31 +186,14 @@ export interface ElrondRawUnsignedTxn {
  * Traits implemented by this module
  */
 export type ElrondHelper = BalanceCheck &
-  TransferNftForeign<
-    ElrondSigner,
-    EsdtNftInfo,
-    Transaction
-  > &
-  UnfreezeForeignNft<
-    ElrondSigner,
-    EsdtNftInfo,
-    Transaction
-  > &
-  TransferNftForeignBatch<
-    ElrondSigner,
-    EsdtNftInfo,
-    Transaction
-  > &
-  UnfreezeForeignNftBatch<
-    ElrondSigner,
-    EsdtNftInfo,
-    Transaction
-  > &
+  TransferNftForeign<ElrondSigner, EsdtNftInfo, Transaction> &
+  UnfreezeForeignNft<ElrondSigner, EsdtNftInfo, Transaction> &
+  TransferNftForeignBatch<ElrondSigner, EsdtNftInfo, Transaction> &
+  UnfreezeForeignNftBatch<ElrondSigner, EsdtNftInfo, Transaction> &
   IssueESDTNFT &
   MintNft<ElrondSigner, NftMintArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-  } &
-  ChainNonceGet &
+  } & ChainNonceGet &
   ValidateAddress &
   ExtractAction<Transaction> &
   PreTransfer<ElrondSigner, EsdtNftInfo, string> &
@@ -422,7 +405,7 @@ export async function elrondHelperFactory(
   const unsignedUnfreezeNftTxn = (
     address: Address,
     to: string,
-	{ tokenIdentifier, nonce }: EsdtNftInfo,
+    { tokenIdentifier, nonce }: EsdtNftInfo,
     tx_fees: BigNumber,
     chain_nonce: string
   ) => {
@@ -433,9 +416,11 @@ export async function elrondHelperFactory(
         .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
         .addArg(new AddressValue(mintContract))
         .addArg(new BigUIntValue(new BigNumber(2)))
-		.addArg(new TokenIdentifierValue(
-			Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")
-		))
+        .addArg(
+          new TokenIdentifierValue(
+            Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")
+          )
+        )
         .addArg(new U64Value(new BigNumber(nonce)))
         .addArg(new BigUIntValue(new BigNumber(1)))
         .addArg(new TokenIdentifierValue(esdtSwaphex))
@@ -483,9 +468,7 @@ export async function elrondHelperFactory(
     }
     if (canTransferNFTCreateRole !== undefined) {
       baseArgs = baseArgs
-        .addArg(
-          new BytesValue(Buffer.from("canChangeOwner", "ascii"))
-        )
+        .addArg(new BytesValue(Buffer.from("canChangeOwner", "ascii")))
         .addArg(
           new BytesValue(
             Buffer.from(canTransferNFTCreateRole ? "true" : "false", "ascii")
@@ -652,7 +635,7 @@ export async function elrondHelperFactory(
 
       return res.data["data"]["tokens"];
     },
-	async preTransferRawTxn(id, address, value) {
+    async preTransferRawTxn(id, address, value) {
       if (!address || !value) {
         throw new Error("address and value is required for elrond egld swap");
       }
@@ -684,12 +667,14 @@ export async function elrondHelperFactory(
       const txu = unsignedSetESDTRoles(token, target, roles);
 
       const tx = await signAndSend(manager, txu);
-	  await transactionResult(tx.getHash());
-	  return tx;
+      await transactionResult(tx.getHash());
+      return tx;
     },
     async transferESDTOwnership(sender, token, target): Promise<Transaction> {
       const txu = new Transaction({
-        receiver: new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
+        receiver: new Address(
+          "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+        ),
         gasLimit: new GasLimit(60000000),
         data: TransactionPayload.contractCall()
           .setFunction(new ContractFunction("transferOwnership"))
@@ -796,7 +781,7 @@ export async function elrondHelperFactory(
       }
     },
   };
-};
+}
 
 function filterEventId(results: Array<ContractRes>): number {
   for (const res of results) {
