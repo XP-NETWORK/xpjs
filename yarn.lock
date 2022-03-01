@@ -1861,6 +1861,13 @@ axios@0.21.1, axios@^0.21.1:
   dependencies:
     follow-redirects "^1.10.0"
 
+axios@^0.24.0:
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
+  integrity sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==
+  dependencies:
+    follow-redirects "^1.14.4"
+
 babel-runtime@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
@@ -2339,12 +2346,6 @@ crypt@0.0.2:
 "crypto-exchange-rate@git+https://github.com/XP-NETWORK/exchange-rate#d0c721e0674feed19d53ec5195f008dd004e8da7":
   version "1.0.0"
   resolved "git+https://github.com/XP-NETWORK/exchange-rate#d0c721e0674feed19d53ec5195f008dd004e8da7"
-  dependencies:
-    axios "^0.21.1"
-
-"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
-  version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#ccc292d237d584ec4744ac691b83a04f66357b5f"
   dependencies:
     axios "^0.21.1"
 
@@ -2955,6 +2956,11 @@ follow-redirects@^1.10.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.1.tgz#d9114ded0a1cfdd334e164e6662ad02bfd91ff43"
   integrity sha512-HWqDgT7ZEkqRzBvc2s64vSZ/hfOceEol3ac/7tKwzuvEyWx3/4UegXh5oBOIotkGsObyk3xznnSRVADBgWSQVg==
+
+follow-redirects@^1.14.4:
+  version "1.14.9"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.9.tgz#dd4ea157de7bfaf9ea9b3fbd85aa16951f78d8d7"
+  integrity sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==
 
 foreach@^2.0.5:
   version "2.0.5"
@@ -4743,13 +4749,13 @@ tronstation@^1.0.1:
     "@babel/runtime" "^7.0.0"
     babel-runtime "^6.26.0"
 
-tronweb@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/tronweb/-/tronweb-4.0.0.tgz#a3677d4d2ee1a06231aa0fd75c15ab0d6d55fc91"
-  integrity sha512-yKRkEe9A5RJCRiDcKXfXhfF6CDJl7QWhBLleaW+GlTwVXKGNJdpGomuYhCXvQyFQVlY6cKzOfH7pXPH69rcfNQ==
+tronweb@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/tronweb/-/tronweb-4.1.0.tgz#a79d3ac8e1d4a78d9d69067e2bc3e6cede6e83c9"
+  integrity sha512-aCBLnww8db5UQaewZFs4XJcgLhXuQG6Qxnbuhnw1LlFMBGWr7kX3OMK+Ld3weGHvZfoxgH6q5+LMhp/xewHrIg==
   dependencies:
     "@babel/runtime" "^7.0.0"
-    axios "^0.21.1"
+    axios "^0.24.0"
     bignumber.js "^9.0.1"
     elliptic "^6.5.4"
     ethers "^5.4.4"
@@ -4757,7 +4763,7 @@ tronweb@^4.0.0:
     injectpromise "^1.0.0"
     lodash "^4.17.21"
     semver "^5.6.0"
-    validator "^13.6.0"
+    validator "^13.7.0"
 
 tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"
@@ -4937,10 +4943,10 @@ v8-compile-cache@^2.0.3:
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.3.0.tgz#2de19618c66dc247dcfb6f99338035d8245a2cee"
   integrity sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==
 
-validator@^13.6.0:
-  version "13.6.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-13.6.0.tgz#1e71899c14cdc7b2068463cb24c1cc16f6ec7059"
-  integrity sha512-gVgKbdbHgtxpRyR8K0O6oFZPhhB5tT1jeEHZR0Znr9Svg03U0+r9DXWMrnRAB+HtCStDQKlaIZm42tVsVjqtjg==
+validator@^13.7.0:
+  version "13.7.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-13.7.0.tgz#4f9658ba13ba8f3d82ee881d3516489ea85c0857"
+  integrity sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==
 
 vscode-textmate@5.2.0:
   version "5.2.0"
@@ -5050,9 +5056,9 @@ xmlhttprequest@1.8.0:
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   integrity sha1-Z/4HXFwk/vOfnWX197f+dRcZaPw=
 
-"xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#c351870fb44fede7c98f6fae00e408b86a39f5a3":
+"xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#4875dd73dd3f1884c0129caa4638135b9c10eb05":
   version "0.1.0"
-  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#c351870fb44fede7c98f6fae00e408b86a39f5a3"
+  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#4875dd73dd3f1884c0129caa4638135b9c10eb05"
   dependencies:
     ethers "^5.5.4"
 
