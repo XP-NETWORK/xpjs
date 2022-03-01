@@ -17,8 +17,8 @@ import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
 import {
   Minter__factory,
   UserNftMinter__factory,
-  Erc1155Minter__factory,
   XPNft__factory,
+  XPNft1155__factory,
 } from "xpnet-web3-contracts";
 import {
   Approve,
@@ -45,8 +45,8 @@ export type MinterRes = {
   minter: string;
   // XPNFT (Wrapper for foreign NFTs) contracte
   xpnft: string;
-  // XPNET (Wrapper for foregin fungible tokens) contract
-  xpnet: string;
+  // XPNFT1155 (Wrapper for ERC1155 Foreign NFTs) contract
+  xpnft1155: string;
   // Whitelisted Native NFT contracts
   whitelist: string[];
 };
@@ -65,15 +65,17 @@ export type BaseTronHelper = BalanceCheck &
      * Deploy Minter Smart Contract
      *
      * @argument deployer  deployer of the smart contract
-     * @argument validators  address of validators of the smart contract
-     * @argument threshold  threshold for executing an action
-     * @argument whitelist  optional whitelisted nfts contract (deploys one if empty/undefined)
+     * @argument frostGroupKey FROST SECP256k1 Group Key
+     * @argument xpnftPrefix XP Wrapped NFT backend with "/" suffix
+     * @argument xpnftPrefix1155 XP Wrapped NFT Backend in erc1155 format (with {id})
+     * @argument whitelist List of NFTs to whitelist
      */
     deployMinter(
       deployer: TronSender,
-      validators: string[],
-      threshold: number,
-      whitelist: string[] | undefined
+      frostGroupKey: string,
+      xpnftPrefix: string,
+      xpnftPrefix1155: string,
+      whitelist?: string[]
     ): Promise<MinterRes>;
   };
 
@@ -110,29 +112,36 @@ export async function baseTronHelperFactory(
     return contract;
   };
 
-  const deployErc1155_i = async (owner: TronSender) => {
-    setSigner(owner);
-
-    const contract = await provider.contract().new({
-      abi: Erc1155Minter__factory.abi,
-      bytecode: Erc1155Minter__factory.bytecode,
-      feeLimit: 3000000000,
-    });
-
-    return contract;
-  };
-
-  const deployXpNft = async (deployer: TronSender) => {
+  const deployXpNft = async (deployer: TronSender, nftPrefix: string) => {
     setSigner(deployer);
 
     const contract = await provider.contract().new({
       abi: XPNft__factory.abi,
       bytecode: XPNft__factory.bytecode,
       feeLimit: 3000000000,
+      parameters: [
+        "XPNFT",
+        "XPNFT",
+        nftPrefix
+      ]
     });
 
     return contract;
   };
+
+  const deployXpNft1155 = async (deployer: TronSender, nftPrefix: string) => {
+    setSigner(deployer);
+    const contract = await provider.contract().new({
+      abi: XPNft1155__factory.abi,
+      bytecode: XPNft1155__factory.bytecode,
+      feeLimit: 3000000000,
+      parameters: [
+        nftPrefix
+      ]
+    });
+
+    return contract;
+  }
 
   return {
     async mintNft(owner: TronSender, options: NftMintArgs): Promise<string> {
@@ -152,8 +161,9 @@ export async function baseTronHelperFactory(
       await deployErc721_i(owner).then((c) => c.address),
     async deployMinter(
       deployer: TronSender,
-      validators: string[],
-      threshold: number,
+      frostGroupKey,
+      xpnftPrefix,
+      xpnftPrefix1155,
       whitelist: string[] = []
     ): Promise<MinterRes> {
       if (whitelist.length == 0) {
@@ -161,28 +171,32 @@ export async function baseTronHelperFactory(
         whitelist.push(unft.address);
       }
 
-      const nft_token = await deployXpNft(deployer);
-      const token = await deployErc1155_i(deployer);
+      const gk = Buffer.from(frostGroupKey, "hex");
+      const gkx = EthBN.from(`0x${gk.slice(1).toString("hex")}`);
+      // gkyp is either 0 or 1
+      const gkyp = EthBN.from(`0x${gk[0] & 1}`);
+  
+      const erc721 = await deployXpNft(deployer, xpnftPrefix);
+      const erc1155 = await deployXpNft1155(deployer, xpnftPrefix1155);
+  
       const minter = await provider.contract().new({
         abi: Minter__factory.abi,
         bytecode: Minter__factory.bytecode,
-        feeLimit: 3000000000,
+        feeLimit: 6000000000,
         parameters: [
-          validators,
-          whitelist,
-          threshold,
-          nft_token.address,
-          token.address,
+          gkx,
+          gkyp,
+          whitelist
         ],
       });
 
-      await nft_token.transferOwnership(minter.address).send();
-      await token.transferOwnership(minter.address).send();
+      await erc721.transferOwnership(minter.address).send();
+      await erc1155.transferOwnership(minter.address).send();
 
       return {
         minter: minter.address,
-        xpnft: nft_token.address,
-        xpnet: token.address,
+        xpnft: erc721.address,
+        xpnft1155: erc1155.address,
         whitelist,
       };
     },
