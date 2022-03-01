@@ -429,7 +429,7 @@ export function ChainFactory(
     return (
       typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
       "undefined" &&
-      !await checkNotOldWrappedNft(nft.collectionIdent).then(() => true).catch(() => false)
+      await checkNotOldWrappedNft(nft.collectionIdent).then(() => true).catch(() => false)
     );
   }
 
