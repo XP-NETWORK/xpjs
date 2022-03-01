@@ -9,7 +9,7 @@ declare type TronSender = string | undefined;
 export declare type MinterRes = {
     minter: string;
     xpnft: string;
-    xpnet: string;
+    xpnft1155: string;
     whitelist: string[];
 };
 export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintArgs, string> & {
@@ -25,11 +25,12 @@ export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintA
      * Deploy Minter Smart Contract
      *
      * @argument deployer  deployer of the smart contract
-     * @argument validators  address of validators of the smart contract
-     * @argument threshold  threshold for executing an action
-     * @argument whitelist  optional whitelisted nfts contract (deploys one if empty/undefined)
+     * @argument frostGroupKey FROST SECP256k1 Group Key
+     * @argument xpnftPrefix XP Wrapped NFT backend with "/" suffix
+     * @argument xpnftPrefix1155 XP Wrapped NFT Backend in erc1155 format (with {id})
+     * @argument whitelist List of NFTs to whitelist
      */
-    deployMinter(deployer: TronSender, validators: string[], threshold: number, whitelist: string[] | undefined): Promise<MinterRes>;
+    deployMinter(deployer: TronSender, frostGroupKey: string, xpnftPrefix: string, xpnftPrefix1155: string, whitelist?: string[]): Promise<MinterRes>;
 };
 export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, Transaction> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo>;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
