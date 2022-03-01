@@ -400,7 +400,7 @@ export function ChainFactory(
     }
   }
 
-  const oldXpWraps: string[] = [
+  const oldXpWraps = new Set([
     "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
     "0xc69ECD37122A9b5FD7e62bC229d478BB83063C9d",
     "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
@@ -410,10 +410,10 @@ export function ChainFactory(
     "0xE773Be36b35e7B58a9b23007057b5e2D4f6686a1",
     "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
     "0xb4A252B3b24AF2cA83fcfdd6c7Fac04Ff9d45A7D",
-  ];
+  ]);
 
-  async function checkNotOldWrappedNft(contract: string) {
-    if (oldXpWraps.findIndex((x) => x === contract) !== -1) {
+  function checkNotOldWrappedNft(contract: string) {
+    if (oldXpWraps.has(contract)) {
       throw new Error(`${contract} is an old wrapped NFT`);
     }
   }
@@ -426,10 +426,15 @@ export function ChainFactory(
   }
 
   async function isWrappedNft(nft: NftInfo<unknown>) {
+    try {
+      checkNotOldWrappedNft(nft.collectionIdent);
+    } catch (_) {
+      return false;
+    }
+
     return (
       typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
-      "undefined" &&
-      await checkNotOldWrappedNft(nft.collectionIdent).then(() => true).catch(() => false)
+      "undefined"
     );
   }
 
