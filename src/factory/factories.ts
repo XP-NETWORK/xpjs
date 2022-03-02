@@ -42,9 +42,15 @@ export namespace ChainFactoryConfigs {
       tronParams: {
         provider: new TronWeb({ fullHost: TestNetRpcUri.TRON }),
         notifier,
-        minter_addr: "41cecf8ffbed6433c1cae2fe196925109aebc726f2",
-        erc721_addr: "41226a324faa855cf0e4774c682c9d772b72dd811e",
-        validators: EVM_TESTNET_VALIDATORS,
+        minter_addr: "41ebb63d3ee6e1a1f7b3ed15b3bd1b67863384d39a",
+        erc721_addr: "4199721637ef58af9b6b91d92939312e2dc0aa2aa3",
+        erc1155Minter: "418e2f8651676728d923158b5cddbb79c62d85a00c",
+        erc721Minter: "414a51be8f24a62529541b0ea831a2e02a4930841b",
+        validators: [
+          "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
+          "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",
+          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N"
+        ],
         nonce: Chain.TRON,
       },
       avalancheParams: {
