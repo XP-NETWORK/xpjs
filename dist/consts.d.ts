@@ -39,7 +39,8 @@ export declare enum MainNetRpcUri {
     FUSE = "https://rpc.fuse.io/",
     VELAS = "https://mainnet.velas.com/rpc",
     TEZOS = "https://mainnet.smartpy.io",
-    IOTEX = "https://babel-api.mainnet.iotex.io"
+    IOTEX = "https://babel-api.mainnet.iotex.io",
+    AURORA = "https://mainnet.aurora.dev"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
