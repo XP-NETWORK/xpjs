@@ -53,7 +53,7 @@ export enum MainNetRpcUri {
   VELAS = "https://mainnet.velas.com/rpc",
   TEZOS = "https://mainnet.smartpy.io",
   IOTEX = "https://babel-api.mainnet.iotex.io",
-  AURORA = "https://mainnet.aurora.dev,
+  AURORA = "https://mainnet.aurora.dev",
   // TODO: Algorand
 }
 
