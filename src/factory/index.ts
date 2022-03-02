@@ -274,7 +274,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.TEZOS, chainParams.tezosParams);
   cToP.set(Chain.VELAS, chainParams.velasParams);
   cToP.set(Chain.IOTEX, chainParams.iotexParams);
-  cToP.set(Chain.Chain.AURORA, chainParams.auroraParams);
+  cToP.set(Chain.AURORA, chainParams.auroraParams);
 
   return cToP;
 }
