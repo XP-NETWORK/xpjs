@@ -322,13 +322,15 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.IOTEX,
       },
       auroraParams: {
-        notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AURORA),
         minter_addr: "0x32E8854DC2a5Fd7049DCF10ef2cb5f01300c7B47",
         erc721_addr: "0x041AE550CB0e76a3d048cc2a4017BbCB74756b43",
         erc1155_addr: "0xca8E2a118d7674080d71762a783b0729AadadD42",
+        erc1155Minter: "0x0000000000000000000000000000000000000000",
+        erc721Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.AURORA,
-      }
+        notifier,
+      },
     };
   };
 }
