@@ -306,4 +306,15 @@ export const Config: AppConfig = {
   wrappedNftPrefix: "https://nft.xp.network/w/",
 };
 
+<<<<<<< Updated upstream
 export const FEE_MARGIN = { min: 0.5, max: 5 };
+=======
+export const TestnetConfig: AppConfig = {
+  exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+  nftListUri:"https://testing-nft-index.herokuapp.com",
+  nftListAuthToken:"eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY0NDIzMDE0NiwiZXhwIjoxNjUyMDA2MTQ2fQ.gX6Auj4hFLdpem5Pk2kAnH71I19iGXfBYjmQrXylMFX_R1yzDEbylVAOLW6kABH9VjnLbAnCRdQvLaQIFmMUpw",
+  txSocketUri:"https://testnet-tx-socket.herokuapp.com",
+  tronScanUri:"https://apilist.tronscan.org/api/",
+  heartbeatUri:"https://testnet-validator-pinger.herokuapp.com/"
+}
+>>>>>>> Stashed changes
