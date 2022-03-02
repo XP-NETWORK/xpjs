@@ -19,9 +19,11 @@ export function evNotifier(url: string) {
         tx_hash: txHash,
       });
     },
-    async notifyElrond(txHash: string) {
+    async notifyElrond(txHash: string, sender: string, uris: string[]) {
       await api.post("/tx/elrond", {
         tx_hash: txHash,
+        sender,
+        uris,
       });
     },
     async notifyTezos(txHash: string) {
