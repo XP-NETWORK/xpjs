@@ -213,6 +213,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
         erc721_addr: "0x7bf2924985CAA6192D721B2B9e1109919aC6ff58",
         minter_addr: "0xC254a8D4eF5f825FD31561bDc69551ed2b8db134",
+        erc1155_addr: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
         nonce: Chain.AVALANCHE,
       },
       polygonParams: {
@@ -230,9 +231,9 @@ export namespace ChainFactoryConfigs {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
         erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
         erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
-        erc1155_addr: "0x93239b1CF8CAd847f387735876EdBa7D75ae4f7A",
-        erc721_addr: "0xa66dA346C08dD77bfB7EE5E68C45010B6F2538ff",
-        minter_addr: "0xF5e0c79CB0B7e7CF6Ad2F9779B01fe74F958964a",
+        erc1155_addr: "0x0B7ED039DFF2b91Eb4746830EaDAE6A0436fC4CB",
+        erc721_addr: "0x9e5761f7A1360E8B3E9d30Ed9dd3161E8b75d4E8",
+        minter_addr: "0x40d8160A0Df3D9aad75b9208070CFFa9387bc051",
         nonce: Chain.FANTOM,
       },
       bscParams: {
