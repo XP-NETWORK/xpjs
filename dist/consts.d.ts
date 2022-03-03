@@ -3,7 +3,6 @@ import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
-import { AppConfig } from "./factory";
 import { TezosHelper, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 export declare enum TestNetRpcUri {
@@ -106,7 +105,6 @@ declare type ChainInfo = {
     get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
 };
 export declare const CHAIN_INFO: ChainInfo;
-export declare const Config: AppConfig;
 export declare const FEE_MARGIN: {
     min: number;
     max: number;
