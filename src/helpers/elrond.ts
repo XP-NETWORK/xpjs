@@ -240,12 +240,14 @@ export async function elrondHelperFactory(
   async function notifyValidator(
     txn: Transaction,
     sender: string,
-    uri: string[]
+    uri: string[],
+    action_id: string
   ) {
     await elrondParams.notifier.notifyElrond(
       txn.getHash().toString(),
       sender,
-      uri
+      uri,
+      action_id
     );
   }
 
@@ -584,7 +586,12 @@ export async function elrondHelperFactory(
         mintWith
       );
       const tx = await signAndSend(sender, txu);
-      await notifyValidator(tx, sender.getAddress().toString(), [info.uri]);
+      await notifyValidator(
+        tx,
+        sender.getAddress().toString(),
+        [info.uri],
+        await extractAction(tx)
+      );
 
       return tx;
     },
@@ -603,7 +610,12 @@ export async function elrondHelperFactory(
         nonce
       );
       const tx = await signAndSend(sender, txu);
-      await notifyValidator(tx, sender.getAddress().toString(), [nft.uri]);
+      await notifyValidator(
+        tx,
+        sender.getAddress().toString(),
+        [nft.uri],
+        await extractAction(tx)
+      );
 
       return tx;
     },
@@ -732,7 +744,8 @@ export async function elrondHelperFactory(
       await notifyValidator(
         tx,
         sender.getAddress().toString(),
-        nfts.map((n) => n.uri)
+        nfts.map((n) => n.uri),
+        await extractAction(tx)
       );
 
       return tx;
@@ -774,7 +787,8 @@ export async function elrondHelperFactory(
       await notifyValidator(
         tx,
         sender.getAddress().toString(),
-        nfts.map((n) => n.uri)
+        nfts.map((n) => n.uri),
+        await extractAction(tx)
       );
 
       return tx;
