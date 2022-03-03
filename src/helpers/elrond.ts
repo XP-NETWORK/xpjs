@@ -61,8 +61,8 @@ const ESDT_ISSUE_ADDR = new Address(
 );
 const ESDT_ISSUE_COST = "50000000000000000";
 
-const NFT_TRANSFER_COST = new BigNumber(45000000);
-const NFT_UNFREEZE_COST = new BigNumber(45000000);
+const NFT_TRANSFER_COST = new BigNumber(350000000);
+const NFT_UNFREEZE_COST = new BigNumber(350000000);
 
 type ContractRes = {
   readonly [idx: string]: number | string;
@@ -794,10 +794,10 @@ export async function elrondHelperFactory(
       return tx;
     },
     async estimateValidateTransferNftBatch(_, nfts) {
-      return estimateGas(new BigNumber(60000000 + 5000000 * nfts.length));
+      return estimateGas(new BigNumber(360000000 + 5000000 * nfts.length));
     },
     async estimateValidateUnfreezeNftBatch(_, nfts) {
-      return estimateGas(new BigNumber(70000000 + 5000000 * nfts.length));
+      return estimateGas(new BigNumber(340000000 + 5000000 * nfts.length));
     },
     async validateAddress(adr: string) {
       try {
