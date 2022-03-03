@@ -16,11 +16,11 @@ const EVM_VALIDATORS = [
   "0xc2a29b4e9fa71e9033a52611544403241c56ac5e",
 ];
 
-const EVM_TESTNET_VALIDATORS = [
-  "0x50aCEC08ce70aa4f2a8ab2F45d8dCd1903ea4E14",
-  "0xae87208a5204B6606d3AB177Be5fdf62267Cd499",
-  "0x5002258315873AdCbdEF25a8E71C715A4f701dF5",
-];
+// const _EVM_TESTNET_VALIDATORS = [
+//   "0x50aCEC08ce70aa4f2a8ab2F45d8dCd1903ea4E14",
+//   "0xae87208a5204B6606d3AB177Be5fdf62267Cd499",
+//   "0x5002258315873AdCbdEF25a8E71C715A4f701dF5",
+// ];
 
 const middleware_uri = "https://notifier.xp.network";
 
@@ -49,7 +49,7 @@ export namespace ChainFactoryConfigs {
         validators: [
           "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
           "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",
-          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N"
+          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N",
         ],
         nonce: Chain.TRON,
       },
