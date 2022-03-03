@@ -2349,6 +2349,12 @@ crypt@0.0.2:
   dependencies:
     axios "^0.21.1"
 
+"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
+  version "1.0.0"
+  resolved "git+https://github.com/xp-network/exchange-rate#fe1803e74aa4fe9d086e215176d8481b338e3455"
+  dependencies:
+    axios "^0.21.1"
+
 crypto-js@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
