@@ -326,11 +326,11 @@ export namespace ChainFactoryConfigs {
       iotexParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.IOTEX),
-        minter_addr: "0x0E99a77fedf8D1Eb783078D1Aa84160a5CBE96D7",
-        erc721_addr: "0xF03d628aD8Ae53919A3E65A0cB85dD8765963C56",
+        minter_addr: "0x4bA4ADdc803B04b71412439712cB1911103380D6",
+        erc721_addr: "0x6eD7dfDf9678eCb2051c46A1A5E38B4f310b18c5",
         erc721Minter: "0xD87755CCeaab0edb28b3f0CD7D6405E1bB827B65",
         erc1155Minter: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
-        erc1155_addr: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
+        erc1155_addr: "0x93Ff4d90a548143c28876736Aa9Da2Bb7B1b52D4",
         nonce: Chain.IOTEX,
       },
       auroraParams: {
