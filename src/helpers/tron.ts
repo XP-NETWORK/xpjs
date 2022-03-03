@@ -119,11 +119,7 @@ export async function baseTronHelperFactory(
       abi: XPNft__factory.abi,
       bytecode: XPNft__factory.bytecode,
       feeLimit: 3000000000,
-      parameters: [
-        "XPNFT",
-        "XPNFT",
-        nftPrefix
-      ]
+      parameters: ["XPNFT", "XPNFT", nftPrefix],
     });
 
     return contract;
@@ -135,13 +131,11 @@ export async function baseTronHelperFactory(
       abi: XPNft1155__factory.abi,
       bytecode: XPNft1155__factory.bytecode,
       feeLimit: 3000000000,
-      parameters: [
-        nftPrefix
-      ]
+      parameters: [nftPrefix],
     });
 
     return contract;
-  }
+  };
 
   return {
     async mintNft(owner: TronSender, options: NftMintArgs): Promise<string> {
@@ -175,28 +169,26 @@ export async function baseTronHelperFactory(
       const gkx = EthBN.from(`0x${gk.slice(1).toString("hex")}`);
       // gkyp is either 0 or 1
       const gkyp = EthBN.from(`0x${gk[0] & 1}`);
-  
+
       const erc721 = await deployXpNft(deployer, xpnftPrefix);
       const erc1155 = await deployXpNft1155(deployer, xpnftPrefix1155);
-  
+
       const minter = await provider.contract().new({
         abi: Minter__factory.abi,
         bytecode: Minter__factory.bytecode,
         feeLimit: 6000000000,
-        parameters: [
-          gkx,
-          gkyp,
-          whitelist
-        ],
+        parameters: [gkx, gkyp, whitelist],
       });
 
       await erc721.transferOwnership(minter.address).send();
       await erc1155.transferOwnership(minter.address).send();
-
+      const minterAddress: string = provider.address.fromHex(minter.address);
+      const erc721Address: string = provider.address.fromHex(erc721.address);
+      const erc1155Address: string = provider.address.fromHex(erc1155.address);
       return {
-        minter: minter.address,
-        xpnft: erc721.address,
-        xpnft1155: erc1155.address,
+        minter: minterAddress,
+        xpnft: erc721Address,
+        xpnft1155: erc1155Address,
         whitelist,
       };
     },
