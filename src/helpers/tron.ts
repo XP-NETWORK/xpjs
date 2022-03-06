@@ -414,13 +414,20 @@ export async function tronHelperFactory(
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber
+      txFees: BigNumber,
+      mintWith
     ): Promise<string> {
       setSigner(sender);
       await approveForMinter(id, sender);
 
       const txr = await minter
-        .freezeErc721(id.native.contract, id.native.tokenId, chain_nonce, to)
+        .freezeErc721(
+          id.native.contract,
+          id.native.tokenId,
+          chain_nonce,
+          to,
+          mintWith
+        )
         .send({ callValue: EthBN.from(txFees.toString(10)) });
 
       await notifyValidator(txr);
