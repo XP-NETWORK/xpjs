@@ -23,7 +23,7 @@ const EVM_VALIDATORS = [
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri = "http://65.21.195.10:8000/"
+const testnet_middleware_uri = "http://65.21.195.10:8076/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Partial<ChainParams> = () => {
@@ -50,7 +50,7 @@ export namespace ChainFactoryConfigs {
         validators: [
           "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
           "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",
-          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N"
+          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N",
         ],
         nonce: Chain.TRON,
       },
