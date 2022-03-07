@@ -232,9 +232,9 @@ export namespace ChainFactoryConfigs {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
         erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
         erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
-        erc1155_addr: "0x0B7ED039DFF2b91Eb4746830EaDAE6A0436fC4CB",
-        erc721_addr: "0x9e5761f7A1360E8B3E9d30Ed9dd3161E8b75d4E8",
-        minter_addr: "0x40d8160A0Df3D9aad75b9208070CFFa9387bc051",
+        erc1155_addr: "0x4bA4ADdc803B04b71412439712cB1911103380D6",
+        erc721_addr: "0x75f93b47719Ab5270d27cF28a74eeA247d5DfeFF",
+        minter_addr: "0x97dd1B3AE755539F56Db8b29258d7C925b20b84B",
         nonce: Chain.FANTOM,
       },
       bscParams: {
