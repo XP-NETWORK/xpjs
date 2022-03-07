@@ -231,7 +231,7 @@ export async function tronHelperFactory(
   tronParams: TronParams
 ): Promise<TronHelper> {
   const { provider, minter_addr } = tronParams;
-  const station = new TronStation(provider);
+  // const station = new TronStation(provider);
   const base = await baseTronHelperFactory(provider);
   const minter = await provider.contract(Minter__factory.abi, minter_addr);
 
@@ -265,41 +265,41 @@ export async function tronHelperFactory(
     return action_id;
   }
 
-  const randomAction = () =>
-    Math.floor(
-      Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000)
-    ).toString();
+  // const _randomAction = () =>
+  //   Math.floor(
+  //     Math.random() * 999 + (Number.MAX_SAFE_INTEGER - 1000)
+  //   ).toString();
 
-  async function estimateGas(
-    addrs: string[],
-    func_sig: string,
-    params: { type: string; value: any }[]
-  ): Promise<BigNumber> {
-    let energy = 0;
-    let bandwidth = 0;
-    const nrgSun = await station.energy.burnedEnergy2Trx(1, { unit: "sun" });
-    const bandSun = 10;
+  // async function _estimateGas(
+  //   addrs: string[],
+  //   func_sig: string,
+  //   params: { type: string; value: any }[]
+  // ): Promise<BigNumber> {
+  //   let energy = 0;
+  //   let bandwidth = 0;
+  //   const nrgSun = await station.energy.burnedEnergy2Trx(1, { unit: "sun" });
+  //   const bandSun = 10;
 
-    for (const [i, addr] of addrs.entries()) {
-      const res = await provider.transactionBuilder.triggerConstantContract(
-        minter.address,
-        func_sig,
-        {},
-        params,
-        provider.address.toHex(addr)
-      );
-      let nrg: number = res["energy_used"];
-      if (i == addrs.length - 1 && addrs.length != 1) nrg *= 2;
-      energy += nrg;
-      const tx_raw: string = res["transaction"]["raw_data_hex"];
-      bandwidth += tx_raw.length;
-    }
-    // Fee = energy * (sun per energy) + bandwidth * (sun per bandwidth)
-    // bandwidth = raw tx byte length
-    const fee = new BigNumber(energy).times(nrgSun).plus(bandwidth * bandSun);
+  //   for (const [i, addr] of addrs.entries()) {
+  //     const res = await provider.transactionBuilder.triggerConstantContract(
+  //       minter.address,
+  //       func_sig,
+  //       {},
+  //       params,
+  //       provider.address.toHex(addr)
+  //     );
+  //     let nrg: number = res["energy_used"];
+  //     if (i == addrs.length - 1 && addrs.length != 1) nrg *= 2;
+  //     energy += nrg;
+  //     const tx_raw: string = res["transaction"]["raw_data_hex"];
+  //     bandwidth += tx_raw.length;
+  //   }
+  //   // Fee = energy * (sun per energy) + bandwidth * (sun per bandwidth)
+  //   // bandwidth = raw tx byte length
+  //   const fee = new BigNumber(energy).times(nrgSun).plus(bandwidth * bandSun);
 
-    return fee;
-  }
+  //   return fee;
+  // }
 
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
@@ -396,11 +396,12 @@ export async function tronHelperFactory(
       sender: TronSender,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber
+      txFees: BigNumber,
+      nonce
     ): Promise<Transaction> {
       setSigner(sender);
       const res = await minter
-        .withdrawNft(to, id.native.tokenId)
+        .withdrawNft(to, nonce, id.native.tokenId, id.native.contract)
         .send({ callValue: EthBN.from(txFees.toString(10)) });
 
       await notifyValidator(res);
@@ -434,21 +435,10 @@ export async function tronHelperFactory(
       return txr;
     },
     async estimateValidateTransferNft(
-      to: string,
-      nftUri: NftInfo<EthNftInfo>
+      _to: string,
+      _nftUri: NftInfo<EthNftInfo>
     ): Promise<BigNumber> {
-      return await estimateGas(
-        tronParams.validators,
-        "validateTransferNft(uint128,address,string)",
-        [
-          { type: "uint128", value: randomAction() },
-          { type: "address", value: to },
-          {
-            type: "string",
-            value: nftUri,
-          },
-        ]
-      );
+      return new BigNumber(0); // TODO
     },
     async estimateValidateUnfreezeNft(
       _to: string,

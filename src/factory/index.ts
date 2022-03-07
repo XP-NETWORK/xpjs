@@ -568,24 +568,24 @@ export function ChainFactory(
       if (nft.native.contract) {
         if (fromChain.getNonce() != 9) {
           //@ts-ignore
-          checkNotOldWrappedNft(new utils.getAddress(`0x${nft.native.contract}`));
+          checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
         }
       }
 
       const mw =
         //@ts-ignore
         nft.native.contract &&
-          mintWith &&
-          checkMintWith(
-            mintWith,
+        mintWith &&
+        checkMintWith(
+          mintWith,
+          //@ts-ignore
+          await getVerifiedContracts(
             //@ts-ignore
-            await getVerifiedContracts(
-              //@ts-ignore
-              nft.native.contract.toLowerCase(),
-              toChain.getNonce(),
-              fromChain.getNonce()
-            )
+            nft.native.contract.toLowerCase(),
+            toChain.getNonce(),
+            fromChain.getNonce()
           )
+        )
           ? mintWith
           : toChain.XpNft;
 
