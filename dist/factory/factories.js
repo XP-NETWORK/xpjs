@@ -294,9 +294,9 @@ var ChainFactoryConfigs;
                 provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.MainNetRpcUri.FUSE),
                 erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
                 erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
-                erc721_addr: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
-                erc1155_addr: "0x7E8493F59274651Cc0919feCf12E6A77153cdA72",
-                minter_addr: "0x7bf2924985CAA6192D721B2B9e1109919aC6ff58",
+                erc721_addr: "0x93239b1CF8CAd847f387735876EdBa7D75ae4f7A",
+                erc1155_addr: "0x2496b44516c8639dA00E8D12ccE64862e3760190",
+                minter_addr: "0xa66dA346C08dD77bfB7EE5E68C45010B6F2538ff",
                 nonce: consts_1.Chain.FUSE,
             },
             tezosParams: {
