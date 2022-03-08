@@ -43,6 +43,6 @@
     "socket.io-client": "^4.1.3",
     "tronstation": "^1.0.1",
     "tronweb": "^4.1.0",
-    "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#4875dd73dd3f1884c0129caa4638135b9c10eb05"
+    "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#65b3d13fb814ec8d8c4ea847c5915d763c0fec6f"
   }
 }
