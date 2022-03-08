@@ -43,10 +43,10 @@ export namespace ChainFactoryConfigs {
       tronParams: {
         provider: new TronWeb({ fullHost: TestNetRpcUri.TRON }),
         notifier,
-        minter_addr: "TP3FdrW9bQP1mpBZyacESdi3q2oupDSBKX",
-        erc721_addr: "TBfgC2uXTbne4TqBP9TtkKbMPvvwYaAQxQ",
-        erc1155Minter: "TPY71u5ao8HSYtqGAALgaMubotTvGKv2MZ",
-        erc721Minter: "TSagiMvx3JQBAGABdqf4Pfj6P3cFWwJn2Y",
+        minter_addr: "TY46GA3GGdMtu9GMaaSPPSQtqq9CZAv5sK",
+        erc721_addr: "TDhb2kyurMwoc1eMndKzqNebji1ap1DJC4",
+        erc1155Minter: "TBeSKv5RSFLAi7SCD7hR64xuvP6N26oEqR",
+        erc721Minter: "TMVDt5PP53eQro5hLafibv2xWzSSDSMyjy",
         validators: [
           "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
           "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",

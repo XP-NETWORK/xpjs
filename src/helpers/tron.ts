@@ -164,7 +164,8 @@ export async function baseTronHelperFactory(
     ): Promise<MinterRes> {
       if (whitelist.length == 0) {
         const unft = await deployErc721_i(deployer);
-        whitelist.push(unft.address);
+        console.log(provider.address.fromHex(unft.address));
+        whitelist.push(provider.address.fromHex(unft.address));
       }
 
       const gk = Buffer.from(frostGroupKey, "hex");
