@@ -91,7 +91,9 @@ export type TronHelper = BaseTronHelper &
   Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, TronRawTxn> &
   ExtractTxnStatus &
-  WhitelistCheck<EthNftInfo>;
+  WhitelistCheck<EthNftInfo> & {
+    XpNft: string;
+  };
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -348,6 +350,7 @@ export async function tronHelperFactory(
   return {
     ...base,
     extractAction,
+    XpNft: tronParams.erc721_addr,
     approveForMinter,
     preTransfer: (s, nft, _fee) => approveForMinter(nft, s),
     async preTransferRawTxn(nft, address, _value) {
