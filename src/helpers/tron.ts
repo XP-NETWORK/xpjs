@@ -34,7 +34,6 @@ import {
   WhitelistCheck,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
-import { Transaction } from "ethers";
 import { EvNotifier } from "../notifier";
 
 // Uses default private key in provider if sender is undefinedd
@@ -81,7 +80,7 @@ export type BaseTronHelper = BalanceCheck &
 
 export type TronHelper = BaseTronHelper &
   TransferNftForeign<TronSender, EthNftInfo, string> &
-  UnfreezeForeignNft<TronSender, EthNftInfo, Transaction> &
+  UnfreezeForeignNft<TronSender, EthNftInfo, string> &
   EstimateTxFees<EthNftInfo> &
   ChainNonceGet &
   Approve<TronSender> &
@@ -402,7 +401,7 @@ export async function tronHelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       nonce
-    ): Promise<Transaction> {
+    ): Promise<string> {
       setSigner(sender);
       const res = await minter
         .withdrawNft(to, nonce, id.native.tokenId, id.native.contract)
