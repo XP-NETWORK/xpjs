@@ -66,10 +66,10 @@ export namespace ChainFactoryConfigs {
       polygonParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.POLYGON),
-        minter_addr: "0x1A9C0d370b6e93dFdbEA1145011Bc551bB1a2B60",
-        erc721_addr: "0x5051679FEDf0D7F01Dc23e72674d0ED58de9be6a",
-        erc1155Minter: "0x5D822bA2a0994434392A0f947C83310328CFB0DE",
-        erc721Minter: "0x941972fa041F507eBb8CfD5d11C05Eb1a51f2E95",
+        minter_addr: "0x224f78681099D66ceEdf4E52ee62E5a98CCB4b9e",
+        erc721_addr: "0xb678b13E41a47e46A4046a4D8315b32E0F34389c",
+        erc1155Minter: "0x5A768f8dDC67ccCA1431879BcA28E93a6c7722bb",
+        erc721Minter: "0x6516E2D3387A9CF4E5e868E7842D110c95A9f3B4",
         nonce: Chain.POLYGON,
       },
       fantomParams: {
@@ -84,10 +84,10 @@ export namespace ChainFactoryConfigs {
       bscParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BSC),
-        minter_addr: "0xbde1262d472aDd62C495a601806c22d228c2d70d",
-        erc721_addr: "0xD90e3e365C204CE22755fEfcbA0E221a2B8a17f6",
-        erc1155Minter: "0xDF7a8f8452E367fA0562d67FEb90aD746b3DD99A",
-        erc721Minter: "0x20929C60f0158A21521dFe695A3876871874C472",
+        minter_addr: "0x3Dd26fFf61D2a79f5fB77100d6daDBF073F334E6",
+        erc721_addr: "0x783eF7485DCF27a3Cf59F5A0A406eEe3f9b2AaeB",
+        erc1155Minter: "0x5dA3b7431f4581a7d35aEc2f3429174DC0f2A2E1",
+        erc721Minter: "0x97CD6fD6cbFfaa24f5c858843955C2601cc7F2b9",
         nonce: Chain.BSC,
       },
       celoParams: {
