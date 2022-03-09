@@ -43,10 +43,10 @@ var ChainFactoryConfigs;
             tronParams: {
                 provider: new tronweb_1.default({ fullHost: consts_1.TestNetRpcUri.TRON }),
                 notifier,
-                minter_addr: "TP3FdrW9bQP1mpBZyacESdi3q2oupDSBKX",
-                erc721_addr: "TBfgC2uXTbne4TqBP9TtkKbMPvvwYaAQxQ",
-                erc1155Minter: "TPY71u5ao8HSYtqGAALgaMubotTvGKv2MZ",
-                erc721Minter: "TSagiMvx3JQBAGABdqf4Pfj6P3cFWwJn2Y",
+                minter_addr: "TY46GA3GGdMtu9GMaaSPPSQtqq9CZAv5sK",
+                erc721_addr: "TDhb2kyurMwoc1eMndKzqNebji1ap1DJC4",
+                erc1155Minter: "TBeSKv5RSFLAi7SCD7hR64xuvP6N26oEqR",
+                erc721Minter: "TMVDt5PP53eQro5hLafibv2xWzSSDSMyjy",
                 validators: [
                     "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
                     "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",
@@ -323,11 +323,11 @@ var ChainFactoryConfigs;
             iotexParams: {
                 notifier,
                 provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.MainNetRpcUri.IOTEX),
-                minter_addr: "0x0E99a77fedf8D1Eb783078D1Aa84160a5CBE96D7",
-                erc721_addr: "0xF03d628aD8Ae53919A3E65A0cB85dD8765963C56",
+                minter_addr: "0x4bA4ADdc803B04b71412439712cB1911103380D6",
+                erc721_addr: "0x6eD7dfDf9678eCb2051c46A1A5E38B4f310b18c5",
                 erc721Minter: "0xD87755CCeaab0edb28b3f0CD7D6405E1bB827B65",
                 erc1155Minter: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
-                erc1155_addr: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
+                erc1155_addr: "0x93Ff4d90a548143c28876736Aa9Da2Bb7B1b52D4",
                 nonce: consts_1.Chain.IOTEX,
             },
             auroraParams: {

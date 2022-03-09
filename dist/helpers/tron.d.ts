@@ -3,7 +3,6 @@ import { TronWeb } from "tronweb";
 import { EthNftInfo } from "./web3";
 import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, NftMintArgs, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonceGet } from "..";
-import { Transaction } from "ethers";
 import { EvNotifier } from "../notifier";
 declare type TronSender = string | undefined;
 export declare type MinterRes = {
@@ -32,7 +31,9 @@ export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintA
      */
     deployMinter(deployer: TronSender, frostGroupKey: string, xpnftPrefix: string, xpnftPrefix1155: string, whitelist?: string[]): Promise<MinterRes>;
 };
-export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, Transaction> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo>;
+export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, string> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo> & {
+    XpNft: string;
+};
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
