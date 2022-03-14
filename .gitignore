@@ -9,3 +9,4 @@ tsconfig.tsbuildinfo
 dist
 src/test.ts
 .env
+test*
