@@ -154,14 +154,14 @@ export namespace ChainFactoryConfigs {
         notifier,
       },
       tezosParams: {
-        bridgeAddress: "KT1MRYxBimYh1PUt3LBhEAmvr7YMK2L7kqCL",
+        bridgeAddress: "KT1RgpK22M3xuhsMwm5qEKqVHdugJVm6H1jX",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1F7THd96y39MYKkTXmLyWkDZQ3H6QgubLh",
+        xpnftAddress: "KT1HopTgHvQBVFn6AqsdSLV2QoUEL29nQvoN",
         validators: [
-          "tz1e4QByQTYQyj98cBiM42hejkMWB2Pg6iXg",
-          "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-          "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+          "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
+          "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
+          "tz1exbY3JKPRpo2KLegK8iqoVNRLn1zFrnZi",
         ],
       },
       velasParams: {

@@ -189,15 +189,16 @@ export async function tezosHelperFactory({
   }
 
   return {
-    async transferNftToForeign(sender, chain, to, nft, fee) {
+    async transferNftToForeign(sender, chain, to, nft, fee, mw) {
       const hash = await withBridge(
         sender,
         (bridge) =>
           bridge.methods.freeze_fa2(
+            nft.collectionIdent,
+            parseInt(nft.native.token_id),
             chain,
-            nft.native.contract,
             to,
-            parseInt(nft.native.token_id)
+            mw
           ),
         { amount: fee.toNumber() / 1e6 }
       );
@@ -208,11 +209,11 @@ export async function tezosHelperFactory({
     async balance(address) {
       return Tezos.tz.getBalance(address);
     },
-    async unfreezeWrappedNft(sender, to, nft, fee) {
+    async unfreezeWrappedNft(sender, to, nft, fee, nonce) {
       const hash = await withBridge(
         sender,
         (bridge) =>
-          bridge.methods.withdraw_nft(to, parseInt(nft.native.token_id)),
+          bridge.methods.withdraw_nft(to, parseInt(nft.native.token_id), nonce),
         { amount: fee.toNumber() / 1e6 }
       );
 
