@@ -197,11 +197,11 @@ export async function tezosHelperFactory({
         sender,
         (bridge) =>
           bridge.methods.freeze_fa2(
-            nft.collectionIdent,
-            parseInt(nft.native.token_id),
             chain,
+            nft.collectionIdent,
+            mw,
             to,
-            mw
+            parseInt(nft.native.token_id),
           ),
         { amount: fee.toNumber() / 1e6 }
       );
@@ -213,10 +213,13 @@ export async function tezosHelperFactory({
       return Tezos.tz.getBalance(address);
     },
     async unfreezeWrappedNft(sender, to, nft, fee, nonce) {
+      console.log("Unfreezing")
+      console.log(nft.native.contract)
       const hash = await withBridge(
         sender,
-        (bridge) =>
-          bridge.methods.withdraw_nft(to, parseInt(nft.native.token_id), nonce),
+        (bridge) => {
+          return bridge.methods.withdraw_nft(nft.native.contract, nonce, to, parseInt(nft.native.token_id))
+        },
         { amount: fee.toNumber() / 1e6 }
       );
 
