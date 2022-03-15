@@ -204,7 +204,7 @@ export type ChainFactory = {
   ): Promise<string[]>;
 
   checkWhitelist<RawNft>(
-    chain: Partial<WhitelistCheck<RawNft>>,
+    chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet,
     nft: NftInfo<RawNft>
   ): Promise<boolean>;
 };
@@ -426,7 +426,10 @@ export function ChainFactory(
     );
   }
 
-  async function isWrappedNft(nft: NftInfo<unknown>) {
+  async function isWrappedNft(nft: NftInfo<unknown>, fc: number) {
+    if (fc === Chain.TEZOS) {
+      return (typeof (nft.native as any).meta.wrapped !== undefined)
+    }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
     } catch (_) {
@@ -471,7 +474,7 @@ export function ChainFactory(
           if (e.native.contractType && e.native.contractType === "ERC721") {
             throw new Error(`ERC721 is not supported`);
           }
-          if (await isWrappedNft(e)) {
+          if (await isWrappedNft(e, from.getNonce())) {
             wrapped.push(e);
           } else {
             unwrapped.push(e);
@@ -597,11 +600,10 @@ export function ChainFactory(
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
       }
-      console.log(mw)
       if (mw === undefined || mw === "") {
         throw new Error(`Mint with is not set`);
       }
-      if (await isWrappedNft(nft)) {
+      if (await isWrappedNft(nft, fromChain.getNonce())) {
         const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,
@@ -643,7 +645,7 @@ export function ChainFactory(
       return await algo.claimableNfts(txSocket, claimer);
     },
     async checkWhitelist(chain, nft) {
-      if (!chain.isNftWhitelisted || (await isWrappedNft(nft))) {
+      if (!chain.isNftWhitelisted || (await isWrappedNft(nft, chain.getNonce()))) {
         return true;
       }
 
