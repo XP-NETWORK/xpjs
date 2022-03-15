@@ -58,6 +58,8 @@ export type TezosHelper = TransferNftForeign<
       address: NftInfo<TezosNftInfo>,
       sender: TezosSigner
     ): Promise<string | undefined>;
+  } & {
+    XpNft: string;
   };
 
 export type TezosParams = {
@@ -189,6 +191,7 @@ export async function tezosHelperFactory({
   }
 
   return {
+    XpNft: xpnftAddress,
     async transferNftToForeign(sender, chain, to, nft, fee, mw) {
       const hash = await withBridge(
         sender,

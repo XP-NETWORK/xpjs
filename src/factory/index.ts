@@ -566,7 +566,7 @@ export function ChainFactory(
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
-        if (fromChain.getNonce() != 9) {
+        if (fromChain.getNonce() !== 9 && fromChain.getNonce() !== 18) {
           //@ts-ignore
           checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
         }
@@ -575,17 +575,17 @@ export function ChainFactory(
       const mw =
         //@ts-ignore
         nft.native.contract &&
-        mintWith &&
-        checkMintWith(
-          mintWith,
-          //@ts-ignore
-          await getVerifiedContracts(
+          mintWith &&
+          checkMintWith(
+            mintWith,
             //@ts-ignore
-            nft.native.contract.toLowerCase(),
-            toChain.getNonce(),
-            fromChain.getNonce()
+            await getVerifiedContracts(
+              //@ts-ignore
+              nft.native.contract.toLowerCase(),
+              toChain.getNonce(),
+              fromChain.getNonce()
+            )
           )
-        )
           ? mintWith
           : toChain.XpNft;
 
@@ -596,6 +596,10 @@ export function ChainFactory(
       }
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
+      }
+      console.log(mw)
+      if (mw === undefined || mw === "") {
+        throw new Error(`Mint with is not set`);
       }
       if (await isWrappedNft(nft)) {
         const res = await fromChain.unfreezeWrappedNft(
