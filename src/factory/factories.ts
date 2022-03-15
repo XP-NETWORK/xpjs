@@ -154,10 +154,10 @@ export namespace ChainFactoryConfigs {
         notifier,
       },
       tezosParams: {
-        bridgeAddress: "KT1RgpK22M3xuhsMwm5qEKqVHdugJVm6H1jX",
+        bridgeAddress: "KT1XcqRsgNpuAv1ediqnRie5zqWsQGSHhYac",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1HopTgHvQBVFn6AqsdSLV2QoUEL29nQvoN",
+        xpnftAddress: "KT1GzPNDh8MBZnxEAiwxvaj69bLGZ58q3TbT",
         validators: [
           "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
