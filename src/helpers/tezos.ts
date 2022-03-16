@@ -32,7 +32,7 @@ import { EvNotifier } from "../notifier";
 
 type TezosSigner = WalletProvider | Signer;
 
-type TezosNftInfo = {
+export type TezosNftInfo = {
   contract: string;
   token_id: string;
 };
@@ -193,6 +193,7 @@ export async function tezosHelperFactory({
   return {
     XpNft: xpnftAddress,
     async transferNftToForeign(sender, chain, to, nft, fee, mw) {
+      await preTransfer(sender, nft)
       const hash = await withBridge(
         sender,
         (bridge) =>
@@ -213,8 +214,6 @@ export async function tezosHelperFactory({
       return Tezos.tz.getBalance(address);
     },
     async unfreezeWrappedNft(sender, to, nft, fee, nonce) {
-      console.log("Unfreezing")
-      console.log(nft.native.contract)
       const hash = await withBridge(
         sender,
         (bridge) => {

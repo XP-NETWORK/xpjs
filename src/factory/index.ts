@@ -428,7 +428,7 @@ export function ChainFactory(
 
   async function isWrappedNft(nft: NftInfo<unknown>, fc: number) {
     if (fc === Chain.TEZOS) {
-      return (typeof (nft.native as any).meta.wrapped !== undefined)
+      return (typeof (nft.native as any).meta?.wrapped !== 'undefined')
     }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
@@ -448,7 +448,7 @@ export function ChainFactory(
     fc: number
   ): Promise<string[]> {
     const res = await axios.get<{ data: { to: string }[] }>(
-      `https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
+      `https://nodes.xp.network/sc-verify/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);
   }
@@ -603,6 +603,7 @@ export function ChainFactory(
       if (mw === undefined || mw === "") {
         throw new Error(`Mint with is not set`);
       }
+      console.log(`Minting With : ${mw}`)
       if (await isWrappedNft(nft, fromChain.getNonce())) {
         const res = await fromChain.unfreezeWrappedNft(
           sender,
