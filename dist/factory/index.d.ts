@@ -98,7 +98,7 @@ export declare type ChainFactory = {
      */
     claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
     getVerifiedContracts(from: string, targetChain: number, fc: number): Promise<string[]>;
-    checkWhitelist<RawNft>(chain: Partial<WhitelistCheck<RawNft>>, nft: NftInfo<RawNft>): Promise<boolean>;
+    checkWhitelist<RawNft>(chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet, nft: NftInfo<RawNft>): Promise<boolean>;
 };
 /**
  * A type representing all the supported chain params.

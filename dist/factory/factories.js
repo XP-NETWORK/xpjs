@@ -102,10 +102,10 @@ var ChainFactoryConfigs;
             harmonyParams: {
                 notifier,
                 provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.TestNetRpcUri.HARMONY),
-                minter_addr: "0xCbA56d441da86dEfe31d3AdDeEc2bA04f7e27d9e",
-                erc721_addr: "0x0AA29baB4F811A9f3dcf6a0F9cAEa9bE18ECED78",
-                erc1155Minter: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
-                erc721Minter: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
+                minter_addr: "0x198Cae9EE853e7b44E99c0b35Bddb451F83485d5",
+                erc721_addr: "0x1280c5c11bF0aAaaEAeBc998893B42e08B26fD5A",
+                erc1155Minter: "0xB546c2358A6e4b0B83192cCBB83CaE37FA572fe1",
+                erc721Minter: "0xb036640d6f7cAfd338103dc60493250561Af2eBc",
                 nonce: consts_1.Chain.HARMONY,
             },
             ropstenParams: {
@@ -153,10 +153,10 @@ var ChainFactoryConfigs;
                 notifier,
             },
             tezosParams: {
-                bridgeAddress: "KT1RgpK22M3xuhsMwm5qEKqVHdugJVm6H1jX",
+                bridgeAddress: "KT1XcqRsgNpuAv1ediqnRie5zqWsQGSHhYac",
                 notifier,
                 Tezos: new taquito_1.TezosToolkit(consts_1.TestNetRpcUri.TEZOS),
-                xpnftAddress: "KT1HopTgHvQBVFn6AqsdSLV2QoUEL29nQvoN",
+                xpnftAddress: "KT1GzPNDh8MBZnxEAiwxvaj69bLGZ58q3TbT",
                 validators: [
                     "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
                     "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
@@ -175,10 +175,10 @@ var ChainFactoryConfigs;
             iotexParams: {
                 notifier,
                 provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.TestNetRpcUri.IOTEX),
-                minter_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
-                erc721_addr: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
-                erc1155Minter: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
-                erc721Minter: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
+                minter_addr: "0xE657b66d683bF4295325c5E66F6bb0fb6D1F7551",
+                erc721_addr: "0x5D822bA2a0994434392A0f947C83310328CFB0DE",
+                erc1155Minter: "0x5df32A2F15D021DeF5086cF94fbCaC4594208A26",
+                erc721Minter: "0xC3dB3dBcf007961541BE1ddF15cD4ECc0Fc758d5",
                 nonce: consts_1.Chain.IOTEX,
             },
         };
