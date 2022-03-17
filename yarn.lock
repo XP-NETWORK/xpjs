@@ -5061,12 +5061,6 @@ xmlhttprequest@1.8.0:
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   integrity sha1-Z/4HXFwk/vOfnWX197f+dRcZaPw=
 
-"xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#4875dd73dd3f1884c0129caa4638135b9c10eb05":
-  version "0.1.0"
-  resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#4875dd73dd3f1884c0129caa4638135b9c10eb05"
-  dependencies:
-    ethers "^5.5.4"
-
 "xpnet-web3-contracts@git+https://github.com/xp-network/XP.network-HECO-Migration#65b3d13fb814ec8d8c4ea847c5915d763c0fec6f":
   version "0.1.0"
   resolved "git+https://github.com/xp-network/XP.network-HECO-Migration#65b3d13fb814ec8d8c4ea847c5915d763c0fec6f"

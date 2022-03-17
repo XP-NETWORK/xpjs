@@ -305,14 +305,17 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.FUSE,
       },
       tezosParams: {
-        bridgeAddress: "KT1B2zBPLVe51oXeuBJ8c7p2vHhi37jGxGHR",
+        bridgeAddress: "KT1WKtpe58XPCqNQmPmVUq6CZkPYRms5oLvu",
         notifier,
         Tezos: new TezosToolkit(MainNetRpcUri.TEZOS),
-        xpnftAddress: "KT1FxthB8GQvT7HnuczSp1qJk4w7dR5umKrx",
+        xpnftAddress: "KT1NEx6MX2GUEKMTX9ydyu8mn9WBNEz3QPEp",
         validators: [
-          "tz1bxXSUcu1PqceWBw1zwc4zMRQuSLpbQ5VX",
-          "tz1VBF2LXnnnqKqKmTQqdESGx91kVLKyZMv4",
-          "tz1hMBJzUouzXYRk3mpdVi2QHY2gP594Kk2G",
+          "tz1MwAQrsg5EgeFD1AQHT2FTutnj9yQJNcjM",
+          "tz1b5AMdXs9nDxsqoN9wa3HTusvhahgBRWuF",
+          "tz1L5DjmMEHbj5npRzZewSARLmTQQyESW4Mj",
+          "tz1csq1THV9rKQQexo2XfSjSEJEg2wRCSHsD",
+          "tz1TBhd1NeZNtWsTbecee8jDMDzeBNLmpViN",
+          "tz1SHcDnXRgb7kWidiaM2J6bbTS7x5jzBr67"
         ],
       },
       velasParams: {
