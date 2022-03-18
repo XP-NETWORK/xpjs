@@ -448,7 +448,7 @@ export function ChainFactory(
     fc: number
   ): Promise<string[]> {
     const res = await axios.get<{ data: { to: string }[] }>(
-      `https://nodes.xp.network/sc-verify/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
+      `https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);
   }
@@ -575,15 +575,12 @@ export function ChainFactory(
         }
       }
 
-      const mw =
-        //@ts-ignore
-        nft.native.contract &&
+      const mw = "contract" in nft.native &&
           mintWith &&
           checkMintWith(
             mintWith,
-            //@ts-ignore
             await getVerifiedContracts(
-              //@ts-ignore
+			  //@ts-expect-error contract is checked
               nft.native.contract.toLowerCase(),
               toChain.getNonce(),
               fromChain.getNonce()
@@ -620,7 +617,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          mw || ""
+          mw
         );
         return res;
       }
