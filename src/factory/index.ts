@@ -428,7 +428,7 @@ export function ChainFactory(
 
   async function isWrappedNft(nft: NftInfo<unknown>, fc: number) {
     if (fc === Chain.TEZOS) {
-      return (typeof (nft.native as any).meta?.wrapped !== 'undefined')
+      return (typeof (nft.native as any).meta?.token?.metadata?.wrapped !== 'undefined')
     }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
