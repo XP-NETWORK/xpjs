@@ -326,7 +326,7 @@ export async function elrondHelperFactory(
     if (res === undefined || new BigNumber(res.balance).lt(value)) {
       const utx = new Transaction({
         receiver: swapContract,
-        gasLimit: new GasLimit(50000000),
+        gasLimit: new GasLimit(300000000),
         value: new Balance(
           Egld.getToken(),
           Egld.getNonce(),
@@ -389,7 +389,7 @@ export async function elrondHelperFactory(
   ) => {
     return new Transaction({
       receiver: address,
-      gasLimit: new GasLimit(70000000),
+      gasLimit: new GasLimit(300000000),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
         .addArg(new AddressValue(mintContract))
@@ -421,7 +421,7 @@ export async function elrondHelperFactory(
   ) => {
     return new Transaction({
       receiver: address,
-      gasLimit: new GasLimit(70000000),
+      gasLimit: new GasLimit(300000000),
       data: TransactionPayload.contractCall()
         .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
         .addArg(new AddressValue(mintContract))
@@ -602,6 +602,7 @@ export async function elrondHelperFactory(
       txFees: EasyBalance,
       nonce
     ): Promise<Transaction> {
+      console.log(`Unfreezing`)
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,

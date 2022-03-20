@@ -576,18 +576,18 @@ export function ChainFactory(
       }
 
       const mw = "contract" in nft.native &&
-          mintWith &&
-          checkMintWith(
-            mintWith,
-            await getVerifiedContracts(
-			  //@ts-expect-error contract is checked
-              nft.native.contract.toLowerCase(),
-              toChain.getNonce(),
-              fromChain.getNonce()
-            )
+        mintWith &&
+        checkMintWith(
+          mintWith,
+          await getVerifiedContracts(
+            //@ts-expect-error contract is checked
+            nft.native.contract.toLowerCase(),
+            toChain.getNonce(),
+            fromChain.getNonce()
           )
-          ? mintWith
-          : toChain.XpNft;
+        )
+        ? mintWith
+        : toChain.XpNft;
 
       await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 

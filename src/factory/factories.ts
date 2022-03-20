@@ -32,11 +32,11 @@ export namespace ChainFactoryConfigs {
       elrondParams: {
         node_uri: TestNetRpcUri.ELROND,
         minter_address:
-          "erd1qqqqqqqqqqqqqpgqzses02wme3gsx320dpja2p2kk3rckgcfksmsj8grdk",
+          "erd1qqqqqqqqqqqqqpgqnd6nmq4vh8e3xrxqrxgpwfldgp3sje83k4as3lusln",
         esdt_swap_address:
-          "erd1qqqqqqqqqqqqqpgqwu3ulmuxppa2e537ajst468wplkxxsqyksms9az8at",
-        esdt_nft: "XPNFT-aca910",
-        esdt_swap: "WEGLD-f8dc4c",
+          "erd1qqqqqqqqqqqqqpgq62h6fe5myaajkeva09whewaw8u2hsuexk4as29tzn9",
+        esdt_nft: "XPNFT-fc0a99",
+        esdt_swap: "WEGLD-2d1d69",
         notifier,
         nonce: 2,
       },
@@ -154,10 +154,10 @@ export namespace ChainFactoryConfigs {
         notifier,
       },
       tezosParams: {
-        bridgeAddress: "KT1XcqRsgNpuAv1ediqnRie5zqWsQGSHhYac",
+        bridgeAddress: "KT195omxiopL2ZDqM3g8hRj2sSCG2pTqjNEj",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1GzPNDh8MBZnxEAiwxvaj69bLGZ58q3TbT",
+        xpnftAddress: "KT1LZ3YqxgHy8jao5L8VBFyMUoPkxhgfLhLV",
         validators: [
           "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
