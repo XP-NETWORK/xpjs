@@ -1,7 +1,6 @@
 import WalletConnect from "@walletconnect/client";
 import algosdk, { Algodv2, SuggestedParams } from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
-import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { Base64 } from "js-base64";
 import {
@@ -16,6 +15,7 @@ import {
   ValidateAddress,
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
+import fs from "fs"
 
 type TxResp = {
   txId: string;
@@ -143,11 +143,11 @@ export type AlgorandParams = {
   sendNftAppId: number;
 };
 
-type MinWrappedNft = {
-  wrapped: {
-    origin: string;
-  };
-};
+// type MinWrappedNft = {
+//   wrapped: {
+//     origin: string;
+//   };
+// };
 
 const encoder = new TextEncoder();
 const MINT_NFT_COST = new BigNumber(1000);
@@ -199,7 +199,8 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     chain_nonce: number,
     to: string,
     nft: NftInfo<AlgoNft>,
-    txFees: BigNumber
+    _txFees: BigNumber,
+    mintWith?: string
   ) => {
     const suggested = await algod.getTransactionParams().do();
 
@@ -211,19 +212,23 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         assetIndex: nft.native.nftId,
         suggestedParams: suggested,
       });
+    const appArgs = [
+      encoder.encode("freeze_nft"),
+      encoder.encode(to),
+      new Uint8Array(
+        Buffer.concat([
+          Buffer.from(new Uint32Array([0]).buffer),
+          Buffer.from(new Uint32Array([chain_nonce]).buffer).reverse(),
+        ])
+      ),
+    ]
+    if (mintWith) {
+      appArgs.push(encoder.encode(mintWith));
+    }
     const tCallTx = algosdk.makeApplicationNoOpTxnFromObject({
       from: signer.address,
       appIndex: args.sendNftAppId,
-      appArgs: [
-        encoder.encode("freeze_nft"),
-        encoder.encode(to),
-        new Uint8Array(
-          Buffer.concat([
-            Buffer.from(new Uint32Array([0]).buffer),
-            Buffer.from(new Uint32Array([chain_nonce]).buffer).reverse(),
-          ])
-        ),
-      ],
+      appArgs,
       foreignAssets: [nft.native.nftId],
       suggestedParams: suggested,
     });
@@ -341,11 +346,11 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return suggested;
     },
     transferNftToForeign: transferNft,
-    unfreezeWrappedNft: async (signer, to, nft, txFees) => {
-      const nftMeta = await axios.get<MinWrappedNft>(nft.uri);
+    unfreezeWrappedNft: async (signer, to, nft, txFees, nonce) => {
+      // const nftMeta = await axios.get<MinWrappedNft>(nft.uri);
       return await transferNft(
         signer,
-        parseInt(nftMeta.data.wrapped.origin),
+        parseInt(nonce),
         to,
         nft,
         txFees
