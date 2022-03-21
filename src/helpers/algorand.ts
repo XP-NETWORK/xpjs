@@ -1,5 +1,5 @@
 import WalletConnect from "@walletconnect/client";
-import algosdk, { SuggestedParams } from "algosdk";
+import algosdk, { Algodv2, SuggestedParams } from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
@@ -173,6 +173,27 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     }
   }
 
+  async function compileProgram(
+    client: Algodv2,
+    programSource: string
+  ) {
+    const enc = new TextEncoder();
+    const programBytes = enc.encode(programSource);
+    const compileResponse = await client.compile(programBytes).do();
+    const compiledBytes = new Uint8Array(
+      Buffer.from(compileResponse.result, 'base64')
+    );
+    return compiledBytes;
+  };
+
+  async function getMintPoolProgram(client: Algodv2, recv: any) {
+    const poolSrc = fs.readFileSync(__dirname + '/bridge_pool.tmpl.teal');
+    return await compileProgram(
+      client,
+      poolSrc.toString().replace('TMPL_RECV_ADDR', recv)
+    );
+  }
+
   const transferNft = async (
     signer: AlgoSignerH,
     chain_nonce: number,
@@ -181,12 +202,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     txFees: BigNumber
   ) => {
     const suggested = await algod.getTransactionParams().do();
-    const feesTx = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      from: signer.address,
-      to: appAddr,
-      amount: BigInt(txFees.toString()),
-      suggestedParams: suggested,
-    });
+
     const transferTx =
       algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         from: signer.address,
@@ -199,7 +215,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       from: signer.address,
       appIndex: args.sendNftAppId,
       appArgs: [
-        encoder.encode("receive_nft"),
+        encoder.encode("freeze_nft"),
         encoder.encode(to),
         new Uint8Array(
           Buffer.concat([
@@ -211,18 +227,16 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       foreignAssets: [nft.native.nftId],
       suggestedParams: suggested,
     });
-    algosdk.assignGroupID([feesTx, transferTx, tCallTx]);
+    algosdk.assignGroupID([tCallTx, transferTx]);
     const encodedTxns = [
-      { txn: Base64.fromUint8Array(feesTx.toByte()) },
-      { txn: Base64.fromUint8Array(transferTx.toByte()) },
       { txn: Base64.fromUint8Array(tCallTx.toByte()) },
+      { txn: Base64.fromUint8Array(transferTx.toByte()) },
     ];
     const signedTxns = await signer.algoSigner.signTxn(encodedTxns);
     const sendRes = await algod
       .sendRawTransaction([
         Base64.toUint8Array(signedTxns[0].blob),
         Base64.toUint8Array(signedTxns[1].blob),
-        Base64.toUint8Array(signedTxns[2].blob),
       ])
       .do();
     await waitTxnConfirm(sendRes.txId);
@@ -267,28 +281,21 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   async function claimNft(signer: AlgoSignerH, info: ClaimNftInfo) {
     await optInNft(signer, info);
 
+    const program = await getMintPoolProgram(algod, signer.address)
+    const lsig = new algosdk.LogicSigAccount(program)
     const suggested = await algod.getTransactionParams().do();
-
-    const callTxn = algosdk.makeApplicationNoOpTxnFromObject({
-      from: signer.address,
-      appIndex: info.appId,
-      appArgs: [encoder.encode("transfer_nft")],
-      foreignAssets: [info.nftId],
+    const xferTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+      from: lsig.address(),
       suggestedParams: suggested,
-    });
-    const encodedCall = Base64.fromUint8Array(callTxn.toByte());
-    const signedCall = await signer.algoSigner.signTxn([
-      {
-        txn: encodedCall,
-      },
-    ]);
-    const callRes = await signer.algoSigner.send({
-      ledger: signer.ledger,
-      tx: signedCall[0].blob,
-    });
+      to: signer.address,
+      amount: 1,
+      assetIndex: info.nftId
+    })
+    const lstx = algosdk.signLogicSigTransactionObject(xferTxn, lsig)
+    const { txId } = await algod.sendRawTransaction([lstx.blob]).do()
 
-    await waitTxnConfirm(callRes.txId);
-    return callRes.txId;
+    await waitTxnConfirm(txId);
+    return txId;
   }
 
   return {
@@ -306,19 +313,31 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       const callTx = algosdk.makeApplicationNoOpTxnFromObject({
         from: sender.address,
         appIndex: args.sendNftAppId,
-        appArgs: [encoder.encode("opt_in_nft")],
+        appArgs: [encoder.encode("optin_asset")],
         foreignAssets: [nft.native.nftId],
         suggestedParams: suggested,
       });
-      const encodedTx = Base64.fromUint8Array(callTx.toByte());
-      const signedTxCall = await sender.algoSigner.signTxn([
-        { txn: encodedTx },
-      ]);
-      const res = await sender.algoSigner.send({
-        ledger: sender.ledger,
-        tx: signedTxCall[0].blob,
-      });
-      await waitTxnConfirm(res.txId);
+      const feesTx = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: sender.address,
+        suggestedParams: suggested,
+        to: appAddr,
+        amount: _fee.toNumber()
+      })
+
+      algosdk.assignGroupID([callTx, feesTx]);
+      const encodedTxns = [
+        { txn: Base64.fromUint8Array(callTx.toByte()) },
+        { txn: Base64.fromUint8Array(feesTx.toByte()) },
+      ];
+      const signedTxns = await sender.algoSigner.signTxn(encodedTxns);
+      const sendRes = await algod
+        .sendRawTransaction([
+          Base64.toUint8Array(signedTxns[0].blob),
+          Base64.toUint8Array(signedTxns[1].blob),
+        ])
+        .do();
+      await waitTxnConfirm(sendRes.txId);
+
       return suggested;
     },
     transferNftToForeign: transferNft,
