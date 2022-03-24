@@ -597,7 +597,7 @@ export function ChainFactory(
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
       }
-      if (mw === undefined || mw === "") {
+      if (mw === undefined) {
         throw new Error(`Mint with is not set`);
       }
       console.log(`Minting With : ${mw}`)
