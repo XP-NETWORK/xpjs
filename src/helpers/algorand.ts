@@ -134,7 +134,7 @@ export type AlgorandHelper = ChainNonceGet &
     ): Promise<string | undefined>;
     walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
     myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
-  } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
+  } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer"> & { XpNft: string };
 
 export type AlgorandParams = {
   algodApiKey: string;
@@ -304,6 +304,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   }
 
   return {
+    XpNft: "",
     algod,
     getNonce: () => Chain.ALGORAND,
     claimNft,
