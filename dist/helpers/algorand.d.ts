@@ -64,7 +64,9 @@ export declare type AlgorandHelper = ChainNonceGet & TransferNftForeign<AlgoSign
     optInNft(signer: AlgoSignerH, info: ClaimNftInfo): Promise<string | undefined>;
     walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
     myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
-} & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer">;
+} & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer"> & {
+    XpNft: string;
+};
 export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;

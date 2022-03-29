@@ -34,7 +34,7 @@
     "@taquito/tzip12": "^11.1.0",
     "@vechain/ethers": "^4.0.27-5",
     "@walletconnect/client": "^1.7.0",
-    "algosdk": "^1.12.0",
+    "algosdk": "^1.15.0-beta.1",
     "axios": "^0.21.1",
     "bignumber.js": "9.0.1",
     "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#master-dist",
