@@ -32,6 +32,7 @@ export enum TestNetRpcUri {
   VELAS = "https://explorer.testnet.velas.com/rpc",
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
+  GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev"
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -53,6 +54,7 @@ export enum MainNetRpcUri {
   TEZOS = "https://mainnet.smartpy.io",
   IOTEX = "https://babel-api.mainnet.iotex.io",
   AURORA = "https://mainnet.aurora.dev",
+  GODWOKEN = "https://mainnet.godwoken.io/rpc"
   // TODO: Algorand
 }
 
@@ -85,6 +87,7 @@ export type MetaMap = {
   0x13: Web3Meta;
   0x14: Web3Meta;
   0x15: Web3Meta;
+  0x16: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -107,6 +110,7 @@ export namespace Chain {
   export const VELAS = 0x13; // 19
   export const IOTEX = 0x14; // 20
   export const AURORA = 0x15; // 21
+  export const GODWOKEN = 0x16; // 22
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -293,5 +297,14 @@ CHAIN_INFO.set(Chain.IOTEX, {
   currency: SupportedCurrency.IOTX,
   chainId: 4689,
 });
+CHAIN_INFO.set(Chain.GODWOKEN, {
+  name: "GodWoken",
+  blockExplorerUrl: "https://aggron.layerview.io/tx/",
+  constructor: web3HelperFactory,
+  nonce: 0x16,
+  decimals: 1e18,
+  currency: SupportedCurrency.CKB,
+  chainId: 868455272153094
+})
 
 export const FEE_MARGIN = { min: 0.5, max: 5 };
