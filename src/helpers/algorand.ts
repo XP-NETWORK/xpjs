@@ -362,20 +362,26 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),
     estimateValidateUnfreezeNft: () => Promise.resolve(MINT_NFT_COST),
     validateAddress: (adr) => Promise.resolve(algosdk.isValidAddress(adr)),
-    claimableNfts: async (_txSocket: AlgorandSocketHelper, owner: string) => {
-      const program = await getMintPoolProgram(algod, owner)
-      const lsig = new algosdk.LogicSigAccount(program)
+    claimableNfts: async (txSocket: AlgorandSocketHelper, owner: string) => {
+      await txSocket.cleanNfts(owner);
+      const claims = await txSocket.claimNfts(owner);
 
-      const idx = new algosdk.Indexer(args.algodApiKey, args.algodUri, args.algodPort)
+      const res = await Promise.all(
+        claims.map(async (v) => {
+          const appId = parseInt(v.app_id);
+          const nftId = parseInt(v.nft_id);
+          const assetInfo = await algod.getAssetByID(nftId).do();
 
-      const nfts = await idx.lookupAccountAssets(lsig.address()).do()
-      console.log(nfts)
+          return {
+            nftId,
+            appId,
+            uri: assetInfo.params.url as string,
+            name: (assetInfo.params.name as string) || "",
+          };
+        })
+      );
 
-      const claims = nfts["assets"]
-
-      console.log(claims)
-
-      return [];
+      return res;
     },
     walletConnectSigner(
       connector: WalletConnect,
