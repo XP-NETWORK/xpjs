@@ -286,21 +286,23 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   async function claimNft(signer: AlgoSignerH, info: ClaimNftInfo) {
     await optInNft(signer, info);
 
-    const program = await getMintPoolProgram(algod, signer.address)
-    const lsig = new algosdk.LogicSigAccount(program)
     const suggested = await algod.getTransactionParams().do();
-    const xferTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-      from: lsig.address(),
+    const txn = algosdk.makeApplicationNoOpTxnFromObject({
+      from: signer.address,
       suggestedParams: suggested,
-      to: signer.address,
-      amount: 1,
-      assetIndex: info.nftId
+      appIndex: info.appId,
+      appArgs: [encoder.encode("transfer_nft")],
+      foreignAssets: [info.nftId]
     })
-    const lstx = algosdk.signLogicSigTransactionObject(xferTxn, lsig)
-    const { txId } = await algod.sendRawTransaction([lstx.blob]).do()
 
-    await waitTxnConfirm(txId);
-    return txId;
+    const encodedTx = Base64.fromUint8Array(txn.toByte());
+    const signedTx = await signer.algoSigner.signTxn([{ txn: encodedTx }]);
+    const res = await signer.algoSigner.send({
+      ledger: signer.ledger,
+      tx: signedTx[0].blob,
+    });
+    await waitTxnConfirm(res.txId);
+    return res.txId;
   }
 
   return {
