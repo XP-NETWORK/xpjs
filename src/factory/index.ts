@@ -276,6 +276,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.VELAS, chainParams.velasParams);
   cToP.set(Chain.IOTEX, chainParams.iotexParams);
   cToP.set(Chain.AURORA, chainParams.auroraParams);
+  cToP.set(Chain.GODWOKEN, chainParams.godwokenParams)
   return cToP;
 }
 /**
