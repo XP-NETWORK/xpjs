@@ -1,5 +1,5 @@
 import WalletConnect from "@walletconnect/client";
-import algosdk, { Algodv2, SuggestedParams } from "algosdk";
+import algosdk, { SuggestedParams } from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import { BigNumber } from "bignumber.js";
 import { Base64 } from "js-base64";
@@ -15,7 +15,7 @@ import {
   ValidateAddress,
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
-import fs from "fs"
+
 
 type TxResp = {
   txId: string;
@@ -173,26 +173,26 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     }
   }
 
-  async function compileProgram(
-    client: Algodv2,
-    programSource: string
-  ) {
-    const enc = new TextEncoder();
-    const programBytes = enc.encode(programSource);
-    const compileResponse = await client.compile(programBytes).do();
-    const compiledBytes = new Uint8Array(
-      Buffer.from(compileResponse.result, 'base64')
-    );
-    return compiledBytes;
-  };
+  // async function compileProgram(
+  //   client: Algodv2,
+  //   programSource: string
+  // ) {
+  //   const enc = new TextEncoder();
+  //   const programBytes = enc.encode(programSource);
+  //   const compileResponse = await client.compile(programBytes).do();
+  //   const compiledBytes = new Uint8Array(
+  //     Buffer.from(compileResponse.result, 'base64')
+  //   );
+  //   return compiledBytes;
+  // };
 
-  async function getMintPoolProgram(client: Algodv2, recv: any) {
-    const poolSrc = fs.readFileSync(__dirname + '/bridge_pool.tmpl.teal');
-    return await compileProgram(
-      client,
-      poolSrc.toString().replace('TMPL_RECV_ADDR', recv)
-    );
-  }
+  // async function getMintPoolProgram(client: Algodv2, recv: any) {
+  //   const poolSrc = fs.readFileSync(__dirname + '/bridge_pool.tmpl.teal');
+  //   return await compileProgram(
+  //     client,
+  //     poolSrc.toString().replace('TMPL_RECV_ADDR', recv)
+  //   );
+  // }
 
   const transferNft = async (
     signer: AlgoSignerH,
