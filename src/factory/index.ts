@@ -591,7 +591,7 @@ export function ChainFactory(
         ? mintWith
         : toChain.XpNft;
 
-      await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
+      // await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
 
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
