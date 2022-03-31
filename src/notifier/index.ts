@@ -8,10 +8,27 @@ export function evNotifier(url: string) {
   });
 
   return {
-    async notifyWeb3(chainNonce: number, txHash: string) {
+    async notifyWeb3(
+      fromChain: number,
+      fromHash: string,
+      actionId?: string,
+      type?: string,
+      toChain?: number,
+      txFees?: string,
+      senderAddress?: string,
+      targetAddress?: string,
+      nftUri?: string
+    ) {
       await api.post("/tx/web3", {
-        chain_nonce: chainNonce,
-        tx_hash: txHash,
+        chain_nonce: fromChain,
+        tx_hash: fromHash,
+        actionId,
+        type,
+        toChain,
+        txFees,
+        senderAddress,
+        targetAddress,
+        nftUri,
       });
     },
     async notifyTron(txHash: string) {

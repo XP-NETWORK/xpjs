@@ -239,8 +239,27 @@ export async function web3HelperFactory(
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
 
-  async function notifyValidator(hash: string): Promise<void> {
-    await params.notifier.notifyWeb3(params.nonce, hash);
+  async function notifyValidator(
+    fromHash: string,
+    actionId?: string,
+    type?: string,
+    toChain?: number,
+    txFees?: string,
+    senderAddress?: string,
+    targetAddress?: string,
+    nftUri?: string
+  ): Promise<void> {
+    await params.notifier.notifyWeb3(
+      params.nonce,
+      fromHash,
+      actionId,
+      type,
+      toChain,
+      txFees,
+      senderAddress,
+      targetAddress,
+      nftUri
+    );
   }
 
   async function extractAction(txr: TransactionResponse): Promise<string> {
@@ -351,6 +370,16 @@ export async function web3HelperFactory(
         }
       );
 
+      // await notifyValidator(
+      //   res.hash,
+      //   await extractAction(res),
+      //   "Unfreeze",
+      //   chainNonce.toString(),
+      //   txFees.toString(),
+      //   await signer.getAddress(),
+      //   to,
+      //   res.data
+      // );
       await notifyValidator(res.hash);
 
       return res;
@@ -416,7 +445,17 @@ export async function web3HelperFactory(
           }
         );
 
-      await notifyValidator(txr.hash);
+      await notifyValidator(
+        txr.hash,
+        await extractAction(txr),
+        "Transfer",
+        chain_nonce,
+        txFees.toString(),
+        await sender.getAddress(),
+        to,
+        id.uri
+      );
+
       return txr;
     },
     async unfreezeWrappedNft(
@@ -432,7 +471,16 @@ export async function web3HelperFactory(
           value: EthBN.from(txFees.toString(10)),
         });
 
-      await notifyValidator(res.hash);
+      await notifyValidator(
+        res.hash,
+        await extractAction(res),
+        "Unfreeze",
+        nonce,
+        txFees.toString(),
+        await sender.getAddress(),
+        to,
+        id.uri
+      );
 
       return res;
     },
