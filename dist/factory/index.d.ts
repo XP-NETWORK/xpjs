@@ -124,6 +124,7 @@ export interface ChainParams {
     iotexParams: Web3Params;
     vechainParams: Web3Params;
     auroraParams: Web3Params;
+    godwokenParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
