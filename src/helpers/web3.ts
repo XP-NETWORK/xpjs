@@ -475,7 +475,7 @@ export async function web3HelperFactory(
         res.hash,
         await extractAction(res),
         "Unfreeze",
-        nonce,
+        Number(nonce),
         txFees.toString(),
         await sender.getAddress(),
         to,
