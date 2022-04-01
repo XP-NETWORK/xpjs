@@ -253,6 +253,7 @@ export interface AppConfig {
   nftListAuthToken: string;
   tronScanUri: string;
   wrappedNftPrefix: string;
+  network: "testnet" | "mainnet"
 }
 
 function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
@@ -591,7 +592,9 @@ export function ChainFactory(
         ? mintWith
         : toChain.XpNft;
 
-      // await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
+      if (appConfig.network === "mainnet") {
+        await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
+      }
 
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
