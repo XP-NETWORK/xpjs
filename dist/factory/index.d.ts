@@ -142,6 +142,7 @@ export interface AppConfig {
     nftListAuthToken: string;
     tronScanUri: string;
     wrappedNftPrefix: string;
+    network: "testnet" | "mainnet";
 }
 /**
  * This function is the basic entry point to use this package as a library.
