@@ -139,6 +139,7 @@ export type AlgorandHelper = ChainNonceGet &
 export type AlgorandParams = {
   algodApiKey: string;
   algodUri: string;
+  indexerUri: string;
   algodPort: number | undefined;
   sendNftAppId: number;
 };
@@ -157,6 +158,11 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   const algod = new algosdk.Algodv2(
     args.algodApiKey,
     args.algodUri,
+    args.algodPort
+  );
+  const indexer = new algosdk.Indexer(
+    args.algodApiKey,
+    args.indexerUri,
     args.algodPort
   );
 
@@ -250,7 +256,10 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   };
 
   async function isOptIn(addr: string, nftId: number) {
-    const user = await algod.accountInformation(addr).do();
+    const userRes = await indexer.lookupAccountByID(addr).do();
+    const user = userRes["account"];
+    if (!user.assets) return false;
+  
     for (let i = 0; i < user["assets"].length; i++) {
       if (user["assets"][i]["asset-id"] === nftId) {
         return true;
@@ -370,7 +379,8 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         claims.map(async (v) => {
           const appId = parseInt(v.app_id);
           const nftId = parseInt(v.nft_id);
-          const assetInfo = await algod.getAssetByID(nftId).do();
+          const assetRes = await indexer.lookupAssetByID(nftId).do();
+          const assetInfo = assetRes.asset;
 
           return {
             nftId,
