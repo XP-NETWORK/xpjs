@@ -190,6 +190,15 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
         erc1155Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
         nonce: Chain.GODWOKEN,
+      },
+      gateChainParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.GATECHAIN),
+        minter_addr: "0x2B24de7BFf5d2ab01b1C53682Ee5987c9BCf1BAc",
+        erc721_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
+        erc721Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
+        erc1155Minter: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
+        nonce: Chain.GATECHAIN,
       }
     };
   };
@@ -366,6 +375,15 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x0000000000000000000000000000000000000000",
         erc1155Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.GODWOKEN,
+      },
+      gateChainParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.GATECHAIN),
+        minter_addr: "0x0000000000000000000000000000000000000000",
+        erc721_addr: "0x0000000000000000000000000000000000000000",
+        erc721Minter: "0x0000000000000000000000000000000000000000",
+        erc1155Minter: "0x0000000000000000000000000000000000000000",
+        nonce: Chain.GATECHAIN,
       }
     };
   };

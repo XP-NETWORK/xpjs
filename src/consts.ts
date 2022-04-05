@@ -32,7 +32,8 @@ export enum TestNetRpcUri {
   VELAS = "https://explorer.testnet.velas.com/rpc",
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
-  GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev"
+  GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
+  GATECHAIN = "https://testnet.gatenode.cc"
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -54,7 +55,8 @@ export enum MainNetRpcUri {
   TEZOS = "https://mainnet.smartpy.io",
   IOTEX = "https://babel-api.mainnet.iotex.io",
   AURORA = "https://mainnet.aurora.dev",
-  GODWOKEN = "https://mainnet.godwoken.io/rpc"
+  GODWOKEN = "https://mainnet.godwoken.io/rpc",
+  GATECHAIN = "https://evm.gatenode.cc"
   // TODO: Algorand
 }
 
@@ -88,6 +90,7 @@ export type MetaMap = {
   0x14: Web3Meta;
   0x15: Web3Meta;
   0x16: Web3Meta;
+  0x17: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -111,6 +114,7 @@ export namespace Chain {
   export const IOTEX = 0x14; // 20
   export const AURORA = 0x15; // 21
   export const GODWOKEN = 0x16; // 22
+  export const GATECHAIN = 0x17; // 23
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -305,6 +309,15 @@ CHAIN_INFO.set(Chain.GODWOKEN, {
   decimals: 1e8,
   currency: SupportedCurrency.CKB,
   chainId: 868455272153094
-})
+});
+CHAIN_INFO.set(Chain.GATECHAIN, {
+  name: "GateChain",
+  blockExplorerUrl: "https://gatescan.org/testnet/tx",
+  constructor: web3HelperFactory,
+  nonce: 0x17,
+  decimals: 1e18,
+  currency: SupportedCurrency.GT,
+  chainId: 85
+});
 
 export const FEE_MARGIN = { min: 0.5, max: 5 };
