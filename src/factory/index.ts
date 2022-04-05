@@ -234,6 +234,7 @@ export interface ChainParams {
   vechainParams: Web3Params;
   auroraParams: Web3Params;
   godwokenParams: Web3Params;
+  gateChainParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -278,6 +279,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.IOTEX, chainParams.iotexParams);
   cToP.set(Chain.AURORA, chainParams.auroraParams);
   cToP.set(Chain.GODWOKEN, chainParams.godwokenParams)
+  cToP.set(Chain.GATECHAIN, chainParams.gateChainParams)
   return cToP;
 }
 /**
