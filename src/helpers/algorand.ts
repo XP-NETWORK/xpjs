@@ -358,15 +358,46 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return suggested;
     },
     transferNftToForeign: transferNft,
-    unfreezeWrappedNft: async (signer, to, nft, txFees, nonce) => {
-      // const nftMeta = await axios.get<MinWrappedNft>(nft.uri);
-      return await transferNft(
-        signer,
-        parseInt(nonce),
-        to,
-        nft,
-        txFees
-      );
+    unfreezeWrappedNft: async (signer, to, nft, _txFees, nonce) => {
+      const suggested = await algod.getTransactionParams().do();
+
+      const transferTx =
+        algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+          from: signer.address,
+          to: appAddr,
+          amount: 1,
+          assetIndex: nft.native.nftId,
+          suggestedParams: suggested,
+        });
+      const sTransferTx = await signer.algoSigner.signTxn([{ txn: Base64.fromUint8Array(transferTx.toByte()) }]);
+      const transferRes = await algod.sendRawTransaction(Base64.toUint8Array(sTransferTx[0].blob)).do();
+      await waitTxnConfirm(transferRes.txId as string);
+
+      const appArgs = [
+        encoder.encode("withdraw_nft"),
+        encoder.encode(to),
+        new Uint8Array(Buffer.from(new Uint32Array([parseInt(nonce)]).buffer).reverse()),
+        new Uint8Array(Buffer.from(""))
+      ];
+      const tCallTx = algosdk.makeApplicationNoOpTxnFromObject({
+        from: signer.address,
+        appIndex: args.sendNftAppId,
+        appArgs,
+        foreignAssets: [nft.native.nftId],
+        suggestedParams: suggested,
+      });
+      const encodedTxns = [
+        { txn: Base64.fromUint8Array(tCallTx.toByte()) },
+      ];
+      const signedTxns = await signer.algoSigner.signTxn(encodedTxns);
+      const sendRes = await algod
+        .sendRawTransaction([
+          Base64.toUint8Array(signedTxns[0].blob),
+        ])
+        .do();
+      await waitTxnConfirm(sendRes.txId);
+  
+      return sendRes.txId as string;
     },
     estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),
     estimateValidateUnfreezeNft: () => Promise.resolve(MINT_NFT_COST),
