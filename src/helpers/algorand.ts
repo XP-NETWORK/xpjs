@@ -205,7 +205,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     chain_nonce: number,
     to: string,
     nft: NftInfo<AlgoNft>,
-    _txFees: BigNumber,
+    txFees: BigNumber,
     mintWith?: string
   ) => {
     const suggested = await algod.getTransactionParams().do();
@@ -218,6 +218,13 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         assetIndex: nft.native.nftId,
         suggestedParams: suggested,
       });
+
+    const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      from: signer.address,
+      suggestedParams: suggested,
+      to: appAddr,
+      amount: BigInt(txFees.toString())
+    })
     const appArgs = [
       encoder.encode("freeze_nft"),
       encoder.encode(to),
@@ -238,16 +245,18 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       foreignAssets: [nft.native.nftId],
       suggestedParams: suggested,
     });
-    algosdk.assignGroupID([tCallTx, transferTx]);
+    algosdk.assignGroupID([tCallTx, transferTx, paymentTxn]);
     const encodedTxns = [
       { txn: Base64.fromUint8Array(tCallTx.toByte()) },
       { txn: Base64.fromUint8Array(transferTx.toByte()) },
+      { txn: Base64.fromUint8Array(paymentTxn.toByte()) },
     ];
     const signedTxns = await signer.algoSigner.signTxn(encodedTxns);
     const sendRes = await algod
       .sendRawTransaction([
         Base64.toUint8Array(signedTxns[0].blob),
         Base64.toUint8Array(signedTxns[1].blob),
+        Base64.toUint8Array(signedTxns[2].blob),
       ])
       .do();
     await waitTxnConfirm(sendRes.txId);
@@ -259,7 +268,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     const userRes = await indexer.lookupAccountByID(addr).do();
     const user = userRes["account"];
     if (!user.assets) return false;
-  
+
     for (let i = 0; i < user["assets"].length; i++) {
       if (user["assets"][i]["asset-id"] === nftId) {
         return true;
@@ -321,7 +330,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     claimNft,
     optInNft,
     isOptIn,
-    async preTransfer(sender, nft, _fee) {
+    async preTransfer(sender, nft, fee) {
       if (await isOptIn(appAddr, nft.native.nftId)) {
         return undefined;
       }
@@ -338,7 +347,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         from: sender.address,
         suggestedParams: suggested,
         to: appAddr,
-        amount: _fee.toNumber()
+        amount: BigInt(fee.toString())
       })
 
       algosdk.assignGroupID([callTx, feesTx]);
@@ -396,7 +405,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         ])
         .do();
       await waitTxnConfirm(sendRes.txId);
-  
+
       return sendRes.txId as string;
     },
     estimateValidateTransferNft: () => Promise.resolve(MINT_NFT_COST),
