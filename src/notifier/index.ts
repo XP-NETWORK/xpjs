@@ -54,5 +54,10 @@ export function evNotifier(url: string) {
         tx_hash: txHash,
       });
     },
+    async notifyAlgorand(txHash: string) {
+      await api.post("/tx/algorand", {
+        tx_hash: txHash
+      })
+    }
   };
 }

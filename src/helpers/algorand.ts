@@ -15,6 +15,7 @@ import {
   ValidateAddress,
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
+import { EvNotifier } from "../notifier";
 
 
 type TxResp = {
@@ -142,6 +143,7 @@ export type AlgorandParams = {
   indexerUri: string;
   algodPort: number | undefined;
   sendNftAppId: number;
+  notifier: EvNotifier;
 };
 
 // type MinWrappedNft = {
@@ -260,6 +262,8 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       ])
       .do();
     await waitTxnConfirm(sendRes.txId);
+
+    await args.notifier.notifyAlgorand(sendRes.txId);
 
     return sendRes.txId as string;
   };
@@ -414,6 +418,8 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         ])
         .do();
       await waitTxnConfirm(sendRes.txId);
+
+      await args.notifier.notifyAlgorand(sendRes.txId);
 
       return sendRes.txId as string;
     },
