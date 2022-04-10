@@ -2345,7 +2345,7 @@ crypt@0.0.2:
 
 "crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#51e8a04490be0f3bf486e5d619b7db9fadaa8b5b"
+  resolved "git+https://github.com/xp-network/exchange-rate#b78aa00d70a44c9f1d42515c9d1d7a67a5aa34b2"
   dependencies:
     axios "^0.21.1"
 
