@@ -367,7 +367,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return suggested;
     },
     transferNftToForeign: transferNft,
-    unfreezeWrappedNft: async (signer, to, nft, _txFees, nonce) => {
+    unfreezeWrappedNft: async (signer, to, nft, txFees, nonce) => {
       const suggested = await algod.getTransactionParams().do();
 
       const transferTx =
@@ -382,6 +382,12 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       const transferRes = await algod.sendRawTransaction(Base64.toUint8Array(sTransferTx[0].blob)).do();
       await waitTxnConfirm(transferRes.txId as string);
 
+      const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: signer.address,
+        suggestedParams: suggested,
+        to: appAddr,
+        amount: BigInt(txFees.toString())
+      });
       const appArgs = [
         encoder.encode("withdraw_nft"),
         encoder.encode(to),
@@ -395,13 +401,16 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         foreignAssets: [nft.native.nftId],
         suggestedParams: suggested,
       });
+      algosdk.assignGroupID([tCallTx, paymentTxn])
       const encodedTxns = [
         { txn: Base64.fromUint8Array(tCallTx.toByte()) },
+        { txn: Base64.fromUint8Array(paymentTxn.toByte()) },
       ];
       const signedTxns = await signer.algoSigner.signTxn(encodedTxns);
       const sendRes = await algod
         .sendRawTransaction([
           Base64.toUint8Array(signedTxns[0].blob),
+          Base64.toUint8Array(signedTxns[1].blob)
         ])
         .do();
       await waitTxnConfirm(sendRes.txId);
@@ -419,19 +428,20 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         claims.map(async (v) => {
           const appId = parseInt(v.app_id);
           const nftId = parseInt(v.nft_id);
-          const assetRes = await indexer.lookupAssetByID(nftId).do();
+          const assetRes = await indexer.lookupAssetByID(nftId).do().catch(() => undefined);
+          if (assetRes == undefined) return []
           const assetInfo = assetRes.asset;
 
-          return {
+          return [{
             nftId,
             appId,
             uri: assetInfo.params.url as string,
             name: (assetInfo.params.name as string) || "",
-          };
+          }];
         })
       );
 
-      return res;
+      return res.flat();
     },
     walletConnectSigner(
       connector: WalletConnect,
