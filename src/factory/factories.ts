@@ -127,13 +127,13 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.XDAI,
       },
       algorandParams: {
-        algodApiKey:
-          "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
-        algodUri: "https://algorand-node.xp.network/",
-        indexerUri: "https://algoexplorerapi.io/idx2",
+        algodApiKey: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        indexerUri: "https://algoindexer.testnet.algoexplorerapi.io",
+        algodUri: 'https://node.testnet.algoexplorerapi.io',
         nonce: Chain.ALGORAND,
-        sendNftAppId: 458971166,
+        sendNftAppId: 83148194,
         algodPort: 443,
+        notifier
       },
       auroraParams: {
         notifier,
@@ -312,6 +312,7 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ALGORAND,
         sendNftAppId: 458971166,
         algodPort: 443,
+        notifier
       },
       fuseParams: {
         notifier,
