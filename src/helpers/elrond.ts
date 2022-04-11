@@ -37,6 +37,8 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
+  GetFeeMargins,
+  FeeMargins,
 } from "./chain";
 import {
   Chain,
@@ -201,7 +203,7 @@ export type ElrondHelper = BalanceCheck &
   EstimateTxFeesBatch<EsdtNftInfo> &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
   ExtractTxnStatus &
-  SetESDTRoles & { XpNft: string };
+  SetESDTRoles & { XpNft: string } & GetFeeMargins;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -218,6 +220,7 @@ export interface ElrondParams {
   esdt_swap_address: string;
   esdt_nft: string;
   esdt_swap: string;
+  feeMargin: FeeMargins;
 }
 
 export async function elrondHelperFactory(
@@ -550,6 +553,9 @@ export async function elrondHelperFactory(
       await wallet.sync(provider);
 
       return wallet.balance.valueOf();
+    },
+    getFeeMargin() {
+      return elrondParams.feeMargin
     },
     async extractTxnStatus(txn) {
       const status = await provider.getTransactionStatus(

@@ -2,6 +2,8 @@ import { BigNumber } from "bignumber.js";
 import {
   BalanceCheck,
   EstimateTxFees,
+  FeeMargins,
+  GetFeeMargins,
   MintNft,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -92,7 +94,7 @@ export type TronHelper = BaseTronHelper &
   ExtractTxnStatus &
   WhitelistCheck<EthNftInfo> & {
     XpNft: string;
-  };
+  } & GetFeeMargins;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -203,6 +205,7 @@ export interface TronParams {
   minter_addr: string;
   erc721_addr: string;
   validators: string[];
+  feeMargin: FeeMargins
 }
 
 export interface TronRawTxn {
@@ -351,6 +354,9 @@ export async function tronHelperFactory(
     ...base,
     extractAction,
     XpNft: tronParams.erc721_addr,
+    getFeeMargin() {
+      return tronParams.feeMargin
+    },
     approveForMinter,
     preTransfer: (s, nft, _fee) => approveForMinter(nft, s),
     async preTransferRawTxn(nft, address, _value) {

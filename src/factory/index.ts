@@ -1,7 +1,7 @@
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
-import { Chain, CHAIN_INFO, FEE_MARGIN } from "../consts";
+import { Chain, CHAIN_INFO } from "../consts";
 export * from "./factories";
 
 import {
@@ -36,6 +36,8 @@ import { Base64 } from "js-base64";
 import { TezosParams } from "../helpers/tezos";
 import {
   EstimateTxFeesBatch,
+  FeeMargins,
+  GetFeeMargins,
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   WhitelistCheck,
@@ -57,7 +59,7 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   UnfreezeForeignNft<Signer, RawNft, Resp> &
   EstimateTxFees<RawNft> &
   ChainNonceGet &
-  ValidateAddress & { XpNft?: string };
+  ValidateAddress & { XpNft?: string } & GetFeeMargins;
 
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   TransferNftForeignBatch<Signer, RawNft, Resp> &
@@ -322,7 +324,8 @@ export function ChainFactory(
   async function calcExchangeFees<T extends ChainNonce>(
     fromChain: T,
     toChain: T,
-    val: BigNumber
+    val: BigNumber,
+    toChainFee: FeeMargins
   ): Promise<BigNumber> {
     const rate = await remoteExchangeRate.getBatchedRate([
       CHAIN_INFO.get(toChain)!.currency,
@@ -332,8 +335,8 @@ export function ChainFactory(
     const fromExRate = rate.get(CHAIN_INFO.get(fromChain)!.currency)!;
     const toExRate = rate.get(CHAIN_INFO.get(toChain)!.currency)!;
     const usdFee = Math.min(
-      Math.max(FEE_MARGIN.min, feeR.times(toExRate * 0.1).toNumber()),
-      FEE_MARGIN.max
+      Math.max(toChainFee.min, feeR.times(toExRate * 0.1).toNumber()),
+      toChainFee.max
     );
     const feeProfit = usdFee / fromExRate;
 
@@ -357,7 +360,8 @@ export function ChainFactory(
     const conv = await calcExchangeFees(
       fromChain.getNonce(),
       toChain.getNonce(),
-      estimate
+      estimate,
+      toChain.getFeeMargin()
     );
     return conv;
   };
@@ -386,7 +390,8 @@ export function ChainFactory(
     const conv = await calcExchangeFees(
       fromChain.getNonce(),
       toChain.getNonce(),
-      estimate.times(nft.length)
+      estimate.times(nft.length),
+      toChain.getFeeMargin()
     );
     return conv;
   }

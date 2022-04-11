@@ -29,6 +29,7 @@ import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import axios from "axios";
 import { EvNotifier } from "../notifier";
+import { FeeMargins, GetFeeMargins } from "./chain";
 
 type TezosSigner = WalletProvider | Signer;
 
@@ -60,7 +61,7 @@ export type TezosHelper = TransferNftForeign<
     ): Promise<string | undefined>;
   } & {
     XpNft: string;
-  };
+  } & GetFeeMargins;
 
 export type TezosParams = {
   Tezos: TezosToolkit;
@@ -68,6 +69,7 @@ export type TezosParams = {
   xpnftAddress: string;
   bridgeAddress: string;
   validators: string[];
+  feeMargin: FeeMargins
 };
 
 export async function tezosHelperFactory({
@@ -76,6 +78,7 @@ export async function tezosHelperFactory({
   xpnftAddress,
   bridgeAddress,
   validators,
+  feeMargin
 }: TezosParams): Promise<TezosHelper> {
   const estimateGas = (validators: string[], baseprice: number) => {
     return new BigNumber(baseprice * (validators.length + 1));
@@ -245,6 +248,9 @@ export async function tezosHelperFactory({
     },
     getNonce() {
       return Chain.TEZOS;
+    },
+    getFeeMargin() {
+      return feeMargin
     },
     async estimateValidateTransferNft() {
       return estimateGas(validators, 1.2e5);

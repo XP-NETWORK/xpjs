@@ -12,6 +12,8 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
+  FeeMargins,
+  GetFeeMargins,
 } from "./chain";
 import {
   Signer,
@@ -127,7 +129,7 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
     XpNft: string;
-  } & WhitelistCheck<EthNftInfo>;
+  } & WhitelistCheck<EthNftInfo> & GetFeeMargins;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -180,6 +182,7 @@ export interface Web3Params {
   erc721Minter: string;
   erc1155Minter: string;
   nonce: ChainNonce;
+  feeMargin: FeeMargins;
 }
 
 type NftMethodVal<T, Tx> = {
@@ -320,6 +323,9 @@ export async function web3HelperFactory(
       const gas = await provider.getGasPrice();
       return new BigNumber(gas.mul(150_000).toString());
     },
+    getFeeMargin() {
+      return params.feeMargin;
+    },
     isApprovedForMinter,
     preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,
@@ -434,16 +440,16 @@ export async function web3HelperFactory(
 
       const txr = await minter
         .connect(sender)
-        [method](
-          id.native.contract,
-          id.native.tokenId,
-          chain_nonce,
-          to,
-          mintWith,
-          {
-            value: EthBN.from(txFees.toString(10)),
-          }
-        );
+      [method](
+        id.native.contract,
+        id.native.tokenId,
+        chain_nonce,
+        to,
+        mintWith,
+        {
+          value: EthBN.from(txFees.toString(10)),
+        }
+      );
 
       await notifyValidator(
         txr.hash,
