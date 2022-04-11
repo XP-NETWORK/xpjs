@@ -320,4 +320,3 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
   chainId: 85
 });
 
-export const FEE_MARGIN = { min: 0.5, max: 5 };

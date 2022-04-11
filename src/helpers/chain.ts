@@ -178,3 +178,10 @@ export async function isWrappedNft(nft: NftInfo<unknown>) {
     "undefined"
   );
 }
+
+export interface FeeMargins {
+  min: number;
+  max: number;
+}
+
+export interface GetFeeMargins { getFeeMargin(): FeeMargins }
