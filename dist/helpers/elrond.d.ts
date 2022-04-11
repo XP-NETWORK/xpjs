@@ -5,7 +5,7 @@
  * @module
  */
 import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
-import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch } from "./chain";
+import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins } from "./chain";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "..";
 import { NftMintArgs } from "..";
 import { EvNotifier } from "../notifier";
@@ -102,7 +102,7 @@ export declare type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigne
     mintableEsdts(address: Address): Promise<string[]>;
 } & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<EsdtNftInfo> & EstimateTxFeesBatch<EsdtNftInfo> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & SetESDTRoles & {
     XpNft: string;
-};
+} & GetFeeMargins;
 /**
  * Create an object implementing cross chain utilities for elrond
  *
@@ -118,6 +118,7 @@ export interface ElrondParams {
     esdt_swap_address: string;
     esdt_nft: string;
     esdt_swap: string;
+    feeMargin: FeeMargins;
 }
 export declare function elrondHelperFactory(elrondParams: ElrondParams): Promise<ElrondHelper>;
 export {};

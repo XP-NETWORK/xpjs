@@ -6,11 +6,11 @@ import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft
 import BigNumber from "bignumber.js";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosParams } from "../helpers/tezos";
-import { EstimateTxFeesBatch, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
+import { EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
 import { ChainNonce, InferChainH, InferChainParam, InferSigner } from "../type-utils";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft?: string;
-};
+} & GetFeeMargins;
 declare type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> & TransferNftForeignBatch<Signer, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, RawNft, Resp> & EstimateTxFeesBatch<RawNft>;
 /**
  * A type representing a chain factory.
@@ -125,6 +125,7 @@ export interface ChainParams {
     vechainParams: Web3Params;
     auroraParams: Web3Params;
     godwokenParams: Web3Params;
+    gateChainParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**

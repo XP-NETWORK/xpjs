@@ -4,4 +4,5 @@ export declare function evNotifier(url: string): {
     notifyTron(txHash: string): Promise<void>;
     notifyElrond(txHash: string, sender: string, uris: string[], action_id: string): Promise<void>;
     notifyTezos(txHash: string): Promise<void>;
+    notifyAlgorand(txHash: string): Promise<void>;
 };

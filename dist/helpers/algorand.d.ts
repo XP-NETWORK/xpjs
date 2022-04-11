@@ -2,6 +2,7 @@ import WalletConnect from "@walletconnect/client";
 import algosdk, { SuggestedParams } from "algosdk";
 import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
+import { EvNotifier } from "../notifier";
 declare type TxResp = {
     txId: string;
 };
@@ -70,8 +71,10 @@ export declare type AlgorandHelper = ChainNonceGet & TransferNftForeign<AlgoSign
 export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;
+    indexerUri: string;
     algodPort: number | undefined;
     sendNftAppId: number;
+    notifier: EvNotifier;
 };
 export declare function algorandHelper(args: AlgorandParams): AlgorandHelper;
 export {};

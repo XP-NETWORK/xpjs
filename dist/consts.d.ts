@@ -22,7 +22,8 @@ export declare enum TestNetRpcUri {
     VELAS = "https://explorer.testnet.velas.com/rpc",
     IOTEX = "https://babel-api.testnet.iotex.io",
     AURORA = "https://testnet.aurora.dev/",
-    GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev"
+    GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
+    GATECHAIN = "https://meteora-evm.gatenode.cc"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -41,7 +42,8 @@ export declare enum MainNetRpcUri {
     TEZOS = "https://mainnet.smartpy.io",
     IOTEX = "https://babel-api.mainnet.iotex.io",
     AURORA = "https://mainnet.aurora.dev",
-    GODWOKEN = "https://mainnet.godwoken.io/rpc"
+    GODWOKEN = "https://mainnet.godwoken.io/rpc",
+    GATECHAIN = "https://evm.gatenode.cc"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
@@ -72,6 +74,7 @@ export declare type MetaMap = {
     0x14: Web3Meta;
     0x15: Web3Meta;
     0x16: Web3Meta;
+    0x17: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -94,6 +97,7 @@ export declare namespace Chain {
     const IOTEX = 20;
     const AURORA = 21;
     const GODWOKEN = 22;
+    const GATECHAIN = 23;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
@@ -109,8 +113,4 @@ declare type ChainInfo = {
     get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
 };
 export declare const CHAIN_INFO: ChainInfo;
-export declare const FEE_MARGIN: {
-    min: number;
-    max: number;
-};
 export {};

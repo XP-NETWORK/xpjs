@@ -1,4 +1,4 @@
-import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, MintNft, GetProvider, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch } from "./chain";
+import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, MintNft, GetProvider, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, FeeMargins, GetFeeMargins } from "./chain";
 import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftMinter } from "xpnet-web3-contracts";
@@ -62,7 +62,7 @@ export declare type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, Eth
     createWallet(privateKey: string): Wallet;
 } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
-} & WhitelistCheck<EthNftInfo>;
+} & WhitelistCheck<EthNftInfo> & GetFeeMargins;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
@@ -84,6 +84,7 @@ export interface Web3Params {
     erc721Minter: string;
     erc1155Minter: string;
     nonce: ChainNonce;
+    feeMargin: FeeMargins;
 }
 declare type NftMethodVal<T, Tx> = {
     freeze: "freezeErc1155" | "freezeErc721";

@@ -1,4 +1,4 @@
-import { BalanceCheck, EstimateTxFees, MintNft, TransferNftForeign, UnfreezeForeignNft } from "./chain";
+import { BalanceCheck, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, TransferNftForeign, UnfreezeForeignNft } from "./chain";
 import { TronWeb } from "tronweb";
 import { EthNftInfo } from "./web3";
 import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, NftMintArgs, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
@@ -33,7 +33,7 @@ export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintA
 };
 export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, string> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo> & {
     XpNft: string;
-};
+} & GetFeeMargins;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;
@@ -41,6 +41,7 @@ export interface TronParams {
     minter_addr: string;
     erc721_addr: string;
     validators: string[];
+    feeMargin: FeeMargins;
 }
 export interface TronRawTxn {
     readonly visible: boolean;
