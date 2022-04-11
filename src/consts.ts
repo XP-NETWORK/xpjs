@@ -33,7 +33,7 @@ export enum TestNetRpcUri {
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
   GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
-  GATECHAIN = "https://testnet.gatenode.cc"
+  GATECHAIN = "https://meteora-evm.gatenode.cc"
   // TODO: Algorand
   // TODO: Fuse
 }
