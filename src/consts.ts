@@ -323,3 +323,12 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
   currency: SupportedCurrency.GT,
   chainId: 85,
 });
+CHAIN_INFO.set(Chain.VECHAIN, {
+  name: "VeChain",
+  blockExplorerUrl: "https://explore-testnet.vechain.org/transactions/",
+  constructor: web3HelperFactory,
+  nonce: 0x19,
+  currency: SupportedCurrency.VET,
+  decimals: 1e18,
+  chainId: 39,
+});
