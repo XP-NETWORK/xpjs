@@ -75,7 +75,6 @@ export declare type MetaMap = {
     0x15: Web3Meta;
     0x16: Web3Meta;
     0x17: Web3Meta;
-    0x19: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -99,7 +98,6 @@ export declare namespace Chain {
     const AURORA = 21;
     const GODWOKEN = 22;
     const GATECHAIN = 23;
-    const VECHAIN = 25;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
