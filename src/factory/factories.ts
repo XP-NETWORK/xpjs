@@ -160,10 +160,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x0AA29baB4F811A9f3dcf6a0F9cAEa9bE18ECED78",
         erc721Minter: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
         nonce: Chain.XDAI,
-        feeMargin: {
-          min: 1,
-          max: 1,
-        },
+        feeMargin,
       },
       algorandParams: {
         algodApiKey:
@@ -174,6 +171,7 @@ export namespace ChainFactoryConfigs {
         sendNftAppId: 83148194,
         algodPort: 443,
         notifier,
+        feeMargin,
       },
       auroraParams: {
         notifier,
@@ -360,10 +358,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0xDcAA2b071c1851D8Da43f85a34a5A57d4Fa93A1A",
         minter_addr: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
         nonce: Chain.XDAI,
-        feeMargin: {
-          min: 1,
-          max: 1,
-        },
+        feeMargin,
       },
       algorandParams: {
         algodApiKey:
@@ -374,6 +369,7 @@ export namespace ChainFactoryConfigs {
         sendNftAppId: 458971166,
         algodPort: 443,
         notifier,
+        feeMargin,
       },
       fuseParams: {
         notifier,
