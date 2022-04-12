@@ -161,7 +161,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
         nonce: Chain.XDAI,
         feeMargin: {
-          min: 0.5,
+          min: 1,
           max: 1,
         },
       },
@@ -361,7 +361,7 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
         nonce: Chain.XDAI,
         feeMargin: {
-          min: 0.5,
+          min: 1,
           max: 1,
         },
       },
