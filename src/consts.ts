@@ -33,7 +33,7 @@ export enum TestNetRpcUri {
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
   GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
-  GATECHAIN = "https://meteora-evm.gatenode.cc"
+  GATECHAIN = "https://meteora-evm.gatenode.cc",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -56,7 +56,7 @@ export enum MainNetRpcUri {
   IOTEX = "https://babel-api.mainnet.iotex.io",
   AURORA = "https://mainnet.aurora.dev",
   GODWOKEN = "https://mainnet.godwoken.io/rpc",
-  GATECHAIN = "https://evm.gatenode.cc"
+  GATECHAIN = "https://evm.gatenode.cc",
   // TODO: Algorand
 }
 
@@ -91,6 +91,8 @@ export type MetaMap = {
   0x15: Web3Meta;
   0x16: Web3Meta;
   0x17: Web3Meta;
+  // 0x18 Reserved
+  0x19: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -115,6 +117,8 @@ export namespace Chain {
   export const AURORA = 0x15; // 21
   export const GODWOKEN = 0x16; // 22
   export const GATECHAIN = 0x17; // 23
+  // 0x18 Reserved
+  export const VECHAIN = 0x19; // 25
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -308,7 +312,7 @@ CHAIN_INFO.set(Chain.GODWOKEN, {
   nonce: 0x16,
   decimals: 1e8,
   currency: SupportedCurrency.CKB,
-  chainId: 868455272153094
+  chainId: 868455272153094,
 });
 CHAIN_INFO.set(Chain.GATECHAIN, {
   name: "GateChain",
@@ -317,6 +321,5 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
   nonce: 0x17,
   decimals: 1e18,
   currency: SupportedCurrency.GT,
-  chainId: 85
+  chainId: 85,
 });
-
