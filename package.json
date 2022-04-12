@@ -32,6 +32,8 @@
     "@taquito/signer": "^11.1.0",
     "@taquito/taquito": "^11.1.0",
     "@taquito/tzip12": "^11.1.0",
+    "@vechain/connex-driver": "^2.0.8",
+    "@vechain/connex-framework": "^2.0.8",
     "@vechain/ethers": "^4.0.27-5",
     "@walletconnect/client": "^1.7.0",
     "algosdk": "^1.15.0-beta.1",
@@ -43,6 +45,7 @@
     "socket.io-client": "^4.1.3",
     "tronstation": "^1.0.1",
     "tronweb": "^4.1.0",
+    "web3-providers-connex": "^0.3.1",
     "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#65b3d13fb814ec8d8c4ea847c5915d763c0fec6f"
   }
 }
