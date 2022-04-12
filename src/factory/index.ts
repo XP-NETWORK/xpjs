@@ -256,7 +256,7 @@ export interface AppConfig {
   nftListAuthToken: string;
   tronScanUri: string;
   wrappedNftPrefix: string;
-  network: "testnet" | "mainnet"
+  network: "testnet" | "mainnet";
 }
 
 function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
@@ -280,8 +280,8 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.VELAS, chainParams.velasParams);
   cToP.set(Chain.IOTEX, chainParams.iotexParams);
   cToP.set(Chain.AURORA, chainParams.auroraParams);
-  cToP.set(Chain.GODWOKEN, chainParams.godwokenParams)
-  cToP.set(Chain.GATECHAIN, chainParams.gateChainParams)
+  cToP.set(Chain.GODWOKEN, chainParams.godwokenParams);
+  cToP.set(Chain.GATECHAIN, chainParams.gateChainParams);
   return cToP;
 }
 /**
@@ -438,7 +438,10 @@ export function ChainFactory(
 
   async function isWrappedNft(nft: NftInfo<unknown>, fc: number) {
     if (fc === Chain.TEZOS) {
-      return (typeof (nft.native as any).meta?.token?.metadata?.wrapped !== 'undefined')
+      return (
+        typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
+        "undefined"
+      );
     }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
@@ -585,7 +588,8 @@ export function ChainFactory(
         }
       }
 
-      const mw = "contract" in nft.native &&
+      const mw =
+        "contract" in nft.native &&
         mintWith &&
         checkMintWith(
           mintWith,
@@ -596,8 +600,8 @@ export function ChainFactory(
             fromChain.getNonce()
           )
         )
-        ? mintWith
-        : toChain.XpNft;
+          ? mintWith
+          : toChain.XpNft;
 
       if (appConfig.network === "mainnet") {
         await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
@@ -612,7 +616,7 @@ export function ChainFactory(
       if (mw === undefined) {
         throw new Error(`Mint with is not set`);
       }
-      console.log(`Minting With : ${mw}`)
+      console.log(`Minting With : ${mw}`);
       if (await isWrappedNft(nft, fromChain.getNonce())) {
         const res = await fromChain.unfreezeWrappedNft(
           sender,
@@ -655,7 +659,10 @@ export function ChainFactory(
       return await algo.claimableNfts(txSocket, claimer);
     },
     async checkWhitelist(chain, nft) {
-      if (!chain.isNftWhitelisted || (await isWrappedNft(nft, chain.getNonce()))) {
+      if (
+        !chain.isNftWhitelisted ||
+        (await isWrappedNft(nft, chain.getNonce()))
+      ) {
         return true;
       }
 
