@@ -3079,7 +3079,7 @@ crypto-browserify@3.12.0:
 
 "crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#7c292cb6f584d977aadd3a348cff6a8b5d375e25"
+  resolved "git+https://github.com/xp-network/exchange-rate#339fbebceda2cc0b698d67e2b0cb0cba8f362aca"
   dependencies:
     axios "^0.21.1"
 
