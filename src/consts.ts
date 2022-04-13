@@ -243,7 +243,7 @@ CHAIN_INFO.set(Chain.XDAI, {
   chainId: 0x64,
   blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
   constructor: web3HelperFactory,
-  currency: SupportedCurrency.GNO,
+  currency: SupportedCurrency.XDAI,
 });
 CHAIN_INFO.set(Chain.ALGORAND, {
   name: "Algorand",
