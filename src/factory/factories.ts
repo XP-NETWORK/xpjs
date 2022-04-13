@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { TezosToolkit } from "@taquito/taquito";
 import { evNotifier } from "../notifier";
 
-const EVM_VALIDATORS = [
+/*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
   "0x837b2eb764860b442c971f98f505e7c5f419edd7",
   "0x9671ce5a02eb53cf0f2cbd220b34e50c39c0bf23",
@@ -14,7 +14,7 @@ const EVM_VALIDATORS = [
   "0xdc80905cafeda39cb19a566baeef52472848e82f",
   "0x77745cd585798e55938940e3d4dd0fd7cde7bdd6",
   "0xc2a29b4e9fa71e9033a52611544403241c56ac5e",
-];
+];*/
 
 // const _EVM_TESTNET_VALIDATORS = [
 //   "0x50aCEC08ce70aa4f2a8ab2F45d8dCd1903ea4E14",
