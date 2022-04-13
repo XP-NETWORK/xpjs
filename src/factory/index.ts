@@ -282,6 +282,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.AURORA, chainParams.auroraParams);
   cToP.set(Chain.GODWOKEN, chainParams.godwokenParams);
   cToP.set(Chain.GATECHAIN, chainParams.gateChainParams);
+  cToP.set(Chain.VECHAIN, chainParams.vechainParams);
   return cToP;
 }
 /**
