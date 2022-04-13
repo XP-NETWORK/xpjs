@@ -33,7 +33,7 @@ export namespace ChainFactoryConfigs {
     const feeMargin = { min: 0.5, max: 5 };
     const notifier = evNotifier(testnet_middleware_uri);
 
-    const net = new SimpleNet("https://sync-mainnet.veblocks.net");
+    const net = new SimpleNet(TestNetRpcUri.VECHAIN);
 
     const driver = await Driver.connect(net);
 
