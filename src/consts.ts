@@ -34,6 +34,7 @@ export enum TestNetRpcUri {
   AURORA = "https://testnet.aurora.dev/",
   GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
   GATECHAIN = "https://meteora-evm.gatenode.cc",
+  VECHAIN = "https://sync-testnet.veblocks.net",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -57,6 +58,7 @@ export enum MainNetRpcUri {
   AURORA = "https://mainnet.aurora.dev",
   GODWOKEN = "https://mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
+  VECHAIN = "https://sync-mainnet.veblocks.net",
   // TODO: Algorand
 }
 
