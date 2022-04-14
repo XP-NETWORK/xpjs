@@ -452,6 +452,21 @@ export function ChainFactory(
     );
   }
 
+  async function algoOptInCheck(
+    nft: NftInfo<unknown>,
+    toChain: FullChain<unknown, unknown, unknown>,
+    receiver: string
+  ) {
+    const nftDat = await axios.get(nft.uri);
+    if (nftDat.data.wrapped.origin == Chain.ALGORAND.toString() &&
+    ("isOptIn" in toChain) &&
+    !await (toChain as AlgorandHelper).isOptIn(
+      receiver, parseInt(nftDat.data.wrapped.assetID)
+    )) {
+      throw Error("receiver hasn't opted-in to wrapped nft");
+    }
+  }
+
   async function getVerifiedContracts(
     from: string,
     tc: number,
@@ -614,6 +629,8 @@ export function ChainFactory(
       }
       console.log(`Minting With : ${mw}`)
       if (await isWrappedNft(nft, fromChain.getNonce())) {
+        await algoOptInCheck(nft, toChain, receiver);
+
         const res = await fromChain.unfreezeWrappedNft(
           sender,
           receiver,
