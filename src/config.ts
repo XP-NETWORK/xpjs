@@ -17,7 +17,7 @@ export namespace AppConfigs {
   export const TestNet: () => AppConfig = () => {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
-      nftListUri: "https://testing-nft-index.herokuapp.com",
+      nftListUri: "http://65.21.195.10/testnet-indexer/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY0NDIzMDE0NiwiZXhwIjoxNjUyMDA2MTQ2fQ.gX6Auj4hFLdpem5Pk2kAnH71I19iGXfBYjmQrXylMFX_R1yzDEbylVAOLW6kABH9VjnLbAnCRdQvLaQIFmMUpw",
       txSocketUri: "https://testnet-tx-socket.herokuapp.com",
