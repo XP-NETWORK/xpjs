@@ -1,5 +1,5 @@
 import { ChainParams } from ".";
 export declare namespace ChainFactoryConfigs {
-    const TestNet: () => Promise<Partial<ChainParams>>;
-    const MainNet: () => Promise<Partial<ChainParams>>;
+    const TestNet: () => Partial<ChainParams>;
+    const MainNet: () => Partial<ChainParams>;
 }

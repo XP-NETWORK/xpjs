@@ -23,8 +23,7 @@ export declare enum TestNetRpcUri {
     IOTEX = "https://babel-api.testnet.iotex.io",
     AURORA = "https://testnet.aurora.dev/",
     GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
-    GATECHAIN = "https://meteora-evm.gatenode.cc",
-    VECHAIN = "https://sync-testnet.veblocks.net"
+    GATECHAIN = "https://meteora-evm.gatenode.cc"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -44,8 +43,7 @@ export declare enum MainNetRpcUri {
     IOTEX = "https://babel-api.mainnet.iotex.io",
     AURORA = "https://mainnet.aurora.dev",
     GODWOKEN = "https://mainnet.godwoken.io/rpc",
-    GATECHAIN = "https://evm.gatenode.cc",
-    VECHAIN = "https://sync-mainnet.veblocks.net"
+    GATECHAIN = "https://evm.gatenode.cc"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
@@ -77,7 +75,6 @@ export declare type MetaMap = {
     0x15: Web3Meta;
     0x16: Web3Meta;
     0x17: Web3Meta;
-    0x19: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -101,7 +98,6 @@ export declare namespace Chain {
     const AURORA = 21;
     const GODWOKEN = 22;
     const GATECHAIN = 23;
-    const VECHAIN = 25;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
