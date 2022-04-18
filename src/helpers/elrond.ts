@@ -244,7 +244,7 @@ export async function elrondHelperFactory(
     txn: Transaction,
     sender: string,
     uri: string[],
-    action_id: string
+    action_id: string | undefined
   ) {
     await elrondParams.notifier.notifyElrond(
       txn.getHash().toString(),
@@ -596,7 +596,8 @@ export async function elrondHelperFactory(
         tx,
         sender.getAddress().toString(),
         [info.uri],
-        await extractAction(tx)
+        undefined
+        // await extractAction(tx)
       );
 
       return tx;
@@ -621,7 +622,8 @@ export async function elrondHelperFactory(
         tx,
         sender.getAddress().toString(),
         [nft.uri],
-        await extractAction(tx)
+        undefined
+        // await extractAction(tx)
       );
 
       return tx;
@@ -752,7 +754,8 @@ export async function elrondHelperFactory(
         tx,
         sender.getAddress().toString(),
         nfts.map((n) => n.uri),
-        await extractAction(tx)
+        undefined
+        // await extractAction(tx)
       );
 
       return tx;
@@ -795,7 +798,8 @@ export async function elrondHelperFactory(
         tx,
         sender.getAddress().toString(),
         nfts.map((n) => n.uri),
-        await extractAction(tx)
+        undefined
+        // await extractAction(tx)
       );
 
       return tx;
