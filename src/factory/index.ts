@@ -23,7 +23,7 @@ import axios from "axios";
 import { exchangeRateRepo } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 import {
   AlgorandParams,
   AlgorandHelper,
@@ -90,6 +90,8 @@ export type ChainFactory = {
    * @param sender {@link Sender} The owner of the NFT.
    * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
    * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
+   * @param mintWith an arbitrary address of the target chain minter contract
+   * @param gasLimit an arbitrary gas limit value (required for some chains)
    */
   transferNft<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
@@ -98,7 +100,8 @@ export type ChainFactory = {
     sender: SignerF,
     receiver: string,
     fee?: BigNumber.Value,
-    mintWith?: string
+    mintWith?: string,
+    gasLimit?: ethers.BigNumberish|undefined
   ): Promise<Resp>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
@@ -594,7 +597,8 @@ export function ChainFactory(
       sender,
       receiver,
       fee,
-      mintWith
+      mintWith,
+      gasLimit
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
@@ -651,7 +655,8 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          mw
+          mw,
+          gasLimit
         );
         return res;
       }

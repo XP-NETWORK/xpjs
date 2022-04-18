@@ -1,5 +1,6 @@
 import axios from "axios";
 import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 import { ChainNonce } from "../type-utils";
 
 /**
@@ -44,7 +45,8 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     to: string,
     id: NftInfo<RawNft>,
     txFees: BigNumber,
-    mintWith: string
+    mintWith: string,
+    gasLimit? : ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
 
