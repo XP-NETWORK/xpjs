@@ -44,7 +44,7 @@ export function evNotifier(url: string) {
       txHash: string,
       sender: string,
       uris: string[],
-      action_id: string
+      action_id: string | undefined
     ) {
       await api.post("/tx/elrond", {
         tx_hash: txHash,
