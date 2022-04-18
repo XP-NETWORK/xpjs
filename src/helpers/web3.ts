@@ -438,23 +438,25 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
-      mintWith
+      mintWith: string,
+      gasLimit: ethers.BigNumberish | undefined = undefined
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       const txr = await minter
         .connect(sender)
-        [method](
-          id.native.contract,
-          id.native.tokenId,
-          chain_nonce,
-          to,
-          mintWith,
-          {
-            value: EthBN.from(txFees.toString(10)),
-          }
-        );
+      [method](
+        id.native.contract,
+        id.native.tokenId,
+        chain_nonce,
+        to,
+        mintWith,
+        {
+          value: EthBN.from(txFees.toString(10)),
+          gasLimit
+        }
+      );
 
       await notifyValidator(
         txr.hash,
