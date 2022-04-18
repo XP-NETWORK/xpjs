@@ -5,6 +5,9 @@ import { Chain, MainNetRpcUri, TestNetRpcUri } from "../consts";
 import { ethers } from "ethers";
 import { TezosToolkit } from "@taquito/taquito";
 import { evNotifier } from "../notifier";
+import { Driver, SimpleNet } from "@vechain/connex-driver";
+import * as thor from "web3-providers-connex";
+import { Framework } from "@vechain/connex-framework";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -26,10 +29,21 @@ const middleware_uri = "https://notifier.xp.network";
 const testnet_middleware_uri = "http://65.21.195.10/notify-test/";
 
 export namespace ChainFactoryConfigs {
-
-  export const TestNet: () => Partial<ChainParams> = () => {
+  export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 0.5, max: 5 };
     const notifier = evNotifier(testnet_middleware_uri);
+
+    const net = new SimpleNet(TestNetRpcUri.VECHAIN);
+
+    const driver = await Driver.connect(net);
+
+    const provider = thor.ethers.modifyProvider(
+      //@ts-ignore
+      new ethers.providers.Web3Provider(
+        new thor.ConnexProvider({ connex: new Framework(driver) })
+      )
+    );
+
     return {
       elrondParams: {
         node_uri: TestNetRpcUri.ELROND,
@@ -41,7 +55,17 @@ export namespace ChainFactoryConfigs {
         esdt_swap: "WEGLD-2d1d69",
         notifier,
         nonce: 2,
-        feeMargin
+        feeMargin,
+      },
+      vechainParams: {
+        notifier,
+        feeMargin,
+        nonce: Chain.VECHAIN,
+        provider,
+        minter_addr: "0x4096e08C5d6270c8cd873daDbEAB575670aad8Bc",
+        erc721_addr: "0x39737B28d02d170Cb7a6141BA55F039104b3Fce9",
+        erc721Minter: "0x38d2A286BF1d7567129506527B7ced29bb42772b",
+        erc1155Minter: "0x9Db78e8750de28B0f08F866d6a54FAd34FF19da6",
       },
       tronParams: {
         provider: new TronWeb({ fullHost: TestNetRpcUri.TRON }),
@@ -56,7 +80,7 @@ export namespace ChainFactoryConfigs {
           "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N",
         ],
         nonce: Chain.TRON,
-        feeMargin
+        feeMargin,
       },
       avalancheParams: {
         notifier,
@@ -66,7 +90,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x10E3EE8526Cc7610393E2f6e25dEee0bD38d057e",
         erc721Minter: "0x1F71E80E1E785dbDB34c69909C11b71bAd8D9802",
         nonce: Chain.AVALANCHE,
-        feeMargin
+        feeMargin,
       },
       polygonParams: {
         notifier,
@@ -76,7 +100,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x5A768f8dDC67ccCA1431879BcA28E93a6c7722bb",
         erc721Minter: "0x6516E2D3387A9CF4E5e868E7842D110c95A9f3B4",
         nonce: Chain.POLYGON,
-        feeMargin
+        feeMargin,
       },
       fantomParams: {
         notifier,
@@ -86,7 +110,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "string",
         erc721Minter: "string",
         nonce: Chain.FANTOM,
-        feeMargin
+        feeMargin,
       },
       bscParams: {
         notifier,
@@ -96,7 +120,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x5dA3b7431f4581a7d35aEc2f3429174DC0f2A2E1",
         erc721Minter: "0x97CD6fD6cbFfaa24f5c858843955C2601cc7F2b9",
         nonce: Chain.BSC,
-        feeMargin
+        feeMargin,
       },
       celoParams: {
         notifier,
@@ -106,7 +130,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "string",
         erc721Minter: "string",
         nonce: Chain.CELO,
-        feeMargin
+        feeMargin,
       },
       harmonyParams: {
         notifier,
@@ -116,7 +140,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0xB546c2358A6e4b0B83192cCBB83CaE37FA572fe1",
         erc721Minter: "0xb036640d6f7cAfd338103dc60493250561Af2eBc",
         nonce: Chain.HARMONY,
-        feeMargin
+        feeMargin,
       },
       ropstenParams: {
         notifier,
@@ -126,7 +150,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
         erc721Minter: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
         nonce: Chain.ETHEREUM,
-        feeMargin
+        feeMargin,
       },
       xDaiParams: {
         notifier,
@@ -136,19 +160,18 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x0AA29baB4F811A9f3dcf6a0F9cAEa9bE18ECED78",
         erc721Minter: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
         nonce: Chain.XDAI,
-        feeMargin: {
-          min: 0.5,
-          max: 1
-        }
+        feeMargin,
       },
       algorandParams: {
-        algodApiKey: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        algodApiKey:
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         indexerUri: "https://algoindexer.testnet.algoexplorerapi.io",
-        algodUri: 'https://node.testnet.algoexplorerapi.io',
+        algodUri: "https://node.testnet.algoexplorerapi.io",
         nonce: Chain.ALGORAND,
         sendNftAppId: 83148194,
         algodPort: 443,
-        notifier
+        notifier,
+        feeMargin,
       },
       auroraParams: {
         notifier,
@@ -158,7 +181,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
         erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
         nonce: Chain.AURORA,
-        feeMargin
+        feeMargin,
       },
       uniqueParams: {
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.UNIQUE),
@@ -168,7 +191,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "string",
         erc721Minter: "string",
         notifier,
-        feeMargin
+        feeMargin,
       },
       tezosParams: {
         bridgeAddress: "KT195omxiopL2ZDqM3g8hRj2sSCG2pTqjNEj",
@@ -180,7 +203,7 @@ export namespace ChainFactoryConfigs {
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
           "tz1exbY3JKPRpo2KLegK8iqoVNRLn1zFrnZi",
         ],
-        feeMargin
+        feeMargin,
       },
       velasParams: {
         notifier,
@@ -190,7 +213,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x5df32A2F15D021DeF5086cF94fbCaC4594208A26",
         nonce: Chain.VELAS,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.VELAS),
-        feeMargin
+        feeMargin,
       },
       iotexParams: {
         notifier,
@@ -200,7 +223,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x5df32A2F15D021DeF5086cF94fbCaC4594208A26",
         erc721Minter: "0xC3dB3dBcf007961541BE1ddF15cD4ECc0Fc758d5",
         nonce: Chain.IOTEX,
-        feeMargin
+        feeMargin,
       },
       godwokenParams: {
         notifier,
@@ -210,7 +233,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
         erc1155Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
         nonce: Chain.GODWOKEN,
-        feeMargin
+        feeMargin,
       },
       gateChainParams: {
         notifier,
@@ -220,12 +243,12 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
         erc1155Minter: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
         nonce: Chain.GATECHAIN,
-        feeMargin
-      }
+        feeMargin,
+      },
     };
   };
 
-  export const MainNet: () => Partial<ChainParams> = () => {
+  export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 0.5, max: 5 };
     const notifier = evNotifier(middleware_uri);
     return {
@@ -239,7 +262,7 @@ export namespace ChainFactoryConfigs {
         esdt_swap: "WEGLD-5f1f8d",
         notifier,
         nonce: Chain.ELROND,
-        feeMargin
+        feeMargin,
       },
       tronParams: {
         provider: new TronWeb({ fullHost: MainNetRpcUri.TRON }),
@@ -269,7 +292,7 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0xC254a8D4eF5f825FD31561bDc69551ed2b8db134",
         erc1155_addr: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
         nonce: Chain.AVALANCHE,
-        feeMargin
+        feeMargin,
       },
       polygonParams: {
         notifier,
@@ -280,7 +303,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0x7bf2924985CAA6192D721B2B9e1109919aC6ff58",
         minter_addr: "0x14CAB7829B03D075c4ae1aCF4f9156235ce99405",
         nonce: Chain.POLYGON,
-        feeMargin
+        feeMargin,
       },
       fantomParams: {
         notifier,
@@ -291,7 +314,7 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x75f93b47719Ab5270d27cF28a74eeA247d5DfeFF",
         minter_addr: "0x97dd1B3AE755539F56Db8b29258d7C925b20b84B",
         nonce: Chain.FANTOM,
-        feeMargin
+        feeMargin,
       },
       bscParams: {
         notifier,
@@ -302,7 +325,7 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x0cC5F00e673B0bcd1F780602CeC6553aec1A57F0",
         minter_addr: "0x0B7ED039DFF2b91Eb4746830EaDAE6A0436fC4CB",
         nonce: Chain.BSC,
-        feeMargin
+        feeMargin,
       },
       celoParams: {
         notifier,
@@ -312,7 +335,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "string",
         erc721Minter: "string",
         nonce: Chain.CELO,
-        feeMargin
+        feeMargin,
       },
       harmonyParams: {
         notifier,
@@ -323,7 +346,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0xF547002799955812378137FA30C21039E69deF05",
         erc721Minter: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
         nonce: Chain.HARMONY,
-        feeMargin
+        feeMargin,
       },
       ropstenParams: {
         notifier,
@@ -334,7 +357,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0xca8E2a118d7674080d71762a783b0729AadadD42",
         erc721Minter: "0xF547002799955812378137FA30C21039E69deF05",
         nonce: Chain.ETHEREUM,
-        feeMargin
+        feeMargin,
       },
       xDaiParams: {
         notifier,
@@ -345,10 +368,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0xDcAA2b071c1851D8Da43f85a34a5A57d4Fa93A1A",
         minter_addr: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
         nonce: Chain.XDAI,
-        feeMargin: {
-          min: 0.5,
-          max: 1
-        }
+        feeMargin,
       },
       algorandParams: {
         algodApiKey:
@@ -358,7 +378,8 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ALGORAND,
         sendNftAppId: 458971166,
         algodPort: 443,
-        notifier
+        notifier,
+        feeMargin,
       },
       fuseParams: {
         notifier,
@@ -369,7 +390,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0x2496b44516c8639dA00E8D12ccE64862e3760190",
         minter_addr: "0xa66dA346C08dD77bfB7EE5E68C45010B6F2538ff",
         nonce: Chain.FUSE,
-        feeMargin
+        feeMargin,
       },
       tezosParams: {
         bridgeAddress: "KT1WKtpe58XPCqNQmPmVUq6CZkPYRms5oLvu",
@@ -382,9 +403,9 @@ export namespace ChainFactoryConfigs {
           "tz1L5DjmMEHbj5npRzZewSARLmTQQyESW4Mj",
           "tz1csq1THV9rKQQexo2XfSjSEJEg2wRCSHsD",
           "tz1TBhd1NeZNtWsTbecee8jDMDzeBNLmpViN",
-          "tz1SHcDnXRgb7kWidiaM2J6bbTS7x5jzBr67"
+          "tz1SHcDnXRgb7kWidiaM2J6bbTS7x5jzBr67",
         ],
-        feeMargin
+        feeMargin,
       },
       velasParams: {
         notifier,
@@ -395,7 +416,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0x0B7ED039DFF2b91Eb4746830EaDAE6A0436fC4CB",
         minter_addr: "0x40d8160A0Df3D9aad75b9208070CFFa9387bc051",
         nonce: Chain.VELAS,
-        feeMargin
+        feeMargin,
       },
       iotexParams: {
         notifier,
@@ -406,7 +427,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0x81e1Fdad0658b69914801aBaDA7Aa0Abb31653E5",
         erc1155_addr: "0x93Ff4d90a548143c28876736Aa9Da2Bb7B1b52D4",
         nonce: Chain.IOTEX,
-        feeMargin
+        feeMargin,
       },
       auroraParams: {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AURORA),
@@ -417,7 +438,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.AURORA,
         notifier,
-        feeMargin
+        feeMargin,
       },
       godwokenParams: {
         notifier,
@@ -427,7 +448,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x0000000000000000000000000000000000000000",
         erc1155Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.GODWOKEN,
-        feeMargin
+        feeMargin,
       },
       gateChainParams: {
         notifier,
@@ -437,8 +458,8 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x0000000000000000000000000000000000000000",
         erc1155Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.GATECHAIN,
-        feeMargin
-      }
+        feeMargin,
+      },
     };
   };
 }
