@@ -129,7 +129,8 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
     XpNft: string;
-  } & WhitelistCheck<EthNftInfo> & GetFeeMargins;
+  } & WhitelistCheck<EthNftInfo> &
+  GetFeeMargins;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -250,7 +251,9 @@ export async function web3HelperFactory(
     txFees?: string,
     senderAddress?: string,
     targetAddress?: string,
-    nftUri?: string
+    nftUri?: string,
+    tokenId?: string,
+    contract?: string
   ): Promise<void> {
     await params.notifier.notifyWeb3(
       params.nonce,
@@ -261,7 +264,9 @@ export async function web3HelperFactory(
       txFees,
       senderAddress,
       targetAddress,
-      nftUri
+      nftUri,
+      tokenId,
+      contract
     );
   }
 
@@ -433,7 +438,8 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
-      mintWith
+      mintWith: string,
+      gasLimit: ethers.BigNumberish | undefined = undefined
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
@@ -448,6 +454,7 @@ export async function web3HelperFactory(
         mintWith,
         {
           value: EthBN.from(txFees.toString(10)),
+          gasLimit
         }
       );
 
@@ -459,7 +466,9 @@ export async function web3HelperFactory(
         txFees.toString(),
         await sender.getAddress(),
         to,
-        id.uri
+        id.uri,
+        id.native.tokenId,
+        id.native.contract
       );
 
       return txr;
@@ -485,7 +494,9 @@ export async function web3HelperFactory(
         txFees.toString(),
         await sender.getAddress(),
         to,
-        id.uri
+        id.uri,
+        id.native.tokenId,
+        id.native.contract
       );
 
       return res;

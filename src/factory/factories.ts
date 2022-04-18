@@ -9,7 +9,7 @@ import { Driver, SimpleNet } from "@vechain/connex-driver";
 import * as thor from "web3-providers-connex";
 import { Framework } from "@vechain/connex-framework";
 
-const EVM_VALIDATORS = [
+/*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
   "0x837b2eb764860b442c971f98f505e7c5f419edd7",
   "0x9671ce5a02eb53cf0f2cbd220b34e50c39c0bf23",
@@ -17,7 +17,7 @@ const EVM_VALIDATORS = [
   "0xdc80905cafeda39cb19a566baeef52472848e82f",
   "0x77745cd585798e55938940e3d4dd0fd7cde7bdd6",
   "0xc2a29b4e9fa71e9033a52611544403241c56ac5e",
-];
+];*/
 
 // const _EVM_TESTNET_VALIDATORS = [
 //   "0x50aCEC08ce70aa4f2a8ab2F45d8dCd1903ea4E14",
@@ -267,8 +267,19 @@ export namespace ChainFactoryConfigs {
       tronParams: {
         provider: new TronWeb({ fullHost: MainNetRpcUri.TRON }),
         notifier,
-        minter_addr: "TMx1nCzbK7tbBinLh29CewahpbR1k64c8E",
-        erc721_addr: "TRON",
+        minter_addr: "TAncANF5aYbvgXDatmwTdvTa5N9PTrq95k",
+        erc721_addr: "TVdp7szDHg3opRyuciQaJi93LLk7y83hrC",
+        erc1155Minter: "TYoj1JVpJt1TAWBFj3GkaKLC2vrcFnjZ1G",
+        erc721Minter: "TPSQTbFWaxiDZbGD7MoqR6N2aWDSWBUNfA",
+        validators: [
+          "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
+          "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",
+          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N",
+          "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
+          "TN9bHXEWditocT4Au15mgm7JM56XBnRCvm",
+          "TRHLhivxVogGhtxKn6sC8UF2Fr3WBdaT8N",
+          "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
+        ],
         nonce: Chain.TRON,
         validators: EVM_VALIDATORS,
         feeMargin,
@@ -421,9 +432,9 @@ export namespace ChainFactoryConfigs {
       },
       auroraParams: {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AURORA),
-        minter_addr: "0x32E8854DC2a5Fd7049DCF10ef2cb5f01300c7B47",
-        erc721_addr: "0x041AE550CB0e76a3d048cc2a4017BbCB74756b43",
-        erc1155_addr: "0xca8E2a118d7674080d71762a783b0729AadadD42",
+        minter_addr: "0x6eD7dfDf9678eCb2051c46A1A5E38B4f310b18c5",
+        erc721_addr: "0x93Ff4d90a548143c28876736Aa9Da2Bb7B1b52D4",
+        erc1155_addr: "0x40d8160A0Df3D9aad75b9208070CFFa9387bc051",
         erc1155Minter: "0x0000000000000000000000000000000000000000",
         erc721Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.AURORA,
