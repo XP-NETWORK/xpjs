@@ -4,6 +4,7 @@ import { Web3Params } from "../helpers/web3";
 export * from "./factories";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, NftInfo, TransactionStatus, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosParams } from "../helpers/tezos";
 import { EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
@@ -38,8 +39,10 @@ export declare type ChainFactory = {
      * @param sender {@link Sender} The owner of the NFT.
      * @param receiver Address of the Receiver of the NFT. Could be Web3 or Elrond or Tron Address.
      * @param fee validator fees from {@link estimateFees} (will be calculated automatically if not given)
+     * @param mintWith an arbitrary address of the target chain minter contract
+     * @param gasLimit an arbitrary gas limit value (required for some chains)
      */
-    transferNft<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp>;
+    transferNft<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string, gasLimit?: ethers.BigNumberish | undefined): Promise<Resp>;
     transferBatchNft<SignerF, RawNftF, Resp>(fromChain: FullChainBatch<SignerF, RawNftF, Resp>, toChain: FullChainBatch<never, unknown, unknown>, nft: NftInfo<RawNftF>[], sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
     /**
      * Mints an NFT on the chain.
