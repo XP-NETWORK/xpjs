@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 import { ChainNonce } from "../type-utils";
 /**
  * NFT Info
@@ -26,7 +27,7 @@ export interface PreTransfer<Signer, Nft, Ret> {
  * @returns Transaction and the Identifier of this action to track the status
  */
 export interface TransferNftForeign<Signer, RawNft, Resp> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string): Promise<Resp>;
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string, gasLimit?: ethers.BigNumberish | undefined): Promise<Resp>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
