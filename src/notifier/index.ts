@@ -17,7 +17,9 @@ export function evNotifier(url: string) {
       txFees?: string,
       senderAddress?: string,
       targetAddress?: string,
-      nftUri?: string
+      nftUri?: string,
+      tokenId?: string,
+      contract?: string
     ) {
       await api.post("/tx/web3", {
         chain_nonce: fromChain,
@@ -29,6 +31,8 @@ export function evNotifier(url: string) {
         senderAddress,
         targetAddress,
         nftUri,
+        tokenId,
+        contract,
       });
     },
     async notifyTron(txHash: string) {
@@ -56,8 +60,8 @@ export function evNotifier(url: string) {
     },
     async notifyAlgorand(txHash: string) {
       await api.post("/tx/algorand", {
-        tx_hash: txHash
-      })
-    }
+        tx_hash: txHash,
+      });
+    },
   };
 }
