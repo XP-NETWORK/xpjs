@@ -281,8 +281,7 @@ export namespace ChainFactoryConfigs {
           "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
         ],
         nonce: Chain.TRON,
-        validators: EVM_VALIDATORS,
-        feeMargin,
+        feeMargin
       },
       avalancheParams: {
         notifier,
