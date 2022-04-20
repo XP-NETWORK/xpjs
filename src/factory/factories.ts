@@ -431,9 +431,9 @@ export namespace ChainFactoryConfigs {
       },
       auroraParams: {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AURORA),
-        minter_addr: "0x6eD7dfDf9678eCb2051c46A1A5E38B4f310b18c5",
-        erc721_addr: "0x93Ff4d90a548143c28876736Aa9Da2Bb7B1b52D4",
-        erc1155_addr: "0x40d8160A0Df3D9aad75b9208070CFFa9387bc051",
+        minter_addr: "0x32E8854DC2a5Fd7049DCF10ef2cb5f01300c7B47",
+        erc721_addr: "0x041AE550CB0e76a3d048cc2a4017BbCB74756b43",
+        erc1155_addr: "0xca8E2a118d7674080d71762a783b0729AadadD42",
         erc1155Minter: "0x0000000000000000000000000000000000000000",
         erc721Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.AURORA,
