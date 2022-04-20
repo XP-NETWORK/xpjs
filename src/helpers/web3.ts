@@ -460,7 +460,7 @@ export async function web3HelperFactory(
 
       await notifyValidator(
         txr.hash,
-        undefined,
+        await extractAction(txr),
         "Transfer",
         chain_nonce,
         txFees.toString(),
@@ -488,7 +488,7 @@ export async function web3HelperFactory(
 
       await notifyValidator(
         res.hash,
-        undefined,
+        await extractAction(res),
         "Unfreeze",
         Number(nonce),
         txFees.toString(),
