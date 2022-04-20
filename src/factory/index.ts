@@ -101,7 +101,7 @@ export type ChainFactory = {
     receiver: string,
     fee?: BigNumber.Value,
     mintWith?: string,
-    gasLimit?: ethers.BigNumberish|undefined
+    gasLimit?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
@@ -466,10 +466,10 @@ export function ChainFactory(
   ) {
     const nftDat = await axios.get(nft.uri);
     if (nftDat.data.wrapped.origin == Chain.ALGORAND.toString() &&
-    ("isOptIn" in toChain) &&
-    !await (toChain as AlgorandHelper).isOptIn(
-      receiver, parseInt(nftDat.data.wrapped.assetID)
-    )) {
+      ("isOptIn" in toChain) &&
+      !await (toChain as AlgorandHelper).isOptIn(
+        receiver, parseInt(nftDat.data.wrapped.assetID)
+      )) {
       throw Error("receiver hasn't opted-in to wrapped nft");
     }
   }
@@ -610,16 +610,16 @@ export function ChainFactory(
 
       const mw =
         "contract" in nft.native &&
-        mintWith &&
-        checkMintWith(
-          mintWith,
-          await getVerifiedContracts(
-            //@ts-expect-error contract is checked
-            nft.native.contract.toLowerCase(),
-            toChain.getNonce(),
-            fromChain.getNonce()
+          mintWith &&
+          checkMintWith(
+            mintWith,
+            await getVerifiedContracts(
+              //@ts-expect-error contract is checked
+              nft.native.contract.toLowerCase(),
+              toChain.getNonce(),
+              fromChain.getNonce()
+            )
           )
-        )
           ? mintWith
           : toChain.XpNft;
 
@@ -629,6 +629,7 @@ export function ChainFactory(
 
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
+        console.log(new BigNumber(fee).toString())
       }
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
