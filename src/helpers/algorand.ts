@@ -453,6 +453,12 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
             .catch(() => undefined);
           if (assetRes == undefined) return [];
           const assetInfo = assetRes.asset;
+          const bal = await indexer.lookupAssetBalances(nftId)
+            .currencyGreaterThan(0)
+            .currencyLessThan(2)
+            .limit(1)
+            .do();
+          if (bal.balances[0].address == owner || bal.balances[0].amount == 0) return [];
 
           return [
             {
