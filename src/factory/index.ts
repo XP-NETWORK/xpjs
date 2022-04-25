@@ -212,6 +212,11 @@ export type ChainFactory = {
     chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet,
     nft: NftInfo<RawNft>
   ): Promise<boolean>;
+
+  isWrappedNft(
+	  nft: NftInfo<unknown>,
+	  fromChain: number
+  ): Promise<boolean>;
 };
 
 /**
@@ -692,6 +697,7 @@ export function ChainFactory(
 
       return await chain.isNftWhitelisted(nft);
     },
+	isWrappedNft
   };
 }
 /**
