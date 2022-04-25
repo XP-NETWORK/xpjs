@@ -26,7 +26,7 @@ import { Framework } from "@vechain/connex-framework";
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri = "http://65.21.195.10/notify-test/";
+const testnet_middleware_uri = "https://testnet-notifier.xp.network/notify-test/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
