@@ -460,9 +460,9 @@ var ChainFactoryConfigs;
             gateChainParams: {
                 notifier,
                 provider: new ethers_1.ethers.providers.JsonRpcProvider(consts_1.MainNetRpcUri.GATECHAIN),
-                minter_addr: "0x32E8854DC2a5Fd7049DCF10ef2cb5f01300c7B47",
-                erc721_addr: "0x041AE550CB0e76a3d048cc2a4017BbCB74756b43",
-                erc1155Minter: "0xca8E2a118d7674080d71762a783b0729AadadD42",
+                minter_addr: "0xFc7f7fD2DBdAF6D8F3ee3f222b3a6a9f89729f05",
+                erc721_addr: "0xD6939f722B977afd7DD934A31bc94d08d4ea4336",
+                erc1155Minter: "0xc45759e51CdDBa46db4D1becC8B8Bcbe5d4a9bB4",
                 erc721Minter: "0x0000000000000000000000000000000000000000",
                 nonce: consts_1.Chain.GATECHAIN,
                 feeMargin,
