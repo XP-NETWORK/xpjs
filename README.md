@@ -66,12 +66,6 @@ yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge" @elrondnetwork/e
 import {
     ChainFactoryConfigs,
     ChainFactory,
-    ElrondHelper,
-    ElrondParams,
-    TronHelper,
-    TronParams,
-    Web3Helper,
-    Web3Params,
     Chain,
     AppConfigs,
     ChainParams
@@ -98,25 +92,8 @@ const CONFIG: Partial<ChainParams> = mainnetConfig;
 ```
 
 <hr/><br/>
-<center>
 
 ## 3. Get the signer objects
-
-<br/>
-
-|   Chain   |   Parameters    |
-| :-------: | :-------------: |
-|  Elrond   |  elrondParams   |
-|    BSC    |    bscParams    |
-| Ethereum  |  ropstenParams  |
-| Avalanche | avalancheParams |
-|  Polygon  |  polygonParams  |
-|  Fantom   |  fantomParams   |
-|   Tron    |   tronParams    |
-|   xDai    |   xDaiParams    |
-|  Harmony  |  harmonyParams  |
-
-</center><br/>
 
 ### 3.1 Example of getting the signer object (for manual EVM testing in the BE)
 
@@ -137,11 +114,35 @@ config();
 // EVM signer for testing in the BE
 const signer = new Wallet(
         process.env.SK!,
+        // Replace 'polygonParams'
+        // with the relevant parameter
+        // from the table below
         CONFIG.polygonParams?.provider
     );
 ```
+<center>
 
-<br/>
+|Chain|Parameters|Chain Nonce|
+| :-: | :-: |:-:|
+|  Elrond   |  elrondParams   |2|
+|    BSC    |    bscParams    |4|
+| Ethereum  |  ropstenParams  |5|
+| Avalanche | avalancheParams |6|
+|  Polygon  |  polygonParams  |7|
+|  Fantom   |  fantomParams   |8|
+|   Tron    |   tronParams    |9|
+|  Harmony  |  harmonyParams  |12|
+|   xDai    |   xDaiParams    |14|
+|Algorand|algorandParams|15|
+|Fuse|fuseParams|16|
+|Tezos|tezosParams|18|
+|Velas|velasParams|19|
+|Aurora|auroraParams|21|
+|Godwoken|godwokenParams|22|
+|Gatechain|gatechainParams|23|
+|VeChain|vechainParams|25|
+
+</center><br/>
 
 ### 3.2 Example of getting the signer object (in the FE for web3):<br/><br/>
 
