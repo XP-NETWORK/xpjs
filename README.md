@@ -52,10 +52,10 @@ OR
 npm i --save xp.network @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
 ```
 
-To import the latest version of xp.network library:
+To import the latest version of xp.network v.2.0 library:
 
 ```bash
-yarn add "git+https://github.com/xp-network/xpjs#master-dist" @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge" @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
 ```
 
 <br/>
@@ -64,28 +64,37 @@ yarn add "git+https://github.com/xp-network/xpjs#master-dist" @elrondnetwork/erd
 
 ```javascript
 import {
-  ChainFactoryConfigs,
-  ChainFactory,
-  ElrondHelper,
-  ElrondParams,
-  TronHelper,
-  TronParams,
-  Web3Helper,
-  Web3Params,
-  typedAlgoSigner,
-} from "xp.network/dist";
-
-// Chanin name to chain nonce mapper:
-import { Chain, Config } from "xp.network/dist/consts";
+    ChainFactoryConfigs,
+    ChainFactory,
+    ElrondHelper,
+    ElrondParams,
+    TronHelper,
+    TronParams,
+    Web3Helper,
+    Web3Params,
+    Chain,
+    AppConfigs,
+    ChainParams
+} from "xp.network";
 
 // Instantiate the chain factory for the
-// MAINNET
-const mainnetConfig = ChainFactoryConfigs.MainNet();
-const factory = ChainFactory(Config, mainnetConfig);
-// or
-// TESTNET
-const testnetConfig = ChainFactoryConfigs.TestNet();
-const factory = ChainFactory(Config, testnetConfig);
+// Connecting to the mainnnets of all the blockchains:
+const mainnetConfig = await ChainFactoryConfigs.MainNet()
+const mainnetFactory: ChainFactory = ChainFactory(
+    AppConfigs.MainNet(),
+    mainnetConfig
+);
+
+// Connecting to the testnets of all the blockchains:
+const testnetConfig = await ChainFactoryConfigs.TestNet();
+const testnetFactory: ChainFactory = ChainFactory(
+    AppConfigs.TestNet(),
+    testnetConfig
+);
+
+// Switching between the mainnets & the testnets:
+const factory: ChainFactory = mainnetFactory;
+const CONFIG: Partial<ChainParams> = mainnetConfig;
 ```
 
 <hr/><br/>
@@ -114,14 +123,22 @@ const factory = ChainFactory(Config, testnetConfig);
 Avoid using 3.1 setup in production. Use it for initial or backend testing only.
 <br/>
 
+Add your private key to the environment:
+```bash
+touch .env
+echo "SK=<Replace this with your Private Key>" >> .env
+```
+
 ```javascript
 // EVM chains compatible wallet:
 import { Wallet } from "ethers";
+import { config } from 'dotenv';
+config();
 // EVM signer for testing in the BE
 const signer = new Wallet(
-  "PRIVATE KEY HERE",
-  mainnetConfig.polygonParams?.provider
-);
+        process.env.SK!,
+        CONFIG.polygonParams?.provider
+    );
 ```
 
 <br/>
@@ -161,6 +178,7 @@ const elrondSigner = ExtensionProvider.getInstance();
 ### 3.5 Example of getting the signer object (in the FE for Algorand):<br/><br/>
 
 ```typescript
+import { typedAlgoSigner } from "xp.network/dist/helpers/algorand";
 // Use the typedAlgoSigner function to get access to the Algorand signer
 const algorandSigner = typedAlgoSigner();
 ```
@@ -171,11 +189,14 @@ const algorandSigner = typedAlgoSigner();
 import { TempleWallet } from "@temple-wallet/dapp";
 (async () => {
   try {
-    const available = await TempleWallet.isAvailable();
-    if (!available) {
-      throw new Error("Temple Wallet not installed");
+        const available = await TempleWallet.isAvailable();
+        if (!available) {
+            throw new Error("Temple Wallet is not installed");
+        }
+        const tezosSigner = new TempleWallet("bridge.xp.network");
+    } catch (error) {
+        console.error("Error:", error);
     }
-    const tezosSigner = new TempleWallet("bridge.xp.network");
 })();
 ```
 
@@ -185,27 +206,31 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 
 <hr/>
 
-### 4. Getting the inner objects from this factory to be used for transferring, minting, estimation of gas fees.<br/><br/>
+### 4. Getting the inner objects from this factory to be used for transferring, minting, and estimation of gas fees.<br/><br/>
 
 ```javascript
 (async () => {
-  // EVM-compatible chains:
-  // Inner Object ====================== Chain Nonce ==
-  const ethereum = await factory.inner(Chain.ETHEREUM);
-  const bsc = await factory.inner(Chain.BSC);
-  const polygon = await factory.inner(Chain.POLYGON);
-  const avax = await factory.inner(Chain.AVALANCHE);
-  const fantom = await factory.inner(Chain.FANTOM);
-  const velas = await factory.inner(Chain.VELAS);
-  const gnosis = await factory.inner(Chain.XDAI);
-  const harmony = await factory.inner(Chain.HARMONY);
+// Inner Object ================================ Chain Nonce
+    const bsc       = await factory.inner(Chain.BSC);       // 4
+    const ethereum  = await factory.inner(Chain.ETHEREUM);  // 5
+    const avax      = await factory.inner(Chain.AVALANCHE); // 6
+    const polygon   = await factory.inner(Chain.POLYGON);   // 7
+    const fantom    = await factory.inner(Chain.FANTOM);    // 8
+    const harmony   = await factory.inner(Chain.HARMONY);   // 12
+    const gnosis    = await factory.inner(Chain.XDAI);      // 14
+    const fuse      = await factory.inner(Chain.FUSE);      // 16
+    const velas     = await factory.inner(Chain.VELAS);     // 19
+    const aurora    = await factory.inner(Chain.AURORA);    // 21
+    const godwoken  = await factory.inner(Chain.GODWOKEN);  // 22
+    const gatechain = await factory.inner(Chain.GATECHAIN); // 23
+    const vechain   = await factory.inner(Chain.VECHAIN);   // 25
 
-  // Non-EVM chains:
-  // Inner Object ====================== Chain Nonce ==
-  const algorand = await factory.inner(Chain.ALGORAND);
-  const elrond = await factory.inner(Chain.ELROND);
-  const tezos = await factory.inner(Chain.TEZOS);
-  const tron = await factory.inner(Chain.TRON);
+    // Non-EVM chains:
+    // Inner Object ================================ Chain Nonce
+    const elrond    = await factory.inner(Chain.ELROND);    // 2
+    const tron      = await factory.inner(Chain.TRON);      // 9
+    const algorand  = await factory.inner(Chain.ALGORAND);  // 15
+    const tezos     = await factory.inner(Chain.TEZOS);     // 18
 })();
 ```
 
