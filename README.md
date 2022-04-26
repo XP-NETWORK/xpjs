@@ -372,83 +372,40 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 ### 5.3 Example of the console logged wrapped NFT from BSC on Velas
 
 ```json
-[
-  {
-    "name": "Unifairy",
-    "description": "The Unifairy are the most magical and fairest of Polkamon. Their wings stretch into the realms beyond this world, enchanting those around her by her unique disposition.",
-    "image": "https://assets.polkamon.com/images/Unimons_T02C03H06B04G00.jpg",
-    "animation_url": "https://assets.polkamon.com/videos/Unimons_T02C03H06B04G00.mp4",
+{
+    "name": "DRVR NOT LVR",
+    "description": "Cliff Blank | Community Pool Drop\n\nWe would need a license to love, there would be fewer lines, fewer misunderstandings but definitely more accidents. \nThe arteries of our heart would be 4 lanes so that we could reach love in a short time. Of course, there could always be works and exits closed but at least we would have fewer surprises and we would react accordingly, choosing another exit or deciding to continue on our way.",
+    "decimals": 0,
+    "isBooleanAmount": true,
+    "image": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
+    "artifactUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
     "wrapped": {
-      "contract": "0x85F0e02cb992aa1F9F47112F815F519EF1A59E2D",
-      "tokenId": "10002366816",
-      "origin": "4",
-      "original_uri": "https://meta.polkamon.com/meta?id=10002366816"
+        "contract": "0x1BFb3FbCf1ce331B7AAE03a3c0Bf3AcF685F4bD6",
+        "tokenId": "10",
+        "contractType": 721,
+        "origin": "14",
+        "original_uri": "https://ipfs.infura.io/ipfs/QmdtemgadGPgWSn9Lq1RvQn4Q2ofEpRNr7ox8oMyNWJ9ma",
+        "mint_with": "0x3a1d5a87c5f0c2f5c5e079b0f234d8797ee0e9b4",
+        "source_mint_ident": "0x1BFb3FbCf1ce331B7AAE03a3c0Bf3AcF685F4bD6"
     },
     "attributes": [
-      {
-        "trait_type": "Original Chain",
-        "value": "BSC"
-      },
-      {
-        "trait_type": "Original Chain Nonce",
-        "value": "4"
-      },
-      {
-        "trait_type": "Original URI",
-        "value": "https://meta.polkamon.com/meta?id=10002366816"
-      },
-      {
-        "trait_type": "Type",
-        "value": "Unifairy"
-      },
-      {
-        "trait_type": "Horn",
-        "value": "Spiral Horn"
-      },
-      {
-        "trait_type": "Color",
-        "value": "Blue"
-      },
-      {
-        "trait_type": "Background",
-        "value": "Mountain Range"
-      },
-      {
-        "trait_type": "Opening Network",
-        "value": "Binance Smart Chain"
-      },
-      {
-        "trait_type": "Glitter",
-        "value": "No"
-      },
-      {
-        "trait_type": "Special",
-        "value": "No"
-      },
-      {
-        "display_type": "date",
-        "trait_type": "Birthday",
-        "value": 1633650473
-      },
-      {
-        "display_type": "number",
-        "trait_type": "Booster",
-        "value": 10000000788939
-      }
+        {
+            "trait_type": "Original Chain",
+            "value": "xDai"
+        },
+        {
+            "trait_type": "Original Chain Nonce",
+            "value": "14"
+        },
+        {
+            "trait_type": "Original URI",
+            "value": "https://ipfs.infura.io/ipfs/QmdtemgadGPgWSn9Lq1RvQn4Q2ofEpRNr7ox8oMyNWJ9ma"
+        }
     ],
-    "uri": "https://wnfts.xp.network/w/61b8adae4298fe05d7a48962",
-    "native": {
-      "chainId": "19",
-      "tokenId": "17",
-      "owner": "0x0d7df42014064a163DfDA404253fa9f6883b9187",
-      "contract": "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
-      "symbol": "XPNFT",
-      "name": "XpWrapNft",
-      "uri": "https://wnfts.xp.network/w/61b8adae4298fe05d7a48962",
-      "contractType": "ERC721"
-    }
-  }
-]
+    "displayUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
+    "thumbnailUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
+    "ipfs": false
+}
 ```
 
 <hr/><br/>
