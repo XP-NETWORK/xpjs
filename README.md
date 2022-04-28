@@ -52,10 +52,10 @@ OR
 npm i --save xp.network @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
 ```
 
-To import the latest version of xp.network library:
+To import the latest version of xp.network v.2.0 library:
 
 ```bash
-yarn add "git+https://github.com/xp-network/xpjs#master-dist" @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge" @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
 ```
 
 <br/>
@@ -64,67 +64,85 @@ yarn add "git+https://github.com/xp-network/xpjs#master-dist" @elrondnetwork/erd
 
 ```javascript
 import {
-  ChainFactoryConfigs,
-  ChainFactory,
-  ElrondHelper,
-  ElrondParams,
-  TronHelper,
-  TronParams,
-  Web3Helper,
-  Web3Params,
-  typedAlgoSigner,
-} from "xp.network/dist";
-
-// Chanin name to chain nonce mapper:
-import { Chain, Config } from "xp.network/dist/consts";
+    ChainFactoryConfigs,
+    ChainFactory,
+    Chain,
+    AppConfigs,
+    ChainParams
+} from "xp.network";
 
 // Instantiate the chain factory for the
-// MAINNET
-const mainnetConfig = ChainFactoryConfigs.MainNet();
-const factory = ChainFactory(Config, mainnetConfig);
-// or
-// TESTNET
-const testnetConfig = ChainFactoryConfigs.TestNet();
-const factory = ChainFactory(Config, testnetConfig);
+// Connecting to the mainnnets of all the blockchains:
+const mainnetConfig = await ChainFactoryConfigs.MainNet()
+const mainnetFactory: ChainFactory = ChainFactory(
+    AppConfigs.MainNet(),
+    mainnetConfig
+);
+
+// Connecting to the testnets of all the blockchains:
+const testnetConfig = await ChainFactoryConfigs.TestNet();
+const testnetFactory: ChainFactory = ChainFactory(
+    AppConfigs.TestNet(),
+    testnetConfig
+);
+
+// Switching between the mainnets & the testnets:
+const factory: ChainFactory = mainnetFactory;
+const CONFIG: Partial<ChainParams> = mainnetConfig;
 ```
 
 <hr/><br/>
-<center>
 
 ## 3. Get the signer objects
-
-<br/>
-
-|   Chain   |   Parameters    |
-| :-------: | :-------------: |
-|  Elrond   |  elrondParams   |
-|    BSC    |    bscParams    |
-| Ethereum  |  ropstenParams  |
-| Avalanche | avalancheParams |
-|  Polygon  |  polygonParams  |
-|  Fantom   |  fantomParams   |
-|   Tron    |   tronParams    |
-|   xDai    |   xDaiParams    |
-|  Harmony  |  harmonyParams  |
-
-</center><br/>
 
 ### 3.1 Example of getting the signer object (for manual EVM testing in the BE)
 
 Avoid using 3.1 setup in production. Use it for initial or backend testing only.
 <br/>
 
+Add your private key to the environment:
+```bash
+touch .env
+echo "SK=<Replace this with your Private Key>" >> .env
+```
+
 ```javascript
 // EVM chains compatible wallet:
 import { Wallet } from "ethers";
+import { config } from 'dotenv';
+config();
 // EVM signer for testing in the BE
 const signer = new Wallet(
-  "PRIVATE KEY HERE",
-  mainnetConfig.polygonParams?.provider
-);
+        process.env.SK!,
+        // Replace 'polygonParams'
+        // with the relevant parameter
+        // from the table below
+        CONFIG.polygonParams?.provider
+    );
 ```
+<center>
 
-<br/>
+|Chain|Parameters|Chain Nonce|
+| :-: | :-: |:-:|
+|  Elrond   |  elrondParams   |2|
+|    BSC    |    bscParams    |4|
+| Ethereum  |  ropstenParams  |5|
+| Avalanche | avalancheParams |6|
+|  Polygon  |  polygonParams  |7|
+|  Fantom   |  fantomParams   |8|
+|   Tron    |   tronParams    |9|
+|  Harmony  |  harmonyParams  |12|
+|   xDai    |   xDaiParams    |14|
+|Algorand|algorandParams|15|
+|Fuse|fuseParams|16|
+|Tezos|tezosParams|18|
+|Velas|velasParams|19|
+|Aurora|auroraParams|21|
+|Godwoken|godwokenParams|22|
+|Gatechain|gatechainParams|23|
+|VeChain|vechainParams|25|
+
+</center><br/>
 
 ### 3.2 Example of getting the signer object (in the FE for web3):<br/><br/>
 
@@ -161,6 +179,7 @@ const elrondSigner = ExtensionProvider.getInstance();
 ### 3.5 Example of getting the signer object (in the FE for Algorand):<br/><br/>
 
 ```typescript
+import { typedAlgoSigner } from "xp.network/dist/helpers/algorand";
 // Use the typedAlgoSigner function to get access to the Algorand signer
 const algorandSigner = typedAlgoSigner();
 ```
@@ -171,11 +190,14 @@ const algorandSigner = typedAlgoSigner();
 import { TempleWallet } from "@temple-wallet/dapp";
 (async () => {
   try {
-    const available = await TempleWallet.isAvailable();
-    if (!available) {
-      throw new Error("Temple Wallet not installed");
+        const available = await TempleWallet.isAvailable();
+        if (!available) {
+            throw new Error("Temple Wallet is not installed");
+        }
+        const tezosSigner = new TempleWallet("bridge.xp.network");
+    } catch (error) {
+        console.error("Error:", error);
     }
-    const tezosSigner = new TempleWallet("bridge.xp.network");
 })();
 ```
 
@@ -185,27 +207,31 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 
 <hr/>
 
-### 4. Getting the inner objects from this factory to be used for transferring, minting, estimation of gas fees.<br/><br/>
+### 4. Getting the inner objects from this factory to be used for transferring, minting, and estimation of gas fees.<br/><br/>
 
 ```javascript
 (async () => {
-  // EVM-compatible chains:
-  // Inner Object ====================== Chain Nonce ==
-  const ethereum = await factory.inner(Chain.ETHEREUM);
-  const bsc = await factory.inner(Chain.BSC);
-  const polygon = await factory.inner(Chain.POLYGON);
-  const avax = await factory.inner(Chain.AVALANCHE);
-  const fantom = await factory.inner(Chain.FANTOM);
-  const velas = await factory.inner(Chain.VELAS);
-  const gnosis = await factory.inner(Chain.XDAI);
-  const harmony = await factory.inner(Chain.HARMONY);
+// Inner Object ================================ Chain Nonce
+    const bsc       = await factory.inner(Chain.BSC);       // 4
+    const ethereum  = await factory.inner(Chain.ETHEREUM);  // 5
+    const avax      = await factory.inner(Chain.AVALANCHE); // 6
+    const polygon   = await factory.inner(Chain.POLYGON);   // 7
+    const fantom    = await factory.inner(Chain.FANTOM);    // 8
+    const harmony   = await factory.inner(Chain.HARMONY);   // 12
+    const gnosis    = await factory.inner(Chain.XDAI);      // 14
+    const fuse      = await factory.inner(Chain.FUSE);      // 16
+    const velas     = await factory.inner(Chain.VELAS);     // 19
+    const aurora    = await factory.inner(Chain.AURORA);    // 21
+    const godwoken  = await factory.inner(Chain.GODWOKEN);  // 22
+    const gatechain = await factory.inner(Chain.GATECHAIN); // 23
+    const vechain   = await factory.inner(Chain.VECHAIN);   // 25
 
-  // Non-EVM chains:
-  // Inner Object ====================== Chain Nonce ==
-  const algorand = await factory.inner(Chain.ALGORAND);
-  const elrond = await factory.inner(Chain.ELROND);
-  const tezos = await factory.inner(Chain.TEZOS);
-  const tron = await factory.inner(Chain.TRON);
+    // Non-EVM chains:
+    // Inner Object ================================ Chain Nonce
+    const elrond    = await factory.inner(Chain.ELROND);    // 2
+    const tron      = await factory.inner(Chain.TRON);      // 9
+    const algorand  = await factory.inner(Chain.ALGORAND);  // 15
+    const tezos     = await factory.inner(Chain.TEZOS);     // 18
 })();
 ```
 
@@ -346,83 +372,40 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 ### 5.3 Example of the console logged wrapped NFT from BSC on Velas
 
 ```json
-[
-  {
-    "name": "Unifairy",
-    "description": "The Unifairy are the most magical and fairest of Polkamon. Their wings stretch into the realms beyond this world, enchanting those around her by her unique disposition.",
-    "image": "https://assets.polkamon.com/images/Unimons_T02C03H06B04G00.jpg",
-    "animation_url": "https://assets.polkamon.com/videos/Unimons_T02C03H06B04G00.mp4",
+{
+    "name": "DRVR NOT LVR",
+    "description": "Cliff Blank | Community Pool Drop\n\nWe would need a license to love, there would be fewer lines, fewer misunderstandings but definitely more accidents. \nThe arteries of our heart would be 4 lanes so that we could reach love in a short time. Of course, there could always be works and exits closed but at least we would have fewer surprises and we would react accordingly, choosing another exit or deciding to continue on our way.",
+    "decimals": 0,
+    "isBooleanAmount": true,
+    "image": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
+    "artifactUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
     "wrapped": {
-      "contract": "0x85F0e02cb992aa1F9F47112F815F519EF1A59E2D",
-      "tokenId": "10002366816",
-      "origin": "4",
-      "original_uri": "https://meta.polkamon.com/meta?id=10002366816"
+        "contract": "0x1BFb3FbCf1ce331B7AAE03a3c0Bf3AcF685F4bD6",
+        "tokenId": "10",
+        "contractType": 721,
+        "origin": "14",
+        "original_uri": "https://ipfs.infura.io/ipfs/QmdtemgadGPgWSn9Lq1RvQn4Q2ofEpRNr7ox8oMyNWJ9ma",
+        "mint_with": "0x3a1d5a87c5f0c2f5c5e079b0f234d8797ee0e9b4",
+        "source_mint_ident": "0x1BFb3FbCf1ce331B7AAE03a3c0Bf3AcF685F4bD6"
     },
     "attributes": [
-      {
-        "trait_type": "Original Chain",
-        "value": "BSC"
-      },
-      {
-        "trait_type": "Original Chain Nonce",
-        "value": "4"
-      },
-      {
-        "trait_type": "Original URI",
-        "value": "https://meta.polkamon.com/meta?id=10002366816"
-      },
-      {
-        "trait_type": "Type",
-        "value": "Unifairy"
-      },
-      {
-        "trait_type": "Horn",
-        "value": "Spiral Horn"
-      },
-      {
-        "trait_type": "Color",
-        "value": "Blue"
-      },
-      {
-        "trait_type": "Background",
-        "value": "Mountain Range"
-      },
-      {
-        "trait_type": "Opening Network",
-        "value": "Binance Smart Chain"
-      },
-      {
-        "trait_type": "Glitter",
-        "value": "No"
-      },
-      {
-        "trait_type": "Special",
-        "value": "No"
-      },
-      {
-        "display_type": "date",
-        "trait_type": "Birthday",
-        "value": 1633650473
-      },
-      {
-        "display_type": "number",
-        "trait_type": "Booster",
-        "value": 10000000788939
-      }
+        {
+            "trait_type": "Original Chain",
+            "value": "xDai"
+        },
+        {
+            "trait_type": "Original Chain Nonce",
+            "value": "14"
+        },
+        {
+            "trait_type": "Original URI",
+            "value": "https://ipfs.infura.io/ipfs/QmdtemgadGPgWSn9Lq1RvQn4Q2ofEpRNr7ox8oMyNWJ9ma"
+        }
     ],
-    "uri": "https://wnfts.xp.network/w/61b8adae4298fe05d7a48962",
-    "native": {
-      "chainId": "19",
-      "tokenId": "17",
-      "owner": "0x0d7df42014064a163DfDA404253fa9f6883b9187",
-      "contract": "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
-      "symbol": "XPNFT",
-      "name": "XpWrapNft",
-      "uri": "https://wnfts.xp.network/w/61b8adae4298fe05d7a48962",
-      "contractType": "ERC721"
-    }
-  }
-]
+    "displayUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
+    "thumbnailUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
+    "ipfs": false
+}
 ```
 
 <hr/><br/>
