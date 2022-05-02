@@ -377,7 +377,7 @@ export namespace ChainFactoryConfigs {
         algodUri: "https://algorand-node.xp.network/",
         indexerUri: "https://algoexplorerapi.io/idx2",
         nonce: Chain.ALGORAND,
-        sendNftAppId: 458971166,
+        sendNftAppId: 721832640,
         algodPort: 443,
         notifier,
         feeMargin,
