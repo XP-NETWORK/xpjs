@@ -26,11 +26,12 @@ import { Framework } from "@vechain/connex-framework";
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri = "https://testnet-notifier.xp.network/notify-test/";
+const testnet_middleware_uri =
+  "https://testnet-notifier.xp.network/notify-test/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
-    const feeMargin = { min: 0.5, max: 5 };
+    const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(testnet_middleware_uri);
 
     const net = new SimpleNet(TestNetRpcUri.VECHAIN);
@@ -249,7 +250,7 @@ export namespace ChainFactoryConfigs {
   };
 
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
-    const feeMargin = { min: 0.5, max: 5 };
+    const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(middleware_uri);
     return {
       elrondParams: {
@@ -281,7 +282,7 @@ export namespace ChainFactoryConfigs {
           "TJuG3kvmGBDxGyUPBbvKePUjbopLurtqSo",
         ],
         nonce: Chain.TRON,
-        feeMargin
+        feeMargin,
       },
       avalancheParams: {
         notifier,
