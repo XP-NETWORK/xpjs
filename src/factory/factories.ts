@@ -34,10 +34,9 @@ export namespace ChainFactoryConfigs {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(testnet_middleware_uri);
 
+    // VeChain related:
     const net = new SimpleNet(TestNetRpcUri.VECHAIN);
-
     const driver = await Driver.connect(net);
-
     const provider = thor.ethers.modifyProvider(
       //@ts-ignore
       new ethers.providers.Web3Provider(
@@ -252,6 +251,17 @@ export namespace ChainFactoryConfigs {
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(middleware_uri);
+    
+    // VeChain related:
+    const net = new SimpleNet(TestNetRpcUri.VECHAIN);
+    const driver = await Driver.connect(net);
+    const provider = thor.ethers.modifyProvider(
+      //@ts-ignore
+      new ethers.providers.Web3Provider(
+        new thor.ConnexProvider({ connex: new Framework(driver) })
+      )
+    );
+
     return {
       elrondParams: {
         node_uri: MainNetRpcUri.ELROND,
@@ -264,6 +274,16 @@ export namespace ChainFactoryConfigs {
         notifier,
         nonce: Chain.ELROND,
         feeMargin,
+      },
+      vechainParams: {
+        notifier,
+        feeMargin,
+        nonce: Chain.VECHAIN,
+        provider,
+        minter_addr: "0xE860cef926E5e76E0E88fdc762417a582F849C27",
+        erc721_addr: "0xf0E778BD5C4c2F219A2A5699e3AfD2D82D50E271",
+        erc721Minter: "0x6e2B43FeF2E750e1562AC572e60B6C484a027424",
+        erc1155Minter: "0x4E3a506800b894f3d7B46475Ab693DD5a567bB5C",
       },
       tronParams: {
         provider: new TronWeb({ fullHost: MainNetRpcUri.TRON }),
