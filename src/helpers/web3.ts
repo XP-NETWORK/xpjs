@@ -48,6 +48,7 @@ import {
 import { NftMintArgs } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
+import axios from "axios";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -239,6 +240,23 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 export async function web3HelperFactory(
   params: Web3Params
 ): Promise<Web3Helper> {
+  const txnUnderpricedPolyWorkaround =
+    params.nonce == 7
+      ? async (utx: PopulatedTransaction) => {
+        const res = await axios.get(
+          'https://gasstation-mainnet.matic.network/v2'
+        );
+        const { fast } = res.data;
+        if (fast) {
+          const sixtyGwei = ethers.utils.parseUnits(
+            Math.ceil(fast.maxFee).toString(),
+            'gwei'
+          );
+          utx.maxFeePerGas = sixtyGwei;
+          utx.maxPriorityFeePerGas = sixtyGwei;
+        }
+      }
+      : () => Promise.resolve();
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
@@ -370,7 +388,7 @@ export async function web3HelperFactory(
       return TransactionStatus.UNKNOWN;
     },
     async unfreezeWrappedNftBatch(signer, chainNonce, to, nfts, txFees) {
-      const res = await minter.connect(signer).withdrawNftBatch(
+      const tx = await minter.connect(signer).populateTransaction.withdrawNftBatch(
         to,
         chainNonce,
         nfts.map((nft) => nft.native.tokenId),
@@ -380,6 +398,8 @@ export async function web3HelperFactory(
           value: EthBN.from(txFees.toString()),
         }
       );
+      await txnUnderpricedPolyWorkaround(tx)
+      const res = await signer.sendTransaction(tx)
 
       // await notifyValidator(
       //   res.hash,
@@ -403,7 +423,7 @@ export async function web3HelperFactory(
       mintWith,
       txFees
     ) {
-      const res = await minter.connect(signer).freezeErc1155Batch(
+      const tx = await minter.connect(signer).populateTransaction.freezeErc1155Batch(
         nfts[0].native.contract,
         nfts.map((nft) => nft.native.tokenId),
         new Array(nfts.length).fill(1),
@@ -414,6 +434,9 @@ export async function web3HelperFactory(
           value: EthBN.from(txFees.toString()),
         }
       );
+      await txnUnderpricedPolyWorkaround(tx)
+
+      const res = await signer.sendTransaction(tx)
 
       await notifyValidator(res.hash);
 
@@ -444,8 +467,9 @@ export async function web3HelperFactory(
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
-      const txr = await minter
+      const tx = await minter
         .connect(sender)
+        .populateTransaction
       [method](
         id.native.contract,
         id.native.tokenId,
@@ -457,6 +481,9 @@ export async function web3HelperFactory(
           gasLimit
         }
       );
+      await txnUnderpricedPolyWorkaround(tx)
+
+      const txr = await sender.sendTransaction(tx)
 
       await notifyValidator(
         txr.hash,
@@ -480,11 +507,15 @@ export async function web3HelperFactory(
       txFees: BigNumber,
       nonce
     ): Promise<TransactionResponse> {
-      const res = await minter
+      const txn = await minter
         .connect(sender)
+        .populateTransaction
         .withdrawNft(to, nonce, id.native.tokenId, id.native.contract, {
           value: EthBN.from(txFees.toString(10)),
         });
+
+      await txnUnderpricedPolyWorkaround(txn)
+      const res = await sender.sendTransaction(txn)
 
       await notifyValidator(
         res.hash,
