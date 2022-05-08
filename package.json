@@ -26,7 +26,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@elrondnetwork/erdjs": "^8.0.1-alpha.8",
+    "@elrondnetwork/erdjs": "^9.2.6",
     "@json-rpc-tools/utils": "^1.7.6",
     "@randlabs/myalgo-connect": "^1.1.1",
     "@taquito/signer": "^11.1.0",
