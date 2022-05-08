@@ -2495,7 +2495,7 @@ belter@^1.0.170:
     cross-domain-utils "^2"
     zalgo-promise "^1"
 
-bignumber.js@9.0.1, bignumber.js@^9.0.0, bignumber.js@^9.0.1:
+bignumber.js@9.0.1, bignumber.js@=9.0.1, bignumber.js@^9.0.0, bignumber.js@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.1.tgz#8d7ba124c882bfd8e43260c67475518d0689e4e5"
   integrity sha512-IdZR9mh6ahOBv/hYGiXyVuyCetmGJhtYkqLBpTStdhEGjegpPlUawydyaF3pbIOFynJTpllEs+NP+CS9jKFLjA==
