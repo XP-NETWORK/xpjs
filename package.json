@@ -1,6 +1,6 @@
 {
   "name": "xp.network",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "xp-network <dima@xp.network>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
