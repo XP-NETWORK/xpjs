@@ -19,7 +19,7 @@ var AppConfigs;
         return {
             exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
             nftListUri: "https://testnet-notifier.xp.network/testnet-indexer/",
-            nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY0NDIzMDE0NiwiZXhwIjoxNjUyMDA2MTQ2fQ.gX6Auj4hFLdpem5Pk2kAnH71I19iGXfBYjmQrXylMFX_R1yzDEbylVAOLW6kABH9VjnLbAnCRdQvLaQIFmMUpw",
+            nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
             txSocketUri: "https://testnet-tx-socket.herokuapp.com",
             tronScanUri: "https://apilist.tronscan.org/api/",
             heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
