@@ -1,0 +1,1 @@
+export { BridgeContract } from './bridge'
