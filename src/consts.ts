@@ -292,7 +292,7 @@ CHAIN_INFO.set(Chain.TON, {
   decimals: 1e9,
   constructor: tonHelperFactory,
   currency: SupportedCurrency.TON,
-  blockExplorerUrl: "https://tezblock.io/transaction",
+  blockExplorerUrl: "",
 });
 CHAIN_INFO.set(Chain.VELAS, {
   name: "Velas",
