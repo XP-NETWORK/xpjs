@@ -13,6 +13,7 @@ import {
 } from "./helpers/algorand";
 import { TezosHelper, tezosHelperFactory, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
+import { TonHelper, tonHelperFactory, TonParams } from "./helpers/ton";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -37,6 +38,7 @@ export enum TestNetRpcUri {
   VECHAIN = "https://sync-testnet.veblocks.net",
   // TODO: Algorand
   // TODO: Fuse
+  TON = "https://testnet.toncenter.com/api/v2/jsonRPC"
 }
 
 export enum MainNetRpcUri {
@@ -60,6 +62,7 @@ export enum MainNetRpcUri {
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
   // TODO: Algorand
+  TON = "https://toncenter.com/api/v2/jsonRPC"
 }
 
 type ElrondMeta = [ElrondHelper, ElrondParams];
@@ -67,6 +70,7 @@ type Web3Meta = [Web3Helper, Web3Params];
 type TronMeta = [TronHelper, TronParams];
 type AlgoMeta = [AlgorandHelper, AlgorandParams];
 type TezosMeta = [TezosHelper, TezosParams];
+type TonMeta = [TonHelper, TonParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
@@ -95,6 +99,7 @@ export type MetaMap = {
   0x17: Web3Meta;
   // 0x18 Reserved
   0x19: Web3Meta;
+  0x1a: TonMeta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -121,6 +126,7 @@ export namespace Chain {
   export const GATECHAIN = 0x17; // 23
   // 0x18 Reserved
   export const VECHAIN = 0x19; // 25
+  export const TON = 0x1a; // 26
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -278,6 +284,14 @@ CHAIN_INFO.set(Chain.TEZOS, {
   decimals: 1e6,
   constructor: tezosHelperFactory,
   currency: SupportedCurrency.XTZ,
+  blockExplorerUrl: "https://tezblock.io/transaction",
+});
+CHAIN_INFO.set(Chain.TON, {
+  name: "Ton",
+  nonce: 0x1a,
+  decimals: 1e9,
+  constructor: tonHelperFactory,
+  currency: SupportedCurrency.TON,
   blockExplorerUrl: "https://tezblock.io/transaction",
 });
 CHAIN_INFO.set(Chain.VELAS, {
