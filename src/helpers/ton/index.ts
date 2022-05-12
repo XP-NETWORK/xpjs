@@ -75,6 +75,21 @@ export async function tonHelperFactory({
             return hash
         },
         async unfreezeWrappedNft(signer, to, nft, fee, nonce) {
+            const payload = await bridge.createWithdrawBody({
+                to: enc.encode(to),
+                chainNonce: parseInt(nonce)
+            })
+            const bocBytes = await payload.toBoc()
+            const nftItemAddress = new Address(nft.native.address)
+            signer.tonWallet.send(
+                'ton_sendTransaction',
+                [{
+                    to: nftItemAddress.toString(true, true, true),
+                    value: fee.toString(),
+                    data: TonWeb.utils.bytesToBase64(bocBytes),
+                    dataType: 'boc'
+                }]
+            )
             const hash = "";  // TODO: get correct transaction hash
             notifyValidator(hash);
             return hash;
