@@ -35,6 +35,7 @@ import algosdk from "algosdk";
 import { Base64 } from "js-base64";
 import { TezosParams } from "../helpers/tezos";
 import {
+  BalanceCheck,
   EstimateTxFeesBatch,
   FeeMargins,
   GetFeeMargins,
@@ -81,6 +82,13 @@ export type ChainFactory = {
    * this is checked regardless before using any bridge related function(e.g transferNft) is called
    */
   bridgeStatus(): Promise<{ [chainNonce: number]: "alive" | "dead" }>;
+  /**
+   * Check the balance of an account
+   * 
+   * @param inner The chain to check the balance in
+   * @param address address of the account
+   */
+  balance(inner: BalanceCheck, address: string): Promise<BigNumber>;
   /**
    * Transfers the NFT from one chain to other.
    * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
@@ -492,6 +500,7 @@ export function ChainFactory(
 
   return {
     getVerifiedContracts,
+    balance: (i, a) => i.balance(a),
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
       type Result = ReturnType<typeof to.transferNftBatchToForeign>;
       let result: Result[] = [];
