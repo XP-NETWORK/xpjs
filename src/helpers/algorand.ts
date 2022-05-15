@@ -16,7 +16,7 @@ import {
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
 import { EvNotifier } from "../notifier";
-import { FeeMargins, GetFeeMargins } from "./chain";
+import { BalanceCheck, FeeMargins, GetFeeMargins } from "./chain";
 
 type TxResp = {
   txId: string;
@@ -138,7 +138,7 @@ export type AlgorandHelper = ChainNonceGet &
   } & Pick<
     PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>,
     "preTransfer"
-  > & { XpNft: string } & GetFeeMargins;
+  > & { XpNft: string } & GetFeeMargins & BalanceCheck;
 
 export type AlgorandParams = {
   algodApiKey: string;
@@ -338,6 +338,12 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     claimNft,
     optInNft,
     isOptIn,
+    async balance(address) {
+      const acc = await algod.accountInformation(address).do().catch(() => undefined);
+      if (!acc) return new BigNumber(0);
+
+      return new BigNumber(acc.amount);
+    },
     async preTransfer(sender, nft, fee) {
       if (await isOptIn(appAddr, nft.native.nftId)) {
         return undefined;
