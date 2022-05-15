@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosParams } from "../helpers/tezos";
-import { EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
+import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
 import { ChainNonce, InferChainH, InferChainParam, InferSigner } from "../type-utils";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft?: string;
@@ -30,6 +30,13 @@ export declare type ChainFactory = {
     bridgeStatus(): Promise<{
         [chainNonce: number]: "alive" | "dead";
     }>;
+    /**
+     * Check the balance of an account
+     *
+     * @param inner The chain to check the balance in
+     * @param address address of the account
+     */
+    balance(inner: BalanceCheck, address: string): Promise<BigNumber>;
     /**
      * Transfers the NFT from one chain to other.
      * @param fromChain {@link FullChain} the chain to transfer from. Use inner method of the factory to get this.
