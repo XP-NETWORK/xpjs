@@ -477,6 +477,7 @@ export function ChainFactory(
     toChain: FullChain<unknown, unknown, unknown>,
     receiver: string
   ) {
+    if ("meta" in (nft.native as Record<string, any>)) return;
     const nftDat = await axios.get(nft.uri);
     if (nftDat.data.wrapped.origin == Chain.ALGORAND.toString() &&
       ("isOptIn" in toChain) &&
