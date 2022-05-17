@@ -6,7 +6,7 @@ export namespace AppConfigs {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
       nftListUri: "https://indexnft.herokuapp.com",
       nftListAuthToken:
-        "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTYzODk2MjMzOCwiZXhwIjoxNjQ2NzM4MzM4fQ.9eQMNMtt-P6myPlji7nBC9PAwTftd0qQvwnIZSt4ycM4E45NpzCF0URsdYj_YN_xqQKQpcHiZu1o4EXjJa_-Zw",
+        "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
       txSocketUri: "https://transaction-socket.xp.network",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
