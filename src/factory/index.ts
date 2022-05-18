@@ -272,6 +272,7 @@ export interface AppConfig {
   nftListAuthToken: string;
   tronScanUri: string;
   wrappedNftPrefix: string;
+  scVerifyUri: string;
   network: "testnet" | "mainnet";
 }
 
@@ -494,7 +495,7 @@ export function ChainFactory(
     fc: number
   ): Promise<string[]> {
     const res = await axios.get<{ data: { to: string }[] }>(
-      `https://sc-verify.xp.network/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
+      `${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);
   }
