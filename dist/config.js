@@ -7,11 +7,12 @@ var AppConfigs;
         return {
             exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
             nftListUri: "https://indexnft.herokuapp.com",
-            nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTYzODk2MjMzOCwiZXhwIjoxNjQ2NzM4MzM4fQ.9eQMNMtt-P6myPlji7nBC9PAwTftd0qQvwnIZSt4ycM4E45NpzCF0URsdYj_YN_xqQKQpcHiZu1o4EXjJa_-Zw",
+            nftListAuthToken: "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
             txSocketUri: "https://transaction-socket.xp.network",
             tronScanUri: "https://apilist.tronscan.org/api/",
             heartbeatUri: "https://xpheartbeat.herokuapp.com",
             wrappedNftPrefix: "https://nft.xp.network/w/",
+            scVerifyUri: "https://sc-verify.xp.network",
             network: "mainnet"
         };
     };
@@ -24,8 +25,9 @@ var AppConfigs;
             tronScanUri: "https://apilist.tronscan.org/api/",
             heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
             wrappedNftPrefix: "https://testnet-w-nft-api.herokuapp.com/",
+            scVerifyUri: "https://testnet-sc-verify.herokuapp.com",
             network: "testnet"
         };
     };
 })(AppConfigs = exports.AppConfigs || (exports.AppConfigs = {}));
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2NvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFFQSxJQUFpQixVQUFVLENBMkIxQjtBQTNCRCxXQUFpQixVQUFVO0lBQ1osa0JBQU8sR0FBb0IsR0FBRyxFQUFFO1FBQzNDLE9BQU87WUFDTCxlQUFlLEVBQUUsNkNBQTZDO1lBQzlELFVBQVUsRUFBRSxnQ0FBZ0M7WUFDNUMsZ0JBQWdCLEVBQ2QsZ0xBQWdMO1lBQ2xMLFdBQVcsRUFBRSx1Q0FBdUM7WUFDcEQsV0FBVyxFQUFFLG1DQUFtQztZQUNoRCxZQUFZLEVBQUUsbUNBQW1DO1lBQ2pELGdCQUFnQixFQUFFLDJCQUEyQjtZQUM3QyxPQUFPLEVBQUUsU0FBUztTQUNuQixDQUFDO0lBQ0osQ0FBQyxDQUFDO0lBQ1csa0JBQU8sR0FBb0IsR0FBRyxFQUFFO1FBQzNDLE9BQU87WUFDTCxlQUFlLEVBQUUsNkNBQTZDO1lBQzlELFVBQVUsRUFBRSxzREFBc0Q7WUFDbEUsZ0JBQWdCLEVBQ2QsZ0xBQWdMO1lBQ2xMLFdBQVcsRUFBRSx5Q0FBeUM7WUFDdEQsV0FBVyxFQUFFLG1DQUFtQztZQUNoRCxZQUFZLEVBQUUsaURBQWlEO1lBQy9ELGdCQUFnQixFQUFFLDBDQUEwQztZQUM1RCxPQUFPLEVBQUUsU0FBUztTQUNuQixDQUFDO0lBQ0osQ0FBQyxDQUFDO0FBQ0osQ0FBQyxFQTNCZ0IsVUFBVSxHQUFWLGtCQUFVLEtBQVYsa0JBQVUsUUEyQjFCIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2NvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFFQSxJQUFpQixVQUFVLENBNkIxQjtBQTdCRCxXQUFpQixVQUFVO0lBQ1osa0JBQU8sR0FBb0IsR0FBRyxFQUFFO1FBQzNDLE9BQU87WUFDTCxlQUFlLEVBQUUsNkNBQTZDO1lBQzlELFVBQVUsRUFBRSxnQ0FBZ0M7WUFDNUMsZ0JBQWdCLEVBQ2QsZ0xBQWdMO1lBQ2xMLFdBQVcsRUFBRSx1Q0FBdUM7WUFDcEQsV0FBVyxFQUFFLG1DQUFtQztZQUNoRCxZQUFZLEVBQUUsbUNBQW1DO1lBQ2pELGdCQUFnQixFQUFFLDJCQUEyQjtZQUNoRCxXQUFXLEVBQUUsOEJBQThCO1lBQ3hDLE9BQU8sRUFBRSxTQUFTO1NBQ25CLENBQUM7SUFDSixDQUFDLENBQUM7SUFDVyxrQkFBTyxHQUFvQixHQUFHLEVBQUU7UUFDM0MsT0FBTztZQUNMLGVBQWUsRUFBRSw2Q0FBNkM7WUFDOUQsVUFBVSxFQUFFLHNEQUFzRDtZQUNsRSxnQkFBZ0IsRUFDZCxnTEFBZ0w7WUFDbEwsV0FBVyxFQUFFLHlDQUF5QztZQUN0RCxXQUFXLEVBQUUsbUNBQW1DO1lBQ2hELFlBQVksRUFBRSxpREFBaUQ7WUFDL0QsZ0JBQWdCLEVBQUUsMENBQTBDO1lBQy9ELFdBQVcsRUFBRSx5Q0FBeUM7WUFDbkQsT0FBTyxFQUFFLFNBQVM7U0FDbkIsQ0FBQztJQUNKLENBQUMsQ0FBQztBQUNKLENBQUMsRUE3QmdCLFVBQVUsR0FBVixrQkFBVSxLQUFWLGtCQUFVLFFBNkIxQiJ9

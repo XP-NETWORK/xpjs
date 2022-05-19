@@ -154,6 +154,7 @@ export interface AppConfig {
     nftListAuthToken: string;
     tronScanUri: string;
     wrappedNftPrefix: string;
+    scVerifyUri: string;
     network: "testnet" | "mainnet";
 }
 /**
