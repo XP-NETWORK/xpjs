@@ -1,13 +1,14 @@
 {
   "name": "xp.network",
-  "version": "3.0.2",
-  "author": "xp-network <dima@xp.network>",
+  "version": "3.0.3",
+  "author": "xp-network <connect@xp.network>",
+  "description": "XP.Network Multi-Chain NFT Bridge JavaScript API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xp-network/bridge-ui-logics.git"
+    "url": "https://github.com/XP-NETWORK/xpjs"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
