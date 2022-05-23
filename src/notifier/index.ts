@@ -63,5 +63,8 @@ export function evNotifier(url: string) {
         tx_hash: txHash,
       });
     },
+    async notifySecret(_: string) {
+      throw Error("unimplemented!")
+    }
   };
 }
