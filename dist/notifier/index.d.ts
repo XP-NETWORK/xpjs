@@ -5,4 +5,5 @@ export declare function evNotifier(url: string): {
     notifyElrond(txHash: string, sender: string, uris: string[], action_id: string | undefined): Promise<void>;
     notifyTezos(txHash: string): Promise<void>;
     notifyAlgorand(txHash: string): Promise<void>;
+    notifySecret(_: string): Promise<never>;
 };
