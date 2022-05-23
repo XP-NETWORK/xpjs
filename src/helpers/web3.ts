@@ -197,7 +197,12 @@ type NftMethodVal<T, Tx> = {
     minterAddr: string,
     tok: string
   ) => Promise<boolean>;
-  approve: (umt: T, forAddr: string, tok: string) => Promise<Tx>;
+  approve: (
+    umt: T,
+    forAddr: string,
+    tok: string,
+    txnUp: (tx: PopulatedTransaction) => Promise<void>
+  ) => Promise<Tx>;
 };
 
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
@@ -215,8 +220,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     approved: (umt: Erc1155Minter, sender: string, minterAddr: string) => {
       return umt.isApprovedForAll(sender, minterAddr);
     },
-    approve: (umt: Erc1155Minter, forAddr: string) => {
-      return umt.setApprovalForAll(forAddr, true);
+    approve: async (
+      umt: Erc1155Minter,
+      forAddr: string,
+      _tok: string,
+      txnUp: (tx: PopulatedTransaction) => Promise<void>
+    ) => {
+      const tx = await umt.populateTransaction.setApprovalForAll(forAddr, true);
+      await txnUp(tx);
+      return await umt.signer.sendTransaction(tx);
     },
   },
   ERC721: {
@@ -231,8 +243,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     ) => {
       return (await umt.getApproved(tok)) == minterAddr;
     },
-    approve: (umt: UserNftMinter, forAddr: string, tok: string) => {
-      return umt.approve(forAddr, tok);
+    approve: async (
+      umt: UserNftMinter,
+      forAddr: string,
+      tok: string,
+      txnUp: (tx: PopulatedTransaction) => Promise<void>
+    ) => {
+      const tx = await umt.populateTransaction.approve(forAddr, tok);
+      await txnUp(tx);
+      return await umt.signer.sendTransaction(tx);
     },
   },
 };
@@ -243,19 +262,19 @@ export async function web3HelperFactory(
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7
       ? async (utx: PopulatedTransaction) => {
-        const res = await axios.get(
-          'https://gasstation-mainnet.matic.network/v2'
-        );
-        const { fast } = res.data;
-        if (fast) {
-          const sixtyGwei = ethers.utils.parseUnits(
-            Math.ceil(fast.maxFee).toString(),
-            'gwei'
+          const res = await axios.get(
+            "https://gasstation-mainnet.matic.network/v2"
           );
-          utx.maxFeePerGas = sixtyGwei;
-          utx.maxPriorityFeePerGas = sixtyGwei;
+          const { fast } = res.data;
+          if (fast) {
+            const sixtyGwei = ethers.utils.parseUnits(
+              Math.ceil(fast.maxFee).toString(),
+              "gwei"
+            );
+            utx.maxFeePerGas = sixtyGwei;
+            utx.maxPriorityFeePerGas = sixtyGwei;
+          }
         }
-      }
       : () => Promise.resolve();
   const w3 = params.provider;
   const { minter_addr, provider } = params;
@@ -329,7 +348,8 @@ export async function web3HelperFactory(
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
       minter_addr,
-      id.native.tokenId
+      id.native.tokenId,
+      txnUnderpricedPolyWorkaround
     );
     await receipt.wait();
     return receipt.hash;
@@ -388,18 +408,20 @@ export async function web3HelperFactory(
       return TransactionStatus.UNKNOWN;
     },
     async unfreezeWrappedNftBatch(signer, chainNonce, to, nfts, txFees) {
-      const tx = await minter.connect(signer).populateTransaction.withdrawNftBatch(
-        to,
-        chainNonce,
-        nfts.map((nft) => nft.native.tokenId),
-        new Array(nfts.length).fill(1),
-        nfts[0].native.contract,
-        {
-          value: EthBN.from(txFees.toString()),
-        }
-      );
-      await txnUnderpricedPolyWorkaround(tx)
-      const res = await signer.sendTransaction(tx)
+      const tx = await minter
+        .connect(signer)
+        .populateTransaction.withdrawNftBatch(
+          to,
+          chainNonce,
+          nfts.map((nft) => nft.native.tokenId),
+          new Array(nfts.length).fill(1),
+          nfts[0].native.contract,
+          {
+            value: EthBN.from(txFees.toString()),
+          }
+        );
+      await txnUnderpricedPolyWorkaround(tx);
+      const res = await signer.sendTransaction(tx);
 
       // await notifyValidator(
       //   res.hash,
@@ -423,20 +445,22 @@ export async function web3HelperFactory(
       mintWith,
       txFees
     ) {
-      const tx = await minter.connect(signer).populateTransaction.freezeErc1155Batch(
-        nfts[0].native.contract,
-        nfts.map((nft) => nft.native.tokenId),
-        new Array(nfts.length).fill(1),
-        chainNonce,
-        to,
-        mintWith,
-        {
-          value: EthBN.from(txFees.toString()),
-        }
-      );
-      await txnUnderpricedPolyWorkaround(tx)
+      const tx = await minter
+        .connect(signer)
+        .populateTransaction.freezeErc1155Batch(
+          nfts[0].native.contract,
+          nfts.map((nft) => nft.native.tokenId),
+          new Array(nfts.length).fill(1),
+          chainNonce,
+          to,
+          mintWith,
+          {
+            value: EthBN.from(txFees.toString()),
+          }
+        );
+      await txnUnderpricedPolyWorkaround(tx);
 
-      const res = await signer.sendTransaction(tx)
+      const res = await signer.sendTransaction(tx);
 
       await notifyValidator(res.hash);
 
@@ -469,21 +493,20 @@ export async function web3HelperFactory(
 
       const tx = await minter
         .connect(sender)
-        .populateTransaction
-      [method](
-        id.native.contract,
-        id.native.tokenId,
-        chain_nonce,
-        to,
-        mintWith,
-        {
-          value: EthBN.from(txFees.toString(10)),
-          gasLimit
-        }
-      );
-      await txnUnderpricedPolyWorkaround(tx)
+        .populateTransaction[method](
+          id.native.contract,
+          id.native.tokenId,
+          chain_nonce,
+          to,
+          mintWith,
+          {
+            value: EthBN.from(txFees.toString(10)),
+            gasLimit,
+          }
+        );
+      await txnUnderpricedPolyWorkaround(tx);
 
-      const txr = await sender.sendTransaction(tx)
+      const txr = await sender.sendTransaction(tx);
 
       await notifyValidator(
         txr.hash,
@@ -509,13 +532,18 @@ export async function web3HelperFactory(
     ): Promise<TransactionResponse> {
       const txn = await minter
         .connect(sender)
-        .populateTransaction
-        .withdrawNft(to, nonce, id.native.tokenId, id.native.contract, {
-          value: EthBN.from(txFees.toString(10)),
-        });
+        .populateTransaction.withdrawNft(
+          to,
+          nonce,
+          id.native.tokenId,
+          id.native.contract,
+          {
+            value: EthBN.from(txFees.toString(10)),
+          }
+        );
 
-      await txnUnderpricedPolyWorkaround(txn)
-      const res = await sender.sendTransaction(txn)
+      await txnUnderpricedPolyWorkaround(txn);
+      const res = await sender.sendTransaction(txn);
 
       await notifyValidator(
         res.hash,
