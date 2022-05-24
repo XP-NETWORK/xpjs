@@ -345,6 +345,6 @@ CHAIN_INFO.set(Chain.SECRET, {
   blockExplorerUrl: "", // TODO
   constructor: secretHelperFactory,
   nonce: Chain.SECRET,
-  currency: SupportedCurrency.ETH, // TODO
+  currency: SupportedCurrency.SCRT,
   decimals: 1e6,
 });
