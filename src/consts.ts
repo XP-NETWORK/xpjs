@@ -13,7 +13,11 @@ import {
 } from "./helpers/algorand";
 import { TezosHelper, tezosHelperFactory, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
-import { SecretHelper, secretHelperFactory, SecretParams } from "./helpers/secret";
+import {
+  SecretHelper,
+  secretHelperFactory,
+  SecretParams,
+} from "./helpers/secret";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {

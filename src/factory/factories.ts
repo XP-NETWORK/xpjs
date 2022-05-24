@@ -251,7 +251,7 @@ export namespace ChainFactoryConfigs {
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(middleware_uri);
-    
+
     // VeChain related:
     const net = new SimpleNet(TestNetRpcUri.VECHAIN);
     const driver = await Driver.connect(net);

@@ -205,7 +205,7 @@ export interface TronParams {
   minter_addr: string;
   erc721_addr: string;
   validators: string[];
-  feeMargin: FeeMargins
+  feeMargin: FeeMargins;
 }
 
 export interface TronRawTxn {
@@ -355,7 +355,7 @@ export async function tronHelperFactory(
     extractAction,
     XpNft: tronParams.erc721_addr,
     getFeeMargin() {
-      return tronParams.feeMargin
+      return tronParams.feeMargin;
     },
     approveForMinter,
     preTransfer: (s, nft, _fee) => approveForMinter(nft, s),

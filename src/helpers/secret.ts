@@ -1,7 +1,16 @@
 import BigNumber from "bignumber.js";
 import { Bech32, SecretNetworkClient } from "secretjs";
 import { EvNotifier } from "../notifier";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import {
+  BalanceCheck,
+  ChainNonceGet,
+  EstimateTxFees,
+  NftInfo,
+  PreTransfer,
+  TransferNftForeign,
+  UnfreezeForeignNft,
+  ValidateAddress,
+} from "./chain";
 
 export type SecretNftInfo = {
   contract: string;
@@ -24,17 +33,17 @@ export type SecretHelper = TransferNftForeign<
   BalanceCheck;
 
 export type SecretContract = {
-  contractAddress: string,
-  codeHash: string
+  contractAddress: string;
+  codeHash: string;
 };
 
 export type SecretParams = {
-  rpcUrl: string,
-  chainId: string,
-  notifier: EvNotifier,
-  bridge: SecretContract,
-  xpnft: SecretContract
-}
+  rpcUrl: string;
+  chainId: string;
+  notifier: EvNotifier;
+  bridge: SecretContract;
+  xpnft: SecretContract;
+};
 
 // TODO
 const TRANSFER_GASL = new BigNumber(0);
@@ -42,16 +51,21 @@ const TRANSFER_GASL = new BigNumber(0);
 // TODO
 const UNFREEZE_GASL = new BigNumber(0);
 
-export async function secretHelperFactory(p: SecretParams): Promise<SecretHelper> {
+export async function secretHelperFactory(
+  p: SecretParams
+): Promise<SecretHelper> {
   const queryClient = await SecretNetworkClient.create({
     grpcWebUrl: p.rpcUrl,
-    chainId: p.chainId
+    chainId: p.chainId,
   });
 
   // TODO
   const gasPrice = 1;
 
-  async function preTransfer(sender: SecretSigner, nft: NftInfo<SecretNftInfo>) {
+  async function preTransfer(
+    sender: SecretSigner,
+    nft: NftInfo<SecretNftInfo>
+  ) {
     // TODO: check if approved
     const res = await sender.tx.compute.executeContract({
       sender: sender.address,
@@ -61,8 +75,8 @@ export async function secretHelperFactory(p: SecretParams): Promise<SecretHelper
         approve: {
           spender: p.bridge.contractAddress,
           token_id: nft.native.token_id,
-        }
-      }
+        },
+      },
     });
 
     return res.transactionHash;
@@ -73,18 +87,18 @@ export async function secretHelperFactory(p: SecretParams): Promise<SecretHelper
     balance: async (address) => {
       const b = await queryClient.query.bank.balance({
         address,
-        denom: 'uscrt'
+        denom: "uscrt",
       });
 
-      return new BigNumber(b.balance?.amount || 0)
+      return new BigNumber(b.balance?.amount || 0);
     },
     validateAddress: async (a) => {
       try {
-        Bech32.decode(a)
+        Bech32.decode(a);
         return true;
       } catch {
         return false;
-      } 
+      }
     },
     estimateValidateTransferNft: async () => {
       return TRANSFER_GASL.times(gasPrice);
@@ -95,53 +109,63 @@ export async function secretHelperFactory(p: SecretParams): Promise<SecretHelper
     preTransfer,
     preUnfreeze: preTransfer,
     transferNftToForeign: async (wallet, chainNonce, to, nft, fee, mw) => {
-      const tx = await wallet.tx.compute.executeContract({
-        sender: wallet.address,
-        contractAddress: p.bridge.contractAddress,
-        codeHash: p.bridge.codeHash,
-        msg: {
-          freeze_nft: {
-            contract: nft.native.contract,
-            contract_hash: nft.native.contractHash,
-            token_id: nft.native.token_id,
-            to,
-            chain_nonce: chainNonce,
-            minter: mw
-          }
+      const tx = await wallet.tx.compute.executeContract(
+        {
+          sender: wallet.address,
+          contractAddress: p.bridge.contractAddress,
+          codeHash: p.bridge.codeHash,
+          msg: {
+            freeze_nft: {
+              contract: nft.native.contract,
+              contract_hash: nft.native.contractHash,
+              token_id: nft.native.token_id,
+              to,
+              chain_nonce: chainNonce,
+              minter: mw,
+            },
+          },
+          sentFunds: [
+            {
+              denom: "uscrt",
+              amount: fee.toString(10),
+            },
+          ],
         },
-        sentFunds: [{
-          denom: 'uscrt',
-          amount: fee.toString(10)
-        }]
-      }, { waitForCommit: true });
+        { waitForCommit: true }
+      );
 
       await p.notifier.notifySecret(tx.transactionHash);
 
       return tx.transactionHash;
     },
     unfreezeWrappedNft: async (wallet, to, nft, fee, chainNonce) => {
-      const tx = await wallet.tx.compute.executeContract({
-        sender: wallet.address,
-        contractAddress: p.bridge.contractAddress,
-        codeHash: p.bridge.codeHash,
-        msg: {
-          withdraw_nft: {
-            burner: nft.native.contract,
-            burner_hash: nft.native.contractHash,
-            token_id: nft.native.token_id,
-            to,
-            chain_nonce: chainNonce
-          }
+      const tx = await wallet.tx.compute.executeContract(
+        {
+          sender: wallet.address,
+          contractAddress: p.bridge.contractAddress,
+          codeHash: p.bridge.codeHash,
+          msg: {
+            withdraw_nft: {
+              burner: nft.native.contract,
+              burner_hash: nft.native.contractHash,
+              token_id: nft.native.token_id,
+              to,
+              chain_nonce: chainNonce,
+            },
+          },
+          sentFunds: [
+            {
+              denom: "uscrt",
+              amount: fee.toString(10),
+            },
+          ],
         },
-        sentFunds: [{
-          denom: 'uscrt',
-          amount: fee.toString(10)
-        }]
-      }, { waitForCommit: true });
+        { waitForCommit: true }
+      );
 
       await p.notifier.notifySecret(tx.transactionHash);
 
       return tx.transactionHash;
-    }
-  }
+    },
+  };
 }

@@ -5,7 +5,6 @@ import { config } from "dotenv";
 config();
 
 (async () => {
-
   // Testnet
   // const api = "https://api.shasta.trongrid.io";
   // const signer = process.env.TRON_SK!;
@@ -29,7 +28,6 @@ config();
     xpnftWrappedUri,
     xpnft1155WrappedUri
   );
-  
-  console.log(contracts);
 
+  console.log(contracts);
 })().catch((e) => console.error(e));
