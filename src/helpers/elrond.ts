@@ -555,7 +555,7 @@ export async function elrondHelperFactory(
       return wallet.balance.valueOf();
     },
     getFeeMargin() {
-      return elrondParams.feeMargin
+      return elrondParams.feeMargin;
     },
     async extractTxnStatus(txn) {
       const status = await provider.getTransactionStatus(
@@ -609,7 +609,7 @@ export async function elrondHelperFactory(
       txFees: EasyBalance,
       nonce
     ): Promise<Transaction> {
-      console.log(`Unfreezing`)
+      console.log(`Unfreezing`);
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,

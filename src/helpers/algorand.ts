@@ -138,7 +138,8 @@ export type AlgorandHelper = ChainNonceGet &
   } & Pick<
     PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>,
     "preTransfer"
-  > & { XpNft: string } & GetFeeMargins & BalanceCheck;
+  > & { XpNft: string } & GetFeeMargins &
+  BalanceCheck;
 
 export type AlgorandParams = {
   algodApiKey: string;
@@ -339,7 +340,10 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
     optInNft,
     isOptIn,
     async balance(address) {
-      const acc = await algod.accountInformation(address).do().catch(() => undefined);
+      const acc = await algod
+        .accountInformation(address)
+        .do()
+        .catch(() => undefined);
       if (!acc) return new BigNumber(0);
 
       return new BigNumber(acc.amount);
@@ -459,12 +463,14 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
             .catch(() => undefined);
           if (assetRes == undefined) return [];
           const assetInfo = assetRes.asset;
-          const bal = await indexer.lookupAssetBalances(nftId)
+          const bal = await indexer
+            .lookupAssetBalances(nftId)
             .currencyGreaterThan(0)
             .currencyLessThan(2)
             .limit(1)
             .do();
-          if (bal.balances[0].address == owner || bal.balances[0].amount == 0) return [];
+          if (bal.balances[0].address == owner || bal.balances[0].amount == 0)
+            return [];
 
           return [
             {

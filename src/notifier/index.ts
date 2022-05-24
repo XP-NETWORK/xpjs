@@ -64,7 +64,7 @@ export function evNotifier(url: string) {
       });
     },
     async notifySecret(_: string) {
-      throw Error("unimplemented!")
-    }
+      throw Error("unimplemented!");
+    },
   };
 }
