@@ -5,14 +5,13 @@ import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { TezosHelper, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
-import { SecretHelper, SecretParams } from "./helpers/secret";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
-    BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet/archive",
-    ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten/archive",
+    BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet",
+    ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
-    POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai/archive",
+    POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai",
     FANTOM = "https://rpc.testnet.fantom.network/",
     TRON = "https://api.shasta.trongrid.io/",
     CELO = "https://alfajores-forno.celo-testnet.org",
@@ -53,7 +52,6 @@ declare type Web3Meta = [Web3Helper, Web3Params];
 declare type TronMeta = [TronHelper, TronParams];
 declare type AlgoMeta = [AlgorandHelper, AlgorandParams];
 declare type TezosMeta = [TezosHelper, TezosParams];
-declare type SecretMeta = [SecretHelper, SecretParams];
 declare type MetaMapAssert = {
     [idx in typeof Chain[keyof typeof Chain]]: unknown;
 };
@@ -79,7 +77,6 @@ export declare type MetaMap = {
     0x15: Web3Meta;
     0x16: Web3Meta;
     0x17: Web3Meta;
-    0x18: SecretMeta;
     0x19: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
@@ -104,7 +101,6 @@ export declare namespace Chain {
     const AURORA = 21;
     const GODWOKEN = 22;
     const GATECHAIN = 23;
-    const SECRET = 24;
     const VECHAIN = 25;
 }
 interface ChainData<T extends ChainNonce> {
