@@ -18,10 +18,10 @@ import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 export enum TestNetRpcUri {
   ELROND = "https://devnet-api.elrond.com",
   HECO = "https://http-testnet.hecochain.com",
-  BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet/archive",
-  ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten/archive",
+  BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet",
+  ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
-  POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai/archive",
+  POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai",
   FANTOM = "https://rpc.testnet.fantom.network/",
   TRON = "https://api.shasta.trongrid.io/",
   CELO = "https://alfajores-forno.celo-testnet.org",
