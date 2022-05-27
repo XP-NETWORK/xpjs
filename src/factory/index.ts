@@ -51,6 +51,7 @@ import {
   InferSigner,
   ParamMap,
 } from "../type-utils";
+import { SecretParams } from "../helpers/secret";
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -250,6 +251,7 @@ export interface ChainParams {
   auroraParams: Web3Params;
   godwokenParams: Web3Params;
   gateChainParams: Web3Params;
+  secretParams: SecretParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -297,6 +299,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.GODWOKEN, chainParams.godwokenParams);
   cToP.set(Chain.GATECHAIN, chainParams.gateChainParams);
   cToP.set(Chain.VECHAIN, chainParams.vechainParams);
+  cToP.set(Chain.SECRET, chainParams.secretParams);
   return cToP;
 }
 /**

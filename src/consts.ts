@@ -40,6 +40,7 @@ export enum TestNetRpcUri {
   GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
+  SECRET = "https://pulsar-2.api.trivium.network:9091/",
   // TODO: Algorand
   // TODO: Fuse
 }
