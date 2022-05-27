@@ -60,7 +60,7 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   UnfreezeForeignNft<Signer, RawNft, Resp> &
   EstimateTxFees<RawNft> &
   ChainNonceGet &
-  ValidateAddress & { XpNft?: string } & GetFeeMargins;
+  ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins;
 
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   TransferNftForeignBatch<Signer, RawNft, Resp> &
@@ -84,7 +84,7 @@ export type ChainFactory = {
   bridgeStatus(): Promise<{ [chainNonce: number]: "alive" | "dead" }>;
   /**
    * Check the balance of an account
-   * 
+   *
    * @param inner The chain to check the balance in
    * @param address address of the account
    */
@@ -221,10 +221,7 @@ export type ChainFactory = {
     nft: NftInfo<RawNft>
   ): Promise<boolean>;
 
-  isWrappedNft(
-	  nft: NftInfo<unknown>,
-	  fromChain: number
-  ): Promise<boolean>;
+  isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
 };
 
 /**
@@ -480,11 +477,14 @@ export function ChainFactory(
   ) {
     if ("meta" in (nft.native as Record<string, any>)) return;
     const nftDat = await axios.get(nft.uri);
-    if (nftDat.data.wrapped.origin == Chain.ALGORAND.toString() &&
-      ("isOptIn" in toChain) &&
-      !await (toChain as AlgorandHelper).isOptIn(
-        receiver, parseInt(nftDat.data.wrapped.assetID)
-      )) {
+    if (
+      nftDat.data.wrapped.origin == Chain.ALGORAND.toString() &&
+      "isOptIn" in toChain &&
+      !(await (toChain as AlgorandHelper).isOptIn(
+        receiver,
+        parseInt(nftDat.data.wrapped.assetID)
+      ))
+    ) {
       throw Error("receiver hasn't opted-in to wrapped nft");
     }
   }
@@ -626,17 +626,21 @@ export function ChainFactory(
 
       const mw =
         "contract" in nft.native &&
-          mintWith &&
-          checkMintWith(
-            mintWith,
-            await getVerifiedContracts(
-              //@ts-expect-error contract is checked
-              nft.native.contract.toLowerCase(),
-              toChain.getNonce(),
-              fromChain.getNonce()
-            )
+        mintWith &&
+        checkMintWith(
+          mintWith,
+          await getVerifiedContracts(
+            //@ts-expect-error contract is checked
+            nft.native.contract.toLowerCase(),
+            toChain.getNonce(),
+            fromChain.getNonce()
           )
+        )
           ? mintWith
+          : "contractType" in nft.native &&
+            //@ts-ignore contractType is checked
+            nft.native.contractType === "ERC1155"
+          ? toChain.XpNft1155
           : toChain.XpNft;
 
       if (appConfig.network === "mainnet") {
@@ -645,7 +649,7 @@ export function ChainFactory(
 
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver);
-        console.log(new BigNumber(fee).toString())
+        console.log(new BigNumber(fee).toString());
       }
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
@@ -708,7 +712,7 @@ export function ChainFactory(
 
       return await chain.isNftWhitelisted(nft);
     },
-	isWrappedNft
+    isWrappedNft,
   };
 }
 /**
