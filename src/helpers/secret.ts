@@ -5,6 +5,9 @@ import {
   BalanceCheck,
   ChainNonceGet,
   EstimateTxFees,
+  FeeMargins,
+  GetFeeMargins,
+  GetProvider,
   NftInfo,
   PreTransfer,
   TransferNftForeign,
@@ -30,7 +33,8 @@ export type SecretHelper = TransferNftForeign<
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
   PreTransfer<SecretSigner, SecretNftInfo, string> &
-  BalanceCheck;
+  BalanceCheck &
+  GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient>;
 
 export type SecretContract = {
   contractAddress: string;
@@ -43,6 +47,7 @@ export type SecretParams = {
   notifier: EvNotifier;
   bridge: SecretContract;
   xpnft: SecretContract;
+  feeMargin: FeeMargins;
 };
 
 // TODO
@@ -83,6 +88,12 @@ export async function secretHelperFactory(
   }
 
   return {
+    getFeeMargin() {
+      return p.feeMargin;
+    },
+    getProvider() {
+      return queryClient;
+    },
     getNonce: () => 0x18,
     balance: async (address) => {
       const b = await queryClient.query.bank.balance({
@@ -92,6 +103,7 @@ export async function secretHelperFactory(
 
       return new BigNumber(b.balance?.amount || 0);
     },
+    XpNft: `${p.xpnft.contractAddress},${p.xpnft.codeHash}`,
     validateAddress: async (a) => {
       try {
         Bech32.decode(a);
