@@ -130,6 +130,7 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
     XpNft: string;
+    XpNft1155: string;
   } & WhitelistCheck<EthNftInfo> &
   GetFeeMargins;
 
@@ -181,6 +182,7 @@ export interface Web3Params {
   notifier: EvNotifier;
   minter_addr: string;
   erc721_addr: string;
+  erc1155_addr: string;
   erc721Minter: string;
   erc1155Minter: string;
   nonce: ChainNonce;
@@ -360,6 +362,7 @@ export async function web3HelperFactory(
   return {
     ...base,
     XpNft: params.erc721_addr,
+    XpNft1155: params.erc1155_addr,
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {

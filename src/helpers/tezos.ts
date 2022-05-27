@@ -69,7 +69,7 @@ export type TezosParams = {
   xpnftAddress: string;
   bridgeAddress: string;
   validators: string[];
-  feeMargin: FeeMargins
+  feeMargin: FeeMargins;
 };
 
 export async function tezosHelperFactory({
@@ -78,7 +78,7 @@ export async function tezosHelperFactory({
   xpnftAddress,
   bridgeAddress,
   validators,
-  feeMargin
+  feeMargin,
 }: TezosParams): Promise<TezosHelper> {
   const estimateGas = (validators: string[], baseprice: number) => {
     return new BigNumber(baseprice * (validators.length + 1));
@@ -196,7 +196,7 @@ export async function tezosHelperFactory({
   return {
     XpNft: xpnftAddress,
     async transferNftToForeign(sender, chain, to, nft, fee, mw) {
-      await preTransfer(sender, nft)
+      await preTransfer(sender, nft);
       const hash = await withBridge(
         sender,
         (bridge) =>
@@ -205,7 +205,7 @@ export async function tezosHelperFactory({
             nft.collectionIdent,
             mw,
             to,
-            parseInt(nft.native.token_id),
+            parseInt(nft.native.token_id)
           ),
         { amount: fee.toNumber() / 1e6 }
       );
@@ -220,7 +220,12 @@ export async function tezosHelperFactory({
       const hash = await withBridge(
         sender,
         (bridge) => {
-          return bridge.methods.withdraw_nft(nft.native.contract, nonce, to, parseInt(nft.native.token_id))
+          return bridge.methods.withdraw_nft(
+            nft.native.contract,
+            nonce,
+            to,
+            parseInt(nft.native.token_id)
+          );
         },
         { amount: fee.toNumber() / 1e6 }
       );
@@ -250,7 +255,7 @@ export async function tezosHelperFactory({
       return Chain.TEZOS;
     },
     getFeeMargin() {
-      return feeMargin
+      return feeMargin;
     },
     async estimateValidateTransferNft() {
       return estimateGas(validators, 1.2e5);
