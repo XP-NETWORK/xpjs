@@ -32,7 +32,7 @@ export enum TestNetRpcUri {
   VELAS = "https://explorer.testnet.velas.com/rpc",
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
-  GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
+  GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
   // TODO: Algorand
