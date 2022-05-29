@@ -62,6 +62,7 @@ export declare type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, Eth
     createWallet(privateKey: string): Wallet;
 } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
+    XpNft1155: string;
 } & WhitelistCheck<EthNftInfo> & GetFeeMargins;
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -81,6 +82,7 @@ export interface Web3Params {
     notifier: EvNotifier;
     minter_addr: string;
     erc721_addr: string;
+    erc1155_addr: string;
     erc721Minter: string;
     erc1155Minter: string;
     nonce: ChainNonce;
