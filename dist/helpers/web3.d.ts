@@ -62,6 +62,7 @@ export declare type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, Eth
     createWallet(privateKey: string): Wallet;
 } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
+    XpNft1155: string;
 } & WhitelistCheck<EthNftInfo> & GetFeeMargins;
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -81,6 +82,7 @@ export interface Web3Params {
     notifier: EvNotifier;
     minter_addr: string;
     erc721_addr: string;
+    erc1155_addr: string;
     erc721Minter: string;
     erc1155Minter: string;
     nonce: ChainNonce;
@@ -91,7 +93,7 @@ declare type NftMethodVal<T, Tx> = {
     validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
     umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
     approved: (umt: T, sender: string, minterAddr: string, tok: string) => Promise<boolean>;
-    approve: (umt: T, forAddr: string, tok: string) => Promise<Tx>;
+    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>) => Promise<Tx>;
 };
 declare type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
 declare type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;

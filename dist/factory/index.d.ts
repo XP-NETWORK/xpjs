@@ -9,9 +9,9 @@ import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosParams } from "../helpers/tezos";
 import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
 import { ChainNonce, InferChainH, InferChainParam, InferSigner } from "../type-utils";
-import { SecretParams } from "../helpers/secret";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
-    XpNft?: string;
+    XpNft: string;
+    XpNft1155?: string;
 } & GetFeeMargins;
 declare type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> & TransferNftForeignBatch<Signer, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, RawNft, Resp> & EstimateTxFeesBatch<RawNft>;
 /**
@@ -138,7 +138,6 @@ export interface ChainParams {
     auroraParams: Web3Params;
     godwokenParams: Web3Params;
     gateChainParams: Web3Params;
-    secretParams: SecretParams;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
