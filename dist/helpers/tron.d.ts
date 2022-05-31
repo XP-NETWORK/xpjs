@@ -33,6 +33,7 @@ export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintA
 };
 export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, string> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo> & {
     XpNft: string;
+    XpNft1155: string;
 } & GetFeeMargins;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
@@ -40,6 +41,7 @@ export interface TronParams {
     notifier: EvNotifier;
     minter_addr: string;
     erc721_addr: string;
+    erc1155_addr: string;
     validators: string[];
     feeMargin: FeeMargins;
 }
