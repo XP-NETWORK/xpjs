@@ -269,7 +269,7 @@ export namespace ChainFactoryConfigs {
     const notifier = evNotifier(middleware_uri);
 
     // VeChain related:
-    const net = new SimpleNet(TestNetRpcUri.VECHAIN);
+    const net = new SimpleNet(MainNetRpcUri.VECHAIN);
     const driver = await Driver.connect(net);
     const provider = thor.ethers.modifyProvider(
       //@ts-ignore
