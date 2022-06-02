@@ -249,14 +249,14 @@ export namespace ChainFactoryConfigs {
         notifier,
         rpcUrl: TestNetRpcUri.SECRET,
         bridge: {
-          contractAddress: "secret1l2gjtt209wfgfka25qfh0s0lmgc65tarrhzthg",
+          contractAddress: "secret1ngxqfwjff25etu26mvqx5erksnwyrf93czy4wm",
           codeHash:
-            "0x99af8844018f3312045149ae3ae45afc25abf9a04f7e79bba2b9c8b925f86fdb",
+            "52c64148569438c2f5b49d09686ffdc3b5b1d07ed7209812a6fbcbaf100a9f82",
         },
         xpnft: {
-          contractAddress: "secret1z8avjhhm2kkhpyx3f490y3mngts5hygfx9q65h",
+          contractAddress: "secret10mcn3q2zys2fdfaxlxtu72s5mvjdvcscqqzwfc",
           codeHash:
-            "0x090ab9b7968745369f8888302a16650164e2ffc2f44c393a7382f74e122a9a8e",
+            "090ab9b7968745369f8888302a16650164e2ffc2f44c393a7382f74e122a9a8e",
         },
         chainId: "0x18",
         feeMargin,
