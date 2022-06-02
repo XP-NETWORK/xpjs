@@ -72,18 +72,23 @@ export async function secretHelperFactory(
     nft: NftInfo<SecretNftInfo>
   ) {
     // TODO: check if approved
-    const res = await sender.tx.compute.executeContract({
-      sender: sender.address,
-      contractAddress: nft.native.contract,
-      codeHash: nft.native.contractHash,
-      msg: {
-        approve: {
-          spender: p.bridge.contractAddress,
-          token_id: nft.native.token_id,
+    const res = await sender.tx.compute.executeContract(
+      {
+        sender: sender.address,
+        contractAddress: nft.native.contract,
+        codeHash: nft.native.contractHash,
+        msg: {
+          approve: {
+            spender: p.bridge.contractAddress,
+            token_id: nft.native.token_id,
+          },
         },
       },
-    });
-
+      {
+        waitForCommit: true,
+        gasLimit: 100_000,
+      }
+    );
     return res.transactionHash;
   }
 
@@ -162,7 +167,7 @@ export async function secretHelperFactory(
               burner_hash: nft.native.contractHash,
               token_id: nft.native.token_id,
               to,
-              chain_nonce: chainNonce,
+              chain_nonce: Number(chainNonce),
             },
           },
           sentFunds: [
@@ -172,7 +177,7 @@ export async function secretHelperFactory(
             },
           ],
         },
-        { waitForCommit: true }
+        { waitForCommit: true, gasLimit: 100_000 }
       );
 
       await p.notifier.notifySecret(tx.transactionHash);
