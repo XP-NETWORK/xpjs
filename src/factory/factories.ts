@@ -26,8 +26,7 @@ import { Framework } from "@vechain/connex-framework";
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri =
-  "https://testnet-notifier.xp.network/notify-test/";
+const testnet_middleware_uri = "http://localhost:5555/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
@@ -249,12 +248,12 @@ export namespace ChainFactoryConfigs {
         notifier,
         rpcUrl: TestNetRpcUri.SECRET,
         bridge: {
-          contractAddress: "secret1ngxqfwjff25etu26mvqx5erksnwyrf93czy4wm",
+          contractAddress: "secret1ecsxtsrct6h647lpztnnzc9e47ezh0uu673c8h",
           codeHash:
-            "52c64148569438c2f5b49d09686ffdc3b5b1d07ed7209812a6fbcbaf100a9f82",
+            "29a127369d1f4326fb684435fde702fa9619c812dfb5b3a1929529bab0e308e0",
         },
         xpnft: {
-          contractAddress: "secret10mcn3q2zys2fdfaxlxtu72s5mvjdvcscqqzwfc",
+          contractAddress: "secret1x4afa2shvq4uwwtl0ld8qnjfm3jkmyvap3yn9g",
           codeHash:
             "090ab9b7968745369f8888302a16650164e2ffc2f44c393a7382f74e122a9a8e",
         },
