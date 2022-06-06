@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Bech32, SecretNetworkClient } from "secretjs";
+import { Bech32, SecretNetworkClient, Tx } from "secretjs";
 import { EvNotifier } from "../notifier";
 import {
   BalanceCheck,
@@ -23,12 +23,8 @@ export type SecretNftInfo = {
 
 type SecretSigner = SecretNetworkClient;
 
-export type SecretHelper = TransferNftForeign<
-  SecretSigner,
-  SecretNftInfo,
-  string
-> &
-  UnfreezeForeignNft<SecretSigner, SecretNftInfo, string> &
+export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
+  UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> &
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
@@ -153,7 +149,7 @@ export async function secretHelperFactory(
 
       await p.notifier.notifySecret(tx.transactionHash);
 
-      return tx.transactionHash;
+      return tx;
     },
     unfreezeWrappedNft: async (wallet, to, nft, fee, chainNonce) => {
       const tx = await wallet.tx.compute.executeContract(
@@ -182,7 +178,7 @@ export async function secretHelperFactory(
 
       await p.notifier.notifySecret(tx.transactionHash);
 
-      return tx.transactionHash;
+      return tx;
     },
   };
 }
