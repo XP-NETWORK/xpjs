@@ -1,4 +1,4 @@
-import { SecretNetworkClient } from "secretjs";
+import { SecretNetworkClient, Tx } from "secretjs";
 import { EvNotifier } from "../notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
 export declare type SecretNftInfo = {
@@ -7,7 +7,7 @@ export declare type SecretNftInfo = {
     token_id: string;
 };
 declare type SecretSigner = SecretNetworkClient;
-export declare type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, string> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, string> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string> & BalanceCheck & GetFeeMargins & {
+export declare type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string> & BalanceCheck & GetFeeMargins & {
     XpNft: string;
 } & GetProvider<SecretNetworkClient>;
 export declare type SecretContract = {
