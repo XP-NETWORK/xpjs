@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Bech32, SecretNetworkClient, Tx } from "secretjs";
+import { Snip721MintOptions } from "secretjs/dist/extensions/snip721/types";
 import { EvNotifier } from "../notifier";
 import {
   BalanceCheck,
@@ -8,6 +9,7 @@ import {
   FeeMargins,
   GetFeeMargins,
   GetProvider,
+  MintNft,
   NftInfo,
   PreTransfer,
   TransferNftForeign,
@@ -20,6 +22,10 @@ export type SecretNftInfo = {
   contractHash: string;
   token_id: string;
 };
+export type SecretMintArgs = {
+  url: string;
+  contract?: SecretContract;
+};
 
 type SecretSigner = SecretNetworkClient;
 
@@ -30,7 +36,8 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
   ChainNonceGet &
   PreTransfer<SecretSigner, SecretNftInfo, string> &
   BalanceCheck &
-  GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient>;
+  GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
+  MintNft<SecretSigner, SecretMintArgs, Tx>;
 
 export type SecretContract = {
   contractAddress: string;
@@ -43,6 +50,7 @@ export type SecretParams = {
   notifier: EvNotifier;
   bridge: SecretContract;
   xpnft: SecretContract;
+  umt: SecretContract;
   feeMargin: FeeMargins;
 };
 
@@ -104,6 +112,30 @@ export async function secretHelperFactory(
 
       return new BigNumber(b.balance?.amount || 0);
     },
+    async mintNft(signer, args) {
+      const minter = args.contract ? args.contract : p.umt;
+      const tx = await signer.tx.compute.executeContract(
+        {
+          contractAddress: minter.contractAddress,
+          codeHash: minter.codeHash,
+          msg: {
+            mint_nft: {
+              public_metadata: {
+                token_uri: args.url,
+              },
+              owner: signer.address,
+              transferable: true,
+            },
+          } as Snip721MintOptions,
+          sender: signer.address,
+        },
+        {
+          waitForCommit: true,
+          gasLimit: 50_000,
+        }
+      );
+      return tx;
+    },
     XpNft: `${p.xpnft.contractAddress},${p.xpnft.codeHash}`,
     validateAddress: async (a) => {
       try {
@@ -144,7 +176,7 @@ export async function secretHelperFactory(
             },
           ],
         },
-        { waitForCommit: true }
+        { waitForCommit: true, gasLimit: 50_000 }
       );
 
       await p.notifier.notifySecret(tx.transactionHash);
