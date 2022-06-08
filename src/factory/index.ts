@@ -494,8 +494,9 @@ export function ChainFactory(
     tc: number,
     fc: number
   ): Promise<string[]> {
+    const _from = ethers.utils.getAddress(from);
     const res = await axios.get<{ data: { to: string }[] }>(
-      `${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
+      `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);
   }
