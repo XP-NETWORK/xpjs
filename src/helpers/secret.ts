@@ -176,7 +176,7 @@ export async function secretHelperFactory(
             },
           ],
         },
-        { waitForCommit: true, gasLimit: 50_000 }
+        { waitForCommit: true, gasLimit: 150_000 }
       );
 
       await p.notifier.notifySecret(tx.transactionHash);
