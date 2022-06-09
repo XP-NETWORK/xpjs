@@ -1,18 +1,18 @@
 {
   "name": "xp.network",
-  "version": "3.0.10",
-  "author": "xp-network <connect@xp.network>",
-  "description": "XP.Network Multi-Chain NFT Bridge JavaScript API",
+  "version": "3.0.1",
+  "author": "xp-network <dima@xp.network>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/XP-NETWORK/xpjs"
+    "url": "https://github.com/xp-network/bridge-ui-logics.git"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.31.0",
@@ -22,7 +22,9 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-functional": "^3.2.1",
+    "husky": "^8.0.0",
     "prettier": "^2.3.2",
+    "pretty-quick": "^3.1.3",
     "typedoc": "^0.22.6",
     "typescript": "^4.3.5"
   },
@@ -40,9 +42,11 @@
     "algosdk": "^1.15.0-beta.1",
     "axios": "^0.21.1",
     "bignumber.js": "=9.0.1",
-    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#master-dist",
+    "crypto-exchange-rate": "git+https://github.com/XP-NETWORK/exchange-rate#04867f1773b37f77a1aa3edd7e0562517099c078",
     "ethers": "^5.5.4",
+    "google-protobuf": "^3.20.1",
     "js-base64": "^3.6.1",
+    "secretjs": "^1.3.0-beta.1",
     "socket.io-client": "^4.1.3",
     "tronstation": "^1.0.1",
     "tronweb": "^4.1.0",
