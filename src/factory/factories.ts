@@ -258,9 +258,9 @@ export namespace ChainFactoryConfigs {
             "090ab9b7968745369f8888302a16650164e2ffc2f44c393a7382f74e122a9a8e",
         },
         umt: {
-          contractAddress: "secret1f7lrnmk8gx9d5540dqmdlrg8702hs05tx9ky0k",
+          contractAddress: "secret146snljq0kjsva7qrx4am54nv3fhfaet7srx4n2",
           codeHash:
-            "1381c39cf889d52a15b683ffdee18c0785bea3ab0154f8df70c3c9ee6939ea43",
+            "af076a49141264ec048270318f1358c9be193893c3f829425cab53ee5eb05e5c",
         },
         chainId: "0x18",
         feeMargin,
