@@ -203,7 +203,10 @@ export type ElrondHelper = BalanceCheck &
   EstimateTxFeesBatch<EsdtNftInfo> &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
   ExtractTxnStatus &
-  SetESDTRoles & { XpNft: string } & GetFeeMargins;
+  SetESDTRoles & { XpNft: string } & GetFeeMargins & {
+    wegldBalance(address: string): Promise<BigNumber>;
+    unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
+  };
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -803,6 +806,30 @@ export async function elrondHelperFactory(
       );
 
       return tx;
+    },
+    async wegldBalance(addr) {
+      const esdtInfo = await provider.getAddressEsdt(
+        new Address(addr),
+        elrondParams.esdt_swap
+      );
+
+      return new BigNumber(esdtInfo.balance);
+    },
+    async unwrapWegld(sender: ElrondSigner, amount: BigNumber) {
+      const txu = new Transaction({
+        receiver: swapContract,
+        gasLimit: new GasLimit(300500000),
+        data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("ESDTTransfer"))
+        .addArg(new TokenIdentifierValue(esdtSwaphex))
+        .addArg(new U64Value(amount))
+        .addArg(new BytesValue(Buffer.from("unwrapEgld")))
+        .build()
+      });
+
+      const tx = await signAndSend(sender, txu);
+
+      return tx.getHash().toString();
     },
     async estimateValidateTransferNftBatch(_, nfts) {
       return estimateGas(new BigNumber(360000000 + 5000000 * nfts.length));
