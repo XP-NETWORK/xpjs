@@ -558,7 +558,7 @@ export async function elrondHelperFactory(
       return wallet.balance.valueOf();
     },
     getFeeMargin() {
-      return elrondParams.feeMargin
+      return elrondParams.feeMargin;
     },
     async extractTxnStatus(txn) {
       const status = await provider.getTransactionStatus(
@@ -612,7 +612,7 @@ export async function elrondHelperFactory(
       txFees: EasyBalance,
       nonce
     ): Promise<Transaction> {
-      console.log(`Unfreezing`)
+      console.log(`Unfreezing`);
       const txu = unsignedUnfreezeNftTxn(
         await getAddress(sender),
         to,
@@ -820,11 +820,11 @@ export async function elrondHelperFactory(
         receiver: swapContract,
         gasLimit: new GasLimit(300500000),
         data: TransactionPayload.contractCall()
-        .setFunction(new ContractFunction("ESDTTransfer"))
-        .addArg(new TokenIdentifierValue(esdtSwaphex))
-        .addArg(new U64Value(amount))
-        .addArg(new BytesValue(Buffer.from("unwrapEgld")))
-        .build()
+          .setFunction(new ContractFunction("ESDTTransfer"))
+          .addArg(new TokenIdentifierValue(esdtSwaphex))
+          .addArg(new U64Value(amount))
+          .addArg(new BytesValue(Buffer.from("unwrapEgld")))
+          .build(),
       });
 
       const tx = await signAndSend(sender, txu);
