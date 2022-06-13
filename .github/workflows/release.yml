@@ -19,8 +19,8 @@ jobs:
         uses: actions/setup-node@v2.4.0
         with:
           node-version: 16.x
-          cache: yarn
-          cache-dependency-path: yarn.lock
+#           cache: yarn
+#           cache-dependency-path: yarn.lock
 
       - name: dep
         run: yarn
