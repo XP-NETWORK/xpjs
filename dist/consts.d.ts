@@ -9,10 +9,10 @@ import { SecretHelper, SecretParams } from "./helpers/secret";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
-    BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet/archive",
-    ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten/archive",
+    BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet",
+    ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
-    POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai/archive",
+    POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai",
     FANTOM = "https://rpc.testnet.fantom.network/",
     TRON = "https://api.shasta.trongrid.io/",
     CELO = "https://alfajores-forno.celo-testnet.org",
@@ -23,7 +23,7 @@ export declare enum TestNetRpcUri {
     VELAS = "https://explorer.testnet.velas.com/rpc",
     IOTEX = "https://babel-api.testnet.iotex.io",
     AURORA = "https://testnet.aurora.dev/",
-    GODWOKEN = "https://godwoken-testnet-web3-v1-rpc.ckbapp.dev",
+    GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
     GATECHAIN = "https://meteora-evm.gatenode.cc",
     VECHAIN = "https://sync-testnet.veblocks.net",
     SECRET = "https://pulsar-2.api.trivium.network:9091/"

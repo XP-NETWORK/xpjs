@@ -11,7 +11,8 @@ import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBat
 import { ChainNonce, InferChainH, InferChainParam, InferSigner } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
-    XpNft?: string;
+    XpNft: string;
+    XpNft1155?: string;
 } & GetFeeMargins;
 declare type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> & TransferNftForeignBatch<Signer, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, RawNft, Resp> & EstimateTxFeesBatch<RawNft>;
 /**
