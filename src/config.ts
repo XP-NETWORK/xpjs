@@ -11,8 +11,8 @@ export namespace AppConfigs {
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
       wrappedNftPrefix: "https://nft.xp.network/w/",
-	  scVerifyUri: "https://sc-verify.xp.network",
-      network: "mainnet"
+      scVerifyUri: "https://sc-verify.xp.network",
+      network: "mainnet",
     };
   };
   export const TestNet: () => AppConfig = () => {
@@ -25,8 +25,8 @@ export namespace AppConfigs {
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
       wrappedNftPrefix: "https://testnet-w-nft-api.herokuapp.com/",
-	  scVerifyUri: "https://testnet-sc-verify.herokuapp.com",
-      network: "testnet"
+      scVerifyUri: "https://testnet-sc-verify.herokuapp.com",
+      network: "testnet",
     };
   };
 }

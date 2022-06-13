@@ -261,6 +261,27 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.GATECHAIN,
         feeMargin,
       },
+      secretParams: {
+        notifier,
+        rpcUrl: TestNetRpcUri.SECRET,
+        bridge: {
+          contractAddress: "secret1ecsxtsrct6h647lpztnnzc9e47ezh0uu673c8h",
+          codeHash:
+            "29a127369d1f4326fb684435fde702fa9619c812dfb5b3a1929529bab0e308e0",
+        },
+        xpnft: {
+          contractAddress: "secret1x4afa2shvq4uwwtl0ld8qnjfm3jkmyvap3yn9g",
+          codeHash:
+            "090ab9b7968745369f8888302a16650164e2ffc2f44c393a7382f74e122a9a8e",
+        },
+        umt: {
+          contractAddress: "secret146snljq0kjsva7qrx4am54nv3fhfaet7srx4n2",
+          codeHash:
+            "af076a49141264ec048270318f1358c9be193893c3f829425cab53ee5eb05e5c",
+        },
+        chainId: "0x18",
+        feeMargin,
+      },
     };
   };
 

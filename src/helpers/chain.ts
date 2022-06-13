@@ -46,7 +46,7 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     id: NftInfo<RawNft>,
     txFees: BigNumber,
     mintWith: string,
-    gasLimit? : ethers.BigNumberish | undefined
+    gasLimit?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
 
@@ -186,4 +186,6 @@ export interface FeeMargins {
   max: number;
 }
 
-export interface GetFeeMargins { getFeeMargin(): FeeMargins }
+export interface GetFeeMargins {
+  getFeeMargin(): FeeMargins;
+}

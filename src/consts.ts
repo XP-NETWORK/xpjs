@@ -13,6 +13,11 @@ import {
 } from "./helpers/algorand";
 import { TezosHelper, tezosHelperFactory, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
+import {
+  SecretHelper,
+  secretHelperFactory,
+  SecretParams,
+} from "./helpers/secret";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -35,6 +40,7 @@ export enum TestNetRpcUri {
   GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
+  SECRET = "https://pulsar-2.api.trivium.network:9091/",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -67,6 +73,7 @@ type Web3Meta = [Web3Helper, Web3Params];
 type TronMeta = [TronHelper, TronParams];
 type AlgoMeta = [AlgorandHelper, AlgorandParams];
 type TezosMeta = [TezosHelper, TezosParams];
+type SecretMeta = [SecretHelper, SecretParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
@@ -93,7 +100,7 @@ export type MetaMap = {
   0x15: Web3Meta;
   0x16: Web3Meta;
   0x17: Web3Meta;
-  // 0x18 Reserved
+  0x18: SecretMeta;
   0x19: Web3Meta;
 } & MetaMapAssert;
 
@@ -119,7 +126,7 @@ export namespace Chain {
   export const AURORA = 0x15; // 21
   export const GODWOKEN = 0x16; // 22
   export const GATECHAIN = 0x17; // 23
-  // 0x18 Reserved
+  export const SECRET = 0x18;
   export const VECHAIN = 0x19; // 25
 }
 
@@ -333,4 +340,12 @@ CHAIN_INFO.set(Chain.VECHAIN, {
   currency: SupportedCurrency.VET,
   decimals: 1e18,
   chainId: 39,
+});
+CHAIN_INFO.set(Chain.SECRET, {
+  name: "Secret",
+  blockExplorerUrl: "", // TODO
+  constructor: secretHelperFactory,
+  nonce: Chain.SECRET,
+  currency: SupportedCurrency.SCRT,
+  decimals: 1e6,
 });

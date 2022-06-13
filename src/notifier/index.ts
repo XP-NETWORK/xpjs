@@ -63,5 +63,8 @@ export function evNotifier(url: string) {
         tx_hash: txHash,
       });
     },
+    async notifySecret(txHash: string) {
+      await api.post("/tx/scrt", { tx_hash: txHash });
+    },
   };
 }
