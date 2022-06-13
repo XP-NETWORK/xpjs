@@ -9,7 +9,7 @@ export function evNotifier(url: string) {
 
   return {
     async notifyWeb3(
-    fromChain: number,
+      fromChain: number,
       fromHash: string,
       actionId?: string,
       type?: string,
@@ -65,6 +65,6 @@ export function evNotifier(url: string) {
     },
     async notifySecret(txHash: string) {
       await api.post("/tx/scrt", { tx_hash: txHash });
-    }
+    },
   };
 }
