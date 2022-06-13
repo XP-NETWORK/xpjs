@@ -61,7 +61,7 @@ type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   UnfreezeForeignNft<Signer, RawNft, Resp> &
   EstimateTxFees<RawNft> &
   ChainNonceGet &
-  ValidateAddress & { XpNft?: string } & GetFeeMargins;
+  ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins;
 
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   TransferNftForeignBatch<Signer, RawNft, Resp> &
@@ -497,8 +497,9 @@ export function ChainFactory(
     tc: number,
     fc: number
   ): Promise<string[]> {
+    const _from = ethers.utils.getAddress(from);
     const res = await axios.get<{ data: { to: string }[] }>(
-      `${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
+      `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);
   }
@@ -644,6 +645,10 @@ export function ChainFactory(
           )
         )
           ? mintWith
+          : "contractType" in nft.native &&
+            //@ts-ignore contractType is checked
+            nft.native.contractType === "ERC1155"
+          ? toChain.XpNft1155
           : toChain.XpNft;
 
       if (appConfig.network === "mainnet") {

@@ -94,6 +94,7 @@ export type TronHelper = BaseTronHelper &
   ExtractTxnStatus &
   WhitelistCheck<EthNftInfo> & {
     XpNft: string;
+    XpNft1155: string;
   } & GetFeeMargins;
 
 export async function baseTronHelperFactory(
@@ -204,6 +205,7 @@ export interface TronParams {
   notifier: EvNotifier;
   minter_addr: string;
   erc721_addr: string;
+  erc1155_addr: string;
   validators: string[];
   feeMargin: FeeMargins;
 }
@@ -353,6 +355,7 @@ export async function tronHelperFactory(
   return {
     ...base,
     extractAction,
+    XpNft1155: tronParams.erc721_addr,
     XpNft: tronParams.erc721_addr,
     getFeeMargin() {
       return tronParams.feeMargin;

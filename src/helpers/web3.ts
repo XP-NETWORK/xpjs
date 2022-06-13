@@ -130,6 +130,7 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
     XpNft: string;
+    XpNft1155: string;
   } & WhitelistCheck<EthNftInfo> &
   GetFeeMargins;
 
@@ -181,6 +182,7 @@ export interface Web3Params {
   notifier: EvNotifier;
   minter_addr: string;
   erc721_addr: string;
+  erc1155_addr: string;
   erc721Minter: string;
   erc1155Minter: string;
   nonce: ChainNonce;
@@ -197,7 +199,12 @@ type NftMethodVal<T, Tx> = {
     minterAddr: string,
     tok: string
   ) => Promise<boolean>;
-  approve: (umt: T, forAddr: string, tok: string) => Promise<Tx>;
+  approve: (
+    umt: T,
+    forAddr: string,
+    tok: string,
+    txnUp: (tx: PopulatedTransaction) => Promise<void>
+  ) => Promise<Tx>;
 };
 
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
@@ -215,8 +222,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     approved: (umt: Erc1155Minter, sender: string, minterAddr: string) => {
       return umt.isApprovedForAll(sender, minterAddr);
     },
-    approve: (umt: Erc1155Minter, forAddr: string) => {
-      return umt.setApprovalForAll(forAddr, true);
+    approve: async (
+      umt: Erc1155Minter,
+      forAddr: string,
+      _tok: string,
+      txnUp: (tx: PopulatedTransaction) => Promise<void>
+    ) => {
+      const tx = await umt.populateTransaction.setApprovalForAll(forAddr, true);
+      await txnUp(tx);
+      return await umt.signer.sendTransaction(tx);
     },
   },
   ERC721: {
@@ -231,8 +245,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     ) => {
       return (await umt.getApproved(tok)) == minterAddr;
     },
-    approve: (umt: UserNftMinter, forAddr: string, tok: string) => {
-      return umt.approve(forAddr, tok);
+    approve: async (
+      umt: UserNftMinter,
+      forAddr: string,
+      tok: string,
+      txnUp: (tx: PopulatedTransaction) => Promise<void>
+    ) => {
+      const tx = await umt.populateTransaction.approve(forAddr, tok);
+      await txnUp(tx);
+      return await umt.signer.sendTransaction(tx);
     },
   },
 };
@@ -329,7 +350,8 @@ export async function web3HelperFactory(
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
       minter_addr,
-      id.native.tokenId
+      id.native.tokenId,
+      txnUnderpricedPolyWorkaround
     );
     await receipt.wait();
     return receipt.hash;
@@ -340,6 +362,7 @@ export async function web3HelperFactory(
   return {
     ...base,
     XpNft: params.erc721_addr,
+    XpNft1155: params.erc1155_addr,
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
