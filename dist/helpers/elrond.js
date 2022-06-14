@@ -52,7 +52,7 @@ async function elrondHelperFactory(elrondParams) {
             stx = await signer.signTransaction(tx);
         }
         else {
-            await signer.sign(tx);
+            await signer.signTransaction(tx);
             stx = tx;
         }
         try {
