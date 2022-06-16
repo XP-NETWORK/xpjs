@@ -196,7 +196,7 @@ export async function tezosHelperFactory({
   return {
     XpNft: xpnftAddress,
     async transferNftToForeign(sender, chain, to, nft, fee, mw) {
-      await preTransfer(sender, nft);
+//       await preTransfer(sender, nft);
       const hash = await withBridge(
         sender,
         (bridge) =>
