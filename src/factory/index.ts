@@ -497,13 +497,13 @@ export function ChainFactory(
     tc: number,
     fc: number
   ): Promise<string[]> {
-    const _from = ethers.utils.getAddress(from);
+  try{    const _from = ethers.utils.getAddress(from);
     const res = await axios.get<{ data: { to: string }[] }>(
       `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
     );
-    return res.data.data.map((r) => r.to);
+    return res.data.data.map((r) => r.to);}
+      catch()err{}
   }
-
   return {
     getVerifiedContracts,
     balance: (i, a) => i.balance(a),
