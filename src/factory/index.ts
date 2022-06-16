@@ -502,7 +502,10 @@ export function ChainFactory(
       `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
     );
     return res.data.data.map((r) => r.to);}
-      catch()err{}
+      catch(err){
+      const res = await axios_1.get<{ data: { to: string }[] }>(`${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`);
+            return res.data.data.map((r) => r.to);
+      }
   }
   return {
     getVerifiedContracts,
