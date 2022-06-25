@@ -66,5 +66,8 @@ export function evNotifier(url: string) {
     async notifySecret(txHash: string) {
       await api.post("/tx/scrt", { tx_hash: txHash });
     },
+    async notifySolana(txHash: string) {
+      await api.post("/tx/solana", { tx_hash: txHash });
+    },
   };
 }
