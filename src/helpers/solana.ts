@@ -18,6 +18,7 @@ import {
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { Chain } from "..";
+import { evNotifier, EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -45,6 +46,7 @@ export type SolanaParams = {
   endpoint: string;
   bridgeContractAddr: string;
   xpnftAddr: string;
+  notifier: EvNotifier;
 };
 
 // Based on https://github.com/solana-labs/solana-program-library/blob/118bd047aa0f1ba1930b5bc4639d40aa2a375ccb/token/js/src/actions/getOrCreateAssociatedTokenAccount.ts
@@ -144,9 +146,13 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
         })
         .rpc();
 
+      await args.notifier.notifySolana(tx);
+
       return tx;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
+      setProvider(sender);
+
       const mintAddr = new PublicKey(id.native.nftMint);
 
       const tokenAcc = await getOrCreateAssociatedTokenAccount(
@@ -166,6 +172,8 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
           tokenProgram: TOKEN_PROGRAM_ID,
         })
         .rpc();
+
+      await args.notifier.notifySolana(tx);
 
       return tx;
     },
