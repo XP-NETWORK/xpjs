@@ -22,3 +22,7 @@ export type HelperMap<K extends ChainNonce> = Map<
   K,
   InferChainH<K> | undefined
 >;
+
+export type Mutable<Type> = {
+  -readonly [Key in keyof Type]: Type[Key];
+};

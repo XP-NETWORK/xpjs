@@ -18,6 +18,7 @@ import {
   secretHelperFactory,
   SecretParams,
 } from "./helpers/secret";
+import { solanaHelper, SolanaHelper, SolanaParams } from "./helpers/solana";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -74,6 +75,7 @@ type TronMeta = [TronHelper, TronParams];
 type AlgoMeta = [AlgorandHelper, AlgorandParams];
 type TezosMeta = [TezosHelper, TezosParams];
 type SecretMeta = [SecretHelper, SecretParams];
+type SolanaMeta = [SolanaHelper, SolanaParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
@@ -102,6 +104,7 @@ export type MetaMap = {
   0x17: Web3Meta;
   0x18: SecretMeta;
   0x19: Web3Meta;
+  0x1a: SolanaMeta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -128,6 +131,8 @@ export namespace Chain {
   export const GATECHAIN = 0x17; // 23
   export const SECRET = 0x18;
   export const VECHAIN = 0x19; // 25
+  export const SOLANA = 0x1a;
+  // 0x1b => TON
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -348,4 +353,12 @@ CHAIN_INFO.set(Chain.SECRET, {
   nonce: Chain.SECRET,
   currency: SupportedCurrency.SCRT,
   decimals: 1e6,
+});
+CHAIN_INFO.set(Chain.SOLANA, {
+  name: "Solana",
+  blockExplorerUrl: "", // TODO
+  constructor: solanaHelper,
+  nonce: Chain.SOLANA,
+  currency: SupportedCurrency.SOL,
+  decimals: 1e9,
 });
