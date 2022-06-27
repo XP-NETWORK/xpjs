@@ -30,6 +30,10 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "@dfinity/agent": "^0.11.3",
+    "@dfinity/candid": "^0.11.3",
+    "@dfinity/nns": "^0.5.0",
+    "@dfinity/principal": "^0.11.3",
     "@elrondnetwork/erdjs": "9.0.3",
     "@json-rpc-tools/utils": "^1.7.6",
     "@project-serum/anchor": "^0.25.0-beta.1",
@@ -46,7 +50,7 @@
     "algosdk": "^1.15.0-beta.1",
     "axios": "^0.21.1",
     "bignumber.js": "=9.0.1",
-    "crypto-exchange-rate": "git+https://github.com/XP-NETWORK/exchange-rate#da4e9788428e1ce135e6ecf10a3e5c4b94c7313a",
+    "crypto-exchange-rate": "git+https://github.com/XP-NETWORK/exchange-rate#5b63a5831f8e89625969852cb29f8f6983b4c93e",
     "ethers": "^5.5.4",
     "google-protobuf": "^3.20.1",
     "js-base64": "^3.6.1",

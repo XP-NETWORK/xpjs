@@ -7,4 +7,5 @@ export declare function evNotifier(url: string): {
     notifyAlgorand(txHash: string): Promise<void>;
     notifySecret(txHash: string): Promise<void>;
     notifySolana(txHash: string): Promise<void>;
+    notifyDfinity(actionId: string): Promise<void>;
 };

@@ -8,6 +8,7 @@ import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 import { SecretHelper, SecretParams } from "./helpers/secret";
 import { SolanaHelper, SolanaParams } from "./helpers/solana";
 import { TonHelper, TonParams } from "./helpers/ton";
+import { DfinityHelper, DfinityParams } from "./helpers/dfinity";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-api.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -59,6 +60,7 @@ declare type TezosMeta = [TezosHelper, TezosParams];
 declare type SecretMeta = [SecretHelper, SecretParams];
 declare type SolanaMeta = [SolanaHelper, SolanaParams];
 declare type TonMeta = [TonHelper, TonParams];
+declare type DfinityMeta = [DfinityHelper, DfinityParams];
 declare type MetaMapAssert = {
     [idx in typeof Chain[keyof typeof Chain]]: unknown;
 };
@@ -88,6 +90,7 @@ export declare type MetaMap = {
     0x19: Web3Meta;
     0x1a: SolanaMeta;
     0x1b: TonMeta;
+    0x1c: DfinityMeta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -115,6 +118,7 @@ export declare namespace Chain {
     const VECHAIN = 25;
     const SOLANA = 26;
     const TON = 27;
+    const DFINITY = 28;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
