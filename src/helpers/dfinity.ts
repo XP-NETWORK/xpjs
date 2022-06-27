@@ -15,6 +15,7 @@ import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
+  PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -27,12 +28,14 @@ export type DfinityNft = {
   tokenId: string;
 };
 
-// TODO: approval
 export type DfinityHelper = ChainNonceGet &
   TransferNftForeign<DfinitySigner, DfinityNft, string> &
   UnfreezeForeignNft<DfinitySigner, DfinityNft, string> &
   EstimateTxFees<DfinityNft> &
-  ValidateAddress & { XpNft: string };
+  ValidateAddress & { XpNft: string } & Pick<
+    PreTransfer<DfinitySigner, DfinityNft, string>,
+    "preTransfer"
+  >;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -78,15 +81,7 @@ export async function dfinityHelper(
         return false;
       }
     },
-    async transferNftToForeign(
-      sender,
-      chain_nonce,
-      to,
-      id,
-      txFees,
-      mintWith,
-      gasLimit?
-    ) {
+    async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
       args.agent.replaceIdentity(sender);
 
       const txFeeBlock = await transferTxFee(txFees);
@@ -134,6 +129,34 @@ export async function dfinityHelper(
       await args.notifier.notifyDfinity(actionId);
 
       return Buffer.from(withdrawCall.requestId).toString("hex");
+    },
+    async preTransfer(sender, nft) {
+      args.agent.replaceIdentity(sender);
+
+      const nftContract = Principal.fromText(nft.native.canisterId);
+      const approvedQuery = await args.agent.query(nftContract, {
+        methodName: "getApproved",
+        arg: encode([Nat], [BigInt(nft.native.tokenId)]),
+      });
+
+      if (
+        "reply" in approvedQuery &&
+        decode([new PrincipalClass()], approvedQuery.reply.arg)[0].toString() ==
+          args.bridgeContract.toString()
+      ) {
+        // already approved
+        return;
+      }
+
+      const approveCall = await args.agent.call(nftContract, {
+        methodName: "approve",
+        arg: encode(
+          [new PrincipalClass(), Nat],
+          [args.bridgeContract, BigInt(nft.native.tokenId)]
+        ),
+      });
+
+      return Buffer.from(approveCall.requestId).toString("hex");
     },
   };
 }
