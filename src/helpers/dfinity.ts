@@ -13,6 +13,7 @@ import BigNumber from "bignumber.js";
 import { Chain } from "../consts";
 import { EvNotifier } from "../notifier";
 import {
+  BalanceCheck,
   ChainNonceGet,
   EstimateTxFees,
   PreTransfer,
@@ -35,7 +36,8 @@ export type DfinityHelper = ChainNonceGet &
   ValidateAddress & { XpNft: string } & Pick<
     PreTransfer<DfinitySigner, DfinityNft, string>,
     "preTransfer"
-  >;
+  > &
+  BalanceCheck;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -157,6 +159,17 @@ export async function dfinityHelper(
       });
 
       return Buffer.from(approveCall.requestId).toString("hex");
+    },
+    async balance(address) {
+      const bal = await ledger.accountBalance({
+        accountIdentifier: AccountIdentifier.fromPrincipal({
+          principal: Principal.fromText(address),
+        }),
+      });
+
+      const e8s = bal.toE8s().toString();
+
+      return new BigNumber(e8s);
     },
   };
 }
