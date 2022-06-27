@@ -20,6 +20,7 @@ import {
 } from "./helpers/secret";
 import { solanaHelper, SolanaHelper, SolanaParams } from "./helpers/solana";
 import { tonHelper, TonHelper, TonParams } from "./helpers/ton";
+import { dfinityHelper, DfinityHelper, DfinityParams } from "./helpers/dfinity";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -78,6 +79,7 @@ type TezosMeta = [TezosHelper, TezosParams];
 type SecretMeta = [SecretHelper, SecretParams];
 type SolanaMeta = [SolanaHelper, SolanaParams];
 type TonMeta = [TonHelper, TonParams];
+type DfinityMeta = [DfinityHelper, DfinityParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
@@ -108,6 +110,7 @@ export type MetaMap = {
   0x19: Web3Meta;
   0x1a: SolanaMeta;
   0x1b: TonMeta;
+  0x1c: DfinityMeta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -136,6 +139,7 @@ export namespace Chain {
   export const VECHAIN = 0x19; // 25
   export const SOLANA = 0x1a;
   export const TON = 0x1b;
+  export const DFINITY = 0x1c;
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -368,8 +372,16 @@ CHAIN_INFO.set(Chain.SOLANA, {
 CHAIN_INFO.set(Chain.TON, {
   name: "TON",
   blockExplorerUrl: "", // TODO
-  constructor: tonHelper, // TODO
+  constructor: tonHelper,
   nonce: Chain.TON,
   currency: SupportedCurrency.TON,
   decimals: 1e9,
+});
+CHAIN_INFO.set(Chain.DFINITY, {
+  name: "DFINITY",
+  blockExplorerUrl: "", // TODO
+  constructor: dfinityHelper,
+  nonce: Chain.DFINITY,
+  currency: SupportedCurrency.ICP,
+  decimals: 1e8,
 });
