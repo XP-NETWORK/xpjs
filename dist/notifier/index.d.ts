@@ -6,4 +6,5 @@ export declare function evNotifier(url: string): {
     notifyTezos(txHash: string): Promise<void>;
     notifyAlgorand(txHash: string): Promise<void>;
     notifySecret(txHash: string): Promise<void>;
+    notifySolana(txHash: string): Promise<void>;
 };

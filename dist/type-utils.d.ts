@@ -9,4 +9,7 @@ export declare type ParamMap = {
     get<T extends ChainNonce>(k: T): InferChainParam<T> | undefined;
 };
 export declare type HelperMap<K extends ChainNonce> = Map<K, InferChainH<K> | undefined>;
+export declare type Mutable<Type> = {
+    -readonly [Key in keyof Type]: Type[Key];
+};
 export {};
