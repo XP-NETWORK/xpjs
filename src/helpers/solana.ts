@@ -18,7 +18,7 @@ import {
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { Chain } from "..";
-import { evNotifier, EvNotifier } from "../notifier";
+import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
