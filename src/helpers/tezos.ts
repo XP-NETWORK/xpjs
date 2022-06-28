@@ -12,7 +12,7 @@ import {
   ValidateAddress,
 } from "..";
 import {
-  ChainIds,
+  BigMapAbstraction,
   ContractAbstraction,
   ContractMethod,
   ContractProvider,
@@ -27,7 +27,6 @@ import {
 
 import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
-import axios from "axios";
 import { EvNotifier } from "../notifier";
 import { FeeMargins, GetFeeMargins } from "./chain";
 
@@ -51,7 +50,7 @@ export type TezosHelper = TransferNftForeign<
   ChainNonceGet &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
     isApprovedForMinter(
-      signer: Signer,
+      signer: TezosSigner,
       nft: NftInfo<TezosNftInfo>
     ): Promise<boolean>;
   } & {
@@ -83,11 +82,6 @@ export async function tezosHelperFactory({
   const estimateGas = (validators: string[], baseprice: number) => {
     return new BigNumber(baseprice * (validators.length + 1));
   };
-
-  const net =
-    (await Tezos.rpc.getChainId()) == ChainIds.MAINNET
-      ? "mainnet"
-      : "hangzhou2net";
 
   async function withContract(
     sender: TezosSigner,
@@ -141,34 +135,15 @@ export async function tezosHelperFactory({
     sender: TezosSigner,
     nft: NftInfo<TezosNftInfo>
   ) {
-    const baseUrl = `https://sheltered-crag-76748.herokuapp.com/https://api.better-call.dev/v1/contract/${net}/${nft.native.contract}/entrypoints/trace`;
     const owner = await getAddress(sender);
-    const res = await axios
-      .post(baseUrl, {
-        name: "update_operators",
-        source: owner,
-        data: {
-          update_operators: [
-            {
-              "@or_29": {
-                add_operator: {
-                  "@pair_32": {
-                    token_id: nft.native.token_id,
-                    operator: bridgeAddress,
-                  },
-                  owner,
-                },
-                schemaKey: "L",
-              },
-            },
-          ],
-        },
-      })
-      .catch((_) => undefined);
-    if (res == undefined) {
-      return false;
-    }
-    return res.data[0].status != "applied";
+    const contract = await Tezos.contract.at(nft.native.contract);
+    const storage = await contract.storage<{ operators: BigMapAbstraction }>();
+    let op = await storage.operators.get({
+      owner,
+      operator: bridgeAddress,
+      token_id: nft.native.token_id,
+    });
+    return op != undefined;
   }
 
   async function notifyValidator(hash: string): Promise<void> {
@@ -196,7 +171,7 @@ export async function tezosHelperFactory({
   return {
     XpNft: xpnftAddress,
     async transferNftToForeign(sender, chain, to, nft, fee, mw) {
-//       await preTransfer(sender, nft);
+      //       await preTransfer(sender, nft);
       const hash = await withBridge(
         sender,
         (bridge) =>
@@ -214,7 +189,7 @@ export async function tezosHelperFactory({
       return hash;
     },
     async balance(address) {
-      return Tezos.tz.getBalance(address);
+      return new BigNumber((await Tezos.tz.getBalance(address)).toString(10));
     },
     async unfreezeWrappedNft(sender, to, nft, fee, nonce) {
       const hash = await withBridge(
