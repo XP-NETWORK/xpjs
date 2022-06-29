@@ -19,6 +19,7 @@ interface BridgeMethods extends ContractMethods {
 interface WithdrawParams {
     chainNonce: number;
     to: Uint8Array;
+    txFees: BN;
 }
 interface FreezeParams {
     chainNonce: number;

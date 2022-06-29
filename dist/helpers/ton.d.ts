@@ -1,7 +1,8 @@
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import { ChainNonceGet, EstimateTxFees, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
-export declare type TonSigner = TonWallet | {
+export declare type TonSigner = {
+    wallet?: TonWallet;
     accIdx: number;
 };
 export declare type TonNft = {
