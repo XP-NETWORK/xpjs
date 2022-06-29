@@ -252,6 +252,7 @@ export interface ChainParams {
   godwokenParams: Web3Params;
   gateChainParams: Web3Params;
   secretParams: SecretParams;
+  hederaParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -300,6 +301,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.GATECHAIN, chainParams.gateChainParams);
   cToP.set(Chain.VECHAIN, chainParams.vechainParams);
   cToP.set(Chain.SECRET, chainParams.secretParams);
+  cToP.set(Chain.HEDERA, chainParams.hederaParams);
   return cToP;
 }
 /**
@@ -497,15 +499,18 @@ export function ChainFactory(
     tc: number,
     fc: number
   ): Promise<string[]> {
-  try{    const _from = ethers.utils.getAddress(from);
-    const res = await axios.get<{ data: { to: string }[] }>(
-      `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
-    );
-    return res.data.data.map((r) => r.to);}
-      catch(err){
-      const res = await axios.get<{ data: { to: string }[] }>(`${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`);
-            return res.data.data.map((r) => r.to);
-      }
+    try {
+      const _from = ethers.utils.getAddress(from);
+      const res = await axios.get<{ data: { to: string }[] }>(
+        `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
+      );
+      return res.data.data.map((r) => r.to);
+    } catch (err) {
+      const res = await axios.get<{ data: { to: string }[] }>(
+        `${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
+      );
+      return res.data.data.map((r) => r.to);
+    }
   }
   return {
     getVerifiedContracts,

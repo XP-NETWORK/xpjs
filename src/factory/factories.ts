@@ -8,6 +8,7 @@ import { evNotifier } from "../notifier";
 import { Driver, SimpleNet } from "@vechain/connex-driver";
 import * as thor from "web3-providers-connex";
 import { Framework } from "@vechain/connex-framework";
+import { hethers } from "@hashgraph/hethers";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -30,6 +31,7 @@ const testnet_middleware_uri =
   "https://testnet-notifier.xp.network/notify-test/";
 
 export namespace ChainFactoryConfigs {
+  //@ts-ignore
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(testnet_middleware_uri);
@@ -238,6 +240,17 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0xC3dB3dBcf007961541BE1ddF15cD4ECc0Fc758d5",
         nonce: Chain.IOTEX,
         feeMargin,
+      },
+      hederaParams: {
+        notifier,
+        provider: hethers.providers.getDefaultProvider("testnet"),
+        feeMargin,
+        nonce: Chain.HEDERA,
+        minter_addr: "",
+        erc1155Minter: "",
+        erc1155_addr: "",
+        erc721Minter: "",
+        erc721_addr: "",
       },
       godwokenParams: {
         notifier,
