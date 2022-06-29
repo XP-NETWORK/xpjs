@@ -111,6 +111,7 @@ export type MetaMap = {
   0x1a: SolanaMeta;
   0x1b: TonMeta;
   0x1c: DfinityMeta;
+  0x1d: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -140,6 +141,7 @@ export namespace Chain {
   export const SOLANA = 0x1a;
   export const TON = 0x1b;
   export const DFINITY = 0x1c;
+  export const HEDERA = 0x1d;
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -384,4 +386,12 @@ CHAIN_INFO.set(Chain.DFINITY, {
   nonce: Chain.DFINITY,
   currency: SupportedCurrency.ICP,
   decimals: 1e8,
+});
+CHAIN_INFO.set(Chain.HEDERA, {
+  blockExplorerUrl: "https://hashscan.io/#/testnet/transaction",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.HBAR,
+  decimals: 1e18,
+  nonce: Chain.HEDERA,
+  name: "Hedera",
 });
