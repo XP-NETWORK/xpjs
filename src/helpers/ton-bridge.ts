@@ -25,6 +25,7 @@ interface BridgeMethods extends ContractMethods {
 interface WithdrawParams {
   chainNonce: number;
   to: Uint8Array;
+  txFees: BN;
 }
 
 interface FreezeParams {
@@ -69,7 +70,7 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
     cell.bits.writeAddress(new TonWeb.Address(this.options.burner)); // target address
     cell.bits.writeAddress(await this.getAddress()); // bridge as response address
     cell.bits.writeBit(false); // null custom_payload
-    cell.bits.writeCoins(new BN(0)); // forward amount
+    cell.bits.writeCoins(params.txFees); // forward amount
     cell.bits.writeBit(false); // forward_payload in this slice, not separate cell
 
     const msg = new Cell();

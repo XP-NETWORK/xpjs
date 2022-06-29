@@ -2,6 +2,8 @@ import { BN } from "@project-serum/anchor";
 import BigNumber from "bignumber.js";
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
+import { NftCollection } from "tonweb/dist/types/contract/token/nft/nft-collection";
+import { NftItem } from "tonweb/dist/types/contract/token/nft/nft-item";
 import { Chain } from "../consts";
 import {
   ChainNonceGet,
@@ -10,9 +12,9 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "./chain";
-// import { BridgeContract } from "./ton-bridge";
+import { BridgeContract } from "./ton-bridge";
 
-export type TonSigner = TonWallet | { accIdx: number };
+export type TonSigner = { wallet?: TonWallet; accIdx: number };
 
 export type TonNft = {
   nftId: number;
@@ -47,9 +49,9 @@ type TonWallet = {
 };
 
 export async function tonHelper(args: TonParams): Promise<TonHelper> {
-  // const bridge = new BridgeContract(args.tonweb.provider, {
-  //   burner: args.burnerAddr
-  // });
+  const bridge = new BridgeContract(args.tonweb.provider, {
+    burner: args.burnerAddr,
+  });
 
   const ton = args.tonweb as TonWeb & TonWallet;
 
@@ -65,12 +67,64 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async validateAddress(adr) {
       return TonWeb.Address.isValid(adr);
     },
-    async transferNftToForeign() {
-      // TODO
+    async transferNftToForeign(signer, chainNonce, to, nft, txFees, mintWith) {
+      const rSigner = signer.wallet || ton;
+      const addr = (await rSigner.send("ton_requestAccounts", undefined))[
+        signer.accIdx
+      ];
+      const nftColl = new NftCollection(ton.provider, {
+        ownerAddress: new TonWeb.Address(addr),
+        nftItemCodeHex: NftItem.codeHex,
+      });
+
+      const nftItemAddr = await nftColl.getNftItemAddressByIndex(
+        nft.native.nftId
+      );
+      const txFeesFull = new BN(txFees.toString(10));
+      const nftFee = TonWeb.utils.toNano("0.05");
+      const payload = await bridge.createFreezeBody({
+        amount: txFeesFull.sub(nftFee),
+        to: Buffer.from(to),
+        chainNonce,
+        mintWith: Buffer.from(mintWith),
+      });
+
+      await rSigner.send("ton_sendTransaction", {
+        value: nftFee.toString(10),
+        to: nftItemAddr.toString(true, true, true),
+        data: Buffer.from(await payload.getRepr()).toString("base64"),
+      });
+
+      // TODO: Tx hash
       return "";
     },
-    async unfreezeWrappedNft() {
-      // TODO
+    async unfreezeWrappedNft(signer, to, nft, txFees, chainNonce) {
+      const rSigner = signer.wallet || ton;
+
+      const nftColl = new NftCollection(ton.provider, {
+        ownerAddress: await bridge.getAddress(),
+        nftItemCodeHex: NftItem.codeHex,
+      });
+
+      const nftItemAddr = await nftColl.getNftItemAddressByIndex(
+        nft.native.nftId
+      );
+
+      const txFeesFull = new BN(txFees.toString(10));
+      const nftFee = TonWeb.utils.toNano("0.05");
+      const payload = await bridge.createWithdrawBody({
+        to: Buffer.from(to),
+        chainNonce: parseInt(chainNonce),
+        txFees: txFeesFull.sub(nftFee),
+      });
+
+      await rSigner.send("ton_sendTransaction", {
+        value: nftFee.toString(10),
+        to: nftItemAddr.toString(true, true, true),
+        data: Buffer.from(await payload.getRepr()).toString("base64"),
+      });
+
+      // TODO: tx hash
       return "";
     },
     tonKpWrapper(kp: TonWebMnemonic.KeyPair): TonWallet {
