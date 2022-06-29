@@ -91,6 +91,7 @@ export declare type MetaMap = {
     0x1a: SolanaMeta;
     0x1b: TonMeta;
     0x1c: DfinityMeta;
+    0x1d: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -119,6 +120,7 @@ export declare namespace Chain {
     const SOLANA = 26;
     const TON = 27;
     const DFINITY = 28;
+    const HEDERA = 29;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;

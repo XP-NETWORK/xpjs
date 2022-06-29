@@ -140,6 +140,7 @@ export interface ChainParams {
     godwokenParams: Web3Params;
     gateChainParams: Web3Params;
     secretParams: SecretParams;
+    hederaParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
