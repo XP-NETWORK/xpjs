@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -18,4 +22,4 @@ __exportStar(require("./socket"), exports);
 __exportStar(require("./factory"), exports);
 __exportStar(require("./consts"), exports);
 __exportStar(require("./config"), exports);
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBQUEsa0RBQWdDO0FBQ2hDLG1EQUFpQztBQUNqQyxpREFBK0I7QUFDL0IsaURBQStCO0FBQy9CLDJDQUF5QjtBQUN6Qiw0Q0FBMEI7QUFDMUIsMkNBQXlCO0FBQ3pCLDJDQUF5QiJ9
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUFnQztBQUNoQyxtREFBaUM7QUFDakMsaURBQStCO0FBQy9CLGlEQUErQjtBQUMvQiwyQ0FBeUI7QUFDekIsNENBQTBCO0FBQzFCLDJDQUF5QjtBQUN6QiwyQ0FBeUIifQ==
