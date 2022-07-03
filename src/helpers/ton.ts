@@ -2,8 +2,8 @@ import { BN } from "@project-serum/anchor";
 import BigNumber from "bignumber.js";
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
-import { NftCollection } from "tonweb/dist/types/contract/token/nft/nft-collection";
-import { NftItem } from "tonweb/dist/types/contract/token/nft/nft-item";
+import { NftCollection } from "tonweb/dist/types/contract/token/nft/nft-collection.d";
+import { NftItem } from "tonweb/dist/types/contract/token/nft/nft-item.d";
 import { Chain } from "../consts";
 import {
   ChainNonceGet,

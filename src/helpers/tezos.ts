@@ -104,9 +104,9 @@ export async function tezosHelperFactory({
       const contractI = await Tezos.wallet.at(contract);
       const res = cb(contractI);
       if (params) {
-        if (!params.storageLimit) params.storageLimit = 60_000;
+        if (!params.storageLimit) params.storageLimit = 5_000;
       } else {
-        params = { storageLimit: 60_000 };
+        params = { storageLimit: 5_000 };
       }
       const tx = await res.send(params);
       await tx.confirmation();
@@ -138,12 +138,19 @@ export async function tezosHelperFactory({
   ) {
     const owner = await getAddress(sender);
     const contract = await Tezos.contract.at(nft.native.contract);
-    const storage = await contract.storage<{ operators: BigMapAbstraction }>();
-    let op = await storage.operators.get({
-      owner,
-      operator: bridgeAddress,
-      token_id: nft.native.token_id,
-    });
+    const storage = await contract.storage<{
+      operators?: BigMapAbstraction;
+      operator?: BigMapAbstraction;
+    }>();
+
+    let op = storage.operators
+      ? await storage.operators.get({
+          owner,
+          operator: bridgeAddress,
+          token_id: nft.native.token_id,
+        })
+      : storage.operator;
+
     return op != undefined;
   }
 
