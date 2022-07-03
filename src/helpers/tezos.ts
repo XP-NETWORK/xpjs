@@ -94,7 +94,9 @@ export async function tezosHelperFactory({
   ) {
     if ("publicKeyHash" in sender) {
       Tezos.setSignerProvider(sender);
+
       const contractI = await Tezos.contract.at(contract);
+
       const res = cb(contractI);
       const tx = await res.send(params);
       await tx.confirmation();
@@ -102,11 +104,15 @@ export async function tezosHelperFactory({
     } else {
       Tezos.setWalletProvider(sender);
       const contractI = await Tezos.wallet.at(contract);
+
       const res = cb(contractI);
+
+      const estim = await Tezos.estimate.transfer(res.toTransferParams(params));
+
       if (params) {
-        if (!params.storageLimit) params.storageLimit = 5_000;
+        if (!params.storageLimit) params.storageLimit = estim.storageLimit;
       } else {
-        params = { storageLimit: 5_000 };
+        params = { storageLimit: estim.storageLimit };
       }
       const tx = await res.send(params);
       await tx.confirmation();
