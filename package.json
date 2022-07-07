@@ -5,6 +5,7 @@
   "description": "XP.Network Multi-Chain NFT Bridge JavaScript API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "commonjs",
   "license": "MIT",
   "repository": {
     "type": "git",
