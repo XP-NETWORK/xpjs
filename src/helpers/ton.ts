@@ -2,8 +2,6 @@ import { BN } from "@project-serum/anchor";
 import BigNumber from "bignumber.js";
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
-import { NftCollection } from "tonweb/dist/types/contract/token/nft/nft-collection.d";
-import { NftItem } from "tonweb/dist/types/contract/token/nft/nft-item.d";
 import { Chain } from "../consts";
 import {
   ChainNonceGet,
@@ -72,9 +70,10 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       const addr = (await rSigner.send("ton_requestAccounts", undefined))[
         signer.accIdx
       ];
-      const nftColl = new NftCollection(ton.provider, {
+
+      const nftColl = new TonWeb.token.nft.NftCollection(ton.provider, {
         ownerAddress: new TonWeb.Address(addr),
-        nftItemCodeHex: NftItem.codeHex,
+        nftItemCodeHex: TonWeb.token.nft.NftItem.codeHex,
       });
 
       const nftItemAddr = await nftColl.getNftItemAddressByIndex(
@@ -101,9 +100,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async unfreezeWrappedNft(signer, to, nft, txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
 
-      const nftColl = new NftCollection(ton.provider, {
+      const nftColl = new TonWeb.token.nft.NftCollection(ton.provider, {
         ownerAddress: await bridge.getAddress(),
-        nftItemCodeHex: NftItem.codeHex,
+        nftItemCodeHex: TonWeb.token.nft.NftItem.codeHex,
       });
 
       const nftItemAddr = await nftColl.getNftItemAddressByIndex(
