@@ -37,7 +37,15 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
   PreTransfer<SecretSigner, SecretNftInfo, string> &
   BalanceCheck &
   GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
-  MintNft<SecretSigner, SecretMintArgs, Tx>;
+  MintNft<SecretSigner, SecretMintArgs, Tx> & {
+    nftList(
+      owner: string,
+
+      viewingKey: string,
+      contract: string,
+      codeHash?: string
+    ): Promise<NftInfo<SecretNftInfo>[]>;
+  };
 
 export type SecretContract = {
   contractAddress: string;
@@ -144,6 +152,49 @@ export async function secretHelperFactory(
       } catch {
         return false;
       }
+    },
+    async nftList(owner, vk, contractAddress, codeHash) {
+      const auth = {
+        viewer: {
+          viewing_key: vk,
+          address: owner,
+        },
+      };
+      if (!codeHash) {
+        codeHash = await queryClient.query.compute.contractCodeHash(
+          contractAddress
+        );
+      }
+      const contract = {
+        address: contractAddress,
+        codeHash: codeHash || "",
+      };
+
+      const { token_list } = await queryClient.query.snip721.GetOwnedTokens({
+        contract,
+        auth,
+        owner,
+      });
+      const response: NftInfo<SecretNftInfo>[] = [];
+      await Promise.all(
+        token_list.tokens.map(async (token) => {
+          const tokenInfo = await queryClient.query.snip721.GetTokenInfo({
+            contract,
+            auth,
+            token_id: token,
+          });
+          response.push({
+            collectionIdent: contractAddress,
+            uri: tokenInfo.all_nft_info.info?.token_uri || "",
+            native: {
+              contract: contractAddress,
+              contractHash: codeHash || "",
+              token_id: token,
+            },
+          });
+        })
+      );
+      return response;
     },
     estimateValidateTransferNft: async () => {
       return TRANSFER_GASL.times(gasPrice);
