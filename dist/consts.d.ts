@@ -29,8 +29,7 @@ export declare enum TestNetRpcUri {
     GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
     GATECHAIN = "https://meteora-evm.gatenode.cc",
     VECHAIN = "https://sync-testnet.veblocks.net",
-    SECRET = "https://pulsar-2.api.trivium.network:9091/",
-    SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab"
+    SECRET = "https://pulsar-2.api.trivium.network:9091/"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -93,7 +92,6 @@ export declare type MetaMap = {
     0x1b: TonMeta;
     0x1c: DfinityMeta;
     0x1d: Web3Meta;
-    0x1e: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -123,7 +121,6 @@ export declare namespace Chain {
     const TON = 27;
     const DFINITY = 28;
     const HEDERA = 29;
-    const SKALE = 30;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
