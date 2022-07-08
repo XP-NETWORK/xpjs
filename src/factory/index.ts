@@ -253,6 +253,7 @@ export interface ChainParams {
   gateChainParams: Web3Params;
   secretParams: SecretParams;
   hederaParams: Web3Params;
+  skaleParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -302,6 +303,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.VECHAIN, chainParams.vechainParams);
   cToP.set(Chain.SECRET, chainParams.secretParams);
   cToP.set(Chain.HEDERA, chainParams.hederaParams);
+  cToP.set(Chain.SKALE, chainParams.skaleParams);
   return cToP;
 }
 /**

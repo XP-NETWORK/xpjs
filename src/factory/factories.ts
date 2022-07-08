@@ -252,6 +252,17 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "",
         erc721_addr: "",
       },
+      skaleParams: {
+        notifier,
+        feeMargin,
+        erc721Minter: "0xdaEcC3fd26fD36E1555005c304216723b947CfdF",
+        erc1155Minter: "0xe95338D1ec0e338e3fC8A8cFa37d096C26AB4EBf",
+        erc1155_addr: "0xDb7E4534E320c1F18A2cF878FAE9eb445aa7f24C",
+        erc721_addr: "0xdAF7a56A174c599C75645E7C14B41abA7b96DAb8",
+        minter_addr: "0x5F05ae4eFE4b55758348cE116B05fb0874219AD6",
+        nonce: Chain.SKALE,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.SKALE),
+      },
       godwokenParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.GODWOKEN),

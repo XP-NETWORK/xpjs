@@ -44,6 +44,7 @@ export enum TestNetRpcUri {
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
+  SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -112,6 +113,7 @@ export type MetaMap = {
   0x1b: TonMeta;
   0x1c: DfinityMeta;
   0x1d: Web3Meta;
+  0x1e: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -142,6 +144,7 @@ export namespace Chain {
   export const TON = 0x1b;
   export const DFINITY = 0x1c;
   export const HEDERA = 0x1d;
+  export const SKALE = 0x1e; // 30
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -394,4 +397,15 @@ CHAIN_INFO.set(Chain.HEDERA, {
   decimals: 1e18,
   nonce: Chain.HEDERA,
   name: "Hedera",
+});
+
+CHAIN_INFO.set(Chain.SKALE, {
+  name: "Skale",
+  blockExplorerUrl:
+    "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/tx/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.sFUEL,
+  decimals: 1e18,
+  chainId: 1305754875840118,
+  nonce: Chain.SKALE,
 });
