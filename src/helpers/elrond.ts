@@ -274,9 +274,8 @@ export async function elrondHelperFactory(
     } else if (signer instanceof ExtensionProvider) {
       stx = await signer.signTransaction(tx);
     } else {
-      //@ts-ignore
-      stx = await (signer as ISigner).signTransaction(tx);
-      //stx = tx;
+      await (signer as ISigner).sign(tx);
+      stx = tx;
     }
     try {
       await stx.send(provider);
