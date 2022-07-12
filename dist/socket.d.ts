@@ -32,3 +32,4 @@ declare type DbClaimInfo = {
  */
 export declare function socketHelper(uri: string, options?: Partial<SocketOptions & ManagerOptions>): TxnSocketHelper & AlgorandSocketHelper;
 export {};
+//# sourceMappingURL=socket.d.ts.map

@@ -106,3 +106,4 @@ export interface FeeMargins {
 export interface GetFeeMargins {
     getFeeMargin(): FeeMargins;
 }
+//# sourceMappingURL=chain.d.ts.map

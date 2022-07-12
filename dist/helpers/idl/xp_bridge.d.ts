@@ -702,3 +702,4 @@ declare const _default: Mutable<{
     }];
 }> & Idl;
 export default _default;
+//# sourceMappingURL=xp_bridge.d.ts.map

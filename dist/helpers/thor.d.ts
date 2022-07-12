@@ -81,3 +81,4 @@ export interface Web3Params {
     nonce: number;
 }
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
+//# sourceMappingURL=thor.d.ts.map

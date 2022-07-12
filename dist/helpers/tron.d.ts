@@ -70,3 +70,4 @@ export interface TronRawTxn {
 }
 export declare function tronHelperFactory(tronParams: TronParams): Promise<TronHelper>;
 export {};
+//# sourceMappingURL=tron.d.ts.map

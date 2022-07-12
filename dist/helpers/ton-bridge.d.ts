@@ -38,3 +38,4 @@ export declare class BridgeContract extends Contract<BridgeOptions, BridgeMethod
     getWhitelist: () => Promise<any>;
 }
 export {};
+//# sourceMappingURL=ton-bridge.d.ts.map

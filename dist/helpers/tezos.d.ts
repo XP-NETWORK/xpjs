@@ -24,3 +24,4 @@ export declare type TezosParams = {
 };
 export declare function tezosHelperFactory({ Tezos, notifier, xpnftAddress, bridgeAddress, validators, feeMargin, }: TezosParams): Promise<TezosHelper>;
 export {};
+//# sourceMappingURL=tezos.d.ts.map

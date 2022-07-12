@@ -17,3 +17,4 @@ export declare type DfinityParams = {
     notifier: EvNotifier;
 };
 export declare function dfinityHelper(args: DfinityParams): Promise<DfinityHelper>;
+//# sourceMappingURL=dfinity.d.ts.map

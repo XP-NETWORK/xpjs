@@ -9,3 +9,4 @@ export declare function evNotifier(url: string): {
     notifySolana(txHash: string): Promise<void>;
     notifyDfinity(actionId: string): Promise<void>;
 };
+//# sourceMappingURL=index.d.ts.map

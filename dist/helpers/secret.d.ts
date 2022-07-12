@@ -31,3 +31,4 @@ export declare type SecretParams = {
 };
 export declare function secretHelperFactory(p: SecretParams): Promise<SecretHelper>;
 export {};
+//# sourceMappingURL=secret.d.ts.map

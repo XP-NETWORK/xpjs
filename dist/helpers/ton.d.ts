@@ -33,3 +33,4 @@ declare type TonWallet = {
 };
 export declare function tonHelper(args: TonParams): Promise<TonHelper>;
 export {};
+//# sourceMappingURL=ton.d.ts.map

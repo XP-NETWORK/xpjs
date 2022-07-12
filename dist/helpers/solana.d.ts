@@ -16,3 +16,4 @@ export declare type SolanaParams = {
     notifier: EvNotifier;
 };
 export declare function solanaHelper(args: SolanaParams): Promise<SolanaHelper>;
+//# sourceMappingURL=solana.d.ts.map

@@ -13,3 +13,4 @@ export declare type Mutable<Type> = {
     -readonly [Key in keyof Type]: Type[Key];
 };
 export {};
+//# sourceMappingURL=type-utils.d.ts.map

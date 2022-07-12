@@ -140,3 +140,4 @@ declare type ChainInfo = {
 };
 export declare const CHAIN_INFO: ChainInfo;
 export {};
+//# sourceMappingURL=consts.d.ts.map

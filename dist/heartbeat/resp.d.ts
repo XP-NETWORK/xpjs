@@ -14,3 +14,4 @@ export declare type StatusResp = {
     [chainNonce: string]: ChainStatus;
 };
 export {};
+//# sourceMappingURL=resp.d.ts.map

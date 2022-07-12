@@ -80,3 +80,4 @@ export declare type AlgorandParams = {
 };
 export declare function algorandHelper(args: AlgorandParams): AlgorandHelper;
 export {};
+//# sourceMappingURL=algorand.d.ts.map

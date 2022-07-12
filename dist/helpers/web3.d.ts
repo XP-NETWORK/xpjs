@@ -100,3 +100,4 @@ declare type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155
 export declare const NFT_METHOD_MAP: NftMethodMap;
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
 export {};
+//# sourceMappingURL=web3.d.ts.map

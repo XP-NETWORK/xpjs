@@ -126,3 +126,4 @@ export interface ElrondParams {
 }
 export declare function elrondHelperFactory(elrondParams: ElrondParams): Promise<ElrondHelper>;
 export {};
+//# sourceMappingURL=elrond.d.ts.map
