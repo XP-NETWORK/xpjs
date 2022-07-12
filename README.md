@@ -69,7 +69,9 @@ import {
   Chain,
   AppConfigs,
   ChainParams,
-} from "xp.network";
+
+import { config } from 'dotenv';
+config();} from "xp.network";
 
 (async () => {
   // Instantiate the chain factory for the
@@ -88,8 +90,8 @@ import {
   );
 
   // Switching between the mainnets & the testnets:
-  const factory: ChainFactory = mainnetFactory;
-  const CONFIG: Partial<ChainParams> = mainnetConfig;
+  const factory: ChainFactory = mainnetFactory;       // or = testnetConfig;
+  const CONFIG: Partial<ChainParams> = mainnetConfig; // or = testnetConfig;
 })();
 ```
 
@@ -161,9 +163,13 @@ const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
 ### 3.3 Example of getting the signer object (in the FE for Elrond):<br/><br/>
 
 ```typescript
-// ELROND provider:
+// ELROND provider (injected from the browser extension):
 import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
 const elrondSigner = ExtensionProvider.getInstance();
+
+// Elrond signer from a PEM key stored in the .env file
+import { UserSigner } from "@elrondnetwork/erdjs/out";
+const elrondSigner = UserSigner.fromPem(process.env.ELROND_PEM!);
 ```
 
 <br/>
@@ -549,20 +555,41 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 
 ```javascript
 (async () => {
-  const receipt = await factory.mint(
-    elrond, // The chain where to mint
-    elrondSigner, // The browser injected signer
-    {
-      // Could be an IPFS URL or Any URL that points to a Metadata
-      uris: [metadata.url],
-      // Description of your NFT. Can be an object.
-      attrs: description,
-      // A name that defines your NFT.
-      name: name,
-      // The identifier with which you want to mint the NFT. You have to own this identifier. i.e.
-      identifier: "XPNFT-eda5d0-c5",
-    }
+  // Deploying ESDTs:
+  const response = await elrond.issueESDTNft(
+      elrondSigner,
+      "Target",
+      "TGT",
+      true, // canFreeze
+      true, // canWipe
+      true  // canTransferNftCreateRole
   );
+
+  // Checking whether ESDTs exist for this account
+  const esdts = await elrond.mintableEsdts(
+    elrondSigner.getAddress())
+    .catch((e) => {
+      console.log("Failed to get Mintable ESDTs", e)
+      return undefined
+  })
+
+    const identifier = esdts ? esdts[0]: undefined;
+
+    if (!identifier) {
+        throw new Error("No ESDT found for this address");
+    }
+
+    // Minting an NFT to an ESDT
+    const response = await elrond.mintNft(
+      elrondSigner,
+      {
+        identifier,  // Your ESDT token
+        quantity: 1, // How many tokens you want to mint > 0
+        name: "Your token name goes here",
+        uris: ["replace with your link(s)"],
+     } as any);
+
+    console.log(response)
 })();
 ```
 
