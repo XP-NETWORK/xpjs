@@ -24,7 +24,7 @@ import { dfinityHelper, DfinityHelper, DfinityParams } from "./helpers/dfinity";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
-  ELROND = "https://devnet-api.elrond.com",
+  ELROND = "https://devnet-gateway.elrond.com",
   HECO = "https://http-testnet.hecochain.com",
   BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet",
   ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten",
