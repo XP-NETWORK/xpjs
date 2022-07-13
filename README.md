@@ -147,6 +147,12 @@ const signer = new Wallet(
 | Godwoken  | godwokenParams  |     22      |
 | Gatechain | gatechainParams |     23      |
 |  VeChain  |  vechainParams  |     25      |
+|  Solana   |  solanaParams   |     26      |
+|  TON      |  tonParams      |     27      |
+|  DFinity  |  dfinityParams  |     28      |
+|  Hedera   |  hederaParams   |     29      |
+|  Skale    |  skaleParams    |     30      |
+  
 
 </center><br/>
 
@@ -221,27 +227,32 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 
 ```javascript
 (async () => {
-  // Inner Object ================================ Chain Nonce
-  const bsc = await factory.inner(Chain.BSC); // 4
-  const ethereum = await factory.inner(Chain.ETHEREUM); // 5
-  const avax = await factory.inner(Chain.AVALANCHE); // 6
-  const polygon = await factory.inner(Chain.POLYGON); // 7
-  const fantom = await factory.inner(Chain.FANTOM); // 8
-  const harmony = await factory.inner(Chain.HARMONY); // 12
-  const gnosis = await factory.inner(Chain.XDAI); // 14
-  const fuse = await factory.inner(Chain.FUSE); // 16
-  const velas = await factory.inner(Chain.VELAS); // 19
-  const aurora = await factory.inner(Chain.AURORA); // 21
-  const godwoken = await factory.inner(Chain.GODWOKEN); // 22
-  const gatechain = await factory.inner(Chain.GATECHAIN); // 23
-  const vechain = await factory.inner(Chain.VECHAIN); // 25
+  // Inner Object ====================================== Chain Nonce
+  const bsc = await factory.inner(Chain.BSC);               // 4
+  const ethereum = await factory.inner(Chain.ETHEREUM);     // 5
+  const avax = await factory.inner(Chain.AVALANCHE);        // 6
+  const polygon = await factory.inner(Chain.POLYGON);       // 7
+  const fantom = await factory.inner(Chain.FANTOM);         // 8
+  const harmony = await factory.inner(Chain.HARMONY);       // 12
+  const gnosis = await factory.inner(Chain.XDAI);           // 14
+  const fuse = await factory.inner(Chain.FUSE);             // 16
+  const velas = await factory.inner(Chain.VELAS);           // 19
+  const aurora = await factory.inner(Chain.AURORA);         // 21
+  const godwoken = await factory.inner(Chain.GODWOKEN);     // 22
+  const gatechain = await factory.inner(Chain.GATECHAIN);   // 23
+  const vechain = await factory.inner(Chain.VECHAIN);       // 25
+  const hedera = await factory.inner(Chain.HEDERA);         // 29
+  const skale = await factory.inner(Chain.SKALE);           // 30
 
   // Non-EVM chains:
-  // Inner Object ================================ Chain Nonce
-  const elrond = await factory.inner(Chain.ELROND); // 2
-  const tron = await factory.inner(Chain.TRON); // 9
-  const algorand = await factory.inner(Chain.ALGORAND); // 15
-  const tezos = await factory.inner(Chain.TEZOS); // 18
+  // Inner Object ====================================== Chain Nonce
+  const elrond = await factory.inner(Chain.ELROND);         // 2
+  const tron = await factory.inner(Chain.TRON);             // 9
+  const algorand = await factory.inner(Chain.ALGORAND);     // 15
+  const tezos = await factory.inner(Chain.TEZOS);           // 18
+  const solana = await factory.inner(Chain.SOLANA);         // 26
+  const ton = await factory.inner(Chain.TON);               // 27
+  const dfinity = await factory.inner(Chain.DFINITY);       // 28
 })();
 ```
 
