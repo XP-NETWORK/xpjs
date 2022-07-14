@@ -5,7 +5,7 @@ export declare type SecretNftInfo = {
     contract: string;
     contractHash: string;
     chainId: string;
-    token_id: string;
+    tokenId: string;
 };
 export declare type SecretMintArgs = {
     url: string;
