@@ -4,6 +4,7 @@ import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins,
 export declare type SecretNftInfo = {
     contract: string;
     contractHash: string;
+    chainId: string;
     token_id: string;
 };
 export declare type SecretMintArgs = {
