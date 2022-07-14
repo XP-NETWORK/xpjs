@@ -336,7 +336,7 @@ CHAIN_INFO.set(Chain.GODWOKEN, {
   blockExplorerUrl: "https://aggron.layerview.io/tx/",
   constructor: web3HelperFactory,
   nonce: 0x16,
-  decimals: 1e8,
+  decimals: 1e18,
   currency: SupportedCurrency.CKB,
   chainId: 868455272153094,
 });
