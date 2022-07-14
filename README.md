@@ -26,7 +26,7 @@ Bridging steps:
 - [x] [7. Transferring NFTs between chains](#7-transferring-an-nft)
 - [x] [Minting NFTs](#minting-nfts-on-evm-chains-elrond--tron)(optional)
 - [x] [Estimating the TX fee on the target chain](#estimating-the-transaction-fee-on-the-target-chain) (optional)
-- [ ] ... and there's much more to come
+- [ ] ... and much more to come
 
 <hr/><br/><center>
 
@@ -148,11 +148,10 @@ const signer = new Wallet(
 | Gatechain | gatechainParams |     23      |
 |  VeChain  |  vechainParams  |     25      |
 |  Solana   |  solanaParams   |     26      |
-|  TON      |  tonParams      |     27      |
+|    TON    |    tonParams    |     27      |
 |  DFinity  |  dfinityParams  |     28      |
 |  Hedera   |  hederaParams   |     29      |
-|  Skale    |  skaleParams    |     30      |
-  
+|   Skale   |   skaleParams   |     30      |
 
 </center><br/>
 
@@ -227,32 +226,33 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 
 ```javascript
 (async () => {
+  // EVM compatible chains:
   // Inner Object ====================================== Chain Nonce
-  const bsc = await factory.inner(Chain.BSC);               // 4
-  const ethereum = await factory.inner(Chain.ETHEREUM);     // 5
-  const avax = await factory.inner(Chain.AVALANCHE);        // 6
-  const polygon = await factory.inner(Chain.POLYGON);       // 7
-  const fantom = await factory.inner(Chain.FANTOM);         // 8
-  const harmony = await factory.inner(Chain.HARMONY);       // 12
-  const gnosis = await factory.inner(Chain.XDAI);           // 14
-  const fuse = await factory.inner(Chain.FUSE);             // 16
-  const velas = await factory.inner(Chain.VELAS);           // 19
-  const aurora = await factory.inner(Chain.AURORA);         // 21
-  const godwoken = await factory.inner(Chain.GODWOKEN);     // 22
-  const gatechain = await factory.inner(Chain.GATECHAIN);   // 23
-  const vechain = await factory.inner(Chain.VECHAIN);       // 25
-  const hedera = await factory.inner(Chain.HEDERA);         // 29
-  const skale = await factory.inner(Chain.SKALE);           // 30
+  const bsc = await factory.inner(Chain.BSC); // 4
+  const ethereum = await factory.inner(Chain.ETHEREUM); // 5
+  const avax = await factory.inner(Chain.AVALANCHE); // 6
+  const polygon = await factory.inner(Chain.POLYGON); // 7
+  const fantom = await factory.inner(Chain.FANTOM); // 8
+  const harmony = await factory.inner(Chain.HARMONY); // 12
+  const gnosis = await factory.inner(Chain.XDAI); // 14
+  const fuse = await factory.inner(Chain.FUSE); // 16
+  const velas = await factory.inner(Chain.VELAS); // 19
+  const aurora = await factory.inner(Chain.AURORA); // 21
+  const godwoken = await factory.inner(Chain.GODWOKEN); // 22
+  const gatechain = await factory.inner(Chain.GATECHAIN); // 23
+  const vechain = await factory.inner(Chain.VECHAIN); // 25
+  const hedera = await factory.inner(Chain.HEDERA); // 29
+  const skale = await factory.inner(Chain.SKALE); // 30
 
   // Non-EVM chains:
   // Inner Object ====================================== Chain Nonce
-  const elrond = await factory.inner(Chain.ELROND);         // 2
-  const tron = await factory.inner(Chain.TRON);             // 9
-  const algorand = await factory.inner(Chain.ALGORAND);     // 15
-  const tezos = await factory.inner(Chain.TEZOS);           // 18
-  const solana = await factory.inner(Chain.SOLANA);         // 26
-  const ton = await factory.inner(Chain.TON);               // 27
-  const dfinity = await factory.inner(Chain.DFINITY);       // 28
+  const elrond = await factory.inner(Chain.ELROND); // 2
+  const tron = await factory.inner(Chain.TRON); // 9
+  const algorand = await factory.inner(Chain.ALGORAND); // 15
+  const tezos = await factory.inner(Chain.TEZOS); // 18
+  const solana = await factory.inner(Chain.SOLANA); // 26
+  const ton = await factory.inner(Chain.TON); // 27
+  const dfinity = await factory.inner(Chain.DFINITY); // 28
 })();
 ```
 
@@ -317,115 +317,37 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 
 ```json
 {
-  "boosterId": 10000000788939,
-  "id": "10002366816",
-  "txHash": "0x37c9b7c54ac05d5e00dd5cff06722fb67bed91ec91732875071f74bce8752e41",
-  "randomNumber": "0x1459a03e3d7a5510023e7385d438508d725dd19de2237c6c1d79a9883b6dc0b3",
-  "image": "https://assets.polkamon.com/images/Unimons_T02C03H06B04G00.jpg",
-  "external_url": "https://polkamon.com/polkamon/T02C03H06B04G00",
-  "description": "The Unifairy are the most magical and fairest of Polkamon. Their wings stretch into the realms beyond this world, enchanting those around her by her unique disposition.",
-  "name": "Unifairy",
-  "initialProbabilities": {
-    "horn": 0.2,
-    "color": 0.25,
-    "background": 1,
-    "glitter": 0.99,
-    "type": 0.135
-  },
-  "attributes": [
-    {
-      "trait_type": "Type",
-      "value": "Unifairy"
-    },
-    {
-      "trait_type": "Horn",
-      "value": "Spiral Horn"
-    },
-    {
-      "trait_type": "Color",
-      "value": "Blue"
-    },
-    {
-      "trait_type": "Background",
-      "value": "Mountain Range"
-    },
-    {
-      "trait_type": "Opening Network",
-      "value": "Binance Smart Chain"
-    },
-    {
-      "trait_type": "Glitter",
-      "value": "No"
-    },
-    {
-      "trait_type": "Special",
-      "value": "No"
-    },
-    {
-      "display_type": "date",
-      "trait_type": "Birthday",
-      "value": 1633650473
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Booster",
-      "value": 10000000788939
-    }
-  ],
-  "opening_network": "Binance Smart Chain",
-  "background_color": "FFFFFF",
-  "animation_url": "https://assets.polkamon.com/videos/Unimons_T02C03H06B04G00.mp4",
-  "code": "T02C03H06B04G00",
-  "uri": "https://meta.polkamon.com/meta?id=10002366816",
+  "uri": "https://api.alturanft.com/meta/chain-caders/",
   "native": {
-    "chainId": "4",
-    "tokenId": "10002366816",
-    "owner": "0x0d7df42014064a163DfDA404253fa9f6883b9187",
-    "contract": "0x85f0e02cb992aa1f9f47112f815f519ef1a59e2d",
-    "symbol": "PMONC",
-    "name": "PolkamonOfficialCollection",
-    "uri": "https://meta.polkamon.com/meta?id=10002366816",
-    "contractType": "ERC721"
-  }
+    "chainId": "4", // ChainId (4 = BSC)
+    "tokenId": "2639", // ID in the NFT smart contract
+    "contract": "0x387d38eEaaa7F1235c00aE6ee9b1462c026007f4",
+    "owner": "0x6449b68cc5675f6011e8DB681B142773A3157cb9",
+    "uri": "https://api.alturanft.com/meta/chain-caders/",
+    "symbol": null,
+    "name": "ChainCaders", // Collection Name
+    "contractType": "ERC1155"
+  },
+  "collectionIdent": "0x387d38eeaaa7f1235c00ae6ee9b1462c026007f4"
 }
 ```
 
-### 5.3 Example of the console logged wrapped NFT from BSC on Velas
+### 5.3 Example of the console logged wrapped NFT
 
 ```json
 {
-  "name": "DRVR NOT LVR",
-  "description": "Cliff Blank | Community Pool Drop\n\nWe would need a license to love, there would be fewer lines, fewer misunderstandings but definitely more accidents. \nThe arteries of our heart would be 4 lanes so that we could reach love in a short time. Of course, there could always be works and exits closed but at least we would have fewer surprises and we would react accordingly, choosing another exit or deciding to continue on our way.",
-  "decimals": 0,
-  "isBooleanAmount": true,
-  "image": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
-  "artifactUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
-  "wrapped": {
-    "contract": "0x1BFb3FbCf1ce331B7AAE03a3c0Bf3AcF685F4bD6",
-    "tokenId": "10",
-    "contractType": 721,
-    "origin": "14",
-    "original_uri": "https://ipfs.infura.io/ipfs/QmdtemgadGPgWSn9Lq1RvQn4Q2ofEpRNr7ox8oMyNWJ9ma",
-    "mint_with": "0x3a1d5a87c5f0c2f5c5e079b0f234d8797ee0e9b4",
-    "source_mint_ident": "0x1BFb3FbCf1ce331B7AAE03a3c0Bf3AcF685F4bD6"
+  "uri": "https://nft.xp.network/w/30576349324667796398547334318",
+  "native": {
+    "chainId": "4", // Original chainId
+    "tokenId": "30576349324667796398547334318", // Wrapped ID
+    "contract": "0x8Ae5Fa4DDb131695CDe906BE03b33ebb277DF9A4", // Original Owner
+    "owner": "0x6449b68cc5675f6011e8DB681B142773A3157cb9",
+    "uri": "https://nft.xp.network/w/30576349324667796398547334318", // Original URI
+    "symbol": "vr3DNFTs", // Custom collection name
+    "name": "Virtual Reality 3D NFTs", // Custom collection name
+    "contractType": "ERC721"
   },
-  "attributes": [
-    {
-      "trait_type": "Original Chain",
-      "value": "xDai"
-    },
-    {
-      "trait_type": "Original Chain Nonce",
-      "value": "14"
-    },
-    {
-      "trait_type": "Original URI",
-      "value": "https://ipfs.infura.io/ipfs/QmdtemgadGPgWSn9Lq1RvQn4Q2ofEpRNr7ox8oMyNWJ9ma"
-    }
-  ],
-  "displayUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
-  "thumbnailUri": "https://ipfs.infura.io/ipfs/QmX4n4QJBsGmVuszy1fXMJHpGnpkp9BePVJNQ8Lf18yA8z",
-  "ipfs": false
+  "collectionIdent": "0x8ae5fa4ddb131695cde906be03b33ebb277df9a4"
 }
 ```
 
