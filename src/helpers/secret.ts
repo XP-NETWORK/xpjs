@@ -20,6 +20,7 @@ import {
 export type SecretNftInfo = {
   contract: string;
   contractHash: string;
+  chainId: string;
   token_id: string;
 };
 export type SecretMintArgs = {
@@ -187,6 +188,7 @@ export async function secretHelperFactory(
             collectionIdent: contractAddress,
             uri: tokenInfo.all_nft_info.info?.token_uri || "",
             native: {
+              chainId: p.chainId,
               contract: contractAddress,
               contractHash: codeHash || "",
               token_id: token,
