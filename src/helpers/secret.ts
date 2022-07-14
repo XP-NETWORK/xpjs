@@ -21,7 +21,7 @@ export type SecretNftInfo = {
   contract: string;
   contractHash: string;
   chainId: string;
-  token_id: string;
+  tokenId: string;
 };
 export type SecretMintArgs = {
   url: string;
@@ -93,7 +93,7 @@ export async function secretHelperFactory(
         msg: {
           approve: {
             spender: p.bridge.contractAddress,
-            token_id: nft.native.token_id,
+            token_id: nft.native.tokenId,
           },
         },
       },
@@ -191,7 +191,7 @@ export async function secretHelperFactory(
               chainId: p.chainId,
               contract: contractAddress,
               contractHash: codeHash || "",
-              token_id: token,
+              tokenId: token,
             },
           });
         })
@@ -216,7 +216,7 @@ export async function secretHelperFactory(
             freeze_nft: {
               contract: nft.native.contract,
               contract_hash: nft.native.contractHash,
-              token_id: nft.native.token_id,
+              token_id: nft.native.tokenId,
               to,
               chain_nonce: chainNonce,
               minter: mw,
@@ -246,7 +246,7 @@ export async function secretHelperFactory(
             withdraw_nft: {
               burner: nft.native.contract,
               burner_hash: nft.native.contractHash,
-              token_id: nft.native.token_id,
+              token_id: nft.native.tokenId,
               to,
               chain_nonce: Number(chainNonce),
             },
