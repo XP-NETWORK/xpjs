@@ -648,8 +648,7 @@ export function ChainFactory(
         checkMintWith(
           mintWith,
           await getVerifiedContracts(
-            //@ts-expect-error contract is checked
-            nft.native.contract.toLowerCase(),
+            nft.collectionIdent,
             toChain.getNonce(),
             fromChain.getNonce()
           )
