@@ -23,6 +23,7 @@ import {
   TransactionHash,
   TransactionPayload,
   U64Value,
+  UserSigner,
   WalletConnectProvider,
 } from "@elrondnetwork/erdjs";
 import axios from "axios";
@@ -273,9 +274,12 @@ export async function elrondHelperFactory(
       stx = txs[0];
     } else if (signer instanceof ExtensionProvider) {
       stx = await signer.signTransaction(tx);
-    } else {
-      await (signer as ISigner).sign(tx);
+    } else if (signer instanceof UserSigner) {
+      await signer.sign(tx);
       stx = tx;
+    } else {
+      //@ts-ignore
+      stx = await signer.signTransaction(tx);
     }
     try {
       await stx.send(provider);
