@@ -176,7 +176,12 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   async function waitTxnConfirm(txId: string) {
     const status = await algod.status().do();
     let lastRound = status["last-round"];
-    let pendingInfo = await algod.pendingTransactionInformation(txId).do();
+    algod.pendingTransactionsInformation();
+    let pendingInfo = (await algod
+      .pendingTransactionInformation(txId)
+      .do()
+      .catch(() => ({}))) as Record<string, any>;
+
     while (
       !(pendingInfo["confirmed-round"] && pendingInfo["confirmed-round"] > 0)
     ) {
