@@ -109,7 +109,7 @@ export declare type ChainFactory = {
      * @param claimer: the account which can claim the nfts
      */
     claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
-    getVerifiedContracts(from: string, targetChain: number, fc: number): Promise<string[]>;
+    getVerifiedContract(from: string, targetChain: number, fc: number, tokenId?: string): Promise<string | undefined>;
     checkWhitelist<RawNft>(chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet, nft: NftInfo<RawNft>): Promise<boolean>;
     isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
 };
