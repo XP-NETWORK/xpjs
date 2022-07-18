@@ -211,11 +211,12 @@ export type ChainFactory = {
    */
   claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
 
-  getVerifiedContracts(
+  getVerifiedContract(
     from: string,
     targetChain: number,
-    fc: number
-  ): Promise<string[]>;
+    fc: number,
+    tokenId?: string
+  ): Promise<string | undefined>;
 
   checkWhitelist<RawNft>(
     chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet,
@@ -451,13 +452,6 @@ export function ChainFactory(
     }
   }
 
-  function checkMintWith(mw: string, contracts: string[]) {
-    return (
-      contracts.find((x) => x.toLowerCase() === mw.toLowerCase().trim()) !=
-      undefined
-    );
-  }
-
   async function isWrappedNft(nft: NftInfo<unknown>, fc: number) {
     if (fc === Chain.TEZOS) {
       return (
@@ -496,26 +490,42 @@ export function ChainFactory(
     }
   }
 
-  async function getVerifiedContracts(
+  async function getVerifiedContract(
     from: string,
     tc: number,
-    fc: number
-  ): Promise<string[]> {
-    try {
-      const _from = ethers.utils.getAddress(from);
-      const res = await axios.get<{ data: { to: string }[] }>(
-        `${appConfig.scVerifyUri}/verify/list?from=${_from}&targetChain=${tc}&fromChain=${fc}`
-      );
-      return res.data.data.map((r) => r.to);
-    } catch (err) {
-      const res = await axios.get<{ data: { to: string }[] }>(
-        `${appConfig.scVerifyUri}/verify/list?from=${from}&targetChain=${tc}&fromChain=${fc}`
-      );
-      return res.data.data.map((r) => r.to);
-    }
+    fc: number,
+    tokenId?: string
+  ): Promise<string | undefined> {
+    const res = await axios
+      .post<{ data: string }>(`${appConfig.scVerifyUri}/default/`, {
+        sc: from,
+        chain: tc,
+        fromChain: fc,
+        tokenId,
+      })
+      .catch(() => {
+        return undefined;
+      });
+    return res?.data.data;
   }
+
+  async function checkMintWith(
+    from: string,
+    to: string,
+    targetChain: number,
+    fromChain: number,
+    tokenId?: string
+  ): Promise<boolean> {
+    const res = await axios.post<{ data: "allowed" | "not allowed" }>(
+      `${appConfig.scVerifyUri}/verify`,
+      { from, to, targetChain, fromChain, tokenId }
+    );
+
+    return res.data.data == "allowed";
+  }
+
   return {
-    getVerifiedContracts,
+    getVerifiedContract,
     balance: (i, a) => i.balance(a),
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
       type Result = ReturnType<typeof to.transferNftBatchToForeign>;
@@ -645,14 +655,14 @@ export function ChainFactory(
       const mw =
         "contract" in nft.native &&
         mintWith &&
-        checkMintWith(
+        (await checkMintWith(
+          nft.collectionIdent,
           mintWith,
-          await getVerifiedContracts(
-            nft.collectionIdent,
-            toChain.getNonce(),
-            fromChain.getNonce()
-          )
-        )
+          toChain.getNonce(),
+          fromChain.getNonce(),
+          //@ts-expect-error tokenId is checked
+          "tokenId" in nft.native ? nft.native.tokenId.toString() : undefined
+        ))
           ? mintWith
           : "contractType" in nft.native &&
             //@ts-ignore contractType is checked
