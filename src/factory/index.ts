@@ -516,12 +516,14 @@ export function ChainFactory(
     fromChain: number,
     tokenId?: string
   ): Promise<boolean> {
-    const res = await axios.post<{ data: "allowed" | "not allowed" }>(
-      `${appConfig.scVerifyUri}/verify`,
-      { from, to, targetChain, fromChain, tokenId }
-    );
+    const res = await axios
+      .post<{ data: "allowed" | "not allowed" }>(
+        `${appConfig.scVerifyUri}/verify`,
+        { from, to, targetChain, fromChain, tokenId }
+      )
+      .catch(() => undefined);
 
-    return res.data.data == "allowed";
+    return res?.data.data == "allowed";
   }
 
   return {
