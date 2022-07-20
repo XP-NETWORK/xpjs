@@ -52,6 +52,7 @@ import {
   ParamMap,
 } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
+import { DfinityParams } from "../helpers/dfinity";
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -255,6 +256,7 @@ export interface ChainParams {
   secretParams: SecretParams;
   hederaParams: Web3Params;
   skaleParams: Web3Params;
+  dfinityParams: DfinityParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -305,6 +307,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.SECRET, chainParams.secretParams);
   cToP.set(Chain.HEDERA, chainParams.hederaParams);
   cToP.set(Chain.SKALE, chainParams.skaleParams);
+  cToP.set(Chain.DFINITY, chainParams.dfinityParams);
   return cToP;
 }
 /**
