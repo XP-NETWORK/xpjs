@@ -3,9 +3,15 @@ import {
   decode,
   encode,
   Nat,
+  Nat32,
   Nat64,
+  Nat8,
+  Opt,
   PrincipalClass,
+  Record,
   Text,
+  Tuple,
+  Vec,
 } from "@dfinity/candid/lib/cjs/idl";
 import { AccountIdentifier, ICP, LedgerCanister } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
@@ -28,6 +34,13 @@ export type DfinityNft = {
   canisterId: string;
   tokenId: string;
 };
+
+const ApproveRequest = Record({
+  token: Text,
+  subaccount: Opt(Vec(Nat8)),
+  allowance: Nat,
+  spender: new PrincipalClass(),
+});
 
 export type DfinityHelper = ChainNonceGet &
   TransferNftForeign<DfinitySigner, DfinityNft, string> &
@@ -57,6 +70,22 @@ export async function dfinityHelper(
       amount: ICP.fromString(amt.toFixed()) as ICP,
     });
   }
+  const to32bits = (num: number) => {
+    let b = new ArrayBuffer(4);
+    new DataView(b).setUint32(0, num);
+    1 << 5;
+    return Array.from(new Uint8Array(b));
+  };
+
+  const tokenIdentifier = (principal: string, index: number) => {
+    const padding = Buffer.from("\x0Atid");
+    const array = new Uint8Array([
+      ...padding,
+      ...Principal.fromText(principal).toUint8Array(),
+      ...to32bits(index),
+    ]);
+    return Principal.fromUint8Array(array).toText();
+  };
 
   async function waitActionId(requestId: RequestId) {
     const pollStrat = polling.defaultStrategy();
@@ -135,26 +164,43 @@ export async function dfinityHelper(
     async preTransfer(sender, nft) {
       args.agent.replaceIdentity(sender);
 
+      const tid = tokenIdentifier(
+        nft.collectionIdent,
+        Number(nft.native.tokenId)
+      );
+
       const nftContract = Principal.fromText(nft.native.canisterId);
       const approvedQuery = await args.agent.query(nftContract, {
-        methodName: "getApproved",
-        arg: encode([Nat], [BigInt(nft.native.tokenId)]),
+        methodName: "getAllowances",
+        arg: encode([Text], [tid]),
       });
 
-      if (
-        "reply" in approvedQuery &&
-        decode([new PrincipalClass()], approvedQuery.reply.arg)[0].toString() ==
-          args.bridgeContract.toString()
-      ) {
-        // already approved
-        return;
+      if ("reply" in approvedQuery) {
+        let decoded: Array<[number, Principal]> = decode(
+          [Vec(Tuple(Nat32, new PrincipalClass()))],
+          approvedQuery.reply.arg
+        )[0] as any;
+        for (const item of decoded) {
+          if (item[0] === Number(nft.native.tokenId)) {
+            if (item[1].toText() === args.bridgeContract.toText()) {
+              return undefined;
+            }
+          }
+        }
       }
 
       const approveCall = await args.agent.call(nftContract, {
         methodName: "approve",
         arg: encode(
-          [new PrincipalClass(), Nat],
-          [args.bridgeContract, BigInt(nft.native.tokenId)]
+          [ApproveRequest],
+          [
+            {
+              token: tid,
+              allowance: BigInt(1),
+              spender: args.bridgeContract,
+              subaccount: [],
+            },
+          ]
         ),
       });
 
