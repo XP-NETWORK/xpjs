@@ -10,6 +10,7 @@ import { TezosParams } from "../helpers/tezos";
 import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
 import { ChainNonce, InferChainH, InferChainParam, InferSigner } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
+import { DfinityParams } from "../helpers/dfinity";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -142,6 +143,7 @@ export interface ChainParams {
     secretParams: SecretParams;
     hederaParams: Web3Params;
     skaleParams: Web3Params;
+    dfinityParams: DfinityParams;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
