@@ -9,6 +9,8 @@ import { Driver, SimpleNet } from "@vechain/connex-driver";
 import * as thor from "web3-providers-connex";
 import { Framework } from "@vechain/connex-framework";
 import { hethers } from "@hashgraph/hethers";
+import { HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -107,6 +109,14 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x6516E2D3387A9CF4E5e868E7842D110c95A9f3B4",
         nonce: Chain.POLYGON,
         feeMargin,
+      },
+      dfinityParams: {
+        agent: new HttpAgent({
+          host: "http://localhost:8000",
+        }),
+        bridgeContract: Principal.fromText("rrkah-fqaaa-aaaaa-aaaaq-cai"),
+        xpnftId: Principal.fromText("r7inp-6aaaa-aaaaa-aaabq-cai"),
+        notifier,
       },
       fantomParams: {
         notifier,
@@ -246,11 +256,11 @@ export namespace ChainFactoryConfigs {
         provider: hethers.providers.getDefaultProvider("testnet"),
         feeMargin,
         nonce: Chain.HEDERA,
-        minter_addr: "",
-        erc1155Minter: "",
-        erc1155_addr: "",
-        erc721Minter: "",
-        erc721_addr: "",
+        minter_addr: "0x000000000000000000000000000000000000f232",
+        erc1155Minter: "0x000000000000000000000000000000000000f20d",
+        erc1155_addr: "0x000000000000000000000000000000000000f224",
+        erc721Minter: "0x000000000000000000000000000000000000f203",
+        erc721_addr: "0x000000000000000000000000000000000000f21a",
       },
       skaleParams: {
         notifier,

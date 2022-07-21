@@ -49,6 +49,7 @@ import { NftMintArgs } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 import axios from "axios";
+import { hethers } from "@hashgraph/hethers";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -87,6 +88,10 @@ export interface Approve<Sender> {
     sender: Sender
   ): Promise<string | undefined>;
 }
+
+hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
+  return EthBN.from("1000");
+};
 
 /**
  * Base util traits

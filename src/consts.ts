@@ -409,3 +409,12 @@ CHAIN_INFO.set(Chain.SKALE, {
   chainId: 1305754875840118,
   nonce: Chain.SKALE,
 });
+
+CHAIN_INFO.set(Chain.DFINITY, {
+  blockExplorerUrl: "", // TODO
+  constructor: dfinityHelper,
+  currency: SupportedCurrency.ICP,
+  decimals: 1e8,
+  name: "DFINITY",
+  nonce: Chain.DFINITY,
+});
