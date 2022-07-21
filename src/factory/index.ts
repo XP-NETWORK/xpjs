@@ -668,7 +668,8 @@ export function ChainFactory(
           ? mintWith
           : "contractType" in nft.native &&
             //@ts-ignore contractType is checked
-            nft.native.contractType === "ERC1155"
+            nft.native.contractType === "ERC1155" &&
+            toChain.XpNft1155
           ? toChain.XpNft1155
           : toChain.XpNft;
 
