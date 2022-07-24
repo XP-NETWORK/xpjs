@@ -22,6 +22,8 @@ import {
   BalanceCheck,
   ChainNonceGet,
   EstimateTxFees,
+  FeeMargins,
+  GetFeeMargins,
   PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -50,13 +52,15 @@ export type DfinityHelper = ChainNonceGet &
     PreTransfer<DfinitySigner, DfinityNft, string>,
     "preTransfer"
   > &
-  BalanceCheck;
+  BalanceCheck &
+  GetFeeMargins;
 
 export type DfinityParams = {
   agent: HttpAgent;
   bridgeContract: Principal;
   xpnftId: Principal;
   notifier: EvNotifier;
+  feeMargin: FeeMargins;
 };
 
 export async function dfinityHelper(
@@ -205,6 +209,9 @@ export async function dfinityHelper(
       });
 
       return Buffer.from(approveCall.requestId).toString("hex");
+    },
+    getFeeMargin() {
+      return args.feeMargin;
     },
     async balance(address) {
       const bal = await ledger.accountBalance({
