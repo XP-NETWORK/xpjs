@@ -112,10 +112,10 @@ export namespace ChainFactoryConfigs {
       },
       dfinityParams: {
         agent: new HttpAgent({
-          host: "http://localhost:8000",
+          host: "https://nodes.xp.network/dfinity/",
         }),
-        bridgeContract: Principal.fromText("rrkah-fqaaa-aaaaa-aaaaq-cai"),
-        xpnftId: Principal.fromText("r7inp-6aaaa-aaaaa-aaabq-cai"),
+        bridgeContract: Principal.fromText("renrk-eyaaa-aaaaa-aaada-cai"),
+        xpnftId: Principal.fromText("qoctq-giaaa-aaaaa-aaaea-cai"),
         notifier,
       },
       fantomParams: {
@@ -253,7 +253,7 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-        provider: hethers.providers.getDefaultProvider("testnet"),
+        provider: hethers.providers.getDefaultProvider("previewnet"),
         feeMargin,
         nonce: Chain.HEDERA,
         minter_addr: "0x000000000000000000000000000000000000f232",
