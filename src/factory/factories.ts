@@ -117,6 +117,7 @@ export namespace ChainFactoryConfigs {
         bridgeContract: Principal.fromText("renrk-eyaaa-aaaaa-aaada-cai"),
         xpnftId: Principal.fromText("qoctq-giaaa-aaaaa-aaaea-cai"),
         notifier,
+        feeMargin,
       },
       fantomParams: {
         notifier,
