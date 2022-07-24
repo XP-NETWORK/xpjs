@@ -2,6 +2,7 @@ import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
 import { Chain, CHAIN_INFO } from "../consts";
+
 export * from "./factories";
 
 import {
@@ -657,6 +658,10 @@ export function ChainFactory(
         }
       }
 
+      const tokenId =
+        //@ts-ignore
+        nft.native && "tokenId" in nft.native && nft.native.tokenId.toString();
+
       const mw =
         "contract" in nft.native &&
         mintWith &&
@@ -665,8 +670,7 @@ export function ChainFactory(
           mintWith,
           toChain.getNonce(),
           fromChain.getNonce(),
-          //@ts-expect-error tokenId is checked
-          "tokenId" in nft.native ? nft.native.tokenId.toString() : undefined
+          tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
         ))
           ? mintWith
           : "contractType" in nft.native &&
