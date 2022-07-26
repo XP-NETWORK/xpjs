@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Bech32, SecretNetworkClient, Tx } from "secretjs";
 import { Snip721MintOptions } from "secretjs/dist/extensions/snip721/types";
+import { Snip721GetTokensResponse } from "secretjs/dist/extensions/snip721/msg/GetTokens";
 import { EvNotifier } from "../notifier";
 import {
   BalanceCheck,
@@ -29,6 +30,10 @@ export type SecretMintArgs = {
 };
 
 type SecretSigner = SecretNetworkClient;
+
+type GetOwnedTokensResponse = Snip721GetTokensResponse & {
+  generic_err?: { msg: string };
+};
 
 export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
   UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> &
@@ -171,11 +176,15 @@ export async function secretHelperFactory(
         codeHash: codeHash || "",
       };
 
-      const { token_list } = await queryClient.query.snip721.GetOwnedTokens({
-        contract,
-        auth,
-        owner,
-      });
+      const { token_list, generic_err } =
+        (await queryClient.query.snip721.GetOwnedTokens({
+          contract,
+          auth,
+          owner,
+        })) as GetOwnedTokensResponse;
+
+      if (generic_err) throw new Error(generic_err.msg);
+
       const response: NftInfo<SecretNftInfo>[] = [];
       await Promise.all(
         token_list.tokens.map(async (token) => {
