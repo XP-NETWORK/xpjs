@@ -103,7 +103,7 @@ export type BaseWeb3Helper = BalanceCheck &
    * @argument signer  owner of the smart contract
    * @argument args  See [[MintArgs]]
    */
-  MintNft<Signer, NftMintArgs, string> & {
+  MintNft<Signer, NftMintArgs, ContractTransaction> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -112,6 +112,11 @@ export type BaseWeb3Helper = BalanceCheck &
      * @returns Address of the deployed smart contract
      */
     deployErc721(owner: Signer): Promise<string>;
+  } & {
+    mintNftErc1155(
+      owner: Signer,
+      options: NftMintArgs
+    ): Promise<ContractTransaction>;
   };
 
 /**
@@ -162,15 +167,20 @@ export async function baseWeb3HelperFactory(
 
       return contract.address;
     },
+    async mintNftErc1155(owner: Signer, { contract }: NftMintArgs) {
+      const erc1155 = Erc1155Minter__factory.connect(contract!, owner);
+      const tx = await erc1155.mintNft(await owner.getAddress());
+
+      return tx;
+    },
     async mintNft(
       owner: Signer,
       { contract, uris }: NftMintArgs
-    ): Promise<string> {
+    ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
 
       const txm = await erc721.mint(uris[0]);
-      const receipt = await txm.wait();
-      return receipt.transactionHash;
+      return txm;
     },
   };
 }
