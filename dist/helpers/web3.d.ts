@@ -45,7 +45,7 @@ export declare type BaseWeb3Helper = BalanceCheck &
  * @argument signer  owner of the smart contract
  * @argument args  See [[MintArgs]]
  */
-MintNft<Signer, NftMintArgs, string> & {
+MintNft<Signer, NftMintArgs, ContractTransaction> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -54,6 +54,8 @@ MintNft<Signer, NftMintArgs, string> & {
      * @returns Address of the deployed smart contract
      */
     deployErc721(owner: Signer): Promise<string>;
+} & {
+    mintNftErc1155(owner: Signer, options: NftMintArgs): Promise<ContractTransaction>;
 };
 /**
  * Traits implemented by this module
