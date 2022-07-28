@@ -149,11 +149,16 @@ export async function tezosHelperFactory({
       operator?: BigMapAbstraction;
     }>();
 
-    let op = await storage?.operators?.get({
-      owner,
-      operator: bridgeAddress,
-      token_id: nft.native.token_id,
-    });
+    const storageOperator = storage.operator || storage.operators;
+    const args = storage.operator
+      ? [bridgeAddress, nft.native.token_id, owner]
+      : {
+          owner,
+          operator: bridgeAddress,
+          token_id: nft.native.token_id,
+        };
+
+    const op = await storageOperator?.get(args);
 
     return op != undefined;
   }
