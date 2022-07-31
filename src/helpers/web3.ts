@@ -279,13 +279,21 @@ export async function web3HelperFactory(
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7
       ? async (utx: PopulatedTransaction) => {
-          const res = await axios.get(
-            "https://gasstation-mainnet.matic.network/v2"
-          );
-          const { fast } = res.data;
+          const res = await axios
+            .get(
+              "https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=pendingpooltxgweidata"
+            )
+            .catch(async (e) => {
+              return await axios.get(
+                "https://gasstation-mainnet.matic.network/v2"
+              );
+            });
+          const { result } = res.data;
+          const fast = result["rapidgaspricegwei"] || res.data.fast;
+
           if (fast) {
             const sixtyGwei = ethers.utils.parseUnits(
-              Math.ceil(fast.maxFee).toString(),
+              Math.ceil(fast.maxFee || fast).toString(),
               "gwei"
             );
             utx.maxFeePerGas = sixtyGwei;
@@ -584,6 +592,7 @@ export async function web3HelperFactory(
       _mintWith
     ): Promise<BigNumber> {
       const gas = await provider.getGasPrice();
+
       return new BigNumber(gas.mul(150_000).toString());
     },
     validateAddress(adr) {
