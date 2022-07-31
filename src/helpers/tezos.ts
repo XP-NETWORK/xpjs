@@ -107,7 +107,9 @@ export async function tezosHelperFactory({
 
       const res = cb(contractI);
 
-      const estim = await Tezos.estimate.transfer(res.toTransferParams(params));
+      const estim = await Tezos.estimate
+        .transfer(res.toTransferParams(params))
+        .catch(() => ({ storageLimit: 0 }));
 
       if (params) {
         if (!params.storageLimit) params.storageLimit = estim.storageLimit;
