@@ -66,7 +66,7 @@ export enum MainNetRpcUri {
   TEZOS = "https://mainnet.smartpy.io",
   IOTEX = "https://babel-api.mainnet.iotex.io",
   AURORA = "https://mainnet.aurora.dev",
-  GODWOKEN = "https://mainnet.godwoken.io/rpc",
+  GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
   // TODO: Algorand
