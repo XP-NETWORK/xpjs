@@ -394,7 +394,7 @@ CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/testnet/transaction",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.HBAR,
-  decimals: 1e18,
+  decimals: 1e6,
   nonce: Chain.HEDERA,
   name: "Hedera",
 });

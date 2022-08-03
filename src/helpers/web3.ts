@@ -90,7 +90,7 @@ export interface Approve<Sender> {
 }
 
 hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
-  return EthBN.from("1000");
+  return EthBN.from("1");
 };
 
 /**
@@ -179,7 +179,7 @@ export async function baseWeb3HelperFactory(
     ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
 
-      const txm = await erc721.mint(uris[0]);
+      const txm = await erc721.mint(uris[0], { gasLimit: 1000000 });
       return txm;
     },
   };
@@ -235,7 +235,10 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     validateUnfreeze: "validateUnfreezeErc1155",
     umt: Erc1155Minter__factory,
     approved: (umt: Erc1155Minter, sender: string, minterAddr: string) => {
-      return umt.isApprovedForAll(sender, minterAddr);
+      return umt.isApprovedForAll(sender, minterAddr, {
+        gasLimit: "1000000",
+        customData: {},
+      });
     },
     approve: async (
       umt: Erc1155Minter,
@@ -243,7 +246,14 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       _tok: string,
       txnUp: (tx: PopulatedTransaction) => Promise<void>
     ) => {
-      const tx = await umt.populateTransaction.setApprovalForAll(forAddr, true);
+      const tx = await umt.populateTransaction.setApprovalForAll(
+        forAddr,
+        true,
+        {
+          gasLimit: "1000000",
+          customData: {},
+        }
+      );
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
     },
@@ -258,7 +268,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       minterAddr: string,
       tok: string
     ) => {
-      return (await umt.getApproved(tok)) == minterAddr;
+      return (
+        (
+          await umt.getApproved(tok, {
+            gasLimit: "1000000",
+            customData: {},
+            //@ts-ignore
+          })
+        ).toLowerCase() == minterAddr.toLowerCase()
+      );
     },
     approve: async (
       umt: UserNftMinter,
@@ -266,7 +284,9 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       tok: string,
       txnUp: (tx: PopulatedTransaction) => Promise<void>
     ) => {
-      const tx = await umt.populateTransaction.approve(forAddr, tok);
+      const tx = await umt.populateTransaction.approve(forAddr, tok, {
+        gasLimit: "100000",
+      });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
     },
@@ -517,6 +537,8 @@ export async function web3HelperFactory(
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
+      const isHedera = params.nonce === 0x1d;
+
       const tx = await minter
         .connect(sender)
         .populateTransaction[method](
@@ -526,7 +548,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString(10)),
+            value: isHedera ? "150" : EthBN.from(txFees.toString(10)),
             gasLimit,
           }
         );
@@ -535,7 +557,8 @@ export async function web3HelperFactory(
       const txr = await sender.sendTransaction(tx);
 
       await notifyValidator(
-        txr.hash,
+        //@ts-ignore
+        isHedera ? txr["transactionId"] : txr.hash,
         await extractAction(txr),
         "Transfer",
         chain_nonce,
