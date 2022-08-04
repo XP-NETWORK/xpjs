@@ -111,9 +111,12 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       dfinityParams: {
-        agent: new HttpAgent(),
-        bridgeContract: Principal.fromText("renrk-eyaaa-aaaaa-aaada-cai"),
-        xpnftId: Principal.fromText("qoctq-giaaa-aaaaa-aaaea-cai"),
+        agent: new HttpAgent({
+          host: "https://ic0.app",
+        }),
+        bridgeContract: Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
+        xpnftId: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
+        umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
         notifier,
         feeMargin,
       },
@@ -348,8 +351,8 @@ export namespace ChainFactoryConfigs {
       dfinityParams: {
         agent: new HttpAgent(),
         bridgeContract: Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
-        xpnftId: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
-        umt: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
+        xpnftId: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
+        umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
         notifier,
         feeMargin,
       },
