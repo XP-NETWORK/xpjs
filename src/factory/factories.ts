@@ -111,9 +111,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       dfinityParams: {
-        agent: new HttpAgent({
-          host: "https://nodes.xp.network/dfinity/",
-        }),
+        agent: new HttpAgent(),
         bridgeContract: Principal.fromText("renrk-eyaaa-aaaaa-aaada-cai"),
         xpnftId: Principal.fromText("qoctq-giaaa-aaaaa-aaaea-cai"),
         notifier,
@@ -345,6 +343,14 @@ export namespace ChainFactoryConfigs {
         esdt_swap: "WEGLD-5f1f8d",
         notifier,
         nonce: Chain.ELROND,
+        feeMargin,
+      },
+      dfinityParams: {
+        agent: new HttpAgent(),
+        bridgeContract: Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
+        xpnftId: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
+        umt: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
+        notifier,
         feeMargin,
       },
       vechainParams: {
