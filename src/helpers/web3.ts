@@ -14,6 +14,7 @@ import {
   EstimateTxFeesBatch,
   FeeMargins,
   GetFeeMargins,
+  IsContractAddress,
 } from "./chain";
 import {
   Signer,
@@ -142,7 +143,8 @@ export type Web3Helper = BaseWeb3Helper &
     XpNft: string;
     XpNft1155: string;
   } & WhitelistCheck<EthNftInfo> &
-  GetFeeMargins;
+  GetFeeMargins &
+  IsContractAddress;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -418,6 +420,10 @@ export async function web3HelperFactory(
     isApprovedForMinter,
     preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,
+    async isContractAddress(address) {
+      const code = await provider.getCode(address);
+      return code !== "0x";
+    },
     getNonce: () => params.nonce,
     async preTransferRawTxn(id, address, _value) {
       const isApproved = await isApprovedForMinter(
