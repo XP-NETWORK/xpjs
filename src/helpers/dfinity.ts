@@ -1,4 +1,11 @@
-import { HttpAgent, Identity, polling, RequestId } from "@dfinity/agent";
+import {
+  HttpAgent,
+  Identity,
+  polling,
+  RequestId,
+  SubmitResponse,
+} from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
 import {
   decode,
   encode,
@@ -24,6 +31,7 @@ import {
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
+  MintNft,
   PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -36,6 +44,26 @@ export type DfinityNft = {
   canisterId: string;
   tokenId: string;
 };
+
+export type DfinityMintArgs = {
+  canisterId?: string;
+  uri: string;
+};
+
+const User = IDL.Variant({
+  principal: IDL.Principal,
+  address: IDL.Text,
+});
+export type User = { principal: Principal } | { address: AccountIdentifier };
+export interface MintRequest {
+  to: User;
+  metadata: [] | [Array<number>];
+}
+
+const MintRequest = IDL.Record({
+  to: User,
+  metadata: IDL.Opt(IDL.Vec(IDL.Nat8)),
+});
 
 const ApproveRequest = Record({
   token: Text,
@@ -53,7 +81,8 @@ export type DfinityHelper = ChainNonceGet &
     "preTransfer"
   > &
   BalanceCheck &
-  GetFeeMargins;
+  GetFeeMargins &
+  MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse>;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -61,6 +90,7 @@ export type DfinityParams = {
   xpnftId: Principal;
   notifier: EvNotifier;
   feeMargin: FeeMargins;
+  umt: Principal;
 };
 
 export async function dfinityHelper(
@@ -140,6 +170,26 @@ export async function dfinityHelper(
       await args.notifier.notifyDfinity(actionId);
 
       return Buffer.from(freezeCall.requestId).toString("hex");
+    },
+    async mintNft(owner, options) {
+      const canister = Principal.fromText(
+        options.canisterId ? options.canisterId : args.umt.toText()
+      );
+      let mint = await args.agent.call(canister, {
+        methodName: "mintNFT",
+        arg: encode(
+          [MintRequest],
+          [
+            {
+              metadata: [[...Buffer.from(options.uri)]],
+              to: {
+                principal: owner.getPrincipal(),
+              },
+            } as MintRequest,
+          ]
+        ),
+      });
+      return mint;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       args.agent.replaceIdentity(sender);
