@@ -99,6 +99,9 @@ export interface GetProvider<Provider> {
     getProvider(): Provider;
 }
 export declare function isWrappedNft(nft: NftInfo<unknown>): Promise<boolean>;
+export interface IsContractAddress {
+    isContractAddress(address: string): Promise<boolean>;
+}
 export interface FeeMargins {
     min: number;
     max: number;
