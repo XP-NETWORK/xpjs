@@ -50,8 +50,8 @@ export type TezosHelper = TransferNftForeign<
   ChainNonceGet &
   Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
     isApprovedForMinter(
-      signer: TezosSigner,
-      nft: NftInfo<TezosNftInfo>
+      nft: NftInfo<TezosNftInfo>,
+      signer: TezosSigner
     ): Promise<boolean>;
   } & {
     approveForMinter(
@@ -141,8 +141,8 @@ export async function tezosHelperFactory({
   }
 
   async function isApprovedForMinter(
-    sender: TezosSigner,
-    nft: NftInfo<TezosNftInfo>
+    nft: NftInfo<TezosNftInfo>,
+    sender: TezosSigner
   ) {
     const owner = await getAddress(sender);
     const contract = await Tezos.contract.at(nft.native.contract);
@@ -170,7 +170,7 @@ export async function tezosHelperFactory({
   }
 
   async function preTransfer(signer: TezosSigner, nft: NftInfo<TezosNftInfo>) {
-    if (await isApprovedForMinter(signer, nft)) {
+    if (await isApprovedForMinter(nft, signer)) {
       return;
     }
     const owner = await getAddress(signer);
