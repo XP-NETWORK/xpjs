@@ -1,8 +1,8 @@
 import { HttpAgent, Identity, SubmitResponse } from "@dfinity/agent";
 import { AccountIdentifier } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
-import { EvNotifier } from "../notifier";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import { EvNotifier } from "../../notifier";
+import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 export declare type DfinitySigner = Identity;
 export declare type DfinityNft = {
     canisterId: string;

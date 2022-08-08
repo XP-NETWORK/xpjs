@@ -8,7 +8,7 @@ import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 import { SecretHelper, SecretParams } from "./helpers/secret";
 import { SolanaHelper, SolanaParams } from "./helpers/solana";
 import { TonHelper, TonParams } from "./helpers/ton";
-import { DfinityHelper, DfinityParams } from "./helpers/dfinity";
+import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
