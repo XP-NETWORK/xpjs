@@ -554,7 +554,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: isHedera ? "150" : EthBN.from(txFees.toString(10)),
+            value: EthBN.from(txFees.toString(10)),
             gasLimit,
           }
         );
