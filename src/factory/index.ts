@@ -53,7 +53,7 @@ import {
   ParamMap,
 } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
-import { DfinityParams } from "../helpers/dfinity";
+import { DfinityParams } from "../helpers/dfinity/dfinity";
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,

@@ -20,7 +20,11 @@ import {
 } from "./helpers/secret";
 import { solanaHelper, SolanaHelper, SolanaParams } from "./helpers/solana";
 import { tonHelper, TonHelper, TonParams } from "./helpers/ton";
-import { dfinityHelper, DfinityHelper, DfinityParams } from "./helpers/dfinity";
+import {
+  dfinityHelper,
+  DfinityHelper,
+  DfinityParams,
+} from "./helpers/dfinity/dfinity";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
