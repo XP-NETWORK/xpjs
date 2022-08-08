@@ -36,8 +36,7 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "../chain";
-//@ts-ignore
-import { idl } from "./idl.js";
+import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
 
 export type DfinitySigner = Identity;
@@ -100,7 +99,7 @@ export async function dfinityHelper(
 ): Promise<DfinityHelper> {
   const ledger = LedgerCanister.create({ agent: args.agent });
 
-  const minter: ActorSubclass<_SERVICE> = Actor.createActor(idl, {
+  const minter: ActorSubclass<_SERVICE> = Actor.createActor(idlFactory, {
     agent: args.agent,
     canisterId: args.bridgeContract,
   });

@@ -1,4 +1,4 @@
-export const idlFactory = ({ IDL }) => {
+export const idlFactory = ({ IDL }: { IDL: any }) => {
   const ValidateWhitelistDip721 = IDL.Record({
     dip_contract: IDL.Principal,
   });
