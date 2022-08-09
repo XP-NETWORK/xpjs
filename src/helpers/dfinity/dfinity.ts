@@ -106,8 +106,10 @@ export async function dfinityHelper(
 
   async function transferTxFee(amt: BigNumber): Promise<bigint> {
     return await ledger.transfer({
-      to: AccountIdentifier.fromPrincipal({ principal: args.bridgeContract }),
-      amount: ICP.fromString(amt.toFixed()) as ICP,
+      to: AccountIdentifier.fromPrincipal({
+        principal: args.bridgeContract,
+      }),
+      amount: ICP.fromE8s(BigInt(amt.toString())),
     });
   }
   const to32bits = (num: number) => {
