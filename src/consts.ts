@@ -20,7 +20,11 @@ import {
 } from "./helpers/secret";
 import { solanaHelper, SolanaHelper, SolanaParams } from "./helpers/solana";
 import { tonHelper, TonHelper, TonParams } from "./helpers/ton";
-import { dfinityHelper, DfinityHelper, DfinityParams } from "./helpers/dfinity";
+import {
+  dfinityHelper,
+  DfinityHelper,
+  DfinityParams,
+} from "./helpers/dfinity/dfinity";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -395,7 +399,7 @@ CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/testnet/transaction",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.HBAR,
-  decimals: 1e18,
+  decimals: 1e6,
   nonce: Chain.HEDERA,
   name: "Hedera",
 });

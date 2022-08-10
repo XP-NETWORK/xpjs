@@ -181,6 +181,10 @@ export async function isWrappedNft(nft: NftInfo<unknown>) {
   );
 }
 
+export interface IsContractAddress {
+  isContractAddress(address: string): Promise<boolean>;
+}
+
 export interface FeeMargins {
   min: number;
   max: number;

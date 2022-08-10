@@ -40,6 +40,7 @@ import {
   EstimateTxFeesBatch,
   GetFeeMargins,
   FeeMargins,
+  IsContractAddress,
 } from "./chain";
 import {
   Chain,
@@ -207,7 +208,7 @@ export type ElrondHelper = BalanceCheck &
   SetESDTRoles & { XpNft: string } & GetFeeMargins & {
     wegldBalance(address: string): Promise<BigNumber>;
     unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
-  };
+  } & IsContractAddress;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -560,6 +561,9 @@ export async function elrondHelperFactory(
       await wallet.sync(provider);
 
       return wallet.balance.valueOf();
+    },
+    async isContractAddress(address) {
+      return Address.fromString(address).isContractAddress();
     },
     getFeeMargin() {
       return elrondParams.feeMargin;

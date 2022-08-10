@@ -53,7 +53,7 @@ import {
   ParamMap,
 } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
-import { DfinityParams } from "../helpers/dfinity";
+import { DfinityParams } from "../helpers/dfinity/dfinity";
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -121,6 +121,17 @@ export type ChainFactory = {
     nft: NftInfo<RawNftF>[],
     sender: SignerF,
     receiver: string,
+    fee?: BigNumber.Value,
+    mintWith?: string
+  ): Promise<Resp[]>;
+
+  transferSft<SignerF, RawNftF, Resp>(
+    fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
+    toChain: FullChainBatch<never, unknown, unknown>,
+    nft: NftInfo<RawNftF>,
+    sender: SignerF,
+    receiver: string,
+    amt: bigint,
     fee?: BigNumber.Value,
     mintWith?: string
   ): Promise<Resp[]>;
@@ -559,7 +570,7 @@ export function ChainFactory(
           }
         })
       );
-      wrapped.length &&
+      unwrapped.length &&
         result.push(
           from.transferNftBatchToForeign(
             signer,
@@ -570,7 +581,7 @@ export function ChainFactory(
             new BigNumber(fee)
           )
         );
-      unwrapped.length &&
+      wrapped.length &&
         result.push(
           from.unfreezeWrappedNftBatch(
             signer,
@@ -583,6 +594,22 @@ export function ChainFactory(
       return await Promise.all(result);
     },
     estimateBatchFees,
+    async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
+      let transfers = Array(parseInt(amt.toString())).fill(nft);
+      if (!fee) {
+        fee = await estimateBatchFees(from, to, transfers, receiver);
+      }
+      const response = this.transferBatchNft(
+        from,
+        to,
+        transfers,
+        sender,
+        receiver,
+        new BigNumber(fee!).dividedToIntegerBy(5),
+        mintWith
+      );
+      return response;
+    },
     async getDestinationTransaction<T>(
       chain: ExtractAction<T> & ExtractTxnStatus,
       targetNonce: number,

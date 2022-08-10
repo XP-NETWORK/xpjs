@@ -1,10 +1,16 @@
-import { HttpAgent, Identity, polling, RequestId } from "@dfinity/agent";
+import {
+  Actor,
+  ActorSubclass,
+  HttpAgent,
+  Identity,
+  SubmitResponse,
+} from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
 import {
   decode,
   encode,
   Nat,
   Nat32,
-  Nat64,
   Nat8,
   Opt,
   PrincipalClass,
@@ -16,19 +22,22 @@ import {
 import { AccountIdentifier, ICP, LedgerCanister } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import BigNumber from "bignumber.js";
-import { Chain } from "../consts";
-import { EvNotifier } from "../notifier";
+import { Chain } from "../../consts";
+import { EvNotifier } from "../../notifier";
 import {
   BalanceCheck,
   ChainNonceGet,
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
+  MintNft,
   PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
-} from "./chain";
+} from "../chain";
+import { idlFactory } from "./idl";
+import { _SERVICE } from "./minter.did";
 
 export type DfinitySigner = Identity;
 
@@ -36,6 +45,26 @@ export type DfinityNft = {
   canisterId: string;
   tokenId: string;
 };
+
+export type DfinityMintArgs = {
+  canisterId?: string;
+  uri: string;
+};
+
+const User = IDL.Variant({
+  principal: IDL.Principal,
+  address: IDL.Text,
+});
+export type User = { principal: Principal } | { address: AccountIdentifier };
+export interface MintRequest {
+  to: User;
+  metadata: [] | [Array<number>];
+}
+
+const MintRequest = IDL.Record({
+  to: User,
+  metadata: IDL.Opt(IDL.Vec(IDL.Nat8)),
+});
 
 const ApproveRequest = Record({
   token: Text,
@@ -53,7 +82,8 @@ export type DfinityHelper = ChainNonceGet &
     "preTransfer"
   > &
   BalanceCheck &
-  GetFeeMargins;
+  GetFeeMargins &
+  MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse>;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -61,6 +91,7 @@ export type DfinityParams = {
   xpnftId: Principal;
   notifier: EvNotifier;
   feeMargin: FeeMargins;
+  umt: Principal;
 };
 
 export async function dfinityHelper(
@@ -68,10 +99,17 @@ export async function dfinityHelper(
 ): Promise<DfinityHelper> {
   const ledger = LedgerCanister.create({ agent: args.agent });
 
+  const minter: ActorSubclass<_SERVICE> = Actor.createActor(idlFactory, {
+    agent: args.agent,
+    canisterId: args.bridgeContract,
+  });
+
   async function transferTxFee(amt: BigNumber): Promise<bigint> {
     return await ledger.transfer({
-      to: AccountIdentifier.fromPrincipal({ principal: args.bridgeContract }),
-      amount: ICP.fromString(amt.toFixed()) as ICP,
+      to: AccountIdentifier.fromPrincipal({
+        principal: args.bridgeContract,
+      }),
+      amount: ICP.fromE8s(BigInt(amt.toString())),
     });
   }
   const to32bits = (num: number) => {
@@ -91,17 +129,17 @@ export async function dfinityHelper(
     return Principal.fromUint8Array(array).toText();
   };
 
-  async function waitActionId(requestId: RequestId) {
-    const pollStrat = polling.defaultStrategy();
-    const resp = await polling.pollForResponse(
-      args.agent,
-      args.bridgeContract,
-      requestId,
-      pollStrat
-    );
+  // async function waitActionId(requestId: RequestId) {
+  //   const pollStrat = polling.defaultStrategy();
+  //   const resp = await polling.pollForResponse(
+  //     args.agent,
+  //     args.bridgeContract,
+  //     requestId,
+  //     pollStrat
+  //   );
 
-    return decode([Nat], resp)[0].toString() as string;
-  }
+  //   return decode([Nat], resp)[0].toString() as string;
+  // }
 
   return {
     XpNft: args.xpnftId.toString(),
@@ -121,49 +159,55 @@ export async function dfinityHelper(
 
       const txFeeBlock = await transferTxFee(txFees);
 
-      const freezeCall = await args.agent.call(args.bridgeContract, {
-        methodName: "freeze_nft",
+      const actionId = await minter.freeze_nft(
+        txFeeBlock,
+        Principal.fromText(id.native.canisterId),
+        BigInt(id.native.tokenId),
+        BigInt(chain_nonce),
+        to,
+        mintWith
+      );
+
+      await args.notifier.notifyDfinity(actionId.toString());
+
+      return "NO TX RESP YET";
+    },
+    async mintNft(owner, options) {
+      const canister = Principal.fromText(
+        options.canisterId ? options.canisterId : args.umt.toText()
+      );
+      let mint = await args.agent.call(canister, {
+        methodName: "mintNFT",
         arg: encode(
-          [Nat64, new PrincipalClass(), Nat, Nat64, Text, Text],
+          [MintRequest],
           [
-            txFeeBlock,
-            Principal.fromText(id.native.canisterId),
-            BigInt(id.native.tokenId),
-            chain_nonce,
-            to,
-            mintWith,
+            {
+              metadata: [[...Buffer.from(options.uri)]],
+              to: {
+                principal: owner.getPrincipal(),
+              },
+            } as MintRequest,
           ]
         ),
       });
-
-      const actionId = await waitActionId(freezeCall.requestId);
-      await args.notifier.notifyDfinity(actionId);
-
-      return Buffer.from(freezeCall.requestId).toString("hex");
+      return mint;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       args.agent.replaceIdentity(sender);
 
       const txFeeBlock = await transferTxFee(txFees);
 
-      const withdrawCall = await args.agent.call(args.bridgeContract, {
-        methodName: "withdraw_nft",
-        arg: encode(
-          [Nat64, new PrincipalClass(), Nat, Nat64, Text],
-          [
-            txFeeBlock,
-            Principal.fromText(id.native.canisterId),
-            BigInt(id.native.tokenId),
-            nonce,
-            to,
-          ]
-        ),
-      });
+      const actionId = await minter.withdraw_nft(
+        txFeeBlock,
+        Principal.fromText(id.native.canisterId),
+        BigInt(id.native.tokenId),
+        BigInt(nonce),
+        to
+      );
 
-      const actionId = await waitActionId(withdrawCall.requestId);
-      await args.notifier.notifyDfinity(actionId);
+      await args.notifier.notifyDfinity(actionId.toString());
 
-      return Buffer.from(withdrawCall.requestId).toString("hex");
+      return "NO TX RESP YET";
     },
     async preTransfer(sender, nft) {
       args.agent.replaceIdentity(sender);
