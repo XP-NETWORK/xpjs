@@ -596,13 +596,16 @@ export function ChainFactory(
     estimateBatchFees,
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
       let transfers = Array(parseInt(amt.toString())).fill(nft);
+      if (!fee) {
+        fee = await estimateBatchFees(from, to, transfers, receiver);
+      }
       const response = this.transferBatchNft(
         from,
         to,
         transfers,
         sender,
         receiver,
-        fee,
+        new BigNumber(fee!).div(5),
         mintWith
       );
       return response;
