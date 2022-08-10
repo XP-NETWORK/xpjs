@@ -94,6 +94,8 @@ hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
   return EthBN.from("1");
 };
 
+type NullableCustomData = Record<string, any> | undefined;
+
 /**
  * Base util traits
  */
@@ -214,13 +216,15 @@ type NftMethodVal<T, Tx> = {
     umt: T,
     sender: string,
     minterAddr: string,
-    tok: string
+    tok: string,
+    customData: NullableCustomData
   ) => Promise<boolean>;
   approve: (
     umt: T,
     forAddr: string,
     tok: string,
-    txnUp: (tx: PopulatedTransaction) => Promise<void>
+    txnUp: (tx: PopulatedTransaction) => Promise<void>,
+    customData: NullableCustomData
   ) => Promise<Tx>;
 };
 
@@ -236,24 +240,31 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     freeze: "freezeErc1155",
     validateUnfreeze: "validateUnfreezeErc1155",
     umt: Erc1155Minter__factory,
-    approved: (umt: Erc1155Minter, sender: string, minterAddr: string) => {
+    approved: (
+      umt: Erc1155Minter,
+      sender: string,
+      minterAddr: string,
+      _tok: string,
+      customData: NullableCustomData
+    ) => {
       return umt.isApprovedForAll(sender, minterAddr, {
         gasLimit: "1000000",
-        customData: {},
+        customData,
       });
     },
     approve: async (
       umt: Erc1155Minter,
       forAddr: string,
       _tok: string,
-      txnUp: (tx: PopulatedTransaction) => Promise<void>
+      txnUp: (tx: PopulatedTransaction) => Promise<void>,
+      customData: NullableCustomData
     ) => {
       const tx = await umt.populateTransaction.setApprovalForAll(
         forAddr,
         true,
         {
           gasLimit: "1000000",
-          customData: {},
+          customData,
         }
       );
       await txnUp(tx);
@@ -268,13 +279,14 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       umt: UserNftMinter,
       _: string,
       minterAddr: string,
-      tok: string
+      tok: string,
+      customData: NullableCustomData
     ) => {
       return (
         (
           await umt.getApproved(tok, {
             gasLimit: "1000000",
-            customData: {},
+            customData,
             //@ts-ignore
           })
         ).toLowerCase() == minterAddr.toLowerCase()
@@ -378,7 +390,8 @@ export async function web3HelperFactory(
       erc as any,
       await signer.getAddress(),
       minter_addr,
-      id.native.tokenId
+      id.native.tokenId,
+      params.nonce === 0x1d ? {} : undefined
     );
   };
 
@@ -396,7 +409,8 @@ export async function web3HelperFactory(
       erc as any,
       minter_addr,
       id.native.tokenId,
-      txnUnderpricedPolyWorkaround
+      txnUnderpricedPolyWorkaround,
+      params.nonce === 0x1d ? {} : undefined
     );
     await receipt.wait();
     return receipt.hash;
