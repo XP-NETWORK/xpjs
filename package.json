@@ -33,6 +33,7 @@
   "dependencies": {
     "@dfinity/agent": "^0.11.3",
     "@dfinity/candid": "^0.11.3",
+    "@dfinity/identity": "^0.12.2",
     "@dfinity/nns": "^0.5.0",
     "@dfinity/principal": "^0.11.3",
     "@elrondnetwork/erdjs": "9.0.3",
