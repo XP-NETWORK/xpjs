@@ -605,7 +605,7 @@ export function ChainFactory(
         transfers,
         sender,
         receiver,
-        new BigNumber(fee!).div(5),
+        new BigNumber(fee!).dividedToIntegerBy(5),
         mintWith
       );
       return response;
