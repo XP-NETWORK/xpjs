@@ -35,6 +35,7 @@ export interface IsApproved<Sender> {
 export interface Approve<Sender> {
     approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<string | undefined>;
 }
+declare type NullableCustomData = Record<string, any> | undefined;
 /**
  * Base util traits
  */
@@ -94,8 +95,8 @@ declare type NftMethodVal<T, Tx> = {
     freeze: "freezeErc1155" | "freezeErc721";
     validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
     umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
-    approved: (umt: T, sender: string, minterAddr: string, tok: string) => Promise<boolean>;
-    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>) => Promise<Tx>;
+    approved: (umt: T, sender: string, minterAddr: string, tok: string, customData: NullableCustomData) => Promise<boolean>;
+    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData) => Promise<Tx>;
 };
 declare type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
 declare type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
