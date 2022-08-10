@@ -570,7 +570,7 @@ export function ChainFactory(
           }
         })
       );
-      wrapped.length &&
+      unwrapped.length &&
         result.push(
           from.transferNftBatchToForeign(
             signer,
@@ -581,7 +581,7 @@ export function ChainFactory(
             new BigNumber(fee)
           )
         );
-      unwrapped.length &&
+      wrapped.length &&
         result.push(
           from.unfreezeWrappedNftBatch(
             signer,
