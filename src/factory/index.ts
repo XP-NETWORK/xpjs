@@ -598,7 +598,7 @@ export function ChainFactory(
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
       let transfers = Array(parseInt(amt.toString())).fill(nft);
       if (!fee) {
-        fee = await estimateBatchFees(from, to, transfers, receiver);
+        fee = await estimateFees(from, to, transfers[0], receiver);
       }
       const response = this.transferBatchNft(
         from,
