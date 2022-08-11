@@ -151,8 +151,8 @@ export type ChainFactory = {
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
    * @param owner: Address of the owner of the NFT as a raw string.
    */
-  nftList<RawNft>(
-    chain: ChainNonceGet,
+  nftList<Signer, RawNft, Resp>(
+    chain: ChainNonceGet & TransferNftForeign<Signer, RawNft, Resp>,
     owner: string
   ): Promise<NftInfo<RawNft>[]>;
   /**
@@ -653,8 +653,11 @@ export function ChainFactory(
       helpers.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },
-    async nftList<T>(chain: ChainNonceGet, owner: string) {
-      let res = await nftlistRest.get<{ data: NftInfo<T>[] }>(
+    async nftList<Signer, RawNft, Resp>(
+      chain: ChainNonceGet & TransferNftForeign<Signer, RawNft, Resp>,
+      owner: string
+    ) {
+      let res = await nftlistRest.get<{ data: NftInfo<RawNft>[] }>(
         `/nfts/${chain.getNonce()}/${owner}`
       );
 
