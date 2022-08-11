@@ -141,11 +141,11 @@ export type ChainFactory = {
    * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
    */
-  mint<Signer>(
-    chain: MintNft<Signer, NftMintArgs, string>,
+  mint<Signer, Args, Ret>(
+    chain: MintNft<Signer, Args, Ret>,
     owner: Signer,
-    args: NftMintArgs
-  ): Promise<string>;
+    args: Args
+  ): Promise<Ret>;
   /**
    * Lists all the NFTs on the chain owner by {@param owner}.
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
@@ -747,11 +747,11 @@ export function ChainFactory(
         return res;
       }
     },
-    mint: async <Signer>(
-      chain: MintNft<Signer, NftMintArgs, string>,
+    mint: async <Signer, Args, Ret>(
+      chain: MintNft<Signer, Args, Ret>,
       owner: Signer,
-      args: NftMintArgs
-    ): Promise<string> => {
+      args: Args
+    ): Promise<Ret> => {
       return await chain.mintNft(owner, args);
     },
     waitAlgorandNft: async (origin, hash, claimer) => {
@@ -779,21 +779,6 @@ export function ChainFactory(
     },
     isWrappedNft,
   };
-}
-/**
- * The interface that defines the arguments to mint an NFT.
- * @property contract is the address of the smart contract that will mint the NFT and it is mandatory for WEB3 and Tron Chains.
- * @property identifier is the identifier of the NFT to mint and it is mandatory for Elrond Chain.
- */
-export interface NftMintArgs {
-  readonly contract?: string;
-  readonly uris: string[];
-  readonly identifier?: string;
-  readonly quantity?: number | undefined;
-  readonly name?: string;
-  readonly royalties?: number | undefined;
-  readonly hash?: string | undefined;
-  readonly attrs: string | undefined;
 }
 
 export * from "./factories";

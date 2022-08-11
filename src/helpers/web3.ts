@@ -46,7 +46,6 @@ import {
   ValidateAddress,
   WhitelistCheck,
 } from "..";
-import { NftMintArgs } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 import axios from "axios";
@@ -106,7 +105,7 @@ export type BaseWeb3Helper = BalanceCheck &
    * @argument signer  owner of the smart contract
    * @argument args  See [[MintArgs]]
    */
-  MintNft<Signer, NftMintArgs, ContractTransaction> & {
+  MintNft<Signer, MintArgs, ContractTransaction> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -118,7 +117,7 @@ export type BaseWeb3Helper = BalanceCheck &
   } & {
     mintNftErc1155(
       owner: Signer,
-      options: NftMintArgs
+      options: MintArgs
     ): Promise<ContractTransaction>;
   };
 
@@ -171,7 +170,7 @@ export async function baseWeb3HelperFactory(
 
       return contract.address;
     },
-    async mintNftErc1155(owner: Signer, { contract }: NftMintArgs) {
+    async mintNftErc1155(owner: Signer, { contract }) {
       const erc1155 = Erc1155Minter__factory.connect(contract!, owner);
       const tx = await erc1155.mintNft(await owner.getAddress());
 
@@ -179,11 +178,11 @@ export async function baseWeb3HelperFactory(
     },
     async mintNft(
       owner: Signer,
-      { contract, uris }: NftMintArgs
+      { contract, uri }: MintArgs
     ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
 
-      const txm = await erc721.mint(uris[0], { gasLimit: 1000000 });
+      const txm = await erc721.mint(uri, { gasLimit: 1000000 });
       return txm;
     },
   };
@@ -461,6 +460,7 @@ export async function web3HelperFactory(
 
       return approvetxn;
     },
+
     async extractTxnStatus(txn) {
       const status = (await (await provider.getTransaction(txn)).wait()).status;
       if (status === undefined) {
