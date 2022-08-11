@@ -13,7 +13,7 @@ import {
 import { TronWeb } from "tronweb";
 // @ts-expect-error no types cope
 import TronStation from "tronstation";
-import { EthNftInfo } from "./web3";
+import { EthNftInfo, MintArgs } from "./web3";
 import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
 
 import {
@@ -28,7 +28,6 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   IsApproved,
-  NftMintArgs,
   PreTransfer,
   PreTransferRawTxn,
   TransactionStatus,
@@ -53,7 +52,7 @@ export type MinterRes = {
 };
 
 export type BaseTronHelper = BalanceCheck &
-  MintNft<TronSender, NftMintArgs, string> & {
+  MintNft<TronSender, MintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract
@@ -142,13 +141,13 @@ export async function baseTronHelperFactory(
   };
 
   return {
-    async mintNft(owner: TronSender, options: NftMintArgs): Promise<string> {
+    async mintNft(owner: TronSender, options: MintArgs): Promise<string> {
       setSigner(owner);
       const erc = await provider.contract(
         UserNftMinter__factory.abi,
         options.contract
       );
-      const res = await erc.mint(options.uris[0]).send();
+      const res = await erc.mint(options.uri).send();
       return res;
     },
     async balance(address: string): Promise<BigNumber> {

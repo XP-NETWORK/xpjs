@@ -5,7 +5,6 @@ import {
   EstimateTxFees,
   MintNft,
   NftInfo,
-  NftMintArgs,
   PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -37,12 +36,19 @@ export type TezosNftInfo = {
   token_id: string;
 };
 
+type TezosMintArgs = {
+  identifier: string;
+  attrs: string;
+  contract: string;
+  uri: string;
+};
+
 export type TezosHelper = TransferNftForeign<
   TezosSigner,
   TezosNftInfo,
   string
 > &
-  MintNft<TezosSigner, NftMintArgs, string> &
+  MintNft<TezosSigner, TezosMintArgs, string> &
   BalanceCheck &
   UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> &
   ValidateAddress &
@@ -227,13 +233,13 @@ export async function tezosHelperFactory({
       notifyValidator(hash);
       return hash;
     },
-    async mintNft(signer, { identifier, attrs, contract, uris }) {
+    async mintNft(signer, { identifier, attrs, contract, uri }) {
       return await withContract(signer, xpnftAddress, (xpnft) =>
         xpnft.methods.mint({
           token_id: identifier,
           address: contract,
           metadata: {
-            uri: uris[0],
+            uri: uri,
             attrs,
           },
           amount: 1,
