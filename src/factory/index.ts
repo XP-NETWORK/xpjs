@@ -555,6 +555,7 @@ export function ChainFactory(
       if (!(await to.validateAddress(receiver))) {
         throw Error("invalid address");
       }
+      console.log(`Batch Minting With: ${mw || to.XpNft1155!}`);
       const wrapped: NftInfo<any>[] = [];
       const unwrapped: NftInfo<any>[] = [];
       await Promise.all(
@@ -577,7 +578,7 @@ export function ChainFactory(
             to.getNonce(),
             receiver,
             unwrapped,
-            mw || to.XpNft || "",
+            mw || to.XpNft1155!,
             new BigNumber(fee)
           )
         );
