@@ -67,7 +67,7 @@ export declare type ChainFactory = {
      * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
      * @param owner: Address of the owner of the NFT as a raw string.
      */
-    nftList<RawNft>(chain: ChainNonceGet, owner: string): Promise<NftInfo<RawNft>[]>;
+    nftList<Signer, RawNft, Resp>(chain: ChainNonceGet & TransferNftForeign<Signer, RawNft, Resp>, owner: string): Promise<NftInfo<RawNft>[]>;
     /**
      * Estimates the required fee for transferring an NFT.
      * @param fromChain: {@link FullChain} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
