@@ -3,7 +3,6 @@ import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } 
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftMinter } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
-import { NftMintArgs } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 /**
@@ -46,7 +45,7 @@ export declare type BaseWeb3Helper = BalanceCheck &
  * @argument signer  owner of the smart contract
  * @argument args  See [[MintArgs]]
  */
-MintNft<Signer, NftMintArgs, ContractTransaction> & {
+MintNft<Signer, MintArgs, ContractTransaction> & {
     /**
      *
      * Deploy an ERC721 smart contract
@@ -56,7 +55,7 @@ MintNft<Signer, NftMintArgs, ContractTransaction> & {
      */
     deployErc721(owner: Signer): Promise<string>;
 } & {
-    mintNftErc1155(owner: Signer, options: NftMintArgs): Promise<ContractTransaction>;
+    mintNftErc1155(owner: Signer, options: MintArgs): Promise<ContractTransaction>;
 };
 /**
  * Traits implemented by this module

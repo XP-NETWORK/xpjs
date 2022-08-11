@@ -1,7 +1,7 @@
 import { BalanceCheck, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, TransferNftForeign, UnfreezeForeignNft } from "./chain";
 import { TronWeb } from "tronweb";
-import { EthNftInfo } from "./web3";
-import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, NftMintArgs, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
+import { EthNftInfo, MintArgs } from "./web3";
+import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonceGet } from "..";
 import { EvNotifier } from "../notifier";
 declare type TronSender = string | undefined;
@@ -11,7 +11,7 @@ export declare type MinterRes = {
     xpnft1155: string;
     whitelist: string[];
 };
-export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, NftMintArgs, string> & {
+export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, MintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract

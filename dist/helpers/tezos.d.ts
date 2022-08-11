@@ -1,4 +1,4 @@
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, MintNft, NftInfo, NftMintArgs, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
+import { BalanceCheck, ChainNonceGet, EstimateTxFees, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import { Signer, TezosToolkit, WalletProvider } from "@taquito/taquito";
 import { EvNotifier } from "../notifier";
 import { FeeMargins, GetFeeMargins, WhitelistCheck } from "./chain";
@@ -7,7 +7,13 @@ export declare type TezosNftInfo = {
     contract: string;
     token_id: string;
 };
-export declare type TezosHelper = TransferNftForeign<TezosSigner, TezosNftInfo, string> & MintNft<TezosSigner, NftMintArgs, string> & BalanceCheck & UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> & ValidateAddress & EstimateTxFees<TezosNftInfo> & ChainNonceGet & Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
+declare type TezosMintArgs = {
+    identifier: string;
+    attrs: string;
+    contract: string;
+    uri: string;
+};
+export declare type TezosHelper = TransferNftForeign<TezosSigner, TezosNftInfo, string> & MintNft<TezosSigner, TezosMintArgs, string> & BalanceCheck & UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> & ValidateAddress & EstimateTxFees<TezosNftInfo> & ChainNonceGet & Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
     isApprovedForMinter(nft: NftInfo<TezosNftInfo>, signer: TezosSigner): Promise<boolean>;
 } & {
     approveForMinter(address: NftInfo<TezosNftInfo>, sender: TezosSigner): Promise<string | undefined>;

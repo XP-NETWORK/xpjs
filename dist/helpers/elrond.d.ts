@@ -8,7 +8,6 @@ import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider
 import BigNumber from "bignumber.js";
 import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress } from "./chain";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "..";
-import { NftMintArgs } from "..";
 import { EvNotifier } from "../notifier";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 /**
@@ -35,12 +34,12 @@ export declare type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
  */
 export declare type NftIssueArgs = {
     readonly identifier: string;
-    readonly quantity: number | undefined;
-    readonly name: string;
-    readonly royalties: number | undefined;
-    readonly hash: string | undefined;
-    readonly attrs: string | undefined;
     readonly uris: Array<string>;
+    readonly name: string;
+    readonly quantity?: number;
+    readonly royalties?: number;
+    readonly hash?: string;
+    readonly attrs?: string;
 };
 /**
  * Utility for issuing ESDT which supports NFT minting
@@ -99,7 +98,7 @@ export interface ElrondRawUnsignedTxn {
 /**
  * Traits implemented by this module
  */
-export declare type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigner, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, EsdtNftInfo, Transaction> & TransferNftForeignBatch<ElrondSigner, EsdtNftInfo, Transaction> & UnfreezeForeignNftBatch<ElrondSigner, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftMintArgs, string> & {
+export declare type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigner, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, EsdtNftInfo, Transaction> & TransferNftForeignBatch<ElrondSigner, EsdtNftInfo, Transaction> & UnfreezeForeignNftBatch<ElrondSigner, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftIssueArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
 } & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<EsdtNftInfo> & EstimateTxFeesBatch<EsdtNftInfo> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & SetESDTRoles & {
     XpNft: string;
