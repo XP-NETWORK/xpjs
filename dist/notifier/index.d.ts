@@ -5,7 +5,7 @@ export declare function evNotifier(url: string): {
     notifyElrond(txHash: string, sender: string, uris: string[], action_id: string | undefined): Promise<void>;
     notifyTezos(txHash: string): Promise<void>;
     notifyAlgorand(txHash: string): Promise<void>;
-    notifySecret(txHash: string): Promise<void>;
+    notifySecret(txHash: string, vk: string): Promise<void>;
     notifySolana(txHash: string): Promise<void>;
     notifyDfinity(actionId: string): Promise<void>;
 };
