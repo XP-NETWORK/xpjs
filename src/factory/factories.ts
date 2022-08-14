@@ -573,12 +573,12 @@ export namespace ChainFactoryConfigs {
         bridge: {
           contractAddress: "secret18f66qjjuyudmh7q6s50hwpt9y679lanjs82jkg",
           codeHash:
-            "0x224f175c92947bbfd656d26e21b5eee40f73eac6aa6b64c328db3c55261ee6b4",
+            "224f175c92947bbfd656d26e21b5eee40f73eac6aa6b64c328db3c55261ee6b4",
         },
         xpnft: {
           contractAddress: "secret16zcej6asqrtfq08u3fdjhs03zpl7lgy7q32eps",
           codeHash:
-            "0xb7f44f7d2f72bfec52b027ee6b3ef802246735b50b2bfe747851876f818d7f45",
+            "b7f44f7d2f72bfec52b027ee6b3ef802246735b50b2bfe747851876f818d7f45",
         },
         umt: {
           contractAddress: "",
