@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { TezosParams } from "../helpers/tezos";
 import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
-import { ChainNonce, InferChainH, InferChainParam, InferSigner } from "../type-utils";
+import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
@@ -67,7 +67,7 @@ export declare type ChainFactory = {
      * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
      * @param owner: Address of the owner of the NFT as a raw string.
      */
-    nftList<Signer, RawNft, Resp>(chain: ChainNonceGet & TransferNftForeign<Signer, RawNft, Resp>, owner: string): Promise<NftInfo<RawNft>[]>;
+    nftList<T>(chain: ChainNonceGet & T, owner: string): Promise<NftInfo<InferNativeNft<T>>[]>;
     /**
      * Estimates the required fee for transferring an NFT.
      * @param fromChain: {@link FullChain} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
