@@ -567,6 +567,17 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.GATECHAIN,
         feeMargin,
       },
+      skaleParams: {
+        nonce: Chain.SKALE,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.SKALE),
+        feeMargin,
+        erc1155_addr: "",
+        erc1155Minter: "",
+        erc721Minter: "",
+        erc721_addr: "",
+        minter_addr: "",
+      },
       secretParams: {
         notifier,
         rpcUrl: MainNetRpcUri.SECRET,
@@ -582,8 +593,7 @@ export namespace ChainFactoryConfigs {
         },
         umt: {
           contractAddress: "",
-          codeHash:
-            "",
+          codeHash: "",
         },
         chainId: "24",
         feeMargin,

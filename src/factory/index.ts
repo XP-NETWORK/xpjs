@@ -652,7 +652,7 @@ export function ChainFactory(
       params: InferChainParam<T>
     ) {
       helpers.delete(chainNonce);
-      cToP.set(chainNonce, params as any);
+      cToP.set(chainNonce, params);
     },
     async nftList<T>(chain: ChainNonceGet & T, owner: string) {
       let res = await nftlistRest.get<{ data: NftInfo<InferNativeNft<T>>[] }>(
