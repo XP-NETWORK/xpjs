@@ -52,7 +52,7 @@ export declare enum MainNetRpcUri {
     GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
     GATECHAIN = "https://evm.gatenode.cc",
     VECHAIN = "https://sync-mainnet.veblocks.net",
-    SECRET = "https://secret-4.api.trivium.network:9091"
+    SECRET = "http://scrt-rpc.blockpane.com:9091/"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
