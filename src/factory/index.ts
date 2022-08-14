@@ -49,6 +49,7 @@ import {
   HelperMap,
   InferChainH,
   InferChainParam,
+  InferNativeNft,
   InferSigner,
   ParamMap,
 } from "../type-utils";
@@ -151,10 +152,10 @@ export type ChainFactory = {
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
    * @param owner: Address of the owner of the NFT as a raw string.
    */
-  nftList<Signer, RawNft, Resp>(
-    chain: ChainNonceGet & TransferNftForeign<Signer, RawNft, Resp>,
+  nftList<T>(
+    chain: ChainNonceGet & T,
     owner: string
-  ): Promise<NftInfo<RawNft>[]>;
+  ): Promise<NftInfo<InferNativeNft<T>>[]>;
   /**
    * Estimates the required fee for transferring an NFT.
    * @param fromChain: {@link FullChain} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
@@ -653,11 +654,8 @@ export function ChainFactory(
       helpers.delete(chainNonce);
       cToP.set(chainNonce, params as any);
     },
-    async nftList<Signer, RawNft, Resp>(
-      chain: ChainNonceGet & TransferNftForeign<Signer, RawNft, Resp>,
-      owner: string
-    ) {
-      let res = await nftlistRest.get<{ data: NftInfo<RawNft>[] }>(
+    async nftList<T>(chain: ChainNonceGet & T, owner: string) {
+      let res = await nftlistRest.get<{ data: NftInfo<InferNativeNft<T>>[] }>(
         `/nfts/${chain.getNonce()}/${owner}`
       );
 
