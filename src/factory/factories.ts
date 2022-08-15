@@ -567,6 +567,37 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.GATECHAIN,
         feeMargin,
       },
+      skaleParams: {
+        nonce: Chain.SKALE,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.SKALE),
+        feeMargin,
+        erc1155_addr: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
+        erc1155Minter: "0xaB9eD7b9734471249255B4d969B32995015116d9",
+        erc721Minter: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+        erc721_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
+        minter_addr: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
+      },
+      secretParams: {
+        notifier,
+        rpcUrl: MainNetRpcUri.SECRET,
+        bridge: {
+          contractAddress: "secret18f66qjjuyudmh7q6s50hwpt9y679lanjs82jkg",
+          codeHash:
+            "224f175c92947bbfd656d26e21b5eee40f73eac6aa6b64c328db3c55261ee6b4",
+        },
+        xpnft: {
+          contractAddress: "secret16zcej6asqrtfq08u3fdjhs03zpl7lgy7q32eps",
+          codeHash:
+            "b7f44f7d2f72bfec52b027ee6b3ef802246735b50b2bfe747851876f818d7f45",
+        },
+        umt: {
+          contractAddress: "",
+          codeHash: "",
+        },
+        chainId: "24",
+        feeMargin,
+      },
     };
   };
 }

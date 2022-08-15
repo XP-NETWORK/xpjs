@@ -49,6 +49,7 @@ import {
   HelperMap,
   InferChainH,
   InferChainParam,
+  InferNativeNft,
   InferSigner,
   ParamMap,
 } from "../type-utils";
@@ -141,20 +142,20 @@ export type ChainFactory = {
    * @param owner: {@link Signer} A signer to sign transaction, can come from either metamask, tronlink, or the elrond's maiar defi wallet.
    * @param args: {@link NftMintArgs} Arguments to mint the nft. Contract is must for web3 and tron. Identifier is must for elrond.
    */
-  mint<Signer>(
-    chain: MintNft<Signer, NftMintArgs, string>,
+  mint<Signer, Args, Ret>(
+    chain: MintNft<Signer, Args, Ret>,
     owner: Signer,
-    args: NftMintArgs
-  ): Promise<string>;
+    args: Args
+  ): Promise<Ret>;
   /**
    * Lists all the NFTs on the chain owner by {@param owner}.
    * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
    * @param owner: Address of the owner of the NFT as a raw string.
    */
-  nftList<RawNft>(
-    chain: ChainNonceGet,
+  nftList<T>(
+    chain: ChainNonceGet & T,
     owner: string
-  ): Promise<NftInfo<RawNft>[]>;
+  ): Promise<NftInfo<InferNativeNft<T>>[]>;
   /**
    * Estimates the required fee for transferring an NFT.
    * @param fromChain: {@link FullChain} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
@@ -555,6 +556,7 @@ export function ChainFactory(
       if (!(await to.validateAddress(receiver))) {
         throw Error("invalid address");
       }
+      console.log(`Batch Minting With: ${mw || to.XpNft1155!}`);
       const wrapped: NftInfo<any>[] = [];
       const unwrapped: NftInfo<any>[] = [];
       await Promise.all(
@@ -577,7 +579,7 @@ export function ChainFactory(
             to.getNonce(),
             receiver,
             unwrapped,
-            mw || to.XpNft || "",
+            mw || to.XpNft1155!,
             new BigNumber(fee)
           )
         );
@@ -597,7 +599,7 @@ export function ChainFactory(
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
       let transfers = Array(parseInt(amt.toString())).fill(nft);
       if (!fee) {
-        fee = await estimateBatchFees(from, to, transfers, receiver);
+        fee = await estimateFees(from, to, transfers[0], receiver);
       }
       const response = this.transferBatchNft(
         from,
@@ -650,10 +652,10 @@ export function ChainFactory(
       params: InferChainParam<T>
     ) {
       helpers.delete(chainNonce);
-      cToP.set(chainNonce, params as any);
+      cToP.set(chainNonce, params);
     },
-    async nftList<T>(chain: ChainNonceGet, owner: string) {
-      let res = await nftlistRest.get<{ data: NftInfo<T>[] }>(
+    async nftList<T>(chain: ChainNonceGet & T, owner: string) {
+      let res = await nftlistRest.get<{ data: NftInfo<InferNativeNft<T>>[] }>(
         `/nfts/${chain.getNonce()}/${owner}`
       );
 
@@ -746,11 +748,11 @@ export function ChainFactory(
         return res;
       }
     },
-    mint: async <Signer>(
-      chain: MintNft<Signer, NftMintArgs, string>,
+    mint: async <Signer, Args, Ret>(
+      chain: MintNft<Signer, Args, Ret>,
       owner: Signer,
-      args: NftMintArgs
-    ): Promise<string> => {
+      args: Args
+    ): Promise<Ret> => {
       return await chain.mintNft(owner, args);
     },
     waitAlgorandNft: async (origin, hash, claimer) => {
@@ -778,21 +780,6 @@ export function ChainFactory(
     },
     isWrappedNft,
   };
-}
-/**
- * The interface that defines the arguments to mint an NFT.
- * @property contract is the address of the smart contract that will mint the NFT and it is mandatory for WEB3 and Tron Chains.
- * @property identifier is the identifier of the NFT to mint and it is mandatory for Elrond Chain.
- */
-export interface NftMintArgs {
-  readonly contract?: string;
-  readonly uris: string[];
-  readonly identifier?: string;
-  readonly quantity?: number | undefined;
-  readonly name?: string;
-  readonly royalties?: number | undefined;
-  readonly hash?: string | undefined;
-  readonly attrs: string | undefined;
 }
 
 export * from "./factories";

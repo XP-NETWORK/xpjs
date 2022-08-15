@@ -49,6 +49,7 @@ export enum TestNetRpcUri {
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
   SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
+  HEDERA = "https://0.testnet.hedera.com/",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -73,7 +74,8 @@ export enum MainNetRpcUri {
   GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
-  SECRET = "https://secret-4.api.trivium.network:26657",
+  SECRET = "https://secret-4.api.trivium.network:9091",
+  SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
   // TODO: Algorand
 }
 
@@ -143,12 +145,12 @@ export namespace Chain {
   export const AURORA = 0x15; // 21
   export const GODWOKEN = 0x16; // 22
   export const GATECHAIN = 0x17; // 23
-  export const SECRET = 0x18;
+  export const SECRET = 0x18; // 24
   export const VECHAIN = 0x19; // 25
-  export const SOLANA = 0x1a;
-  export const TON = 0x1b;
-  export const DFINITY = 0x1c;
-  export const HEDERA = 0x1d;
+  export const SOLANA = 0x1a; // 26
+  export const TON = 0x1b; // 27
+  export const DFINITY = 0x1c; // 28
+  export const HEDERA = 0x1d; // 29
   export const SKALE = 0x1e; // 30
 }
 
@@ -411,7 +413,7 @@ CHAIN_INFO.set(Chain.SKALE, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.sFUEL,
   decimals: 1e18,
-  chainId: 1305754875840118,
+  chainId: 1564830818,
   nonce: Chain.SKALE,
 });
 
