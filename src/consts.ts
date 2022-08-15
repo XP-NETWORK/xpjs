@@ -74,7 +74,7 @@ export enum MainNetRpcUri {
   GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
-  SECRET = "http://scrt-rpc.blockpane.com:9091/",
+  SECRET = "https://scrt-rpc.blockpane.com:9091/",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
   // TODO: Algorand
 }
