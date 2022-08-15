@@ -49,6 +49,7 @@ export enum TestNetRpcUri {
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
   SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
+  HEDERA = "https://http://0.testnet.hedera.com/",
   // TODO: Algorand
   // TODO: Fuse
 }
