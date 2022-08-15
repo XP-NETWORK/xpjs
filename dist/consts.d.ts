@@ -31,7 +31,7 @@ export declare enum TestNetRpcUri {
     VECHAIN = "https://sync-testnet.veblocks.net",
     SECRET = "https://pulsar-2.api.trivium.network:9091/",
     SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
-    HEDERA = "https://http://0.testnet.hedera.com/"
+    HEDERA = "https://0.testnet.hedera.com/"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -53,7 +53,7 @@ export declare enum MainNetRpcUri {
     GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
     GATECHAIN = "https://evm.gatenode.cc",
     VECHAIN = "https://sync-mainnet.veblocks.net",
-    SECRET = "https://scrt-rpc.blockpane.com:9091/",
+    SECRET = "https://secret-4.api.trivium.network:9091",
     SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
