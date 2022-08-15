@@ -53,7 +53,6 @@ import {
   PreTransferRawTxn,
   ValidateAddress,
 } from "..";
-import { NftMintArgs } from "..";
 import { EvNotifier } from "../notifier";
 
 type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
@@ -101,12 +100,12 @@ export type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
  */
 export type NftIssueArgs = {
   readonly identifier: string;
-  readonly quantity: number | undefined;
-  readonly name: string;
-  readonly royalties: number | undefined;
-  readonly hash: string | undefined;
-  readonly attrs: string | undefined;
   readonly uris: Array<string>;
+  readonly name: string;
+  readonly quantity?: number;
+  readonly royalties?: number;
+  readonly hash?: string;
+  readonly attrs?: string;
 };
 
 /**
@@ -195,7 +194,7 @@ export type ElrondHelper = BalanceCheck &
   TransferNftForeignBatch<ElrondSigner, EsdtNftInfo, Transaction> &
   UnfreezeForeignNftBatch<ElrondSigner, EsdtNftInfo, Transaction> &
   IssueESDTNFT &
-  MintNft<ElrondSigner, NftMintArgs, string> & {
+  MintNft<ElrondSigner, NftIssueArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
   } & ChainNonceGet &
   ValidateAddress &
@@ -660,11 +659,8 @@ export async function elrondHelperFactory(
       const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8");
     },
-    async mintNft(owner: ElrondSigner, args: NftMintArgs): Promise<string> {
-      const txu = unsignedMintNftTxn(
-        await getAddress(owner),
-        args as NftIssueArgs
-      );
+    async mintNft(owner: ElrondSigner, args: NftIssueArgs): Promise<string> {
+      const txu = unsignedMintNftTxn(await getAddress(owner), args);
       const tx = await signAndSend(owner, txu);
       return tx.getHash().toString();
     },

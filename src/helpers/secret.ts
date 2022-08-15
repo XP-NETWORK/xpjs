@@ -23,6 +23,7 @@ export type SecretNftInfo = {
   contractHash: string;
   chainId: string;
   tokenId: string;
+  vk: string;
 };
 export type SecretMintArgs = {
   url: string;
@@ -201,6 +202,7 @@ export async function secretHelperFactory(
               contract: contractAddress,
               contractHash: codeHash || "",
               tokenId: token,
+              vk,
             },
           });
         })
@@ -241,7 +243,7 @@ export async function secretHelperFactory(
         { waitForCommit: true, gasLimit: 150_000 }
       );
 
-      await p.notifier.notifySecret(tx.transactionHash);
+      await p.notifier.notifySecret(tx.transactionHash, nft.native.vk);
 
       return tx;
     },
@@ -270,7 +272,7 @@ export async function secretHelperFactory(
         { waitForCommit: true, gasLimit: 100_000 }
       );
 
-      await p.notifier.notifySecret(tx.transactionHash);
+      await p.notifier.notifySecret(tx.transactionHash, nft.native.vk);
 
       return tx;
     },
