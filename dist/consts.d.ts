@@ -34,7 +34,8 @@ export declare enum TestNetRpcUri {
     SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
     HEDERA = "https://0.testnet.hedera.com/",
     NEAR = "https://rpc.testnet.near.org",
-    MOONBEAM = "https://rpc.api.moonbase.moonbeam.network"
+    MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
+    ABEYCHAIN = "https://testrpc.abeychain.com"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -104,6 +105,7 @@ export declare type MetaMap = {
     0x1e: Web3Meta;
     0x1f: NearMeta;
     0x20: Web3Meta;
+    0x21: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -136,6 +138,7 @@ export declare namespace Chain {
     const SKALE = 30;
     const NEAR = 31;
     const MOONBEAM = 32;
+    const ABEYCHAIN = 33;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;

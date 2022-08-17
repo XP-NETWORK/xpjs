@@ -146,6 +146,7 @@ export interface ChainParams {
     skaleParams: Web3Params;
     dfinityParams: DfinityParams;
     moonbeamParams: Web3Params;
+    abeyChainParams: Web3Params;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
