@@ -6,4 +6,5 @@ export declare type NearParams = {
     xpnft: string;
 };
 export declare type NearHelper = any;
+export declare function NearHelperFactory(): Promise<void>;
 //# sourceMappingURL=near.d.ts.map
