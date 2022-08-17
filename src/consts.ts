@@ -52,6 +52,7 @@ export enum TestNetRpcUri {
   SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
+  MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -126,6 +127,7 @@ export type MetaMap = {
   0x1d: Web3Meta;
   0x1e: Web3Meta;
   0x1f: NearMeta;
+  0x20: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -158,6 +160,7 @@ export namespace Chain {
   export const HEDERA = 0x1d; // 29
   export const SKALE = 0x1e; // 30
   export const NEAR = 0x1f; // 31
+  export const MOONBEAM = 0x20; // 32
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -439,4 +442,14 @@ CHAIN_INFO.set(Chain.NEAR, {
   decimals: 1e8,
   name: "NEAR",
   nonce: Chain.NEAR,
+});
+
+CHAIN_INFO.set(Chain.MOONBEAM, {
+  blockExplorerUrl: "https://moonbase.moonscan.io/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.GLMR,
+  decimals: 1e18,
+  name: "MoonBeam",
+  nonce: Chain.MOONBEAM,
+  chainId: 0x507,
 });

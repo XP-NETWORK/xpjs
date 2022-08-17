@@ -120,6 +120,17 @@ export namespace ChainFactoryConfigs {
         notifier,
         feeMargin,
       },
+      moonbeamParams: {
+        nonce: Chain.MOONBEAM,
+        notifier,
+        feeMargin,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.MOONBEAM),
+        erc721Minter: "0x1F71E80E1E785dbDB34c69909C11b71bAd8D9802",
+        erc1155Minter: "0x10E3EE8526Cc7610393E2f6e25dEee0bD38d057e",
+        erc1155_addr: "0xd023739a76Df4cC6260A1Ba25e8BEbCe8389D60D",
+        erc721_addr: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
+        minter_addr: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+      },
       fantomParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FANTOM),
