@@ -11,6 +11,7 @@ import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBat
 import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
+import { NearParams } from "../helpers/near";
 declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -145,6 +146,7 @@ export interface ChainParams {
     hederaParams: Web3Params;
     skaleParams: Web3Params;
     dfinityParams: DfinityParams;
+    nearParams: NearParams;
     moonbeamParams: Web3Params;
     abeyChainParams: Web3Params;
 }

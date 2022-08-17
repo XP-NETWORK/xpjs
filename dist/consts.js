@@ -358,7 +358,7 @@ exports.CHAIN_INFO.set(Chain.DFINITY, {
 });
 exports.CHAIN_INFO.set(Chain.NEAR, {
     blockExplorerUrl: "https://explorer.testnet.near.org/transactions/",
-    constructor: near_1.NearHelperFactory,
+    constructor: near_1.nearHelperFactory,
     currency: domain_1.SupportedCurrency.NEAR,
     decimals: 1e8,
     name: "NEAR",
