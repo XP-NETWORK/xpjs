@@ -272,6 +272,7 @@ export interface ChainParams {
   dfinityParams: DfinityParams;
   // Space for Near
   moonbeamParams: Web3Params;
+  abeyChainParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -323,6 +324,9 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.HEDERA, chainParams.hederaParams);
   cToP.set(Chain.SKALE, chainParams.skaleParams);
   cToP.set(Chain.DFINITY, chainParams.dfinityParams);
+  // Space for Near
+  cToP.set(Chain.MOONBEAM, chainParams.moonbeamParams);
+  cToP.set(Chain.ABEYCHAIN, chainParams.abeyChainParams);
   return cToP;
 }
 /**
