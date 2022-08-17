@@ -53,6 +53,7 @@ export enum TestNetRpcUri {
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
+  ABEYCHAIN = "https://testrpc.abeychain.com",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -128,6 +129,7 @@ export type MetaMap = {
   0x1e: Web3Meta;
   0x1f: NearMeta;
   0x20: Web3Meta;
+  0x21: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -161,6 +163,7 @@ export namespace Chain {
   export const SKALE = 0x1e; // 30
   export const NEAR = 0x1f; // 31
   export const MOONBEAM = 0x20; // 32
+  export const ABEYCHAIN = 0x21; // 33
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -452,4 +455,14 @@ CHAIN_INFO.set(Chain.MOONBEAM, {
   name: "MoonBeam",
   nonce: Chain.MOONBEAM,
   chainId: 0x507,
+});
+
+CHAIN_INFO.set(Chain.ABEYCHAIN, {
+  blockExplorerUrl: "https://testnet-explorer.abeychain.com/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ABEY,
+  decimals: 1e18,
+  name: "AbeyChain",
+  nonce: Chain.ABEYCHAIN,
+  chainId: 178,
 });
