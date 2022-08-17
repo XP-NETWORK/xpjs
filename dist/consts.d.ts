@@ -33,7 +33,8 @@ export declare enum TestNetRpcUri {
     SECRET = "https://pulsar-2.api.trivium.network:9091/",
     SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
     HEDERA = "https://0.testnet.hedera.com/",
-    NEAR = "https://rpc.testnet.near.org"
+    NEAR = "https://rpc.testnet.near.org",
+    MOONBEAM = "https://rpc.api.moonbase.moonbeam.network"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -102,6 +103,7 @@ export declare type MetaMap = {
     0x1d: Web3Meta;
     0x1e: Web3Meta;
     0x1f: NearMeta;
+    0x20: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -133,6 +135,7 @@ export declare namespace Chain {
     const HEDERA = 29;
     const SKALE = 30;
     const NEAR = 31;
+    const MOONBEAM = 32;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
