@@ -9,6 +9,7 @@ import { SecretHelper, SecretParams } from "./helpers/secret";
 import { SolanaHelper, SolanaParams } from "./helpers/solana";
 import { TonHelper, TonParams } from "./helpers/ton";
 import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
+import { NearHelper, NearParams } from "./helpers/near";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -31,7 +32,8 @@ export declare enum TestNetRpcUri {
     VECHAIN = "https://sync-testnet.veblocks.net",
     SECRET = "https://pulsar-2.api.trivium.network:9091/",
     SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
-    HEDERA = "https://0.testnet.hedera.com/"
+    HEDERA = "https://0.testnet.hedera.com/",
+    NEAR = "https://rpc.testnet.near.org"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -54,7 +56,8 @@ export declare enum MainNetRpcUri {
     GATECHAIN = "https://evm.gatenode.cc",
     VECHAIN = "https://sync-mainnet.veblocks.net",
     SECRET = "https://secret-4.api.trivium.network:9091",
-    SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague"
+    SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+    NEAR = "https://rpc.mainnet.near.org"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
@@ -65,6 +68,7 @@ declare type SecretMeta = [SecretHelper, SecretParams];
 declare type SolanaMeta = [SolanaHelper, SolanaParams];
 declare type TonMeta = [TonHelper, TonParams];
 declare type DfinityMeta = [DfinityHelper, DfinityParams];
+declare type NearMeta = [NearHelper, NearParams];
 declare type MetaMapAssert = {
     [idx in typeof Chain[keyof typeof Chain]]: unknown;
 };
@@ -97,6 +101,7 @@ export declare type MetaMap = {
     0x1c: DfinityMeta;
     0x1d: Web3Meta;
     0x1e: Web3Meta;
+    0x1f: NearMeta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -127,6 +132,7 @@ export declare namespace Chain {
     const DFINITY = 28;
     const HEDERA = 29;
     const SKALE = 30;
+    const NEAR = 31;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
