@@ -25,6 +25,7 @@ import {
   DfinityHelper,
   DfinityParams,
 } from "./helpers/dfinity/dfinity";
+import { NearHelper, NearParams } from "./helpers/near";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -50,6 +51,7 @@ export enum TestNetRpcUri {
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
   SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
   HEDERA = "https://0.testnet.hedera.com/",
+  NEAR = "https://rpc.testnet.near.org",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -76,6 +78,7 @@ export enum MainNetRpcUri {
   VECHAIN = "https://sync-mainnet.veblocks.net",
   SECRET = "https://secret-4.api.trivium.network:9091",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+  NEAR = "https://rpc.mainnet.near.org",
   // TODO: Algorand
 }
 
@@ -88,6 +91,7 @@ type SecretMeta = [SecretHelper, SecretParams];
 type SolanaMeta = [SolanaHelper, SolanaParams];
 type TonMeta = [TonHelper, TonParams];
 type DfinityMeta = [DfinityHelper, DfinityParams];
+type NearMeta = [NearHelper, NearParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
@@ -121,6 +125,7 @@ export type MetaMap = {
   0x1c: DfinityMeta;
   0x1d: Web3Meta;
   0x1e: Web3Meta;
+  0x1f: NearMeta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -152,6 +157,7 @@ export namespace Chain {
   export const DFINITY = 0x1c; // 28
   export const HEDERA = 0x1d; // 29
   export const SKALE = 0x1e; // 30
+  export const NEAR = 0x1f; // 31
 }
 
 interface ChainData<T extends ChainNonce> {

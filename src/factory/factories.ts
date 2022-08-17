@@ -318,6 +318,13 @@ export namespace ChainFactoryConfigs {
         chainId: "24",
         feeMargin,
       },
+      nearParams: {
+        networkId: "testnet",
+        nonce: Chain.NEAR,
+        rpcUrl: TestNetRpcUri.NEAR,
+        bridge: "xpbridge.testnet",
+        xpnft: "xpnft.testnet",
+      },
     };
   };
 
@@ -597,6 +604,13 @@ export namespace ChainFactoryConfigs {
         },
         chainId: "24",
         feeMargin,
+      },
+      nearParams: {
+        networkId: "mainnet",
+        nonce: Chain.NEAR,
+        rpcUrl: MainNetRpcUri.NEAR,
+        bridge: "",
+        xpnft: "",
       },
     };
   };
