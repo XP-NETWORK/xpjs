@@ -55,6 +55,7 @@ import {
 } from "../type-utils";
 import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
+import { NearParams } from "../helpers/near";
 
 type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -270,7 +271,7 @@ export interface ChainParams {
   hederaParams: Web3Params;
   skaleParams: Web3Params;
   dfinityParams: DfinityParams;
-  // Space for Near
+  nearParams: NearParams;
   moonbeamParams: Web3Params;
   abeyChainParams: Web3Params;
 }
@@ -324,7 +325,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.HEDERA, chainParams.hederaParams);
   cToP.set(Chain.SKALE, chainParams.skaleParams);
   cToP.set(Chain.DFINITY, chainParams.dfinityParams);
-  // Space for Near
+  cToP.set(Chain.NEAR, chainParams.nearParams);
   cToP.set(Chain.MOONBEAM, chainParams.moonbeamParams);
   cToP.set(Chain.ABEYCHAIN, chainParams.abeyChainParams);
   return cToP;

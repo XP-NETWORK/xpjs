@@ -25,7 +25,7 @@ import {
   DfinityHelper,
   DfinityParams,
 } from "./helpers/dfinity/dfinity";
-import { NearHelper, NearParams, NearHelperFactory } from "./helpers/near";
+import { NearHelper, NearParams, nearHelperFactory } from "./helpers/near";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -440,7 +440,7 @@ CHAIN_INFO.set(Chain.DFINITY, {
 
 CHAIN_INFO.set(Chain.NEAR, {
   blockExplorerUrl: "https://explorer.testnet.near.org/transactions/",
-  constructor: NearHelperFactory,
+  constructor: nearHelperFactory,
   currency: SupportedCurrency.NEAR,
   decimals: 1e8,
   name: "NEAR",
