@@ -6,4 +6,8 @@ export type NearParams = {
   xpnft: string;
 };
 
-export type NearHelper = any;
+export type NearHelper = any; // TODO
+
+export async function NearHelperFactory() {
+  // TODO
+}
