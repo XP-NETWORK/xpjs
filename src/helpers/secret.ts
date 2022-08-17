@@ -187,6 +187,8 @@ export async function secretHelperFactory(
       if (generic_err) throw new Error(generic_err.msg);
 
       const response: NftInfo<SecretNftInfo>[] = [];
+
+      console.log(token_list, "token_list");
       await Promise.all(
         token_list.tokens.map(async (token) => {
           const tokenInfo = await queryClient.query.snip721.GetTokenInfo({
@@ -194,6 +196,8 @@ export async function secretHelperFactory(
             auth,
             token_id: token,
           });
+
+          console.log(tokenInfo);
           response.push({
             collectionIdent: contractAddress,
             uri: tokenInfo.all_nft_info.info?.token_uri || "",
@@ -204,6 +208,7 @@ export async function secretHelperFactory(
               tokenId: token,
               vk,
             },
+            metaData: tokenInfo.all_nft_info.info?.extension,
           });
         })
       );
