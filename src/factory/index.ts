@@ -272,6 +272,7 @@ export interface ChainParams {
   dfinityParams: DfinityParams;
   // Space for Near
   moonbeamParams: Web3Params;
+  abeyChainParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";

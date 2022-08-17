@@ -131,6 +131,17 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
         minter_addr: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
       },
+      abeyChainParams: {
+        nonce: Chain.ABEYCHAIN,
+        notifier,
+        feeMargin,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ABEYCHAIN),
+        erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
+        erc1155Minter: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
+        erc1155_addr: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
+        erc721_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
+        minter_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
+      },
       fantomParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FANTOM),
