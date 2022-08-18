@@ -555,7 +555,9 @@ export function ChainFactory(
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
       type Result = ReturnType<typeof to.transferNftBatchToForeign>;
       let result: Result[] = [];
-      await requireBridge([from.getNonce(), to.getNonce()]);
+      if (appConfig.network === "mainnet") {
+        await requireBridge([from.getNonce(), to.getNonce()]);
+      }
 
       if (!fee) {
         fee = await estimateBatchFees(from, to, nfts, receiver);
