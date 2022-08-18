@@ -230,6 +230,10 @@ export async function secretHelperFactory(
             freeze_nft: {
               contract: nft.native.contract,
               contract_hash: nft.native.contractHash,
+              viewer: {
+                viewing_key: nft.native.vk,
+                address: wallet.address,
+              },
               token_id: nft.native.tokenId,
               to,
               chain_nonce: chainNonce,
