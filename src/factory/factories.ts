@@ -378,7 +378,9 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       dfinityParams: {
-        agent: new HttpAgent(),
+        agent: new HttpAgent({
+          host: "https://ic0.app",
+        }),
         bridgeContract: Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
         xpnftId: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
         umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
