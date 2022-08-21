@@ -69,7 +69,7 @@ export enum MainNetRpcUri {
   TRON = "https://api.trongrid.io/",
   CELO = "https://forno.celo.org",
   HARMONY = "https://rpc.s0.t.hmny.io",
-  XDAI = "https://gnosischain-rpc.gateway.pokt.network",
+  XDAI = "https://gnosis.xp.network/node",
   FUSE = "https://rpc.fuse.io/",
   VELAS = "https://mainnet.velas.com/rpc",
   TEZOS = "https://mainnet.smartpy.io",
