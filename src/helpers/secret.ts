@@ -52,6 +52,11 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
       contract: string,
       codeHash?: string
     ): Promise<NftInfo<SecretNftInfo>[]>;
+    setViewingKey(
+      client: SecretNetworkClient,
+      contract: string,
+      vk: string
+    ): Promise<Tx>;
   };
 
 export type SecretContract = {
@@ -217,6 +222,23 @@ export async function secretHelperFactory(
     },
     estimateValidateUnfreezeNft: async () => {
       return UNFREEZE_GASL.times(gasPrice);
+    },
+    async setViewingKey(client, contract, vk) {
+      const tx = await client.tx.snip721.setViewingKey(
+        {
+          contractAddress: contract,
+          msg: {
+            set_viewing_key: {
+              key: vk,
+            },
+          },
+          sender: client.address,
+        },
+        {
+          waitForCommit: true,
+        }
+      );
+      return tx;
     },
     preTransfer,
     preUnfreeze: preTransfer,
