@@ -41,7 +41,7 @@ export enum TestNetRpcUri {
   HARMONY = "https://api.s0.b.hmny.io",
   XDAI = "https://sokol.poa.network",
   UNIQUE = "https://rpc-opal.unique.network/",
-  TEZOS = "https://hangzhounet.smartpy.io",
+  TEZOS = "https://ghostnet.smartpy.io",
   VELAS = "https://explorer.testnet.velas.com/rpc",
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
