@@ -684,7 +684,7 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.1"
 
-"@grpc/grpc-js@^1.6.7":
+"@grpc/grpc-js@^1.5.3":
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.6.10.tgz#b6584c59ef90aa76d878ac92c21785e602f247ff"
   integrity sha512-XTX5z/P5kH802MDoVm/rqOil0UwYEOEjf9+NPgfmm5UINIxDzwYaXfVR6z8svCBG8Hlbu/FzkXqhP8J5xaWzSQ==
@@ -715,7 +715,7 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@hashgraph/cryptography@^1.4.0":
+"@hashgraph/cryptography@^1.1.0-beta.5":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@hashgraph/cryptography/-/cryptography-1.4.0.tgz#c97364f7352e80b2d4e6b60d40691d9b550757d9"
   integrity sha512-NtDmeuwaWJKBDYZd+g/etAD56p/RPUuZGdT9jhXxiFW0YrKCaU1k4ramICbRaJg7E+RDSFJXJLarh0G72z5YDA==
@@ -727,26 +727,26 @@
     tweetnacl "^1.0.3"
     utf8 "^3.0.0"
 
-"@hashgraph/hethers@^1.1.2":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@hashgraph/hethers/-/hethers-1.1.4.tgz#6ab8de0f7271deb5be8d91a990c4ef5ab406fd0f"
-  integrity sha512-yFAT6D0g7iBinY8bFRTzstB+n/7GNJRSKq2HOQugEMsUsu/rO4EoPLCBRcAKH9nsHVJC8358GyeYg8hWhZjeog==
+"@hashgraph/hethers@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@hashgraph/hethers/-/hethers-1.1.2.tgz#f665b0068b9ec5423181ce6cc2f07db096174732"
+  integrity sha512-DezQCwm86oQCIXfDwJI6G+/RI0YPy9a/Ho/z3CRUSY9/1gBB0ZFRSK9HUovlrj30eyNtWVeIrHsYE+ZerQI5rQ==
   dependencies:
     "@ethersproject/solidity" "5.5.0"
-    "@hethers/abstract-provider" "1.1.2"
-    "@hethers/abstract-signer" "1.1.3"
+    "@hethers/abstract-provider" "1.1.1"
+    "@hethers/abstract-signer" "1.1.2"
     "@hethers/address" "1.1.0"
     "@hethers/constants" "1.1.0"
-    "@hethers/contracts" "1.1.3"
-    "@hethers/hdnode" "1.1.3"
-    "@hethers/json-wallets" "1.1.3"
+    "@hethers/contracts" "1.1.1"
+    "@hethers/hdnode" "1.1.1"
+    "@hethers/json-wallets" "1.1.1"
     "@hethers/logger" "1.1.0"
-    "@hethers/networks" "1.1.2"
-    "@hethers/providers" "1.1.3"
+    "@hethers/networks" "1.1.0"
+    "@hethers/providers" "1.1.1"
     "@hethers/signing-key" "1.1.0"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/transactions" "1.1.1"
     "@hethers/units" "1.1.0"
-    "@hethers/wallet" "1.1.3"
+    "@hethers/wallet" "1.1.1"
 
 "@hashgraph/proto@2.1.5":
   version "2.1.5"
@@ -756,57 +756,60 @@
     long "^4.0.0"
     protobufjs "^6.11.2"
 
-"@hashgraph/proto@2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@hashgraph/proto/-/proto-2.9.0.tgz#ec2cc21a2a4e02e6b3f101dd9e09aaef9b92afc2"
-  integrity sha512-Ot0OVLCl9lNBpHZozN0BS4mvlpxgJ0Bkea4p+6MoQ/+sZtOCu+FMsidIVdvFZBvdNjgPXx8byYjkpmFaxiIOpQ==
+"@hashgraph/sdk@2.11.0-beta.1":
+  version "2.11.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.11.0-beta.1.tgz#bc2d2dbc2c8768c78836dcaf108ec624887578d7"
+  integrity sha512-rpUSg0c580paop1uOvHhUFt7WGnDuvqC0iDpBr0Bp2jTOhgL12AOG5sF0RF/bEQfwAdsizgRBTT24xhmk07yhA==
   dependencies:
-    long "^4.0.0"
-    protobufjs "^6.11.3"
-
-"@hashgraph/sdk@^2.17.1":
-  version "2.18.0"
-  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.18.0.tgz#868f14eefa60f2841a32b79144eef73b6f4c0225"
-  integrity sha512-+ycMaHKk9HWdhMSuw5BCo450FT9CCpjIwbWpw2lpJ+QKeifORzM1wc70nAm27FkING8/azC4/FL7CLf1DelgTA==
-  dependencies:
-    "@ethersproject/rlp" "^5.6.1"
-    "@grpc/grpc-js" "^1.6.7"
-    "@hashgraph/cryptography" "^1.4.0"
-    "@hashgraph/proto" "2.9.0"
-    axios "^0.27.2"
+    "@grpc/grpc-js" "^1.5.3"
+    "@hashgraph/cryptography" "^1.1.0-beta.5"
+    "@hashgraph/proto" "2.1.5"
     bignumber.js "^9.0.2"
     crypto-js "^4.1.1"
     js-base64 "^3.7.2"
     js-logger "^1.6.1"
     long "^4.0.0"
-    protobufjs "^6.11.3"
+    protobufjs "^6.11.2"
     utf8 "^3.0.0"
 
-"@hethers/abstract-provider@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@hethers/abstract-provider/-/abstract-provider-1.1.2.tgz#afe926da8eb72115e6fed990ed1ea01b4148b777"
-  integrity sha512-NwPj1LdSYzQFgOF6ns5ZgaNGoERq0iZJ9kqqkKhGp954LdzlZx+wwAnXPd7athUCR7jIzOL27wlogYFdb5AAHQ==
+"@hethers/abstract-provider@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/abstract-provider/-/abstract-provider-1.1.1.tgz#1f1f946f5970cd56dd9a46b09dfaa0f66e8074a6"
+  integrity sha512-s3u4Cu2qpdWgLh7oYf/evCFk7sgZYlaaIhje6BMXFN+jOKgWWQA6MSECqHSc6h9p9eNEsKt1HmM7yWClikrzyQ==
   dependencies:
     "@ethersproject/bignumber" "5.5.0"
     "@ethersproject/bytes" "5.5.0"
     "@ethersproject/properties" "5.5.0"
     "@ethersproject/web" "5.5.0"
     "@hethers/logger" "1.1.0"
-    "@hethers/networks" "1.1.2"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/networks" "1.1.0"
+    "@hethers/transactions" "1.1.1"
 
-"@hethers/abstract-signer@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@hethers/abstract-signer/-/abstract-signer-1.1.3.tgz#1f2b2e0a328d64ce8f66e2cd03baa02500b65411"
-  integrity sha512-u9rFmHhSyxVM2IsNBYApHNekoaDIUviIkJ6VqgnQoJzokbJUL63fO+cEXayYmXCjLmilcYTOL4fbIyQK1IFRuQ==
+"@hethers/abstract-signer@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/abstract-signer/-/abstract-signer-1.1.1.tgz#60d95c45811bad09c5eda9236b7ba3b9935c65bb"
+  integrity sha512-g6NyaC/Fwj+l30MqMudKRgL/zNJUcHFdJ5ZdRJAeJaOVBRl7Za3X/2Fz9/A1YJocnhvZFBygq67fl25a+1aKYw==
   dependencies:
     "@ethersproject/bignumber" "5.5.0"
     "@ethersproject/bytes" "5.5.0"
     "@ethersproject/properties" "5.5.0"
-    "@hethers/abstract-provider" "1.1.2"
+    "@hethers/abstract-provider" "1.1.1"
     "@hethers/address" "1.1.0"
     "@hethers/logger" "1.1.0"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/transactions" "1.1.1"
+
+"@hethers/abstract-signer@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@hethers/abstract-signer/-/abstract-signer-1.1.2.tgz#f42d02b1d5763b77535ad5236174c476a4e9357d"
+  integrity sha512-F66cbneTByr/BlfXvXsZ1wfjxXAa1daTMV0YNWrBgsjuT/xZxyqfuEMCNeHVYSd91S7gNlGGdGcEqKcqlJpVew==
+  dependencies:
+    "@ethersproject/bignumber" "5.5.0"
+    "@ethersproject/bytes" "5.5.0"
+    "@ethersproject/properties" "5.5.0"
+    "@hethers/abstract-provider" "1.1.1"
+    "@hethers/address" "1.1.0"
+    "@hethers/logger" "1.1.0"
+    "@hethers/transactions" "1.1.1"
 
 "@hethers/address@1.1.0":
   version "1.1.0"
@@ -825,26 +828,26 @@
   dependencies:
     "@ethersproject/bignumber" "5.5.0"
 
-"@hethers/contracts@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@hethers/contracts/-/contracts-1.1.3.tgz#03112b856611e46a6bca55ab744841740f23ade6"
-  integrity sha512-CJh2UuEyx8ruM5Fr7JbSmkSiHembnLGcpdqnPF8ev9wwSRkGugsTZ5KHaM9pJdBgLMrkL7z87xTRDaWxsZapEQ==
+"@hethers/contracts@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/contracts/-/contracts-1.1.1.tgz#5f56f2741d46b810476f7d0a39b3c1f7a4019722"
+  integrity sha512-72zte2dgoLBnsf5DU1YtfbWvQ9OZh6S1qdBdRCxaNBc/3p0lTuxPWcerIuLeKV/HtDKnwSU4mYIoO46FWyZ2eA==
   dependencies:
     "@ethersproject/abi" "5.5.0"
     "@ethersproject/bignumber" "5.5.0"
     "@ethersproject/bytes" "5.5.0"
     "@ethersproject/properties" "5.5.0"
-    "@hethers/abstract-provider" "1.1.2"
-    "@hethers/abstract-signer" "1.1.3"
+    "@hethers/abstract-provider" "1.1.1"
+    "@hethers/abstract-signer" "1.1.1"
     "@hethers/address" "1.1.0"
     "@hethers/logger" "1.1.0"
-    "@hethers/providers" "1.1.3"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/providers" "1.1.1"
+    "@hethers/transactions" "1.1.1"
 
-"@hethers/hdnode@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@hethers/hdnode/-/hdnode-1.1.3.tgz#710cfd01ad7050b2202349cb1eb43f79d5ea34ba"
-  integrity sha512-14+CjQaHTwm3lF1KX+OzKKumlx4gXwQUanNvUeC19cZVMD1VlQmKc/n6od9V8P4I9BO8RopcHv+GyDw48XUKOA==
+"@hethers/hdnode@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/hdnode/-/hdnode-1.1.1.tgz#9c2a53f496b405ae8636dabeecf62bcd6b99c365"
+  integrity sha512-/yECuQAUaCGIhcDG3x81XJOH6nDwahfMpSq7B7AWl+buS7tswBF9fYwAD/G9SzgnjB9LlIaBWCJcK1/Z5sU39g==
   dependencies:
     "@ethersproject/basex" "5.5.0"
     "@ethersproject/bignumber" "5.5.0"
@@ -854,15 +857,15 @@
     "@ethersproject/sha2" "5.5.0"
     "@ethersproject/strings" "5.5.0"
     "@ethersproject/wordlists" "5.5.0"
-    "@hethers/abstract-signer" "1.1.3"
+    "@hethers/abstract-signer" "1.1.1"
     "@hethers/logger" "1.1.0"
     "@hethers/signing-key" "1.1.0"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/transactions" "1.1.1"
 
-"@hethers/json-wallets@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@hethers/json-wallets/-/json-wallets-1.1.3.tgz#2610585c7f2d44819c65f95c6cf93c9af21f6e11"
-  integrity sha512-FRve8n3Hx2IQQyFpvOLsvUMw/6MUQDjkROtxQn+LLnr6KrEA5VmXeFy0av5MkwjbFw6x98DW1ZxfHyLQD9XAOw==
+"@hethers/json-wallets@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/json-wallets/-/json-wallets-1.1.1.tgz#8746dada5206e9ef819056ae856fdffe20de70d9"
+  integrity sha512-GtEHrKex0B0u3EdTX6tYrMpYESvS1zZNraE1Q/gFyWpB/VmwEze2aUApdcEDnWiOJOvZhg5E8QOaSZeHzMS0SQ==
   dependencies:
     "@ethersproject/bytes" "5.5.0"
     "@ethersproject/keccak256" "5.5.0"
@@ -870,11 +873,11 @@
     "@ethersproject/properties" "5.5.0"
     "@ethersproject/random" "5.5.0"
     "@ethersproject/strings" "5.5.0"
-    "@hethers/abstract-signer" "1.1.3"
+    "@hethers/abstract-signer" "1.1.1"
     "@hethers/address" "1.1.0"
-    "@hethers/hdnode" "1.1.3"
+    "@hethers/hdnode" "1.1.1"
     "@hethers/logger" "1.1.0"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/transactions" "1.1.1"
     aes-js "3.0.0"
     scrypt-js "3.0.1"
 
@@ -883,18 +886,18 @@
   resolved "https://registry.yarnpkg.com/@hethers/logger/-/logger-1.1.0.tgz#946017e30fd6b573f744d9bc76d005dd07e39549"
   integrity sha512-EZAM5kirlNobe6auj7AUS1QyNOxunm9ZglatkC0fIx+9y4tEQsrx4asu5r2SPg1fgZiJ9mk2DbaidMWuHSr3kA==
 
-"@hethers/networks@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@hethers/networks/-/networks-1.1.2.tgz#cc2e7745046342b185c31bf29983dda76ebc56aa"
-  integrity sha512-b8GLO6Z8O7hO6OpHAnbnvFXBlUFSz3HbK/1GpoyXwfDFzQZ9EjzD6MUaiX6NCFaZ14OL/o3IrB9eJnFPpK3Nuw==
+"@hethers/networks@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@hethers/networks/-/networks-1.1.0.tgz#55011e436566a0e34c8e3cab81ffd7eb16f709d0"
+  integrity sha512-xtS+5KHlyXND+1CbUCeMPJrqlyDk7ayhcxeAKSc7aHyHm1/wa3xI45W6tJj+AMDC8sGS5GZvAU3YrKSkUGTFdw==
   dependencies:
     "@hethers/address" "1.1.0"
     "@hethers/logger" "1.1.0"
 
-"@hethers/providers@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@hethers/providers/-/providers-1.1.3.tgz#45b89351b3aac076715bc288826c4977b841dc02"
-  integrity sha512-b4uuaq6MKiFhu1m8uP9aAX3n/9yQM3QbrHYbhbnYTip0pZ8yg+kPawTfqRoqz913Mj62f1Vq1GfJqclJWme0gw==
+"@hethers/providers@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/providers/-/providers-1.1.1.tgz#4dd374a75aeb99a03e93859b22d6f859dede8ec4"
+  integrity sha512-6CdwiB7GVD7tFm7G1mLemoVKgZ8KNiQvTTEyFxqazRFW6G8unVW07S104+hq/jfVL2eMoZP0O3LZLD+ny5Jelg==
   dependencies:
     "@ethersproject/base64" "5.5.0"
     "@ethersproject/basex" "5.5.0"
@@ -907,14 +910,14 @@
     "@ethersproject/strings" "5.5.0"
     "@ethersproject/web" "5.5.0"
     "@hashgraph/proto" "2.1.5"
-    "@hashgraph/sdk" "^2.17.1"
-    "@hethers/abstract-provider" "1.1.2"
-    "@hethers/abstract-signer" "1.1.3"
+    "@hashgraph/sdk" "2.11.0-beta.1"
+    "@hethers/abstract-provider" "1.1.1"
+    "@hethers/abstract-signer" "1.1.1"
     "@hethers/address" "1.1.0"
     "@hethers/constants" "1.1.0"
     "@hethers/logger" "1.1.0"
-    "@hethers/networks" "1.1.2"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/networks" "1.1.0"
+    "@hethers/transactions" "1.1.1"
     "@types/axios" "^0.14.0"
     axios "^0.24.0"
     bech32 "1.1.4"
@@ -932,10 +935,10 @@
     elliptic "6.5.4"
     hash.js "1.1.7"
 
-"@hethers/transactions@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@hethers/transactions/-/transactions-1.1.2.tgz#bac9027a9668acab2790d1e094f32c121d8d1989"
-  integrity sha512-vVyuiLFp/npfPL1t1dbSLOokcsUTF+kZkbY19z8xvGrOsEuHFdCNghRyklC60T0T7Foq+qXzYvEKV52HnVLtgw==
+"@hethers/transactions@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/transactions/-/transactions-1.1.1.tgz#9e6bfa02547bede017065647eede0d49c1e3c23e"
+  integrity sha512-M4EL3l/xJ3MmtWSQEm8ZpD9LJUd9LPEi106VfBEL/ns/xcTW6wRlIw+xwLHdqDibZ8/Niu8SYN18LbHp/zY6ng==
   dependencies:
     "@ethersproject/base64" "5.5.0"
     "@ethersproject/bignumber" "5.5.0"
@@ -955,10 +958,10 @@
     "@ethersproject/bignumber" "5.5.0"
     "@hethers/logger" "1.1.0"
 
-"@hethers/wallet@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@hethers/wallet/-/wallet-1.1.3.tgz#bf3ec2cf53aa5a4bf7129fd79870783d01814df6"
-  integrity sha512-W4k2FEClW8jzNCFgbWd58U2av3hsoF/pNclpeEaASWo3aZEcmPGc1/87AwwMXBaM3lzDN/BTzLMkZY3ogIA8jQ==
+"@hethers/wallet@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hethers/wallet/-/wallet-1.1.1.tgz#f1eddf7e4a77b821faa85392745ef404655e9f96"
+  integrity sha512-tg6vrjZL1t1FQziCat7zBx2IjqfFbWsQv5WwZkHPjn7Y/lFzmZuVYdh90t7/p3rquC96VGdmqYa/557qdotzRw==
   dependencies:
     "@ethersproject/bignumber" "5.5.0"
     "@ethersproject/bytes" "5.5.0"
@@ -967,15 +970,15 @@
     "@ethersproject/properties" "5.5.0"
     "@ethersproject/random" "5.5.0"
     "@ethersproject/wordlists" "5.5.0"
-    "@hashgraph/sdk" "^2.17.1"
-    "@hethers/abstract-provider" "1.1.2"
-    "@hethers/abstract-signer" "1.1.3"
+    "@hashgraph/sdk" "2.11.0-beta.1"
+    "@hethers/abstract-provider" "1.1.1"
+    "@hethers/abstract-signer" "1.1.1"
     "@hethers/address" "1.1.0"
-    "@hethers/hdnode" "1.1.3"
-    "@hethers/json-wallets" "1.1.3"
+    "@hethers/hdnode" "1.1.1"
+    "@hethers/json-wallets" "1.1.1"
     "@hethers/logger" "1.1.0"
     "@hethers/signing-key" "1.1.0"
-    "@hethers/transactions" "1.1.2"
+    "@hethers/transactions" "1.1.1"
 
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
@@ -2480,7 +2483,7 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-axios@*, axios@^0.27.2:
+axios@*:
   version "0.27.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.27.2.tgz#207658cc8621606e586c85db4b41a750e756d972"
   integrity sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==
@@ -6873,10 +6876,10 @@ secp256k1@^4.0.1, secp256k1@^4.0.2:
     node-addon-api "^2.0.0"
     node-gyp-build "^4.2.0"
 
-secretjs@^1.3.0-beta.1:
-  version "1.3.0-beta.23"
-  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.3.0-beta.23.tgz#b956d2479cc6b06c1fed3623ae19a8ba7c540f8a"
-  integrity sha512-zXL0t1h68it1+77+kobAq4JcIWV7EUtHfP2W2Vpc9MpAGLUeJ5XgfSNs6uO4IYq7viIEL7idTTls/7ljWBb8xw==
+secretjs@=1.3.0-beta.25:
+  version "1.3.0-beta.25"
+  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.3.0-beta.25.tgz#d3aced17bccc6da46e68ab64f846d51bb9ea6b49"
+  integrity sha512-fHTMGtHGP7aEVBD1142xTb2k7547misrnCs+EKMZN+CCr+fl1PZdEVX4r3MjC+qRpQIMgwVVXJZr4EUNwN7u3A==
   dependencies:
     "@cosmjs/encoding" "0.27.1"
     "@cosmjs/math" "0.27.1"
