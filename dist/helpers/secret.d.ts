@@ -18,6 +18,7 @@ export declare type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInf
 } & GetProvider<SecretNetworkClient> & MintNft<SecretSigner, SecretMintArgs, Tx> & {
     nftList(owner: string, viewingKey: string, contract: string, codeHash?: string): Promise<NftInfo<SecretNftInfo>[]>;
     setViewingKey(client: SecretNetworkClient, contract: string, vk: string): Promise<Tx>;
+    isApprovedForMinter(sender: SecretSigner, nft: NftInfo<SecretNftInfo>): Promise<boolean>;
 };
 export declare type SecretContract = {
     contractAddress: string;
