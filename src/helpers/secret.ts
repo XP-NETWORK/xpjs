@@ -57,6 +57,10 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
       contract: string,
       vk: string
     ): Promise<Tx>;
+    isApprovedForMinter(
+      sender: SecretSigner,
+      nft: NftInfo<SecretNftInfo>
+    ): Promise<boolean>;
   };
 
 export type SecretContract = {
@@ -91,11 +95,42 @@ export async function secretHelperFactory(
   // TODO
   const gasPrice = 1;
 
+  async function isApprovedForMinter(
+    sender: SecretSigner,
+    nft: NftInfo<SecretNftInfo>
+  ) {
+    const approval = await sender.query.snip721.GetTokenInfo({
+      auth: {
+        viewer: {
+          address: sender.address,
+          viewing_key: nft.native.vk,
+        },
+      },
+      contract: {
+        address: nft.collectionIdent,
+        codeHash: nft.native.contractHash,
+      },
+      token_id: nft.native.tokenId,
+    });
+    for (let appr of approval.all_nft_info.access.approvals) {
+      if (
+        (appr as any)["spender"].toLowerCase() ===
+        p.bridge.contractAddress.toLowerCase()
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   async function preTransfer(
     sender: SecretSigner,
     nft: NftInfo<SecretNftInfo>
   ) {
     // TODO: check if approved
+    if (await isApprovedForMinter(sender, nft)) {
+      return undefined;
+    }
     const res = await sender.tx.compute.executeContract(
       {
         sender: sender.address,
@@ -132,6 +167,7 @@ export async function secretHelperFactory(
 
       return new BigNumber(b.balance?.amount || 0);
     },
+    isApprovedForMinter,
     async mintNft(signer, args) {
       const minter = args.contract ? args.contract : p.umt;
       const tx = await signer.tx.compute.executeContract(
@@ -236,6 +272,7 @@ export async function secretHelperFactory(
         },
         {
           waitForCommit: true,
+          gasLimit: 30000,
         }
       );
       return tx;
