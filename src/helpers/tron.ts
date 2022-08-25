@@ -14,7 +14,7 @@ import { TronWeb } from "tronweb";
 // @ts-expect-error no types cope
 import TronStation from "tronstation";
 import { EthNftInfo, MintArgs } from "./web3";
-import { BigNumber as EthBN } from "@ethersproject/bignumber/lib/bignumber";
+import { BigNumber as EthBN } from "ethers";
 
 import {
   Minter__factory,
