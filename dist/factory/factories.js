@@ -258,10 +258,10 @@ var ChainFactoryConfigs;
                 feeMargin,
             },
             tezosParams: {
-                bridgeAddress: "KT195omxiopL2ZDqM3g8hRj2sSCG2pTqjNEj",
+                bridgeAddress: "KT1KbL9kWPM8GkMr5M38vF1eHdsNxTc4WkyQ",
                 notifier,
                 Tezos: new taquito_1.TezosToolkit(consts_1.TestNetRpcUri.TEZOS),
-                xpnftAddress: "KT1LZ3YqxgHy8jao5L8VBFyMUoPkxhgfLhLV",
+                xpnftAddress: "KT1WR4fe9wFGPgNViK5feigMGyXKG9gCX8n4",
                 validators: [
                     "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
                     "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
