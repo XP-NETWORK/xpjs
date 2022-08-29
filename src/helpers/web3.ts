@@ -557,8 +557,6 @@ export async function web3HelperFactory(
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
-      const isHedera = params.nonce === 0x1d;
-
       const tx = await minter
         .connect(sender)
         .populateTransaction[method](
@@ -574,12 +572,30 @@ export async function web3HelperFactory(
         );
       await txnUnderpricedPolyWorkaround(tx);
 
-      const txr = await sender.sendTransaction(tx);
+      const txr: TransactionResponse | unknown = await sender
+        .sendTransaction(tx)
+        .catch((e) => {
+          if (params.nonce === 33) {
+            return e;
+          } else throw e;
+        });
+      let txHash: string;
+      if (params.nonce === 0x1d) {
+        //@ts-ignore checked hedera
+        txHash = txr["transactionId"];
+      }
+      if (params.nonce === 33) {
+        //@ts-ignore checked abeychain
+        txHash = txr["returnedHash"];
+      } else {
+        //@ts-ignore checked normal evm
+        txHash = txr.hash;
+      }
 
       await notifyValidator(
         //@ts-ignore
-        isHedera ? txr["transactionId"] : txr.hash,
-        await extractAction(txr),
+        txHash,
+        await extractAction(await provider.getTransaction(txHash)),
         "Transfer",
         chain_nonce,
         txFees.toString(),
@@ -589,8 +605,9 @@ export async function web3HelperFactory(
         id.native.tokenId,
         id.native.contract
       );
-
-      return txr;
+      return params.nonce === 33
+        ? await provider.getTransaction(txHash)
+        : (txr as TransactionResponse);
     },
     async unfreezeWrappedNft(
       sender: Signer,
