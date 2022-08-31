@@ -114,7 +114,8 @@ export type ChainFactory = {
     receiver: string,
     fee?: BigNumber.Value,
     mintWith?: string,
-    gasLimit?: ethers.BigNumberish | undefined
+    gasLimit?: ethers.BigNumberish | undefined,
+    extraFee?: BigNumber.Value
   ): Promise<Resp>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
@@ -396,19 +397,26 @@ export function ChainFactory(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
-    receiver: string
+    receiver: string,
+    extraFee?: BigNumber.Value
   ) => {
     const estimate = await toChain.estimateValidateTransferNft(
       receiver,
       nft as any,
       ""
     );
-    const conv = await calcExchangeFees(
+    let conv = await calcExchangeFees(
       fromChain.getNonce(),
       toChain.getNonce(),
       estimate,
       toChain.getFeeMargin()
     );
+
+    if (extraFee) {
+      conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
+      console.log("extra conv");
+    }
+
     return conv;
   };
 
@@ -682,7 +690,8 @@ export function ChainFactory(
       receiver,
       fee,
       mintWith,
-      gasLimit
+      gasLimit,
+      extraFee
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
@@ -723,7 +732,7 @@ export function ChainFactory(
       }
 
       if (!fee) {
-        fee = await estimateFees(fromChain, toChain, nft, receiver);
+        fee = await estimateFees(fromChain, toChain, nft, receiver, extraFee);
         console.log(new BigNumber(fee).toString());
       }
       if (!(await toChain.validateAddress(receiver))) {
@@ -733,6 +742,7 @@ export function ChainFactory(
         throw new Error(`Mint with is not set`);
       }
       console.log(`Minting With : ${mw}`);
+
       if (await isWrappedNft(nft, fromChain.getNonce())) {
         await algoOptInCheck(nft, toChain, receiver);
 
@@ -743,6 +753,7 @@ export function ChainFactory(
           new BigNumber(fee),
           toChain.getNonce().toString()
         );
+
         return res;
       } else {
         const res = await fromChain.transferNftToForeign(
@@ -754,6 +765,7 @@ export function ChainFactory(
           mw,
           gasLimit
         );
+
         return res;
       }
     },
