@@ -346,6 +346,7 @@ export namespace ChainFactoryConfigs {
         rpcUrl: TestNetRpcUri.NEAR,
         bridge: "xpbridge.testnet",
         xpnft: "xpnft.testnet",
+        feeMargin,
       },
     };
   };
@@ -635,6 +636,7 @@ export namespace ChainFactoryConfigs {
         rpcUrl: MainNetRpcUri.NEAR,
         bridge: "",
         xpnft: "",
+        feeMargin,
       },
     };
   };
