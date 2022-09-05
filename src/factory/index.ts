@@ -405,6 +405,7 @@ export function ChainFactory(
       nft as any,
       ""
     );
+
     let conv = await calcExchangeFees(
       fromChain.getNonce(),
       toChain.getNonce(),
