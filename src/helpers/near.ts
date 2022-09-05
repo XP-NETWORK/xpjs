@@ -9,6 +9,8 @@ import { Chain } from "../consts";
 import {
   ChainNonceGet,
   EstimateTxFees,
+  FeeMargins,
+  GetFeeMargins,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -20,6 +22,7 @@ export type NearParams = {
   rpcUrl: string;
   bridge: string;
   xpnft: string;
+  feeMargin: FeeMargins;
 };
 export type NearNFT = {
   tokenId: string;
@@ -29,12 +32,16 @@ export type NearHelper = ChainNonceGet &
   TransferNftForeign<Account, NearNFT, string> &
   UnfreezeForeignNft<Account, NearNFT, string> &
   EstimateTxFees<NearNFT> &
-  ValidateAddress;
+  ValidateAddress & {
+    XpNft: string;
+  } & GetFeeMargins;
 
 export async function nearHelperFactory({
   networkId,
   bridge,
   rpcUrl,
+  xpnft,
+  feeMargin,
 }: NearParams): Promise<NearHelper> {
   const near = await connect({
     nodeUrl: rpcUrl,
@@ -59,6 +66,7 @@ export async function nearHelperFactory({
     getNonce() {
       return Chain.NEAR;
     },
+    XpNft: xpnft,
     async transferNftToForeign(
       sender,
       chain_nonce,
@@ -81,6 +89,9 @@ export async function nearHelperFactory({
         txFees
       );
       return resp;
+    },
+    getFeeMargin() {
+      return feeMargin;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       const minter = await getMinter(sender);
