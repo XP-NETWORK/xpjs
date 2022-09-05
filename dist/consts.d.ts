@@ -13,10 +13,10 @@ import { NearHelper, NearParams } from "./helpers/near";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
-    BSC = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/bsc/testnet",
-    ROPSTEN = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/eth/ropsten",
+    BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
+    ROPSTEN = "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
-    POLYGON = "https://speedy-nodes-nyc.moralis.io/3749d19c2c6dbb6264f47871/polygon/mumbai",
+    POLYGON = "https://matic-mumbai.chainstacklabs.com",
     FANTOM = "https://rpc.testnet.fantom.network/",
     TRON = "https://api.shasta.trongrid.io/",
     CELO = "https://alfajores-forno.celo-testnet.org",
@@ -59,7 +59,9 @@ export declare enum MainNetRpcUri {
     VECHAIN = "https://sync-mainnet.veblocks.net",
     SECRET = "https://secret-4.api.trivium.network:9091",
     SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
-    NEAR = "https://rpc.mainnet.near.org"
+    NEAR = "https://rpc.mainnet.near.org",
+    MOONBEAM = "https://rpc.api.moonbeam.network",
+    ABEYCHAIN = "https://rpc.abeychain.com"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
