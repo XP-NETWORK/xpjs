@@ -368,10 +368,10 @@ export async function web3HelperFactory(
   async function getTransaction(hash: string) {
     let trx;
     let fails = 0;
-    while (!trx && fails < 5) {
+    while (!trx && fails < 7) {
       trx = await provider.getTransaction(hash);
       await new Promise((resolve) =>
-        setTimeout(() => resolve("wait"), 4000 + fails * 2)
+        setTimeout(() => resolve("wait"), 5000 + fails * 2)
       );
       fails++;
     }
