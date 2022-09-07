@@ -240,6 +240,8 @@ export type ChainFactory = {
   ): Promise<boolean>;
 
   isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
+
+  setProvider(fromChain: number, provider: any): Promise<void>;
 };
 
 /**
@@ -366,6 +368,15 @@ export function ChainFactory(
       helpers.set(chain, helper);
     }
     return helper!;
+  };
+
+  const setProvider = async <T extends ChainNonce>(chain: T, provider: any) => {
+    const args = {
+      ...cToP.get(chain)!,
+      provider,
+    };
+    const helper = await CHAIN_INFO.get(chain)!.constructor(args);
+    helpers.set(chain, helper);
   };
 
   async function calcExchangeFees<T extends ChainNonce>(
@@ -801,6 +812,7 @@ export function ChainFactory(
       return await chain.isNftWhitelisted(nft);
     },
     isWrappedNft,
+    setProvider,
   };
 }
 
