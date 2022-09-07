@@ -115,6 +115,7 @@ export declare type ChainFactory = {
     getVerifiedContract(from: string, targetChain: number, fc: number, tokenId?: string): Promise<string | undefined>;
     checkWhitelist<RawNft>(chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet, nft: NftInfo<RawNft>): Promise<boolean>;
     isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
+    setProvider(fromChain: number, provider: any): Promise<void>;
 };
 /**
  * A type representing all the supported chain params.
