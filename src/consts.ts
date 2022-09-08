@@ -26,6 +26,7 @@ import {
   DfinityParams,
 } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams, nearHelperFactory } from "./helpers/near";
+import { AptosHelper, AptosParams } from "./helpers/aptos";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -54,6 +55,7 @@ export enum TestNetRpcUri {
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
   ABEYCHAIN = "https://testrpc.abeychain.com",
+  APTOS = "https://fullnode.devnet.aptoslabs.com",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -96,6 +98,7 @@ type SolanaMeta = [SolanaHelper, SolanaParams];
 type TonMeta = [TonHelper, TonParams];
 type DfinityMeta = [DfinityHelper, DfinityParams];
 type NearMeta = [NearHelper, NearParams];
+type AptosMeta = [AptosHelper, AptosParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
@@ -132,6 +135,7 @@ export type MetaMap = {
   0x1f: NearMeta;
   0x20: Web3Meta;
   0x21: Web3Meta;
+  0x22: AptosMeta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -166,6 +170,7 @@ export namespace Chain {
   export const NEAR = 0x1f; // 31
   export const MOONBEAM = 0x20; // 32
   export const ABEYCHAIN = 0x21; // 33
+  export const APTOS = 0x22; // 34
 }
 
 interface ChainData<T extends ChainNonce> {
