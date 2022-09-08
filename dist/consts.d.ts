@@ -10,6 +10,7 @@ import { SolanaHelper, SolanaParams } from "./helpers/solana";
 import { TonHelper, TonParams } from "./helpers/ton";
 import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams } from "./helpers/near";
+import { AptosHelper, AptosParams } from "./helpers/aptos";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -35,7 +36,8 @@ export declare enum TestNetRpcUri {
     HEDERA = "https://0.testnet.hedera.com/",
     NEAR = "https://rpc.testnet.near.org",
     MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
-    ABEYCHAIN = "https://testrpc.abeychain.com"
+    ABEYCHAIN = "https://testrpc.abeychain.com",
+    APTOS = "https://fullnode.devnet.aptoslabs.com"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -73,6 +75,7 @@ declare type SolanaMeta = [SolanaHelper, SolanaParams];
 declare type TonMeta = [TonHelper, TonParams];
 declare type DfinityMeta = [DfinityHelper, DfinityParams];
 declare type NearMeta = [NearHelper, NearParams];
+declare type AptosMeta = [AptosHelper, AptosParams];
 declare type MetaMapAssert = {
     [idx in typeof Chain[keyof typeof Chain]]: unknown;
 };
@@ -108,6 +111,7 @@ export declare type MetaMap = {
     0x1f: NearMeta;
     0x20: Web3Meta;
     0x21: Web3Meta;
+    0x22: AptosMeta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -141,6 +145,7 @@ export declare namespace Chain {
     const NEAR = 31;
     const MOONBEAM = 32;
     const ABEYCHAIN = 33;
+    const APTOS = 34;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
