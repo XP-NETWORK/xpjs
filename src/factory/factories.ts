@@ -344,8 +344,8 @@ export namespace ChainFactoryConfigs {
         networkId: "testnet",
         nonce: Chain.NEAR,
         rpcUrl: TestNetRpcUri.NEAR,
-        bridge: "xpbridge.testnet",
-        xpnft: "xpnft.testnet",
+        bridge: "xp_minter.testnet",
+        xpnft: "xp_nft.testnet",
         feeMargin,
       },
     };
