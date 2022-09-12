@@ -1,9 +1,12 @@
 import BigNumber from "bignumber.js";
+import { BN } from "bn.js";
+
 import {
   Account,
   connect,
   Contract,
   DEFAULT_FUNCTION_CALL_GAS,
+  Near,
 } from "near-api-js";
 import { Chain } from "../consts";
 import {
@@ -11,6 +14,7 @@ import {
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
+  GetProvider,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -34,7 +38,8 @@ export type NearHelper = ChainNonceGet &
   EstimateTxFees<NearNFT> &
   ValidateAddress & {
     XpNft: string;
-  } & GetFeeMargins;
+  } & GetFeeMargins &
+  GetProvider<Near>;
 
 export async function nearHelperFactory({
   networkId,
@@ -51,7 +56,7 @@ export async function nearHelperFactory({
 
   const getMinter = async (connection: Account) => {
     return new Contract(connection, bridge, {
-      changeMethods: ["freeze_nft"],
+      changeMethods: ["freeze_nft", "withdraw_nft"],
       viewMethods: [],
     }) as any;
   };
@@ -93,18 +98,23 @@ export async function nearHelperFactory({
     getFeeMargin() {
       return feeMargin;
     },
+    getProvider() {
+      return near;
+    },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       const minter = await getMinter(sender);
       const resp = minter.withdraw_nft(
         // token_id: TokenId, chain_nonce: u8, to: String, amt: u128
         {
-          token_id: id.native.tokenId,
-          chain_nonce: nonce,
-          to,
-          amt: new BigNumber(txFees),
-        },
-        DEFAULT_FUNCTION_CALL_GAS,
-        txFees
+          args: {
+            token_id: id.native.tokenId,
+            chain_nonce: parseInt(nonce),
+            to,
+            amt: parseInt(txFees.toString()),
+          },
+          gas: DEFAULT_FUNCTION_CALL_GAS,
+          amount: new BN(txFees.toString()),
+        }
       );
       return resp;
     },
