@@ -10,8 +10,13 @@ export type ChainNonce = keyof MetaMap;
 
 export type InferChainParam<K extends ChainNonce> = MetaMap[K][1];
 export type InferChainH<K extends ChainNonce> = MetaMap[K][0];
-export type InferSigner<K extends TransferNftChain<any, any, any>> =
-  K extends TransferNftChain<infer S, unknown, unknown> ? S : never;
+export type InferSigner<K> = K extends TransferNftChain<
+  infer S,
+  unknown,
+  unknown
+>
+  ? S
+  : never;
 
 export type InferNativeNft<K> = K extends TransferNftChain<
   any,
