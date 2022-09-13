@@ -69,6 +69,9 @@ export function evNotifier(url: string) {
     async notifySolana(txHash: string) {
       await api.post("/tx/solana", { tx_hash: txHash });
     },
+    async notifyNear(txHash: string) {
+      await api.post("/tx/near", { tx_hash: txHash });
+    },
     async notifyDfinity(actionId: string) {
       await api.post("/tx/dfinity", { action_id: actionId });
     },

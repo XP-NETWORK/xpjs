@@ -7,6 +7,7 @@ import {
   getTransactionLastResult,
 } from "near-api-js/lib/providers";
 import { Chain } from "../consts";
+import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -27,6 +28,7 @@ export type NearParams = {
   bridge: string;
   xpnft: string;
   feeMargin: FeeMargins;
+  notifier: EvNotifier;
 };
 export type NearNFT = {
   tokenId: string;
@@ -46,6 +48,7 @@ export async function nearHelperFactory({
   rpcUrl,
   xpnft,
   feeMargin,
+  notifier,
 }: NearParams): Promise<NearHelper> {
   const near = await connect({
     nodeUrl: rpcUrl,
@@ -86,6 +89,7 @@ export async function nearHelperFactory({
         attachedDeposit: new BN(txFees.toString()),
         gas: new BN(gasLimit?.toString() ?? DEFAULT_FUNCTION_CALL_GAS),
       });
+      await notifier.notifyNear(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
     },
     getFeeMargin() {
@@ -107,6 +111,7 @@ export async function nearHelperFactory({
         attachedDeposit: new BN(txFees.toString()),
         gas: DEFAULT_FUNCTION_CALL_GAS,
       });
+      await notifier.notifyNear(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
     },
     async validateAddress(adr) {
