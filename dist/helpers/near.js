@@ -5,8 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.nearHelperFactory = void 0;
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
-const bn_js_1 = require("bn.js");
+const bn_js_1 = __importDefault(require("bn.js"));
 const near_api_js_1 = require("near-api-js");
+const providers_1 = require("near-api-js/lib/providers");
 const consts_1 = require("../consts");
 async function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, }) {
     const near = await (0, near_api_js_1.connect)({
@@ -14,12 +15,6 @@ async function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, 
         networkId,
         headers: {},
     });
-    const getMinter = async (connection) => {
-        return new near_api_js_1.Contract(connection, bridge, {
-            changeMethods: ["freeze_nft", "withdraw_nft"],
-            viewMethods: [],
-        });
-    };
     return {
         async estimateValidateTransferNft(_to, _metadata, _mintWith) {
             return new bignumber_js_1.default(0); // TODO
@@ -32,15 +27,21 @@ async function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, 
         },
         XpNft: xpnft,
         async transferNftToForeign(sender, chain_nonce, to, id, txFees, mint_with, gasLimit) {
-            const minter = await getMinter(sender);
-            const resp = minter.freeze_nft({
-                token_id: id.native.tokenId,
-                chain_nonce,
-                to,
-                amt: new bignumber_js_1.default(txFees),
-                mint_with,
-            }, gasLimit !== null && gasLimit !== void 0 ? gasLimit : near_api_js_1.DEFAULT_FUNCTION_CALL_GAS, txFees);
-            return resp;
+            var _a;
+            const result = await sender.functionCall({
+                contractId: bridge,
+                args: {
+                    token_id: id.native.tokenId,
+                    chain_nonce,
+                    to,
+                    amt: new bignumber_js_1.default(txFees),
+                    mint_with,
+                },
+                methodName: "freeze_nft",
+                attachedDeposit: new bn_js_1.default(txFees.toString()),
+                gas: new bn_js_1.default((_a = gasLimit === null || gasLimit === void 0 ? void 0 : gasLimit.toString()) !== null && _a !== void 0 ? _a : near_api_js_1.DEFAULT_FUNCTION_CALL_GAS),
+            });
+            return [result, (0, providers_1.getTransactionLastResult)(result)];
         },
         getFeeMargin() {
             return feeMargin;
@@ -49,24 +50,23 @@ async function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, 
             return near;
         },
         async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
-            const minter = await getMinter(sender);
-            const resp = minter.withdraw_nft(
-            // token_id: TokenId, chain_nonce: u8, to: String, amt: u128
-            {
+            const result = await sender.functionCall({
+                contractId: bridge,
                 args: {
                     token_id: id.native.tokenId,
                     chain_nonce: parseInt(nonce),
                     to,
                     amt: parseInt(txFees.toString()),
                 },
+                methodName: "withdraw_nft",
+                attachedDeposit: new bn_js_1.default(txFees.toString()),
                 gas: near_api_js_1.DEFAULT_FUNCTION_CALL_GAS,
-                amount: new bn_js_1.BN(txFees.toString()),
             });
-            return resp;
+            return [result, (0, providers_1.getTransactionLastResult)(result)];
         },
         async validateAddress(adr) {
             try {
-                new near_api_js_1.Account(near.connection, adr).accountId;
+                await new near_api_js_1.Account(near.connection, adr).getAccountBalance();
                 return true;
             }
             catch (e) {
@@ -76,4 +76,4 @@ async function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, 
     };
 }
 exports.nearHelperFactory = nearHelperFactory;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibmVhci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9oZWxwZXJzL25lYXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUEsZ0VBQXFDO0FBQ3JDLGlDQUEyQjtBQUUzQiw2Q0FNcUI7QUFDckIsc0NBQWtDO0FBaUMzQixLQUFLLFVBQVUsaUJBQWlCLENBQUMsRUFDdEMsU0FBUyxFQUNULE1BQU0sRUFDTixNQUFNLEVBQ04sS0FBSyxFQUNMLFNBQVMsR0FDRTtJQUNYLE1BQU0sSUFBSSxHQUFHLE1BQU0sSUFBQSxxQkFBTyxFQUFDO1FBQ3pCLE9BQU8sRUFBRSxNQUFNO1FBQ2YsU0FBUztRQUNULE9BQU8sRUFBRSxFQUFFO0tBQ1osQ0FBQyxDQUFDO0lBRUgsTUFBTSxTQUFTLEdBQUcsS0FBSyxFQUFFLFVBQW1CLEVBQUUsRUFBRTtRQUM5QyxPQUFPLElBQUksc0JBQVEsQ0FBQyxVQUFVLEVBQUUsTUFBTSxFQUFFO1lBQ3RDLGFBQWEsRUFBRSxDQUFDLFlBQVksRUFBRSxjQUFjLENBQUM7WUFDN0MsV0FBVyxFQUFFLEVBQUU7U0FDaEIsQ0FBUSxDQUFDO0lBQ1osQ0FBQyxDQUFDO0lBRUYsT0FBTztRQUNMLEtBQUssQ0FBQywyQkFBMkIsQ0FBQyxHQUFHLEVBQUUsU0FBUyxFQUFFLFNBQVM7WUFDekQsT0FBTyxJQUFJLHNCQUFTLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxPQUFPO1FBQ2xDLENBQUM7UUFDRCxLQUFLLENBQUMsMkJBQTJCLENBQUMsR0FBRyxFQUFFLFNBQVMsRUFBRSxTQUFTO1lBQ3pELE9BQU8sSUFBSSxzQkFBUyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTztRQUNsQyxDQUFDO1FBQ0QsUUFBUTtZQUNOLE9BQU8sY0FBSyxDQUFDLElBQUksQ0FBQztRQUNwQixDQUFDO1FBQ0QsS0FBSyxFQUFFLEtBQUs7UUFDWixLQUFLLENBQUMsb0JBQW9CLENBQ3hCLE1BQU0sRUFDTixXQUFXLEVBQ1gsRUFBRSxFQUNGLEVBQUUsRUFDRixNQUFNLEVBQ04sU0FBUyxFQUNULFFBQVE7WUFFUixNQUFNLE1BQU0sR0FBRyxNQUFNLFNBQVMsQ0FBQyxNQUFNLENBQUMsQ0FBQztZQUN2QyxNQUFNLElBQUksR0FBRyxNQUFNLENBQUMsVUFBVSxDQUM1QjtnQkFDRSxRQUFRLEVBQUUsRUFBRSxDQUFDLE1BQU0sQ0FBQyxPQUFPO2dCQUMzQixXQUFXO2dCQUNYLEVBQUU7Z0JBQ0YsR0FBRyxFQUFFLElBQUksc0JBQVMsQ0FBQyxNQUFNLENBQUM7Z0JBQzFCLFNBQVM7YUFDVixFQUNELFFBQVEsYUFBUixRQUFRLGNBQVIsUUFBUSxHQUFJLHVDQUF5QixFQUNyQyxNQUFNLENBQ1AsQ0FBQztZQUNGLE9BQU8sSUFBSSxDQUFDO1FBQ2QsQ0FBQztRQUNELFlBQVk7WUFDVixPQUFPLFNBQVMsQ0FBQztRQUNuQixDQUFDO1FBQ0QsV0FBVztZQUNULE9BQU8sSUFBSSxDQUFDO1FBQ2QsQ0FBQztRQUNELEtBQUssQ0FBQyxrQkFBa0IsQ0FBQyxNQUFNLEVBQUUsRUFBRSxFQUFFLEVBQUUsRUFBRSxNQUFNLEVBQUUsS0FBSztZQUNwRCxNQUFNLE1BQU0sR0FBRyxNQUFNLFNBQVMsQ0FBQyxNQUFNLENBQUMsQ0FBQztZQUN2QyxNQUFNLElBQUksR0FBRyxNQUFNLENBQUMsWUFBWTtZQUM5Qiw0REFBNEQ7WUFDNUQ7Z0JBQ0UsSUFBSSxFQUFFO29CQUNKLFFBQVEsRUFBRSxFQUFFLENBQUMsTUFBTSxDQUFDLE9BQU87b0JBQzNCLFdBQVcsRUFBRSxRQUFRLENBQUMsS0FBSyxDQUFDO29CQUM1QixFQUFFO29CQUNGLEdBQUcsRUFBRSxRQUFRLENBQUMsTUFBTSxDQUFDLFFBQVEsRUFBRSxDQUFDO2lCQUNqQztnQkFDRCxHQUFHLEVBQUUsdUNBQXlCO2dCQUM5QixNQUFNLEVBQUUsSUFBSSxVQUFFLENBQUMsTUFBTSxDQUFDLFFBQVEsRUFBRSxDQUFDO2FBQ2xDLENBQ0YsQ0FBQztZQUNGLE9BQU8sSUFBSSxDQUFDO1FBQ2QsQ0FBQztRQUNELEtBQUssQ0FBQyxlQUFlLENBQUMsR0FBRztZQUN2QixJQUFJO2dCQUNGLElBQUkscUJBQU8sQ0FBQyxJQUFJLENBQUMsVUFBVSxFQUFFLEdBQUcsQ0FBQyxDQUFDLFNBQVMsQ0FBQztnQkFDNUMsT0FBTyxJQUFJLENBQUM7YUFDYjtZQUFDLE9BQU8sQ0FBQyxFQUFFO2dCQUNWLE9BQU8sS0FBSyxDQUFDO2FBQ2Q7UUFDSCxDQUFDO0tBQ0YsQ0FBQztBQUNKLENBQUM7QUF0RkQsOENBc0ZDIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibmVhci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9oZWxwZXJzL25lYXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUEsZ0VBQXFDO0FBQ3JDLGtEQUF1QjtBQUV2Qiw2Q0FBZ0Y7QUFDaEYseURBR21DO0FBQ25DLHNDQUFrQztBQWtDM0IsS0FBSyxVQUFVLGlCQUFpQixDQUFDLEVBQ3RDLFNBQVMsRUFDVCxNQUFNLEVBQ04sTUFBTSxFQUNOLEtBQUssRUFDTCxTQUFTLEdBQ0U7SUFDWCxNQUFNLElBQUksR0FBRyxNQUFNLElBQUEscUJBQU8sRUFBQztRQUN6QixPQUFPLEVBQUUsTUFBTTtRQUNmLFNBQVM7UUFDVCxPQUFPLEVBQUUsRUFBRTtLQUNaLENBQUMsQ0FBQztJQUVILE9BQU87UUFDTCxLQUFLLENBQUMsMkJBQTJCLENBQUMsR0FBRyxFQUFFLFNBQVMsRUFBRSxTQUFTO1lBQ3pELE9BQU8sSUFBSSxzQkFBUyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTztRQUNsQyxDQUFDO1FBQ0QsS0FBSyxDQUFDLDJCQUEyQixDQUFDLEdBQUcsRUFBRSxTQUFTLEVBQUUsU0FBUztZQUN6RCxPQUFPLElBQUksc0JBQVMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLE9BQU87UUFDbEMsQ0FBQztRQUNELFFBQVE7WUFDTixPQUFPLGNBQUssQ0FBQyxJQUFJLENBQUM7UUFDcEIsQ0FBQztRQUNELEtBQUssRUFBRSxLQUFLO1FBQ1osS0FBSyxDQUFDLG9CQUFvQixDQUN4QixNQUFNLEVBQ04sV0FBVyxFQUNYLEVBQUUsRUFDRixFQUFFLEVBQ0YsTUFBTSxFQUNOLFNBQVMsRUFDVCxRQUFROztZQUVSLE1BQU0sTUFBTSxHQUFHLE1BQU0sTUFBTSxDQUFDLFlBQVksQ0FBQztnQkFDdkMsVUFBVSxFQUFFLE1BQU07Z0JBQ2xCLElBQUksRUFBRTtvQkFDSixRQUFRLEVBQUUsRUFBRSxDQUFDLE1BQU0sQ0FBQyxPQUFPO29CQUMzQixXQUFXO29CQUNYLEVBQUU7b0JBQ0YsR0FBRyxFQUFFLElBQUksc0JBQVMsQ0FBQyxNQUFNLENBQUM7b0JBQzFCLFNBQVM7aUJBQ1Y7Z0JBQ0QsVUFBVSxFQUFFLFlBQVk7Z0JBQ3hCLGVBQWUsRUFBRSxJQUFJLGVBQUUsQ0FBQyxNQUFNLENBQUMsUUFBUSxFQUFFLENBQUM7Z0JBQzFDLEdBQUcsRUFBRSxJQUFJLGVBQUUsQ0FBQyxNQUFBLFFBQVEsYUFBUixRQUFRLHVCQUFSLFFBQVEsQ0FBRSxRQUFRLEVBQUUsbUNBQUksdUNBQXlCLENBQUM7YUFDL0QsQ0FBQyxDQUFDO1lBQ0gsT0FBTyxDQUFDLE1BQU0sRUFBRSxJQUFBLG9DQUF3QixFQUFDLE1BQU0sQ0FBQyxDQUFDLENBQUM7UUFDcEQsQ0FBQztRQUNELFlBQVk7WUFDVixPQUFPLFNBQVMsQ0FBQztRQUNuQixDQUFDO1FBQ0QsV0FBVztZQUNULE9BQU8sSUFBSSxDQUFDO1FBQ2QsQ0FBQztRQUNELEtBQUssQ0FBQyxrQkFBa0IsQ0FBQyxNQUFNLEVBQUUsRUFBRSxFQUFFLEVBQUUsRUFBRSxNQUFNLEVBQUUsS0FBSztZQUNwRCxNQUFNLE1BQU0sR0FBRyxNQUFNLE1BQU0sQ0FBQyxZQUFZLENBQUM7Z0JBQ3ZDLFVBQVUsRUFBRSxNQUFNO2dCQUNsQixJQUFJLEVBQUU7b0JBQ0osUUFBUSxFQUFFLEVBQUUsQ0FBQyxNQUFNLENBQUMsT0FBTztvQkFDM0IsV0FBVyxFQUFFLFFBQVEsQ0FBQyxLQUFLLENBQUM7b0JBQzVCLEVBQUU7b0JBQ0YsR0FBRyxFQUFFLFFBQVEsQ0FBQyxNQUFNLENBQUMsUUFBUSxFQUFFLENBQUM7aUJBQ2pDO2dCQUNELFVBQVUsRUFBRSxjQUFjO2dCQUMxQixlQUFlLEVBQUUsSUFBSSxlQUFFLENBQUMsTUFBTSxDQUFDLFFBQVEsRUFBRSxDQUFDO2dCQUMxQyxHQUFHLEVBQUUsdUNBQXlCO2FBQy9CLENBQUMsQ0FBQztZQUNILE9BQU8sQ0FBQyxNQUFNLEVBQUUsSUFBQSxvQ0FBd0IsRUFBQyxNQUFNLENBQUMsQ0FBQyxDQUFDO1FBQ3BELENBQUM7UUFDRCxLQUFLLENBQUMsZUFBZSxDQUFDLEdBQUc7WUFDdkIsSUFBSTtnQkFDRixNQUFNLElBQUkscUJBQU8sQ0FBQyxJQUFJLENBQUMsVUFBVSxFQUFFLEdBQUcsQ0FBQyxDQUFDLGlCQUFpQixFQUFFLENBQUM7Z0JBQzVELE9BQU8sSUFBSSxDQUFDO2FBQ2I7WUFBQyxPQUFPLENBQUMsRUFBRTtnQkFDVixPQUFPLEtBQUssQ0FBQzthQUNkO1FBQ0gsQ0FBQztLQUNGLENBQUM7QUFDSixDQUFDO0FBOUVELDhDQThFQyJ9
