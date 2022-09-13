@@ -600,7 +600,7 @@ export async function web3HelperFactory(
       }
       if (params.nonce === 33) {
         //@ts-ignore checked abeychain
-        txHash = txr["returnedHash"];
+        txHash = txr["returnedHash"] || txr.hash;
       } else {
         //@ts-ignore checked normal evm
         txHash = txr.hash;
