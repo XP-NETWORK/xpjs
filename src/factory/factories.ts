@@ -345,7 +345,7 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.NEAR,
         rpcUrl: TestNetRpcUri.NEAR,
         bridge: "xp_minter.testnet",
-        xpnft: "xp_nft.testnet",
+        xpnft: "xp_nft12.testnet",
         feeMargin,
       },
     };
