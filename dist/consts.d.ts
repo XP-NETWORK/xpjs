@@ -155,11 +155,25 @@ interface ChainData<T extends ChainNonce> {
     blockExplorerUrl: string;
     chainId?: number;
     currency: SupportedCurrency;
+    type: string;
 }
 declare type ChainInfo = {
     set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
     get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
-};
+} & Map<ChainNonce, ChainData<ChainNonce>>;
+export declare enum ChainType {
+    EVM = "EVM",
+    ELROND = "ELROND",
+    TRON = "TRON",
+    TEZOS = "TEZOS",
+    ALGORAND = "ALGORAND",
+    SECRET = "SECRET",
+    DFINITY = "DFINITY",
+    SOLANA = "SOLANA",
+    TON = "TON",
+    NEAR = "NEAR",
+    HEDERA = "HEDERA"
+}
 export declare const CHAIN_INFO: ChainInfo;
 export {};
 //# sourceMappingURL=consts.d.ts.map
