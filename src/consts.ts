@@ -181,12 +181,27 @@ interface ChainData<T extends ChainNonce> {
   blockExplorerUrl: string;
   chainId?: number;
   currency: SupportedCurrency;
+  type: string;
 }
 
 type ChainInfo = {
   set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
   get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
-};
+} & Map<ChainNonce, ChainData<ChainNonce>>;
+
+export enum ChainType {
+  EVM = "EVM",
+  ELROND = "ELROND",
+  TRON = "TRON",
+  TEZOS = "TEZOS",
+  ALGORAND = "ALGORAND",
+  SECRET = "SECRET",
+  DFINITY = "DFINITY",
+  SOLANA = "SOLANA",
+  TON = "TON",
+  NEAR = "NEAR",
+  HEDERA = "HEDERA",
+}
 
 export const CHAIN_INFO: ChainInfo = new Map();
 CHAIN_INFO.set(Chain.ELROND, {
@@ -196,6 +211,7 @@ CHAIN_INFO.set(Chain.ELROND, {
   constructor: elrondHelperFactory,
   blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
   currency: SupportedCurrency.EGLD,
+  type: ChainType.ELROND,
 });
 CHAIN_INFO.set(Chain.HECO, {
   name: "HECO",
@@ -205,6 +221,7 @@ CHAIN_INFO.set(Chain.HECO, {
   blockExplorerUrl: "https://testnet.hecoinfo.com/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.HT,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.BSC, {
   name: "BSC",
@@ -214,6 +231,7 @@ CHAIN_INFO.set(Chain.BSC, {
   blockExplorerUrl: "https://testnet.bscscan.com/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.BNB,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.ETHEREUM, {
   name: "Ethereum",
@@ -223,6 +241,7 @@ CHAIN_INFO.set(Chain.ETHEREUM, {
   decimals: 1e18,
   blockExplorerUrl: "https://ropsten.etherscan.io/tx",
   constructor: web3HelperFactory,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.AVALANCHE, {
   name: "Avalanche",
@@ -232,6 +251,7 @@ CHAIN_INFO.set(Chain.AVALANCHE, {
   blockExplorerUrl: "https://cchain.explorer.avax-test.network/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.AVAX,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.POLYGON, {
   name: "Polygon",
@@ -241,6 +261,7 @@ CHAIN_INFO.set(Chain.POLYGON, {
   blockExplorerUrl: "https://mumbai.polygonscan.com/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.MATIC,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.FANTOM, {
   name: "Fantom",
@@ -250,6 +271,7 @@ CHAIN_INFO.set(Chain.FANTOM, {
   blockExplorerUrl: "https://explorer.testnet.fantom.network/transactions",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.FTM,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.TRON, {
   name: "Tron",
@@ -258,6 +280,7 @@ CHAIN_INFO.set(Chain.TRON, {
   blockExplorerUrl: "https://shasta.tronscan.org/#/transaction",
   constructor: tronHelperFactory,
   currency: SupportedCurrency.TRX,
+  type: ChainType.TRON,
 });
 CHAIN_INFO.set(Chain.CELO, {
   name: "Celo",
@@ -267,6 +290,7 @@ CHAIN_INFO.set(Chain.CELO, {
   blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.CELO,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.HARMONY, {
   name: "Harmony",
@@ -276,6 +300,7 @@ CHAIN_INFO.set(Chain.HARMONY, {
   blockExplorerUrl: "https://explorer.pops.one/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ONE,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.ONT, {
   name: "Ontology",
@@ -285,6 +310,7 @@ CHAIN_INFO.set(Chain.ONT, {
   blockExplorerUrl: "https://explorer.pops.one/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ONT,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.XDAI, {
   name: "xDai",
@@ -294,6 +320,7 @@ CHAIN_INFO.set(Chain.XDAI, {
   blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.XDAI,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.ALGORAND, {
   name: "Algorand",
@@ -303,6 +330,7 @@ CHAIN_INFO.set(Chain.ALGORAND, {
   blockExplorerUrl: "https://algoexplorer.io/tx",
   currency: SupportedCurrency.ALGO,
   constructor: (p) => Promise.resolve(algorandHelper(p)),
+  type: ChainType.ALGORAND,
 });
 CHAIN_INFO.set(Chain.FUSE, {
   name: "FUSE",
@@ -312,6 +340,7 @@ CHAIN_INFO.set(Chain.FUSE, {
   blockExplorerUrl: "https://explorer.fuse.io/tx",
   currency: SupportedCurrency.FUSE,
   constructor: web3HelperFactory,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.UNIQUE, {
   name: "Unique",
@@ -321,6 +350,7 @@ CHAIN_INFO.set(Chain.UNIQUE, {
   blockExplorerUrl: "CANT FIND",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.OPL,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.TEZOS, {
   name: "Tezos",
@@ -329,6 +359,7 @@ CHAIN_INFO.set(Chain.TEZOS, {
   constructor: tezosHelperFactory,
   currency: SupportedCurrency.XTZ,
   blockExplorerUrl: "https://tezblock.io/transaction",
+  type: ChainType.TEZOS,
 });
 CHAIN_INFO.set(Chain.VELAS, {
   name: "Velas",
@@ -338,6 +369,7 @@ CHAIN_INFO.set(Chain.VELAS, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.VLX,
   chainId: 111,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.AURORA, {
   name: "Aurora",
@@ -347,6 +379,7 @@ CHAIN_INFO.set(Chain.AURORA, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.AURORA,
   chainId: 1313161554,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.IOTEX, {
   name: "IoTeX",
@@ -356,6 +389,7 @@ CHAIN_INFO.set(Chain.IOTEX, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.IOTX,
   chainId: 4689,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.GODWOKEN, {
   name: "GodWoken",
@@ -365,6 +399,7 @@ CHAIN_INFO.set(Chain.GODWOKEN, {
   decimals: 1e18,
   currency: SupportedCurrency.CKB,
   chainId: 868455272153094,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.GATECHAIN, {
   name: "GateChain",
@@ -374,6 +409,7 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
   decimals: 1e18,
   currency: SupportedCurrency.GT,
   chainId: 85,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.VECHAIN, {
   name: "VeChain",
@@ -383,6 +419,7 @@ CHAIN_INFO.set(Chain.VECHAIN, {
   currency: SupportedCurrency.VET,
   decimals: 1e18,
   chainId: 39,
+  type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.SECRET, {
   name: "Secret",
@@ -391,6 +428,7 @@ CHAIN_INFO.set(Chain.SECRET, {
   nonce: Chain.SECRET,
   currency: SupportedCurrency.SCRT,
   decimals: 1e6,
+  type: ChainType.SECRET,
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",
@@ -399,6 +437,7 @@ CHAIN_INFO.set(Chain.SOLANA, {
   nonce: Chain.SOLANA,
   currency: SupportedCurrency.SOL,
   decimals: 1e9,
+  type: ChainType.SOLANA,
 });
 CHAIN_INFO.set(Chain.TON, {
   name: "TON",
@@ -407,6 +446,7 @@ CHAIN_INFO.set(Chain.TON, {
   nonce: Chain.TON,
   currency: SupportedCurrency.TON,
   decimals: 1e9,
+  type: ChainType.TON,
 });
 CHAIN_INFO.set(Chain.DFINITY, {
   name: "DFINITY",
@@ -415,6 +455,7 @@ CHAIN_INFO.set(Chain.DFINITY, {
   nonce: Chain.DFINITY,
   currency: SupportedCurrency.ICP,
   decimals: 1e8,
+  type: ChainType.DFINITY,
 });
 CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/testnet/transaction",
@@ -423,6 +464,7 @@ CHAIN_INFO.set(Chain.HEDERA, {
   decimals: 1e6,
   nonce: Chain.HEDERA,
   name: "Hedera",
+  type: ChainType.HEDERA,
 });
 
 CHAIN_INFO.set(Chain.SKALE, {
@@ -434,6 +476,7 @@ CHAIN_INFO.set(Chain.SKALE, {
   decimals: 1e18,
   chainId: 1564830818,
   nonce: Chain.SKALE,
+  type: ChainType.EVM,
 });
 
 CHAIN_INFO.set(Chain.DFINITY, {
@@ -443,6 +486,7 @@ CHAIN_INFO.set(Chain.DFINITY, {
   decimals: 1e8,
   name: "DFINITY",
   nonce: Chain.DFINITY,
+  type: ChainType.DFINITY,
 });
 
 CHAIN_INFO.set(Chain.NEAR, {
@@ -452,6 +496,7 @@ CHAIN_INFO.set(Chain.NEAR, {
   decimals: 1e8,
   name: "NEAR",
   nonce: Chain.NEAR,
+  type: ChainType.NEAR,
 });
 
 CHAIN_INFO.set(Chain.MOONBEAM, {
@@ -462,6 +507,7 @@ CHAIN_INFO.set(Chain.MOONBEAM, {
   name: "MoonBeam",
   nonce: Chain.MOONBEAM,
   chainId: 0x507,
+  type: ChainType.EVM,
 });
 
 CHAIN_INFO.set(Chain.ABEYCHAIN, {
@@ -472,4 +518,5 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
   name: "AbeyChain",
   nonce: Chain.ABEYCHAIN,
   chainId: 178,
+  type: ChainType.EVM,
 });

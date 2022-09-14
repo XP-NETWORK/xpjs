@@ -21,7 +21,7 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { exchangeRateRepo } from "./cons";
+import { exchangeRateRepo, getDefaultContract } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
 import { ethers, utils } from "ethers";
@@ -57,7 +57,7 @@ import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 
-type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
+export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
   RawNft,
   Resp
@@ -732,12 +732,7 @@ export function ChainFactory(
           tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
         ))
           ? mintWith
-          : "contractType" in nft.native &&
-            //@ts-ignore contractType is checked
-            nft.native.contractType === "ERC1155" &&
-            toChain.XpNft1155
-          ? toChain.XpNft1155
-          : toChain.XpNft;
+          : getDefaultContract(nft, fromChain, toChain);
 
       if (appConfig.network === "mainnet") {
         await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
@@ -750,9 +745,7 @@ export function ChainFactory(
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
       }
-      if (mw === undefined) {
-        throw new Error(`Mint with is not set`);
-      }
+
       console.log(`Minting With : ${mw}`);
 
       if (await isWrappedNft(nft, fromChain.getNonce())) {
@@ -768,6 +761,10 @@ export function ChainFactory(
 
         return res;
       } else {
+        if (mw === undefined) {
+          throw new Error(`Mint with is not set`);
+        }
+
         const res = await fromChain.transferNftToForeign(
           sender,
           toChain.getNonce(),
