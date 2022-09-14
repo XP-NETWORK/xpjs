@@ -34,6 +34,21 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   const fromType = CHAIN_INFO.get(from)?.type;
   const toType = CHAIN_INFO.get(to)?.type;
 
+  const contract =
+    "contractType" in nft.native &&
+    //@ts-ignore contractType is checked
+    nft.native.contractType === "ERC1155" &&
+    toChain.XpNft1155
+      ? toChain.XpNft1155
+      : toChain.XpNft;
+
+  if (
+    typeof window !== "undefined" &&
+    /(testing\.bridge)/.test(window.location.origin)
+  ) {
+    return contract;
+  }
+
   if (fromType === ChainType.EVM && toType === ChainType.EVM) {
     return undefined;
   }
@@ -46,10 +61,5 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     return undefined;
   }
 
-  return "contractType" in nft.native &&
-    //@ts-ignore contractType is checked
-    nft.native.contractType === "ERC1155" &&
-    toChain.XpNft1155
-    ? toChain.XpNft1155
-    : toChain.XpNft;
+  return contract;
 }
