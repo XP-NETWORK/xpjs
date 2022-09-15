@@ -70,7 +70,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       const rSigner = signer.wallet || ton;
 
       const txFeesFull = new BN(txFees.toString(10));
-      const nftFee = TonWeb.utils.toNano("0.05");
+      const nftFee = TonWeb.utils.toNano("0.07");
       const payload = await bridge.createFreezeBody({
         amount: txFeesFull.sub(nftFee),
         to: Buffer.from(to),
@@ -79,7 +79,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       });
 
       await rSigner.send("ton_sendTransaction", {
-        value: nftFee.toString(10),
+        value: txFeesFull.toString(10),
         to: nft.native.nftItemAddr,
         data: Buffer.from(await payload.getRepr()).toString("base64"),
       });
@@ -99,7 +99,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       });
 
       await rSigner.send("ton_sendTransaction", {
-        value: nftFee.toString(10),
+        value: txFeesFull.toString(10),
         to: nft.native.nftItemAddr,
         data: Buffer.from(await payload.getRepr()).toString("base64"),
       });
