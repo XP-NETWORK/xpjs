@@ -12,11 +12,14 @@ export declare class BridgeClient {
     initialize(account: AptosAccount, groupKey: Uint8Array): Promise<string>;
     pause(account: AptosAccount, actionId: number | bigint, signature: Uint8Array): Promise<string>;
     unpause(account: AptosAccount, actionId: number | bigint, signature: Uint8Array): Promise<string>;
-    validateTransferNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string | undefined, _actionId: number | bigint, _signature: Uint8Array): Promise<string>;
-    withdrawNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion?: string): Promise<string>;
-    validateBurnNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string | undefined, _actionId: number | bigint, _signature: Uint8Array): Promise<string>;
-    freezeNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion?: string): Promise<string>;
-    validateUnfreezeNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string | undefined, _actionId: number | bigint, _signature: Uint8Array): Promise<string>;
+    validateWhitelist(account: AptosAccount, collectionCreator: HexString, collectionName: string, actionId: number | bigint, signature: Uint8Array): Promise<string>;
+    validateBlacklist(account: AptosAccount, collectionCreator: HexString, collectionName: string, actionId: number | bigint, signature: Uint8Array): Promise<string>;
+    validateWithdrawFees(account: AptosAccount, to: HexString, actionId: number | bigint, signature: Uint8Array): Promise<string>;
+    validateTransferNft(account: AptosAccount, collection: string, name: string, description: string, maximum: number | bigint, uri: string, royaltyPayeeAddress: HexString, royaltyPointsDenominator: number | bigint, royaltyPointsNumerator: number | bigint, mutateSetting: boolean[], propertyKeys: string[], propertyValues: number[][], propertyTypes: string[], to: HexString, actionId: number | bigint, signature: Uint8Array): Promise<string>;
+    withdrawNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string, price: number | bigint, chainNonce: number | bigint, to: string, mintWith: string): Promise<string>;
+    validateBurnNft(account: AptosAccount, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string, actionId: number | bigint, signature: Uint8Array): Promise<string>;
+    freezeNft(account: AptosAccount, bridgeAdmin: HexString, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string, price: number | bigint, chainNonce: number | bigint, to: string, mintWith: string): Promise<string>;
+    validateUnfreezeNft(account: AptosAccount, collectionCreator: HexString, collectionName: string, tokenName: string, propertyVersion: string, to: HexString, actionId: number | bigint, signature: Uint8Array): Promise<string>;
     updateGroupKey(account: AptosAccount, groupKey: Uint8Array, actionId: number | bigint, signature: Uint8Array): Promise<string>;
     getBridgeData(creator: MaybeHexString): Promise<BridgeData>;
 }
