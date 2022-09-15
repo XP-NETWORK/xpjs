@@ -70,11 +70,11 @@ export async function aptosHelper({
     },
     async transferNftToForeign(
       sender,
-      _chain_nonce,
-      _to,
+      chain_nonce,
+      to,
       id,
-      _txFees,
-      _mintWith,
+      txFees,
+      mintWith,
       _gasLimit?
     ) {
       const receipt = await bridgeClient.freezeNft(
@@ -83,12 +83,28 @@ export async function aptosHelper({
         HexString.ensure(id.native.collection_creator),
         id.native.collection_name,
         id.native.token_name,
-        id.native.property_version.toString()
+        id.native.property_version.toString(),
+        BigInt(txFees.toString()),
+        chain_nonce,
+        to,
+        mintWith
       );
       return receipt;
     },
-    async unfreezeWrappedNft(_sender, _to, _id, _txFees, _nonce) {
-      throw new Error("Method not implemented.");
+    async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
+      const receipt = await bridgeClient.withdrawNft(
+        sender,
+        HexString.ensure(bridge),
+        HexString.ensure(id.native.collection_creator),
+        id.native.collection_name,
+        id.native.token_name,
+        id.native.property_version.toString(),
+        BigInt(txFees.toString()),
+        parseInt(nonce),
+        to,
+        id.native.collection_creator
+      );
+      return receipt;
     },
   };
 }
