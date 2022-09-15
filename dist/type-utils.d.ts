@@ -3,7 +3,7 @@ declare type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<Signer,
 export declare type ChainNonce = keyof MetaMap;
 export declare type InferChainParam<K extends ChainNonce> = MetaMap[K][1];
 export declare type InferChainH<K extends ChainNonce> = MetaMap[K][0];
-export declare type InferSigner<K extends TransferNftChain<any, any, any>> = K extends TransferNftChain<infer S, unknown, unknown> ? S : never;
+export declare type InferSigner<K> = K extends TransferNftChain<infer S, unknown, unknown> ? S : never;
 export declare type InferNativeNft<K> = K extends TransferNftChain<any, infer RawNft, any> ? RawNft : never;
 export declare type ParamMap = {
     set<T extends ChainNonce>(k: T, v: InferChainParam<T> | undefined): void;

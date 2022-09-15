@@ -7,6 +7,7 @@ export declare function evNotifier(url: string): {
     notifyAlgorand(txHash: string): Promise<void>;
     notifySecret(txHash: string, vk: string): Promise<void>;
     notifySolana(txHash: string): Promise<void>;
+    notifyNear(txHash: string): Promise<void>;
     notifyDfinity(actionId: string): Promise<void>;
 };
 //# sourceMappingURL=index.d.ts.map
