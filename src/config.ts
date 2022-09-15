@@ -11,7 +11,7 @@ export namespace AppConfigs {
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
       wrappedNftPrefix: "https://nft.xp.network/w/",
-      scVerifyUri: "https://testing-sc-verify.herokuapp.com",
+      scVerifyUri: "https://sc-verify.xp.network",
       network: "mainnet",
     };
   };
