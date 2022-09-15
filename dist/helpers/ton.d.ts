@@ -6,12 +6,12 @@ export declare type TonSigner = {
     accIdx: number;
 };
 export declare type TonNft = {
-    nftId: number;
+    nftItemAddr: string;
 };
 export declare type TonHelper = ChainNonceGet & TransferNftForeign<TonSigner, TonNft, string> & UnfreezeForeignNft<TonSigner, TonNft, string> & EstimateTxFees<TonNft> & ValidateAddress & {
     XpNft: string;
 } & {
-    tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonWallet;
+    tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
 };
 export declare type TonParams = {
     tonweb: TonWeb;
