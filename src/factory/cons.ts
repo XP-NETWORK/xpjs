@@ -44,7 +44,8 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
 
   if (
     typeof window !== "undefined" &&
-    /(testing\.bridge)/.test(window.location.origin)
+    (/(testing\.bridge)/.test(window.location.origin) ||
+      /testnet/.test(window.location.pathname))
   ) {
     return contract;
   }
