@@ -10,6 +10,11 @@ import { NftInfo, FullChain } from "..";
 
 import { CHAIN_INFO, ChainType } from "../consts";
 
+export const _headers = {
+  "Content-Type": "application/json",
+  Accept: "*/*",
+};
+
 export function exchangeRateRepo(
   baseUrl: string
 ): ExchangeRateRepo & BatchExchangeRateRepo {
@@ -54,9 +59,9 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     return contract;
   }
 
-  if (fromType === ChainType.EVM && toType === ChainType.EVM) {
+  /*if (fromType === ChainType.EVM && toType === ChainType.EVM) {
     throw defaultMintError;
-  }
+  }*/
 
   if (
     (fromType === ChainType.EVM && toType === ChainType.ELROND) ||
