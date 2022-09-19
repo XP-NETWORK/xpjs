@@ -66,25 +66,91 @@ export class BridgeClient {
     return this.aptosClient.generateSignSubmitTransaction(account, payload);
   }
 
-  async validateTransferNft(
+  async validateWhitelist(
     account: AptosAccount,
-    bridgeAdmin: HexString,
     collectionCreator: HexString,
     collectionName: string,
-    tokenName: string,
-    propertyVersion: string = "0",
-    _actionId: number | bigint,
-    _signature: Uint8Array
+    actionId: number | bigint,
+    signature: Uint8Array
+  ): Promise<string> {
+    const payload = this.transactionBuilder.buildTransactionPayload(
+      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_whitelist",
+      [],
+      [collectionCreator.toString(), collectionName, actionId, signature]
+    );
+
+    return this.aptosClient.generateSignSubmitTransaction(account, payload);
+  }
+
+  async validateBlacklist(
+    account: AptosAccount,
+    collectionCreator: HexString,
+    collectionName: string,
+    actionId: number | bigint,
+    signature: Uint8Array
+  ): Promise<string> {
+    const payload = this.transactionBuilder.buildTransactionPayload(
+      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_blacklist",
+      [],
+      [collectionCreator.toString(), collectionName, actionId, signature]
+    );
+
+    return this.aptosClient.generateSignSubmitTransaction(account, payload);
+  }
+
+  async validateWithdrawFees(
+    account: AptosAccount,
+    to: HexString,
+    actionId: number | bigint,
+    signature: Uint8Array
+  ): Promise<string> {
+    const payload = this.transactionBuilder.buildTransactionPayload(
+      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_withdraw_fees",
+      [],
+      [to.toString(), actionId, signature]
+    );
+
+    return this.aptosClient.generateSignSubmitTransaction(account, payload);
+  }
+
+  async validateTransferNft(
+    account: AptosAccount,
+    collection: string,
+    name: string,
+    description: string,
+    maximum: number | bigint,
+    uri: string,
+    royaltyPayeeAddress: HexString,
+    royaltyPointsDenominator: number | bigint,
+    royaltyPointsNumerator: number | bigint,
+    mutateSetting: boolean[],
+    propertyKeys: string[],
+    propertyValues: number[][],
+    propertyTypes: string[],
+    to: HexString,
+    actionId: number | bigint,
+    signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
       "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_transfer_nft",
       [],
       [
-        bridgeAdmin.toString(),
-        collectionCreator.toString(),
-        collectionName,
-        tokenName,
-        propertyVersion,
+        collection,
+        name,
+        description,
+        maximum,
+        uri,
+        royaltyPayeeAddress.toString(),
+        royaltyPointsDenominator,
+        royaltyPointsNumerator,
+        mutateSetting,
+        propertyKeys,
+        propertyValues,
+        propertyValues,
+        propertyTypes,
+        to.toString(),
+        actionId,
+        signature,
       ]
     );
 
@@ -97,7 +163,11 @@ export class BridgeClient {
     collectionCreator: HexString,
     collectionName: string,
     tokenName: string,
-    propertyVersion: string = "0"
+    propertyVersion: string,
+    price: number | bigint,
+    chainNonce: number | bigint,
+    to: string,
+    mintWith: string
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
       "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::withdraw_nft",
@@ -108,6 +178,10 @@ export class BridgeClient {
         collectionName,
         tokenName,
         propertyVersion,
+        price,
+        chainNonce,
+        to,
+        mintWith,
       ]
     );
 
@@ -116,23 +190,23 @@ export class BridgeClient {
 
   async validateBurnNft(
     account: AptosAccount,
-    bridgeAdmin: HexString,
     collectionCreator: HexString,
     collectionName: string,
     tokenName: string,
-    propertyVersion: string = "0",
-    _actionId: number | bigint,
-    _signature: Uint8Array
+    propertyVersion: string,
+    actionId: number | bigint,
+    signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
       "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_burn_nft",
       [],
       [
-        bridgeAdmin.toString(),
         collectionCreator.toString(),
         collectionName,
         tokenName,
         propertyVersion,
+        actionId,
+        signature,
       ]
     );
 
@@ -145,7 +219,11 @@ export class BridgeClient {
     collectionCreator: HexString,
     collectionName: string,
     tokenName: string,
-    propertyVersion: string = "0"
+    propertyVersion: string,
+    price: number | bigint,
+    chainNonce: number | bigint,
+    to: string,
+    mintWith: string
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
       "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::freeze_nft",
@@ -156,6 +234,10 @@ export class BridgeClient {
         collectionName,
         tokenName,
         propertyVersion,
+        price,
+        chainNonce,
+        to,
+        mintWith,
       ]
     );
 
@@ -164,23 +246,25 @@ export class BridgeClient {
 
   async validateUnfreezeNft(
     account: AptosAccount,
-    bridgeAdmin: HexString,
     collectionCreator: HexString,
     collectionName: string,
     tokenName: string,
-    propertyVersion: string = "0",
-    _actionId: number | bigint,
-    _signature: Uint8Array
+    propertyVersion: string,
+    to: HexString,
+    actionId: number | bigint,
+    signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
       "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_unfreeze_nft",
       [],
       [
-        bridgeAdmin.toString(),
         collectionCreator.toString(),
         collectionName,
         tokenName,
         propertyVersion,
+        to.toString(),
+        actionId,
+        signature,
       ]
     );
 

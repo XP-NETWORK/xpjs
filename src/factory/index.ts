@@ -21,7 +21,7 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { exchangeRateRepo, getDefaultContract } from "./cons";
+import { exchangeRateRepo, getDefaultContract, _headers } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
 import { ethers, utils } from "ethers";
@@ -540,12 +540,18 @@ export function ChainFactory(
     tokenId?: string
   ): Promise<string | undefined> {
     const res = await axios
-      .post<{ data: string }>(`${appConfig.scVerifyUri}/default/`, {
-        sc: from,
-        chain: tc,
-        fromChain: fc,
-        tokenId,
-      })
+      .post<{ data: string }>(
+        `${appConfig.scVerifyUri}/default/`,
+        {
+          sc: from,
+          chain: tc,
+          fromChain: fc,
+          tokenId,
+        },
+        {
+          headers: _headers,
+        }
+      )
       .catch(() => {
         return undefined;
       });
@@ -562,7 +568,10 @@ export function ChainFactory(
     const res = await axios
       .post<{ data: "allowed" | "not allowed" }>(
         `${appConfig.scVerifyUri}/verify`,
-        { from, to, targetChain, fromChain, tokenId }
+        { from, to, targetChain, fromChain, tokenId },
+        {
+          headers: _headers,
+        }
       )
       .catch(() => undefined);
 
