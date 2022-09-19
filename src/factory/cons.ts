@@ -10,6 +10,11 @@ import { NftInfo, FullChain } from "..";
 
 import { CHAIN_INFO, ChainType } from "../consts";
 
+export const _headers = {
+  "Content-Type": "application/json",
+  Accept: "*/*",
+};
+
 export function exchangeRateRepo(
   baseUrl: string
 ): ExchangeRateRepo & BatchExchangeRateRepo {
@@ -28,6 +33,10 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   fromChain: FullChain<SignerT, RawNftT, Resp>,
   toChain: FullChain<SignerT, RawNftT, Resp>
 ): string | undefined {
+  const defaultMintError = new Error(
+    `Transfer has been canceled. The NFT you are trying to send will be minted with a default NFT collection`
+  );
+
   const from = fromChain.getNonce();
   const to = toChain.getNonce();
 
@@ -44,22 +53,28 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
 
   if (
     typeof window !== "undefined" &&
-    (/(testing\.bridge)/.test(window.location.origin) ||
+    (/(allowDefaultMint=true)/.test(window.location.search) ||
       /testnet/.test(window.location.pathname))
   ) {
     return contract;
   }
 
-  if (fromType === ChainType.EVM && toType === ChainType.EVM) {
-    return undefined;
+  /*if (fromType === ChainType.EVM && toType === ChainType.EVM) {
+    throw defaultMintError;
+  }*/
+
+  if (
+    (fromType === ChainType.EVM && toType === ChainType.ELROND) ||
+    (fromType === ChainType.ELROND && toType === ChainType.EVM)
+  ) {
+    throw defaultMintError;
   }
 
-  if (fromType === ChainType.ELROND && toType === ChainType.EVM) {
-    return undefined;
-  }
-
-  if (fromType === ChainType.EVM && toType === ChainType.ELROND) {
-    return undefined;
+  if (
+    (fromType === ChainType.EVM && toType === ChainType.TEZOS) ||
+    (fromType === ChainType.TEZOS && toType === ChainType.EVM)
+  ) {
+    throw defaultMintError;
   }
 
   return contract;
