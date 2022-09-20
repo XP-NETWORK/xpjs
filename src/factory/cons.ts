@@ -8,7 +8,7 @@ import {
 
 import { NftInfo, FullChain } from "..";
 
-import { CHAIN_INFO, ChainType } from "../consts";
+import { CHAIN_INFO, ChainType, Chain } from "../consts";
 
 export const _headers = {
   "Content-Type": "application/json",
@@ -59,9 +59,12 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     return contract;
   }
 
-  /*if (fromType === ChainType.EVM && toType === ChainType.EVM) {
+  if (
+    (from === Chain.VECHAIN && toType === ChainType.EVM) ||
+    (to === Chain.VECHAIN && fromType === ChainType.EVM)
+  ) {
     throw defaultMintError;
-  }*/
+  }
 
   if (
     (fromType === ChainType.EVM && toType === ChainType.ELROND) ||
