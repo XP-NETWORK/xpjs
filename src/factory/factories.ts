@@ -347,6 +347,7 @@ export namespace ChainFactoryConfigs {
         bridge: "xp_bridge_1.testnet",
         xpnft: "xp_nft_1.testnet",
         feeMargin,
+        notifier,
       },
     };
   };
