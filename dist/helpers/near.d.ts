@@ -4,13 +4,13 @@ import { EvNotifier } from "../notifier";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
 declare type NearTxResult = [FinalExecutionOutcome, any];
 export declare type NearParams = {
-    networkId: string;
-    nonce: number;
-    rpcUrl: string;
-    bridge: string;
-    xpnft: string;
-    feeMargin: FeeMargins;
-    notifier: EvNotifier;
+    readonly networkId: string;
+    readonly nonce: number;
+    readonly rpcUrl: string;
+    readonly bridge: string;
+    readonly xpnft: string;
+    readonly feeMargin: FeeMargins;
+    readonly notifier: EvNotifier;
 };
 export declare type NearNFT = {
     tokenId: string;
