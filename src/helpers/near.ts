@@ -32,6 +32,7 @@ export type NearParams = {
 };
 export type NearNFT = {
   tokenId: string;
+  contract: string;
 };
 
 export type NearHelper = ChainNonceGet &
@@ -84,6 +85,7 @@ export async function nearHelperFactory({
           to,
           amt: new BigNumber(txFees),
           mint_with,
+          token_contract: id.native.contract,
         },
         methodName: "freeze_nft",
         attachedDeposit: new BN(txFees.toString()),
@@ -106,6 +108,7 @@ export async function nearHelperFactory({
           chain_nonce: parseInt(nonce),
           to,
           amt: parseInt(txFees.toString()),
+          token_contract: id.native.contract,
         },
         methodName: "withdraw_nft",
         attachedDeposit: new BN(txFees.toString()),
