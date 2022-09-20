@@ -14,6 +14,7 @@ export declare type NearParams = {
 };
 export declare type NearNFT = {
     tokenId: string;
+    contract: string;
 };
 export declare type NearHelper = ChainNonceGet & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & EstimateTxFees<NearNFT> & ValidateAddress & {
     XpNft: string;
