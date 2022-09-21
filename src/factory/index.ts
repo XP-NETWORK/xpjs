@@ -730,19 +730,6 @@ export function ChainFactory(
         //@ts-ignore
         nft.native && "tokenId" in nft.native && nft.native.tokenId.toString();
 
-      const mw =
-        "contract" in nft.native &&
-        mintWith &&
-        (await checkMintWith(
-          nft.collectionIdent,
-          mintWith,
-          toChain.getNonce(),
-          fromChain.getNonce(),
-          tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
-        ))
-          ? mintWith
-          : getDefaultContract(nft, fromChain, toChain);
-
       if (appConfig.network === "mainnet") {
         await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
       }
@@ -754,8 +741,6 @@ export function ChainFactory(
       if (!(await toChain.validateAddress(receiver))) {
         throw Error("invalid address");
       }
-
-      console.log(`Minting With : ${mw}`);
 
       if (await isWrappedNft(nft, fromChain.getNonce())) {
         await algoOptInCheck(nft, toChain, receiver);
@@ -770,6 +755,21 @@ export function ChainFactory(
 
         return res;
       } else {
+        const mw =
+          "contract" in nft.native &&
+          mintWith &&
+          (await checkMintWith(
+            nft.collectionIdent,
+            mintWith,
+            toChain.getNonce(),
+            fromChain.getNonce(),
+            tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
+          ))
+            ? mintWith
+            : getDefaultContract(nft, fromChain, toChain);
+
+        console.log(`Minting With : ${mw}`);
+
         if (mw === undefined) {
           throw new Error(`Mint with is not set`);
         }
