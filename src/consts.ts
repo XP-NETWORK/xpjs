@@ -50,7 +50,7 @@ export enum TestNetRpcUri {
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
-  SKALE = "https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab",
+  SKALE = "https://staging-v2.skalenodes.com/v1/actual-secret-cebalrai",
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
