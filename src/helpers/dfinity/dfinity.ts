@@ -31,6 +31,7 @@ import {
   FeeMargins,
   GetFeeMargins,
   MintNft,
+  NftInfo,
   PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
@@ -50,6 +51,25 @@ export type DfinityMintArgs = {
   canisterId?: string;
   uri: string;
 };
+
+const Metadata = IDL.Variant({
+  fungible: IDL.Record({
+    decimals: IDL.Nat8,
+    metadata: IDL.Opt(IDL.Vec(IDL.Nat8)),
+    name: IDL.Text,
+    symbol: IDL.Text,
+  }),
+  nonfungible: IDL.Record({ metadata: IDL.Opt(IDL.Vec(IDL.Nat8)) }),
+});
+const CommonError = IDL.Variant({
+  InvalidToken: IDL.Text,
+  Other: IDL.Text,
+});
+
+const Result_Bearer = IDL.Variant({
+  ok: IDL.Text,
+  err: CommonError,
+});
 
 const User = IDL.Variant({
   principal: IDL.Principal,
@@ -83,7 +103,9 @@ export type DfinityHelper = ChainNonceGet &
   > &
   BalanceCheck &
   GetFeeMargins &
-  MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse>;
+  MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
+    nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
+  };
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -182,7 +204,7 @@ export async function dfinityHelper(
           [MintRequest],
           [
             {
-              metadata: [[...Buffer.from(options.uri)]],
+              metadata: [...Buffer.from(options.uri)],
               to: {
                 principal: owner.getPrincipal(),
               },
@@ -208,6 +230,54 @@ export async function dfinityHelper(
       await args.notifier.notifyDfinity(actionId.toString());
 
       return "NO TX RESP YET";
+    },
+    /// owner = principal of owner
+    async nftList(owner, contract) {
+      let aid = AccountIdentifier.fromPrincipal({
+        principal: Principal.fromText(owner),
+      });
+      let tokens: NftInfo<DfinityNft>[] = [];
+      const response = await args.agent.query(contract, {
+        methodName: "getTokens",
+        arg: encode([], []),
+      });
+      if ("reply" in response) {
+        let decoded = decode(
+          [IDL.Vec(IDL.Tuple(Nat32, Metadata))],
+          response.reply.arg
+        )[0] as any[];
+        await Promise.all(
+          decoded.map(async (e) => {
+            let [tokenId, metadata]: [number, any] = e;
+            let tid = tokenIdentifier(contract, tokenId);
+            const ownerQuery = await args.agent.query(contract, {
+              methodName: "bearer",
+              arg: encode([Text], [tid]),
+            });
+            if ("reply" in ownerQuery) {
+              const response = decode(
+                [Result_Bearer],
+                ownerQuery.reply.arg
+              )[0] as Record<string, string>;
+              if ("ok" in response) {
+                if (response.ok === aid.toHex()) {
+                  tokens.push({
+                    collectionIdent: contract,
+                    native: {
+                      canisterId: contract,
+                      tokenId: tokenId.toString(),
+                    },
+                    uri: Buffer.from(
+                      metadata["nonfungible"]["metadata"]
+                    ).toString("utf-8"),
+                  });
+                }
+              }
+            }
+          })
+        );
+      }
+      return tokens;
     },
     async preTransfer(sender, nft) {
       args.agent.replaceIdentity(sender);
