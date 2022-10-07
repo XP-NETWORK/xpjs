@@ -2,7 +2,7 @@ import { HttpAgent, Identity, SubmitResponse } from "@dfinity/agent";
 import { AccountIdentifier } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import { EvNotifier } from "../../notifier";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
+import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 export declare type DfinitySigner = Identity;
 export declare type DfinityNft = {
     canisterId: string;
@@ -23,7 +23,9 @@ export interface MintRequest {
 }
 export declare type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, DfinityNft, string> & UnfreezeForeignNft<DfinitySigner, DfinityNft, string> & EstimateTxFees<DfinityNft> & ValidateAddress & {
     XpNft: string;
-} & Pick<PreTransfer<DfinitySigner, DfinityNft, string>, "preTransfer"> & BalanceCheck & GetFeeMargins & MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse>;
+} & Pick<PreTransfer<DfinitySigner, DfinityNft, string>, "preTransfer"> & BalanceCheck & GetFeeMargins & MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
+    nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
+};
 export declare type DfinityParams = {
     agent: HttpAgent;
     bridgeContract: Principal;
