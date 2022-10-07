@@ -8,7 +8,6 @@ export declare type NftInfo<Raw> = {
     readonly uri: string;
     readonly native: Raw;
     readonly collectionIdent: string;
-    readonly metaData?: any;
 };
 /**
  * Action to perform before transfer/unfreeze (if any)

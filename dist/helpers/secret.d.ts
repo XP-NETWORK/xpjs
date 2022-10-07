@@ -1,4 +1,5 @@
 import { SecretNetworkClient, Tx } from "secretjs";
+import { Extension } from "secretjs/dist/extensions/snip721/types";
 import { EvNotifier } from "../notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
 export declare type SecretNftInfo = {
@@ -7,6 +8,7 @@ export declare type SecretNftInfo = {
     chainId: string;
     tokenId: string;
     vk: string;
+    metadata: Extension | undefined;
 };
 export declare type SecretMintArgs = {
     url: string;
