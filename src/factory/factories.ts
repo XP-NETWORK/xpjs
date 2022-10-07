@@ -33,7 +33,6 @@ const testnet_middleware_uri =
   "https://testnet-notifier.xp.network/notify-test/";
 
 export namespace ChainFactoryConfigs {
-  //@ts-ignore
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(testnet_middleware_uri);
@@ -42,7 +41,6 @@ export namespace ChainFactoryConfigs {
     const net = new SimpleNet(TestNetRpcUri.VECHAIN);
     const driver = await Driver.connect(net);
     const provider = thor.ethers.modifyProvider(
-      //@ts-ignore
       new ethers.providers.Web3Provider(
         new thor.ConnexProvider({ connex: new Framework(driver) })
       )
@@ -277,7 +275,7 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-        provider: hethers.getDefaultProvider("testnet"),
+        provider: hethers.getDefaultProvider("testnet") as any,
         feeMargin,
         nonce: Chain.HEDERA,
         erc721_addr: "0x0000000000000000000000000000000002da3c22",
@@ -360,7 +358,6 @@ export namespace ChainFactoryConfigs {
     const net = new SimpleNet(MainNetRpcUri.VECHAIN);
     const driver = await Driver.connect(net);
     const provider = thor.ethers.modifyProvider(
-      //@ts-ignore
       new ethers.providers.Web3Provider(
         new thor.ConnexProvider({ connex: new Framework(driver) })
       )
