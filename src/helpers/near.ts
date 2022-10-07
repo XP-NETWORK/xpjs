@@ -15,6 +15,8 @@ import {
   GetFeeMargins,
   GetProvider,
   MintNft,
+  NftInfo,
+  PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -62,6 +64,7 @@ export type NearHelper = ChainNonceGet &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
   MintNft<Account, NearMintArgs, NearTxResult> &
   EstimateTxFees<NearNFT> &
+  Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> &
   ValidateAddress & {
     XpNft: string;
   } & GetFeeMargins &
@@ -79,6 +82,25 @@ export async function nearHelperFactory({
     networkId,
     headers: {},
   });
+
+  const isApproved = async (
+    account: Account,
+    nft: NftInfo<NearNFT>
+  ): Promise<boolean> => {
+    const { tokenId: token_id, contract } = nft.native;
+    const result = await account.functionCall({
+      args: {
+        token_id,
+        approved_account_id: bridge,
+        approval_id: null,
+      },
+      contractId: contract,
+      methodName: "nft_is_approved",
+    });
+    const res = getTransactionLastResult(result) as boolean;
+    console.log(res);
+    return res;
+  };
 
   return {
     async estimateValidateTransferNft(_to, _metadata, _mintWith) {
@@ -102,6 +124,26 @@ export async function nearHelperFactory({
         attachedDeposit: new BN("10000000000000000000000"), // 0.01 Near
       });
       return [result, getTransactionLastResult(result)];
+    },
+    async preTransfer(sender, nft, _fee) {
+      if (await isApproved(sender, nft)) {
+        return undefined;
+      }
+      const result = await sender
+        .functionCall({
+          contractId: nft.native.contract,
+          methodName: "nft_approve",
+          args: {
+            token_id: nft.native.tokenId,
+            account_id: bridge,
+            msg: "Approval for NFT Transfer via XP Network Multichain NFT Bridge",
+          },
+          attachedDeposit: new BN("1000000000000000000000"), // 0.001 Near
+        })
+        .catch((e) => {
+          return e["transaction_outcome"]["id"];
+        });
+      return result;
     },
     XpNft: xpnft,
     async transferNftToForeign(
