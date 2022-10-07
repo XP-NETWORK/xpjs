@@ -14,6 +14,7 @@ import {
   FeeMargins,
   GetFeeMargins,
   GetProvider,
+  MintNft,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -35,9 +36,31 @@ export type NearNFT = {
   contract: string;
 };
 
+export type Metadata = {
+  title?: string;
+  description?: string;
+  media?: string;
+  mediaHash: Uint8Array | null;
+  issued_at: string | null;
+  expires_at: string | null;
+  starts_at: string | null;
+  updated_at: string | null;
+  extra?: string;
+  reference: string | null;
+  referenceHash: Uint8Array | null;
+};
+
+export interface NearMintArgs {
+  contract: string;
+  token_id: string;
+  token_owner_id: string;
+  metadata: Metadata;
+}
+
 export type NearHelper = ChainNonceGet &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
+  MintNft<Account, NearMintArgs, NearTxResult> &
   EstimateTxFees<NearNFT> &
   ValidateAddress & {
     XpNft: string;
@@ -66,6 +89,19 @@ export async function nearHelperFactory({
     },
     getNonce() {
       return Chain.NEAR;
+    },
+    async mintNft(owner, options) {
+      const result = await owner.functionCall({
+        contractId: options.contract,
+        methodName: "nft_mint",
+        args: {
+          token_id: options.token_id,
+          token_owner_id: options.token_owner_id,
+          token_metadata: options.metadata,
+        },
+        attachedDeposit: new BN("10000000000000000000000"), // 0.01 Near
+      });
+      return [result, getTransactionLastResult(result)];
     },
     XpNft: xpnft,
     async transferNftToForeign(
