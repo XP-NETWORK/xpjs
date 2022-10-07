@@ -1,6 +1,9 @@
 import BigNumber from "bignumber.js";
 import { Bech32, SecretNetworkClient, Tx } from "secretjs";
-import { Snip721MintOptions } from "secretjs/dist/extensions/snip721/types";
+import {
+  Extension,
+  Snip721MintOptions,
+} from "secretjs/dist/extensions/snip721/types";
 import { Snip721GetTokensResponse } from "secretjs/dist/extensions/snip721/msg/GetTokens";
 import { EvNotifier } from "../notifier";
 import {
@@ -24,6 +27,7 @@ export type SecretNftInfo = {
   chainId: string;
   tokenId: string;
   vk: string;
+  metadata: Extension | undefined;
 };
 export type SecretMintArgs = {
   url: string;
@@ -246,8 +250,8 @@ export async function secretHelperFactory(
               contractHash: codeHash || "",
               tokenId: token,
               vk,
+              metadata: tokenInfo.all_nft_info.info?.extension,
             },
-            metaData: tokenInfo.all_nft_info.info?.extension,
           });
         })
       );

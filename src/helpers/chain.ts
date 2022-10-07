@@ -10,7 +10,6 @@ export type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
   readonly collectionIdent: string;
-  readonly metaData?: any;
 };
 
 /**
