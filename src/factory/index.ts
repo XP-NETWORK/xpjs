@@ -716,11 +716,7 @@ export function ChainFactory(
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
-        if (
-          fromChain.getNonce() !== 9 &&
-          fromChain.getNonce() !== 18 &&
-          fromChain.getNonce() !== 24
-        ) {
+        if (![9, 18, 24, 31].includes(fromChain.getNonce())) {
           //@ts-ignore
           checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
         }

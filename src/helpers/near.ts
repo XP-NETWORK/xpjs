@@ -67,6 +67,7 @@ export type NearHelper = ChainNonceGet &
   Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> &
   ValidateAddress & {
     XpNft: string;
+    nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
   } & GetFeeMargins &
   GetProvider<Near>;
 export async function nearHelperFactory({
@@ -98,7 +99,6 @@ export async function nearHelperFactory({
       methodName: "nft_is_approved",
     });
     const res = getTransactionLastResult(result) as boolean;
-    console.log(res);
     return res;
   };
 
@@ -124,6 +124,25 @@ export async function nearHelperFactory({
         attachedDeposit: new BN("10000000000000000000000"), // 0.01 Near
       });
       return [result, getTransactionLastResult(result)];
+    },
+    async nftList(owner, contract) {
+      const result = await owner.functionCall({
+        contractId: contract,
+        methodName: "nft_tokens_for_owner",
+        args: { account_id: owner.accountId },
+      });
+      const res = getTransactionLastResult(result) as any[];
+
+      return res.map((r) => {
+        return {
+          native: {
+            tokenId: r.token_id,
+            contract,
+          },
+          collectionIdent: contract,
+          uri: r.metadata.extra || r.metadata.media,
+        };
+      });
     },
     async preTransfer(sender, nft, _fee) {
       if (await isApproved(sender, nft)) {

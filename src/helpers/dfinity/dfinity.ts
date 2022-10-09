@@ -204,7 +204,7 @@ export async function dfinityHelper(
           [MintRequest],
           [
             {
-              metadata: [...Buffer.from(options.uri)],
+              metadata: [[...Buffer.from(options.uri)]],
               to: {
                 principal: owner.getPrincipal(),
               },
@@ -268,7 +268,7 @@ export async function dfinityHelper(
                       tokenId: tokenId.toString(),
                     },
                     uri: Buffer.from(
-                      metadata["nonfungible"]["metadata"]
+                      metadata["nonfungible"]["metadata"][0] ?? []
                     ).toString("utf-8"),
                   });
                 }
