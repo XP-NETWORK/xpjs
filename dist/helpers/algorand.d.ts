@@ -3,7 +3,7 @@ import algosdk, { SuggestedParams } from "algosdk";
 import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
 import { EvNotifier } from "../notifier";
-import { BalanceCheck, FeeMargins, GetFeeMargins } from "./chain";
+import { BalanceCheck, FeeMargins, GetFeeMargins, GetTokenURI } from "./chain";
 declare type TxResp = {
     txId: string;
 };
@@ -68,7 +68,7 @@ export declare type AlgorandHelper = ChainNonceGet & TransferNftForeign<AlgoSign
     myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
 } & Pick<PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>, "preTransfer"> & {
     XpNft: string;
-} & GetFeeMargins & BalanceCheck;
+} & GetFeeMargins & BalanceCheck & GetTokenURI;
 export declare type AlgorandParams = {
     algodApiKey: string;
     algodUri: string;

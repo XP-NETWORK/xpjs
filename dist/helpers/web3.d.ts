@@ -2,7 +2,7 @@ import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, MintNft, GetProvi
 import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
 import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftMinter } from "xpnet-web3-contracts";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 /**
@@ -65,7 +65,7 @@ export declare type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, Eth
 } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
     XpNft1155: string;
-} & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress;
+} & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *

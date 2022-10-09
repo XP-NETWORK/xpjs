@@ -1,7 +1,7 @@
 import { BalanceCheck, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, TransferNftForeign, UnfreezeForeignNft } from "./chain";
 import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
-import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
+import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck, GetTokenURI } from "..";
 import { ChainNonceGet } from "..";
 import { EvNotifier } from "../notifier";
 declare type TronSender = string | undefined;
@@ -34,7 +34,7 @@ export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, MintArgs
 export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, string> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo> & {
     XpNft: string;
     XpNft1155: string;
-} & GetFeeMargins;
+} & GetFeeMargins & GetTokenURI;
 export declare function baseTronHelperFactory(provider: TronWeb): Promise<BaseTronHelper>;
 export interface TronParams {
     provider: TronWeb;

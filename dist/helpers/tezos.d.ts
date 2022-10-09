@@ -1,7 +1,7 @@
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import { Signer, TezosToolkit, WalletProvider } from "@taquito/taquito";
 import { EvNotifier } from "../notifier";
-import { FeeMargins, GetFeeMargins, WhitelistCheck } from "./chain";
+import { FeeMargins, GetFeeMargins, WhitelistCheck, GetTokenURI } from "./chain";
 declare type TezosSigner = WalletProvider | Signer;
 export declare type TezosNftInfo = {
     contract: string;
@@ -19,7 +19,7 @@ export declare type TezosHelper = TransferNftForeign<TezosSigner, TezosNftInfo, 
     approveForMinter(address: NftInfo<TezosNftInfo>, sender: TezosSigner): Promise<string | undefined>;
 } & {
     XpNft: string;
-} & GetFeeMargins & WhitelistCheck<TezosNftInfo>;
+} & GetFeeMargins & WhitelistCheck<TezosNftInfo> & GetTokenURI;
 export declare type TezosParams = {
     Tezos: TezosToolkit;
     notifier: EvNotifier;

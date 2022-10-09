@@ -6,7 +6,7 @@
  */
 import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress } from "./chain";
+import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress, GetTokenURI } from "./chain";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "..";
 import { EvNotifier } from "../notifier";
 declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
@@ -105,7 +105,7 @@ export declare type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigne
 } & GetFeeMargins & {
     wegldBalance(address: string): Promise<BigNumber>;
     unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
-} & IsContractAddress;
+} & IsContractAddress & GetTokenURI;
 /**
  * Create an object implementing cross chain utilities for elrond
  *
