@@ -39,6 +39,7 @@ import {
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
+  GetTokenURI,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
@@ -145,7 +146,8 @@ export type Web3Helper = BaseWeb3Helper &
     XpNft1155: string;
   } & WhitelistCheck<EthNftInfo> &
   GetFeeMargins &
-  IsContractAddress;
+  IsContractAddress &
+  GetTokenURI;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -486,6 +488,13 @@ export async function web3HelperFactory(
         return TransactionStatus.FAILURE;
       }
       return TransactionStatus.UNKNOWN;
+    },
+    async getTokenURI(contract, tokenId) {
+      if (ethers.utils.isAddress(contract) && tokenId) {
+        const erc721 = UserNftMinter__factory.connect(contract!, provider);
+        return await erc721.tokenURI(tokenId).catch(() => "");
+      }
+      return "";
     },
     async unfreezeWrappedNftBatch(signer, chainNonce, to, nfts, txFees) {
       const tx = await minter

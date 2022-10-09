@@ -33,6 +33,7 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
+  GetTokenURI,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
 import { EvNotifier } from "../notifier";
@@ -94,7 +95,8 @@ export type TronHelper = BaseTronHelper &
   WhitelistCheck<EthNftInfo> & {
     XpNft: string;
     XpNft1155: string;
-  } & GetFeeMargins;
+  } & GetFeeMargins &
+  GetTokenURI;
 
 export async function baseTronHelperFactory(
   provider: TronWeb
@@ -464,6 +466,17 @@ export async function tronHelperFactory(
       return minter.nftWhitelist(nft.native.contract).call({
         from: tronParams.provider.defaultAddress.base58,
       });
+    },
+    // const minter = await provider.contract(Minter__factory.abi, minter_addr);
+    async getTokenURI(contract, tokenId) {
+      if (provider.isAddress(contract) && tokenId) {
+        const _contract = await provider.contract(
+          UserNftMinter__factory.abi,
+          contract
+        );
+        return await _contract.tokenURI(tokenId).catch(() => "");
+      }
+      return "";
     },
   };
 }

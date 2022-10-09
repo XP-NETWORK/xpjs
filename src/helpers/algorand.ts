@@ -16,7 +16,7 @@ import {
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
 import { EvNotifier } from "../notifier";
-import { BalanceCheck, FeeMargins, GetFeeMargins } from "./chain";
+import { BalanceCheck, FeeMargins, GetFeeMargins, GetTokenURI } from "./chain";
 
 type TxResp = {
   txId: string;
@@ -139,7 +139,8 @@ export type AlgorandHelper = ChainNonceGet &
     PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>,
     "preTransfer"
   > & { XpNft: string } & GetFeeMargins &
-  BalanceCheck;
+  BalanceCheck &
+  GetTokenURI;
 
 export type AlgorandParams = {
   algodApiKey: string;
@@ -468,6 +469,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
             .catch(() => undefined);
           if (assetRes == undefined) return [];
           const assetInfo = assetRes.asset;
+
           const bal = await indexer
             .lookupAssetBalances(nftId)
             .currencyGreaterThan(0)
@@ -549,6 +551,15 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         address,
         ledger: "any",
       };
+    },
+    async getTokenURI(contract, tokenId) {
+      if (algosdk.isValidAddress(contract) && tokenId) {
+        const res = await indexer.lookupAssetByID(+tokenId).do();
+        console.log(res);
+
+        return "";
+      }
+      return "";
     },
   };
 }

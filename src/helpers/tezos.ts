@@ -27,7 +27,12 @@ import {
 import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import { EvNotifier } from "../notifier";
-import { FeeMargins, GetFeeMargins, WhitelistCheck } from "./chain";
+import {
+  FeeMargins,
+  GetFeeMargins,
+  WhitelistCheck,
+  GetTokenURI,
+} from "./chain";
 
 type TezosSigner = WalletProvider | Signer;
 
@@ -67,7 +72,8 @@ export type TezosHelper = TransferNftForeign<
   } & {
     XpNft: string;
   } & GetFeeMargins &
-  WhitelistCheck<TezosNftInfo>;
+  WhitelistCheck<TezosNftInfo> &
+  GetTokenURI;
 
 export type TezosParams = {
   Tezos: TezosToolkit;
@@ -274,6 +280,18 @@ export async function tezosHelperFactory({
       const whitelisted = await storage.nft_whitelist.get(nft.native.contract);
 
       return whitelisted == 2;
+    },
+    async getTokenURI(contract, tokenId) {
+      if (utils.validateAddress(contract) && tokenId) {
+        const _contract = await Tezos.contract.at(contract);
+
+        const storage = (await _contract.storage()) as any;
+        const tokenStorage = await storage.token_metadata.get(tokenId);
+        if (tokenStorage) {
+          return utils.bytes2Char(tokenStorage.token_info?.get(""));
+        }
+      }
+      return "";
     },
   };
 }
