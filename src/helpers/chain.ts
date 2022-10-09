@@ -133,6 +133,10 @@ export interface ExtractTxnStatus {
   extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
 
+export interface GetTokenURI {
+  getTokenURI(contract: string, tokenId: string): Promise<string>;
+}
+
 export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
   transferNftBatchToForeign(
     sender: Signer,

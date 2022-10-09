@@ -26,7 +26,7 @@ import {
   UserSigner,
   WalletConnectProvider,
 } from "@elrondnetwork/erdjs";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
@@ -41,6 +41,7 @@ import {
   GetFeeMargins,
   FeeMargins,
   IsContractAddress,
+  GetTokenURI,
 } from "./chain";
 import {
   Chain,
@@ -54,6 +55,7 @@ import {
   ValidateAddress,
 } from "..";
 import { EvNotifier } from "../notifier";
+import { Base64 } from "js-base64";
 
 type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 
@@ -207,7 +209,8 @@ export type ElrondHelper = BalanceCheck &
   SetESDTRoles & { XpNft: string } & GetFeeMargins & {
     wegldBalance(address: string): Promise<BigNumber>;
     unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
-  } & IsContractAddress;
+  } & IsContractAddress &
+  GetTokenURI;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -851,6 +854,17 @@ export async function elrondHelperFactory(
       } catch (_) {
         return false;
       }
+    },
+    async getTokenURI(_, tokenId) {
+      if (tokenId) {
+        const res = await axios(`https://api.elrond.com/nfts/${tokenId}`).catch(
+          () => ({ data: null })
+        );
+        if (res.data?.uris) {
+          return Base64.decode(res.data?.uris[1]);
+        }
+      }
+      return "";
     },
   };
 }
