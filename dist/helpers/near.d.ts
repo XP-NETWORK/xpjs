@@ -1,7 +1,7 @@
 import { Account, Near } from "near-api-js";
 import { FinalExecutionOutcome } from "near-api-js/lib/providers";
 import { EvNotifier } from "../notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
 declare type NearTxResult = [FinalExecutionOutcome, any];
 export declare type NearParams = {
     readonly networkId: string;
@@ -37,6 +37,7 @@ export interface NearMintArgs {
 }
 export declare type NearHelper = ChainNonceGet & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> & ValidateAddress & {
     XpNft: string;
+    nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
 } & GetFeeMargins & GetProvider<Near>;
 export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, }: NearParams): Promise<NearHelper>;
 export {};
