@@ -26,7 +26,7 @@ import {
   UserSigner,
   WalletConnectProvider,
 } from "@elrondnetwork/erdjs";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
