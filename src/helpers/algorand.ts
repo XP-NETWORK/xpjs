@@ -552,12 +552,12 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
         ledger: "any",
       };
     },
-    async getTokenURI(contract, tokenId) {
-      if (algosdk.isValidAddress(contract) && tokenId) {
+    async getTokenURI(_, tokenId) {
+      if (tokenId) {
         const res = await indexer.lookupAssetByID(+tokenId).do();
-        console.log(res);
-
-        return "";
+        if (res?.asset?.params) {
+          return res.asset.params.url as string;
+        }
       }
       return "";
     },

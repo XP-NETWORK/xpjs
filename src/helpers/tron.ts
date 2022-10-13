@@ -469,12 +469,13 @@ export async function tronHelperFactory(
     },
     // const minter = await provider.contract(Minter__factory.abi, minter_addr);
     async getTokenURI(contract, tokenId) {
+      return "";
       if (provider.isAddress(contract) && tokenId) {
         const _contract = await provider.contract(
           UserNftMinter__factory.abi,
           contract
         );
-        return await _contract.tokenURI(tokenId).catch(() => "");
+        return await _contract.tokenURI(+tokenId).call();
       }
       return "";
     },
