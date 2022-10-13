@@ -176,7 +176,8 @@ export declare enum ChainType {
     SOLANA = "SOLANA",
     TON = "TON",
     NEAR = "NEAR",
-    HEDERA = "HEDERA"
+    HEDERA = "HEDERA",
+    APTOS = "APTOS"
 }
 export declare const CHAIN_INFO: ChainInfo;
 export {};
