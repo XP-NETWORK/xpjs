@@ -3363,9 +3363,9 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
+"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#168cdfdef984ef482909d78c365f9b39aede0366":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#8e87b6c98ee57df76edace5f6ccfa879e952d2ac"
+  resolved "git+https://github.com/xp-network/exchange-rate#168cdfdef984ef482909d78c365f9b39aede0366"
   dependencies:
     axios "^0.21.1"
 
