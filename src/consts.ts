@@ -529,7 +529,7 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
 CHAIN_INFO.set(Chain.APTOS, {
   blockExplorerUrl: "https://explorer.aptoslabs.com/",
   constructor: aptosHelper,
-  currency: SupportedCurrency.APTOS,
+  currency: SupportedCurrency.APT,
   decimals: 1e18,
   name: "Aptos",
   nonce: Chain.APTOS,
