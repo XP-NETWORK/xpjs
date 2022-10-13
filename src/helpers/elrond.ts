@@ -857,11 +857,16 @@ export async function elrondHelperFactory(
     },
     async getTokenURI(_, tokenId) {
       if (tokenId) {
-        const res = await axios(`https://api.elrond.com/nfts/${tokenId}`).catch(
-          () => ({ data: null })
-        );
-        if (res.data?.uris) {
-          return Base64.decode(res.data?.uris[1]);
+        const url = `https://api.elrond.com/nfts/${tokenId}`;
+        const res = await axios(url).catch(() => ({ data: null }));
+
+        if (res.data?.metadata) {
+          return url;
+        }
+
+        const uri = res.data?.uris[1] || res.data?.uris[0];
+        if (uri) {
+          return Base64.decode(uri);
         }
       }
       return "";
