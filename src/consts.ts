@@ -5,6 +5,7 @@ import {
 } from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
+
 import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
 import {
   AlgorandParams,
@@ -26,7 +27,7 @@ import {
   DfinityParams,
 } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams, nearHelperFactory } from "./helpers/near";
-import { AptosHelper, AptosParams } from "./helpers/aptos";
+import { aptosHelper, AptosHelper, AptosParams } from "./helpers/aptos";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -205,6 +206,7 @@ export enum ChainType {
   TON = "TON",
   NEAR = "NEAR",
   HEDERA = "HEDERA",
+  APTOS = "APTOS",
 }
 
 export const CHAIN_INFO: ChainInfo = new Map();
@@ -523,4 +525,13 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
   nonce: Chain.ABEYCHAIN,
   chainId: 178,
   type: ChainType.EVM,
+});
+CHAIN_INFO.set(Chain.APTOS, {
+  blockExplorerUrl: "https://explorer.aptoslabs.com/",
+  constructor: aptosHelper,
+  currency: SupportedCurrency.APTOS,
+  decimals: 1e18,
+  name: "Aptos",
+  nonce: Chain.APTOS,
+  type: ChainType.APTOS,
 });
