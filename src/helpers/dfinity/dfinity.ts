@@ -106,10 +106,6 @@ export type DfinityHelper = ChainNonceGet &
   GetFeeMargins &
   MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
-    dfinityUserNftsByContract(
-      principalContract: string,
-      contractId: string
-    ): Promise<NftInfo<DfinityNft>[]>;
   };
 
 export type DfinityParams = {
@@ -284,13 +280,6 @@ export async function dfinityHelper(
         );
       }
       return tokens;
-    },
-    async dfinityUserNftsByContract(principalContract, canisterId) {
-      try {
-        return []
-      } catch {
-        return [];
-      }
     },
     async preTransfer(sender, nft) {
       args.agent.replaceIdentity(sender);
