@@ -24,6 +24,8 @@ import { Principal } from "@dfinity/principal";
 import BigNumber from "bignumber.js";
 import { Chain } from "../../consts";
 import { EvNotifier } from "../../notifier";
+import { getNFTActor } from "@psychedelic/dab-js";
+
 import {
   BalanceCheck,
   ChainNonceGet,
@@ -105,6 +107,10 @@ export type DfinityHelper = ChainNonceGet &
   GetFeeMargins &
   MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
+    dfinityUserNftsByContract(
+      principalContract: string,
+      contractId: string
+    ): Promise<NftInfo<DfinityNft>[]>;
   };
 
 export type DfinityParams = {
@@ -231,6 +237,7 @@ export async function dfinityHelper(
 
       return "NO TX RESP YET";
     },
+
     /// owner = principal of owner
     async nftList(owner, contract) {
       let aid = AccountIdentifier.fromPrincipal({
@@ -278,6 +285,30 @@ export async function dfinityHelper(
         );
       }
       return tokens;
+    },
+    async dfinityUserNftsByContract(principalContract, canisterId) {
+      try {
+        const NFTActor = getNFTActor({
+          canisterId,
+          agent: args.agent as any,
+          standard: "EXT",
+        });
+        let nfts = await NFTActor.getUserTokens(
+          Principal.fromText(principalContract) as any
+        );
+        return nfts.map((n) => {
+          return {
+            collectionIdent: n.canister,
+            native: {
+              canisterId: n.canister,
+              tokenId: n.index.toString(),
+            },
+            uri: n.url,
+          };
+        });
+      } catch {
+        return [];
+      }
     },
     async preTransfer(sender, nft) {
       args.agent.replaceIdentity(sender);
