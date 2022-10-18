@@ -74,19 +74,6 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@dfinity/agent@0.9.3":
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/@dfinity/agent/-/agent-0.9.3.tgz#e49f07d6749e534c4c30aa2df2bba59e3fa9570f"
-  integrity sha512-vR0t5Uf+srbUHTdGunJxek3a4jCmBKU+B2yYEX0/aSGQfJmEf5X5snuNcnrIDOCfHeK7uxmOqs65BdI8Lhn4fg==
-  dependencies:
-    base64-arraybuffer "^0.2.0"
-    bignumber.js "^9.0.0"
-    borc "^2.1.1"
-    buffer "^6.0.3"
-    buffer-pipe "^0.0.4"
-    js-sha256 "0.9.0"
-    simple-cbor "^0.4.1"
-
 "@dfinity/agent@^0.11.3":
   version "0.11.3"
   resolved "https://registry.yarnpkg.com/@dfinity/agent/-/agent-0.11.3.tgz#3363b1dbaa10a6e5cfe25e269316e2416fd3d11d"
@@ -98,28 +85,10 @@
     js-sha256 "0.9.0"
     simple-cbor "^0.4.1"
 
-"@dfinity/candid@0.9.3":
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/@dfinity/candid/-/candid-0.9.3.tgz#96b2a5339da634ccc5546a0560f48f5ceef70dfe"
-  integrity sha512-VMovKFrExqN0mwcn1/aut4Ou4cA9IA2+QrBjV+Ro4eVCpVvGpVRqn4jizlV9QnJjcuEBG1yImIG5RKMdZ2ejQQ==
-  dependencies:
-    buffer "^6.0.3"
-    buffer-pipe "^0.0.4"
-
 "@dfinity/candid@^0.11.3":
   version "0.11.3"
   resolved "https://registry.yarnpkg.com/@dfinity/candid/-/candid-0.11.3.tgz#aed66124751545522acf9bde7cdc22b5d9ce31df"
   integrity sha512-xX7xNj2lLt7SIlvy0sqNp4fpcTD/xnwEu9APj0tnIF64cnsxIiS12T1Z8jl9g80jCQ1CbRPQf4cfsOfS3Cd2OA==
-
-"@dfinity/identity@0.9.3":
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/@dfinity/identity/-/identity-0.9.3.tgz#7d65d1ee7655d9028034bf22a92c21eea8b24028"
-  integrity sha512-8mEpkLqGW74QMsVJzuewwN0tO1fdShAT+vyfQM08VOX/u4IHckH8zZ+qGTeXKaGzuwiJRa5WZT2U7L32LDfJJg==
-  dependencies:
-    borc "^2.1.1"
-    buffer "^6.0.3"
-    buffer-pipe "0.0.4"
-    tweetnacl "^1.0.1"
 
 "@dfinity/identity@^0.12.2":
   version "0.12.2"
@@ -147,11 +116,6 @@
     google-protobuf "^3.20.1"
     js-sha256 "^0.9.0"
     randombytes "^2.1.0"
-
-"@dfinity/principal@0.9.3":
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/@dfinity/principal/-/principal-0.9.3.tgz#52e4980bac8dd35e7a6bb2564bea89df97383e06"
-  integrity sha512-DSL3b/gGm+f57+3XkFjlK4DigtKXe9MVO8UYXDQWkVIhy0UF1KYjRNGs6awc1GTQoOTxeQ8UTFwXuvnEvJ1hpQ==
 
 "@dfinity/principal@^0.11.3":
   version "0.11.3"
@@ -1501,20 +1465,6 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
-
-"@psychedelic/dab-js@^1.4.13":
-  version "1.4.13"
-  resolved "https://npm.pkg.github.com/download/@Psychedelic/dab-js/1.4.13/4ac9f8e0add1727b37bc1edc622bbba3a2c6cd20#4ac9f8e0add1727b37bc1edc622bbba3a2c6cd20"
-  integrity sha512-/qE1ls1m2B5GS0j5ScpvIzmCG+/RcGKlZ3qgbn0UaTsgu3MwUPUaK/oqHnhNEj4MKwMsk7lSnxOYLdTmH1bm8A==
-  dependencies:
-    "@dfinity/agent" "0.9.3"
-    "@dfinity/candid" "0.9.3"
-    "@dfinity/identity" "0.9.3"
-    "@dfinity/principal" "0.9.3"
-    axios "^0.24.0"
-    buffer-crc32 "^0.2.13"
-    cross-fetch "^3.1.4"
-    crypto-js "^4.1.1"
 
 "@randlabs/communication-bridge@^1.0.0":
   version "1.0.0"
@@ -2970,22 +2920,10 @@ bs58check@<3.0.0, bs58check@^2.1.1, bs58check@^2.1.2:
     create-hash "^1.1.0"
     safe-buffer "^5.1.2"
 
-buffer-crc32@^0.2.13:
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz#0d333e3f00eac50aa1454abd30ef8c2a5d9a7242"
-  integrity sha512-VO9Ht/+p3SN7SKWqcrgEzjGbRSJYTx+Q1pTQC0wrWqHx0vpJraQ6GtHx8tvcg1rlK1byhU5gccxgOgj7B0TDkQ==
-
 buffer-layout@^1.2.0, buffer-layout@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/buffer-layout/-/buffer-layout-1.2.2.tgz#b9814e7c7235783085f9ca4966a0cfff112259d5"
   integrity sha512-kWSuLN694+KTk8SrYvCqwP2WcgQjoRCiF5b4QDvkkz8EmgD+aWAIceGFKMIAdmF/pH+vpgNV3d3kAKorcdAmWA==
-
-buffer-pipe@0.0.4, buffer-pipe@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/buffer-pipe/-/buffer-pipe-0.0.4.tgz#e7f2ea95beb60fb692fc1dd1c878e894397a974d"
-  integrity sha512-8cHio1V6wgX+LIX6+af4tCn0+Ljl2vQd9JZdZ8vDJZdDf8x5p2DneKaq1dWxSswJG+sK4Inok9aqoqILG5kQVQ==
-  dependencies:
-    safe-buffer "^5.1.2"
 
 buffer-to-arraybuffer@^0.0.5:
   version "0.0.5"
