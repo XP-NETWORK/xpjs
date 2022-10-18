@@ -24,7 +24,6 @@ import { Principal } from "@dfinity/principal";
 import BigNumber from "bignumber.js";
 import { Chain } from "../../consts";
 import { EvNotifier } from "../../notifier";
-import { getNFTActor } from "@psychedelic/dab-js";
 
 import {
   BalanceCheck,
@@ -288,24 +287,7 @@ export async function dfinityHelper(
     },
     async dfinityUserNftsByContract(principalContract, canisterId) {
       try {
-        const NFTActor = getNFTActor({
-          canisterId,
-          agent: args.agent as any,
-          standard: "EXT",
-        });
-        let nfts = await NFTActor.getUserTokens(
-          Principal.fromText(principalContract) as any
-        );
-        return nfts.map((n) => {
-          return {
-            collectionIdent: n.canister,
-            native: {
-              canisterId: n.canister,
-              tokenId: n.index.toString(),
-            },
-            uri: n.url,
-          };
-        });
+        return []
       } catch {
         return [];
       }
