@@ -15,7 +15,7 @@ export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
     BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
-    ROPSTEN = "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    ROPSTEN = "https://ethereum-goerli-rpc.allthatnode.com",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
     POLYGON = "https://matic-mumbai.chainstacklabs.com",
     FANTOM = "https://rpc.testnet.fantom.network/",
