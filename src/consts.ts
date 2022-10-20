@@ -243,7 +243,7 @@ CHAIN_INFO.set(Chain.ETHEREUM, {
   name: "Ethereum",
   nonce: 5,
   currency: SupportedCurrency.ETH,
-  chainId: 3,
+  chainId: 5,
   decimals: 1e18,
   blockExplorerUrl: "https://goerli.etherscan.io/tx",
   constructor: web3HelperFactory,
