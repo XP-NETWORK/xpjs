@@ -4,6 +4,7 @@ import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { Chain } from "../consts";
+import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -29,6 +30,7 @@ export type TonHelper = ChainNonceGet &
 
 export type TonParams = {
   tonweb: TonWeb;
+  notifier: EvNotifier;
   bridgeAddr: string;
   burnerAddr: string;
   xpnftAddr: string;
@@ -81,16 +83,15 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         mintWith: Buffer.from(mintWith),
       });
 
-      console.log(
-        await rSigner.send("ton_sendTransaction", {
-          value: txFeesFull.toString(10),
-          to: nft.native.nftItemAddr,
-          data: payload,
-        })
-      );
+      const res = (await rSigner.send("ton_sendTransaction", {
+        value: txFeesFull.toString(10),
+        to: nft.native.nftItemAddr,
+        data: payload,
+      })) as { hash: string };
 
-      // TODO: Tx hash
-      return "";
+      await args.notifier.notifyTon(res.hash);
+
+      return res.hash;
     },
     async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
@@ -103,17 +104,15 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         txFees: txFeesFull.sub(nftFee),
       });
 
-      console.log(
-        "txHash:",
-        await rSigner.send("ton_sendTransaction", {
-          value: txFeesFull.toString(10),
-          to: nft.native.nftItemAddr,
-          data: payload,
-        })
-      );
+      const res = (await rSigner.send("ton_sendTransaction", {
+        value: txFeesFull.toString(10),
+        to: nft.native.nftItemAddr,
+        data: payload,
+      })) as { hash: string };
 
-      // TODO: tx hash
-      return "";
+      await args.notifier.notifyTon(res.hash);
+
+      return res.hash;
     },
     tonKpWrapper(kp: TonWebMnemonic.KeyPair): TonSigner {
       const wallet = new TonWeb.Wallets.all.v3R2(ton.provider, {
