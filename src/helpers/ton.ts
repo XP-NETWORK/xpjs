@@ -53,6 +53,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
   });
 
   const ton = args.tonweb as TonWeb & TonWallet;
+  ton.provider.sendBoc = (b) =>
+    ton.provider.send("sendBocReturnHash", { boc: b });
 
   return {
     getNonce: () => Chain.TON,
@@ -78,11 +80,13 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         mintWith: Buffer.from(mintWith),
       });
 
-      await rSigner.send("ton_sendTransaction", {
-        value: txFeesFull.toString(10),
-        to: nft.native.nftItemAddr,
-        data: Buffer.from(await payload.getRepr()).toString("base64"),
-      });
+      console.log(
+        await rSigner.send("ton_sendTransaction", {
+          value: txFeesFull.toString(10),
+          to: nft.native.nftItemAddr,
+          data: TonWeb.utils.bytesToBase64(await payload.getRepr()),
+        })
+      );
 
       // TODO: Tx hash
       return "";
@@ -98,11 +102,14 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         txFees: txFeesFull.sub(nftFee),
       });
 
-      await rSigner.send("ton_sendTransaction", {
-        value: txFeesFull.toString(10),
-        to: nft.native.nftItemAddr,
-        data: Buffer.from(await payload.getRepr()).toString("base64"),
-      });
+      console.log(
+        "txHash:",
+        await rSigner.send("ton_sendTransaction", {
+          value: txFeesFull.toString(10),
+          to: nft.native.nftItemAddr,
+          data: TonWeb.utils.bytesToBase64(await payload.getRepr()),
+        })
+      );
 
       // TODO: tx hash
       return "";
@@ -128,7 +135,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
                   amount: new BN(params!.value),
                   seqno: (await wallet.methods.seqno().call()) || 0,
                   sendMode: 3,
-                  payload: Buffer.from(params!.data, "base64"),
+                  payload: TonWeb.utils.base64ToBytes(params!.data),
                 })
                 .send();
           }
