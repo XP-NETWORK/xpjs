@@ -2,6 +2,7 @@ import { BN } from "@project-serum/anchor";
 import BigNumber from "bignumber.js";
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
+import type { Cell } from "tonweb/dist/types/boc/cell";
 import { Chain } from "../consts";
 import {
   ChainNonceGet,
@@ -35,7 +36,7 @@ export type TonParams = {
 
 type MethodMap = {
   ton_requestAccounts: [undefined, string];
-  ton_sendTransaction: [{ value: string; to: string; data: string }, unknown];
+  ton_sendTransaction: [{ value: string; to: string; data: Cell }, unknown];
   ton_getBalance: [undefined, string];
 };
 
@@ -84,20 +85,20 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         await rSigner.send("ton_sendTransaction", {
           value: txFeesFull.toString(10),
           to: nft.native.nftItemAddr,
-          data: TonWeb.utils.bytesToBase64(await payload.getRepr()),
+          data: payload,
         })
       );
 
       // TODO: Tx hash
       return "";
     },
-    async unfreezeWrappedNft(signer, to, nft, txFees, chainNonce) {
+    async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
 
-      const txFeesFull = new BN(txFees.toString(10));
+      const txFeesFull = TonWeb.utils.toNano("0.08");
       const nftFee = TonWeb.utils.toNano("0.05");
       const payload = await bridge.createWithdrawBody({
-        to: Buffer.from(to),
+        to: new Uint8Array(Buffer.from(to)),
         chainNonce: parseInt(chainNonce),
         txFees: txFeesFull.sub(nftFee),
       });
@@ -107,7 +108,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         await rSigner.send("ton_sendTransaction", {
           value: txFeesFull.toString(10),
           to: nft.native.nftItemAddr,
-          data: TonWeb.utils.bytesToBase64(await payload.getRepr()),
+          data: payload,
         })
       );
 
@@ -135,7 +136,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
                   amount: new BN(params!.value),
                   seqno: (await wallet.methods.seqno().call()) || 0,
                   sendMode: 3,
-                  payload: TonWeb.utils.base64ToBytes(params!.data),
+                  payload: params!.data,
                 })
                 .send();
           }
