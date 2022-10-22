@@ -75,5 +75,8 @@ export function evNotifier(url: string) {
     async notifyDfinity(actionId: string) {
       await api.post("/tx/dfinity", { action_id: actionId });
     },
+    async notifyTon(txHash: string) {
+      await api.post("/tx/ton", { tx_hash: txHash });
+    },
   };
 }
