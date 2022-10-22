@@ -7503,10 +7503,10 @@ tonweb-mnemonic@^1.0.1:
   dependencies:
     tweetnacl "^1.0.3"
 
-tonweb@^0.0.43:
-  version "0.0.43"
-  resolved "https://registry.yarnpkg.com/tonweb/-/tonweb-0.0.43.tgz#c659dd806aaa982413ffda33762ddca204da87a9"
-  integrity sha512-wed71NUHymDNVeGFIaMVTj658CXnbr9iafLpKRk4LyvZ17FU2fIBja7m1Uc+oD/+Gf6n0Zqbhsf0b69jF/41Hw==
+tonweb@^0.0.57:
+  version "0.0.57"
+  resolved "https://registry.yarnpkg.com/tonweb/-/tonweb-0.0.57.tgz#f18c44525690d74b81cd248453d5769c872a068a"
+  integrity sha512-/kqRn3/H1nw2bJ68uOtvwkOj6/9EgYaYpMYAXs93I2pLdJZxVKNwTuZ7weGKVmrn9tOt/nCNooq3OAZDSAVUSg==
   dependencies:
     "@ledgerhq/hw-transport-web-ble" "5.48.0"
     "@ledgerhq/hw-transport-webhid" "5.48.0"

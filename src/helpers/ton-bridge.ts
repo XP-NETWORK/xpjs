@@ -39,20 +39,6 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
   constructor(provider: HttpProvider, options: BridgeOptions) {
     super(provider, options);
 
-    this.methods.seqno = () => {
-      return {
-        call: async () => {
-          const address = await this.getAddress();
-          let n = null;
-          try {
-            n = (await provider.call2(address.toString(), "seqno")).toNumber();
-          } catch (e) {
-            console.log(e);
-          }
-          return n;
-        },
-      };
-    };
     this.methods.getPublicKey = this.getPublicKey;
     this.methods.isInitialized = this.isInitialized;
     this.methods.getActionId = this.getActionId;
@@ -71,11 +57,13 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
     cell.bits.writeAddress(await this.getAddress()); // bridge as response address
     cell.bits.writeBit(false); // null custom_payload
     cell.bits.writeCoins(new BN(0)); // forward amount
-    cell.bits.writeBit(false); // forward_payload in this slice, not separate cell
+    cell.bits.writeBit(true); // forward_payload in this slice, not separate cell
 
     const msg = new Cell();
     msg.bits.writeUint(params.chainNonce, 8);
+    msg.bits.writeUint(params.to.length, 16);
     msg.bits.writeBytes(params.to);
+    msg.bits.writeBytes(new Uint8Array(12));
     cell.refs[0] = msg;
 
     return cell;
