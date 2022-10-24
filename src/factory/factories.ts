@@ -12,8 +12,9 @@ import { hethers } from "@hashgraph/hethers";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
-import { HttpProvider } from "tonweb/dist/types/providers/http-provider";
 import { FeeMargins } from "../helpers/chain";
+
+const { HttpProvider } = TonWeb;
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
