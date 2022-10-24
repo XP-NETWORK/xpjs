@@ -69,10 +69,10 @@ var ChainFactoryConfigs;
         return {
             elrondParams: {
                 node_uri: consts_1.TestNetRpcUri.ELROND,
-                minter_address: "erd1qqqqqqqqqqqqqpgqnd6nmq4vh8e3xrxqrxgpwfldgp3sje83k4as3lusln",
-                esdt_swap_address: "erd1qqqqqqqqqqqqqpgq62h6fe5myaajkeva09whewaw8u2hsuexk4as29tzn9",
-                esdt_nft: "XPNFT-fc0a99",
-                esdt_swap: "WEGLD-2d1d69",
+                minter_address: "erd1qqqqqqqqqqqqqpgqy2nx5z4cpr90de4sga2v2yx62fph3lg8g6vskt0k2f",
+                esdt_swap_address: "erd1qqqqqqqqqqqqqpgqc854pa9ruzgs5f8rdzzc02xgq8kqku3ng6vs59vmf8",
+                esdt_nft: "XPNFT-af3fde",
+                esdt_swap: "WEGLD-708f9b",
                 notifier,
                 nonce: 2,
                 feeMargin,
