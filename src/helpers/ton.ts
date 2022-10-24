@@ -8,6 +8,8 @@ import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
+  FeeMargins,
+  GetFeeMargins,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -26,7 +28,7 @@ export type TonHelper = ChainNonceGet &
   EstimateTxFees<TonNft> &
   ValidateAddress & { XpNft: string } & {
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
-  };
+  } & GetFeeMargins;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -34,6 +36,7 @@ export type TonParams = {
   bridgeAddr: string;
   burnerAddr: string;
   xpnftAddr: string;
+  feeMargin: FeeMargins;
 };
 
 type MethodMap = {
@@ -70,6 +73,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     },
     async validateAddress(adr) {
       return TonWeb.Address.isValid(adr);
+    },
+    getFeeMargin() {
+      return args.feeMargin;
     },
     async transferNftToForeign(signer, chainNonce, to, nft, txFees, mintWith) {
       const rSigner = signer.wallet || ton;
