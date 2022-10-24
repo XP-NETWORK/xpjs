@@ -56,6 +56,7 @@ import {
 import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
+import { TonParams } from "../helpers/ton";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -277,6 +278,7 @@ export interface ChainParams {
   nearParams: NearParams;
   moonbeamParams: Web3Params;
   abeyChainParams: Web3Params;
+  tonParams: TonParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -297,7 +299,7 @@ export interface AppConfig {
   tronScanUri: string;
   wrappedNftPrefix: string;
   scVerifyUri: string;
-  network: "testnet" | "mainnet";
+  network: "testnet" | "mainnet" | "staging";
 }
 
 function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {

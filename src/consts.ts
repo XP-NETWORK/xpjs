@@ -86,6 +86,7 @@ export enum MainNetRpcUri {
   NEAR = "https://rpc.mainnet.near.org",
   MOONBEAM = "https://rpc.api.moonbeam.network",
   ABEYCHAIN = "https://rpc.abeychain.com",
+  TON = "https://toncenter.com/api/v2/jsonRPC",
   // TODO: Algorand
 }
 
