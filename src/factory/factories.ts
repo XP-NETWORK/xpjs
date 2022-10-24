@@ -408,6 +408,17 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x8B7f2bC31976230E374B93DF88D6eCD14f7B5D7F",
         nonce: Chain.MOONBEAM,
       },
+      polygonParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
+        erc721Minter: "0x88B830293D4B25dBDAF97A88dc188Fbf1d41F5C8",
+        erc1155Minter: "0xCb83A7Db754F2586DB00384E4dd317D9Dd86913c",
+        erc721_addr: "0x2d6907df316D5960e9064412a71810A7c9D8f4c7",
+        erc1155_addr: "0xb35fF4cC9311324bb8DED72331498994f764Fe0f",
+        minter_addr: "0x8BD036a8a60b39cbAd5CBbf30E04dbe91FbeFc94",
+        nonce: Chain.POLYGON,
+        feeMargin,
+      },
     };
   };
 
