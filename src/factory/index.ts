@@ -333,6 +333,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.NEAR, chainParams.nearParams);
   cToP.set(Chain.MOONBEAM, chainParams.moonbeamParams);
   cToP.set(Chain.ABEYCHAIN, chainParams.abeyChainParams);
+  cToP.set(Chain.TON, chainParams.tonParams);
   return cToP;
 }
 /**

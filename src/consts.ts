@@ -536,3 +536,12 @@ CHAIN_INFO.set(Chain.APTOS, {
   nonce: Chain.APTOS,
   type: ChainType.APTOS,
 });
+CHAIN_INFO.set(Chain.TON, {
+  name: "TON",
+  constructor: tonHelper,
+  currency: SupportedCurrency.TON,
+  decimals: 1e9,
+  nonce: Chain.TON,
+  type: ChainType.TON,
+  blockExplorerUrl: "https://testnet.tonscan.org/tx/",
+});
