@@ -2,7 +2,7 @@ import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { EvNotifier } from "../notifier";
-import { ChainNonceGet, EstimateTxFees, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
 export declare type TonSigner = {
     wallet?: TonWallet;
     accIdx: number;
@@ -14,13 +14,14 @@ export declare type TonHelper = ChainNonceGet & TransferNftForeign<TonSigner, To
     XpNft: string;
 } & {
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
-};
+} & GetFeeMargins;
 export declare type TonParams = {
     tonweb: TonWeb;
     notifier: EvNotifier;
     bridgeAddr: string;
     burnerAddr: string;
     xpnftAddr: string;
+    feeMargin: FeeMargins;
 };
 declare type MethodMap = {
     ton_requestAccounts: [undefined, string];
