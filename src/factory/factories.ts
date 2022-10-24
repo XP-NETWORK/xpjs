@@ -365,6 +365,7 @@ export namespace ChainFactoryConfigs {
         notifier,
         tonweb: new TonWeb(new HttpProvider(MainNetRpcUri.TON)),
         xpnftAddr: "EQAns6QsHVgQFGrbLScBt3aztOOUDj5SO_J7x-N4SDTzqIRb",
+        feeMargin,
       },
       secretParams: {
         bridge: {
