@@ -29,4 +29,19 @@ export namespace AppConfigs {
       network: "testnet",
     };
   };
+
+  export const Staging: () => AppConfig = () => {
+    return {
+      exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+      nftListUri: "https://tools.xp.network/index",
+      nftListAuthToken:
+        "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
+      txSocketUri: "https://bridge1.xp.network/tx-socket",
+      tronScanUri: "https://apilist.tronscan.org/api/",
+      heartbeatUri: "https://xpheartbeat.herokuapp.com",
+      wrappedNftPrefix: "https://staging-nft.xp.network/w/",
+      scVerifyUri: "https://bridge1.xp.network/sc-verify",
+      network: "staging",
+    };
+  };
 }

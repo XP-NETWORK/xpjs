@@ -11,6 +11,9 @@ import { Framework } from "@vechain/connex-framework";
 import { hethers } from "@hashgraph/hethers";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
+import TonWeb from "tonweb";
+import { HttpProvider } from "tonweb/dist/types/providers/http-provider";
+import { FeeMargins } from "../helpers/chain";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -346,6 +349,63 @@ export namespace ChainFactoryConfigs {
         xpnft: "xp_nft_1.testnet",
         feeMargin,
         notifier,
+      },
+    };
+  };
+
+  export const Staging: () => Promise<Partial<ChainParams>> = async () => {
+    const feeMargin: FeeMargins = { min: 1, max: 5 };
+    const notifier = evNotifier("https://bridge1.xp.network/notifier");
+
+    return {
+      tonParams: {
+        bridgeAddr: "kQDa3qh1bl8VTWH8sqSvy3Ecc3-GvAxFRz_OBktNgADywx7K",
+        burnerAddr: "kQDpiiIGbDsQj1adgHtBmRyWBk_a78Td-86bIZWOSukYD6IH",
+        notifier,
+        tonweb: new TonWeb(new HttpProvider(MainNetRpcUri.TON)),
+        xpnftAddr: "EQAns6QsHVgQFGrbLScBt3aztOOUDj5SO_J7x-N4SDTzqIRb",
+      },
+      secretParams: {
+        bridge: {
+          contractAddress: "secret1t0g8tvc0tyvpwdsdc5zepa9j2ptr3vfte26qhu",
+          codeHash:
+            "684afe616d92b29c097c5f00365d07c005e99c90ff1227507a0284b601a2cc5e",
+        },
+        xpnft: {
+          contractAddress: "secret1ggvqzks96k7hawhdx3harrtnffhttrrq2qxmdg",
+          codeHash:
+            "b7f44f7d2f72bfec52b027ee6b3ef802246735b50b2bfe747851876f818d7f45",
+        },
+        notifier,
+        rpcUrl: MainNetRpcUri.SECRET,
+        umt: {
+          contractAddress: "",
+          codeHash: "",
+        },
+        chainId: "24",
+        feeMargin,
+      },
+      abeyChainParams: {
+        notifier,
+        feeMargin,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ABEYCHAIN),
+        erc1155_addr: "0x8776073043eef8929F4a9cBa8Aacc6B59A21BA52",
+        erc1155Minter: "0x5Ed657a379e06CBAc1Ba1a9cF6D28e71c66B0c83",
+        erc721_addr: "0x3C8C51809Ee58E9D3BA37e37112843e41DcBD7B7",
+        erc721Minter: "0xD580913Ef2c8CA4Ca90D4bE6851ACa004cf586D8",
+        minter_addr: "0x14db0f56042Fa87F3b3921E871f87248f4C56A71",
+        nonce: Chain.ABEYCHAIN,
+      },
+      moonbeamParams: {
+        notifier,
+        feeMargin,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.MOONBEAM),
+        erc1155_addr: "0x55B1D1891ABb21A5d245d149B49007b55Bd3746D",
+        erc721_addr: "0x4ceDb46481d7118E1D292C318E37510E5919bBe6",
+        erc1155Minter: "0xF9DfD29ddEDEa3224f9c7E12c7Bbe37101341786",
+        erc721Minter: "0x35c3c3959d19A310Fc052545fCC29200dc440CdA",
+        minter_addr: "0x8B7f2bC31976230E374B93DF88D6eCD14f7B5D7F",
+        nonce: Chain.MOONBEAM,
       },
     };
   };
