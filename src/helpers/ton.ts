@@ -95,6 +95,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         data: payload,
       })) as { hash: string };
 
+      await new Promise((r) => setTimeout(r, 10000));
       await args.notifier.notifyTon(res.hash);
 
       return res.hash;
@@ -116,6 +117,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         data: payload,
       })) as { hash: string };
 
+      await new Promise((r) => setTimeout(r, 10000));
       await args.notifier.notifyTon(res.hash);
 
       return res.hash;

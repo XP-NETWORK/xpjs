@@ -252,7 +252,7 @@ export async function tronHelperFactory(
   }
 
   async function extractAction(hash: string): Promise<string> {
-    await new Promise((r) => setTimeout(r, 6000));
+    await new Promise((r) => setTimeout(r, 10000));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getEv: (retries?: number) => Promise<any> = async (retries = 0) => {
