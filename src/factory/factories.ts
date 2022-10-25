@@ -14,8 +14,6 @@ import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
 import { FeeMargins } from "../helpers/chain";
 
-const { HttpProvider } = TonWeb;
-
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
   "0x837b2eb764860b442c971f98f505e7c5f419edd7",
@@ -363,7 +361,12 @@ export namespace ChainFactoryConfigs {
         bridgeAddr: "kQDa3qh1bl8VTWH8sqSvy3Ecc3-GvAxFRz_OBktNgADywx7K",
         burnerAddr: "kQDpiiIGbDsQj1adgHtBmRyWBk_a78Td-86bIZWOSukYD6IH",
         notifier,
-        tonweb: new TonWeb(new HttpProvider(MainNetRpcUri.TON)),
+        tonweb: new TonWeb(
+          new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
+            apiKey:
+              "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
+          })
+        ),
         xpnftAddr: "EQAns6QsHVgQFGrbLScBt3aztOOUDj5SO_J7x-N4SDTzqIRb",
         feeMargin,
       },
