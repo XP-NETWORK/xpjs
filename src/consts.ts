@@ -479,7 +479,7 @@ CHAIN_INFO.set(Chain.SKALE, {
   blockExplorerUrl:
     "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/tx/",
   constructor: web3HelperFactory,
-  currency: SupportedCurrency.SKL,
+  currency: SupportedCurrency.sFUEL,
   decimals: 1e18,
   chainId: 1564830818,
   nonce: Chain.SKALE,
