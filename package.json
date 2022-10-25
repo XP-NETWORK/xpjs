@@ -60,7 +60,7 @@
     "bignumber.js": "=9.0.1",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
-    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#168cdfdef984ef482909d78c365f9b39aede0366",
+    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#master-dist",
     "ethers": "^5.5.4",
     "google-protobuf": "^3.20.1",
     "js-base64": "^3.6.1",
