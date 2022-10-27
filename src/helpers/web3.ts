@@ -35,6 +35,7 @@ import {
   UserNftMinter,
 } from "xpnet-web3-contracts";
 import {
+  Chain,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
@@ -50,7 +51,8 @@ import {
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 import axios from "axios";
-import { hethers } from "@hashgraph/hethers";
+import { ContractFactory, hethers } from "@hashgraph/hethers";
+import { HEDERA_TOKEN_SERVICE_ABI } from "./hedera/hts_abi";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -431,6 +433,51 @@ export async function web3HelperFactory(
     return receipt.hash;
   };
 
+  const isApprovedForHedera = async (
+    id: NftInfo<EthNftInfo>,
+    signer: Signer
+  ) => {
+    const htsFactory = new ContractFactory(
+      HEDERA_TOKEN_SERVICE_ABI,
+      "0x",
+      signer as any
+    );
+    const hts = htsFactory.attach("0x0000000000000000000000000000000000000167");
+    const [, approvedAddress] = await hts.getApproved(
+      id.native.contract,
+      id.native.tokenId
+    );
+    const toApprove = id.uri.includes("xp.network")
+      ? params.erc721_addr
+      : params.minter_addr;
+    return approvedAddress === toApprove;
+  };
+
+  const approveForHedera = async (id: NftInfo<EthNftInfo>, sender: Signer) => {
+    if (params.nonce !== Chain.HEDERA)
+      throw new Error(`Used Hedera Specific Function for Non Hedera Chain`);
+
+    if (await isApprovedForHedera(id, sender)) return undefined;
+
+    const htsFactory = new ContractFactory(
+      HEDERA_TOKEN_SERVICE_ABI,
+      "0x",
+      sender as any
+    );
+    const hts = htsFactory.attach("0x0000000000000000000000000000000000000167");
+
+    const toApprove = id.uri.includes("xp.network")
+      ? params.erc721_addr
+      : params.minter_addr;
+
+    const receipt = await hts.functions.approveNFT(
+      id.native.contract,
+      toApprove,
+      id.native.tokenId
+    );
+    return receipt;
+  };
+
   const base = await baseWeb3HelperFactory(params.provider);
 
   return {
@@ -446,8 +493,12 @@ export async function web3HelperFactory(
     getFeeMargin() {
       return params.feeMargin;
     },
-    isApprovedForMinter,
-    preTransfer: (s, id, _fee) => approveForMinter(id, s),
+    isApprovedForMinter:
+      params.nonce === Chain.HEDERA ? isApprovedForHedera : isApprovedForMinter,
+    preTransfer: (s, id, _fee) =>
+      params.nonce === Chain.HEDERA
+        ? approveForHedera(id, s)
+        : approveForMinter(id, s),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
