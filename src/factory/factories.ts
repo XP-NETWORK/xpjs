@@ -358,8 +358,8 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        bridgeAddr: "kQDF-xoZP2TABGNcAhksY-NeI6ReLQEBLaOxwBU9NrPzlHtW",
-        burnerAddr: "kQA7KtuofEMDDXj-G38YKjrqpNYGtNuSQlMwQTTBoy3J3gbw",
+        bridgeAddr: "kQD3Fic8toRl0SIMswto8wmy5H41CDZUGAIyIK95Al5BBUiX",
+        burnerAddr: "kQBCnW4TO466p7YzKGZebnsylUSHTyxTKuwMDXo5JEQbIEOF",
         notifier,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
@@ -367,7 +367,7 @@ export namespace ChainFactoryConfigs {
               "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
           })
         ),
-        xpnftAddr: "EQBD8K8bbKaYjN-0KCyPMWUgqHH1uHfUXjujW_lEedbqXaj-",
+        xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
       secretParams: {
