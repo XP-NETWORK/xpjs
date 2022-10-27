@@ -367,13 +367,13 @@ var ChainFactoryConfigs;
         const notifier = (0, notifier_1.evNotifier)("https://bridge1.xp.network/notifier");
         return {
             tonParams: {
-                bridgeAddr: "kQBsDRwwjJP5AN70Xs4NSMuEh5kmJMn4rqR8gIompeEllkFa",
-                burnerAddr: "kQB-CnHaI9uLkAlqXolHomnStisOjvvA4nFc_2fWTxKuGrsG",
+                bridgeAddr: "kQDF-xoZP2TABGNcAhksY-NeI6ReLQEBLaOxwBU9NrPzlHtW",
+                burnerAddr: "kQA7KtuofEMDDXj-G38YKjrqpNYGtNuSQlMwQTTBoy3J3gbw",
                 notifier,
                 tonweb: new tonweb_1.default(new tonweb_1.default.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
                     apiKey: "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
                 })),
-                xpnftAddr: "EQCXli05m77eazNjRkIoQq5u-WT6X3DLJCTpr1leikjyc4c_",
+                xpnftAddr: "EQBD8K8bbKaYjN-0KCyPMWUgqHH1uHfUXjujW_lEedbqXaj-",
                 feeMargin,
             },
             secretParams: {
