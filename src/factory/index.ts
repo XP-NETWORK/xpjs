@@ -21,13 +21,13 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { exchangeRateRepo, getDefaultContract, _headers } from "./cons";
+import { _headers, exchangeRateRepo, getDefaultContract } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
 import { ethers, utils } from "ethers";
 import {
-  AlgorandParams,
   AlgorandHelper,
+  AlgorandParams,
   AlgoSignerH,
   algoSignerWrapper,
   ClaimNftInfo,
@@ -57,6 +57,12 @@ import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { TonParams } from "../helpers/ton";
+import { ContractFactory, Wallet } from "@hashgraph/hethers";
+import {
+  HEDERA_PROXY_ABI,
+  HEDERA_PROXY_BC,
+  HEDERA_TOKEN_SERVICE_ABI,
+} from "../helpers/hedera/hts_abi";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -75,7 +81,6 @@ type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
 
 /**
  * A type representing a chain factory.
- *
  */
 export type ChainFactory = {
   /**
@@ -129,6 +134,17 @@ export type ChainFactory = {
     mintWith?: string
   ): Promise<Resp[]>;
 
+  claimHederaNFT(
+    serialNumber: ethers.BigNumberish,
+    contractAddress: string,
+    sender: Wallet
+  ): Promise<any>;
+
+  listHederaClaimableNFT(
+    mintWith: string,
+    sender: Wallet
+  ): Promise<ethers.BigNumber[]>;
+
   transferSft<SignerF, RawNftF, Resp>(
     fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
     toChain: FullChainBatch<never, unknown, unknown>,
@@ -180,7 +196,6 @@ export type ChainFactory = {
     receiver: string
   ): Promise<BigNumber>;
   /**
-   *
    * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
    * @param params : New Params to be set.
    */
@@ -193,7 +208,6 @@ export type ChainFactory = {
     key: string
   ): Promise<InferSigner<InferChainH<S>>>;
   /**
-   *
    * Get transaction in the destination chain
    * WARN: use claimAlgorandNft instead for algorand.
    *
@@ -209,9 +223,7 @@ export type ChainFactory = {
     hash: Txn
   ): Promise<[string, TransactionStatus]>;
   /**
-   *
    * Claim an algorand nft
-   *
    *
    * @param originChain chain from which the nft was transferred
    * @param txn Transaction Hash of the original
@@ -223,7 +235,6 @@ export type ChainFactory = {
     claimer: AlgoSignerH
   ): Promise<ClaimNftInfo>;
   /**
-   *
    * @param claimer: the account which can claim the nfts
    */
   claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
@@ -792,6 +803,52 @@ export function ChainFactory(
       args: Args
     ): Promise<Ret> => {
       return await chain.mintNft(owner, args);
+    },
+    /**
+     * Claim a transferred NFT
+     * @param serialNumber The Serial Number of the claimable NFTs
+     * @param contractAddress The MintWith HTS Proxy Contract used in the transfer
+     * @param sender wallet of the sender
+     * @returns txn response of the claimer
+     */
+    async claimHederaNFT(serialNumber, contractAddress, sender) {
+      const htscf = new ContractFactory(
+        HEDERA_PROXY_ABI,
+        HEDERA_PROXY_BC,
+        sender
+      );
+      const hts_contract = htscf.attach(contractAddress);
+      const cf = new ContractFactory(HEDERA_TOKEN_SERVICE_ABI, "0x", sender);
+      const contract = cf.attach("0x0000000000000000000000000000000000000167");
+      (
+        await contract.associateToken(
+          await sender.getAddress(),
+          await hts_contract.htsToken({ gasLimit: 1000000 }),
+          { gasLimit: 1000000 }
+        )
+      ).wait();
+
+      const res = await hts_contract.functions.claimNft(serialNumber, {
+        gasLimit: 1000000,
+      });
+      return res;
+    },
+    /**
+     *  Returns all the claimable NFTs of the contract
+     * @param htsContract the address of the HTS Proxy contract that was used as mintWith in the transfer
+     * @param sender wallet of the sender
+     * @returns array of tokens that were minted
+     */
+    async listHederaClaimableNFT(htsContract, sender) {
+      const cf = new ContractFactory(HEDERA_PROXY_ABI, HEDERA_PROXY_BC, sender);
+      const contract = cf.attach(htsContract);
+      const tokens = await contract.functions.getClaimableNfts(
+        await sender.getAddress(),
+        {
+          gasLimit: 1000000,
+        }
+      );
+      return tokens[0];
     },
     waitAlgorandNft: async (origin, hash, claimer) => {
       const action = await origin.extractAction(hash);
