@@ -56,8 +56,8 @@ export declare type ChainFactory = {
      */
     transferNft<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string, gasLimit?: ethers.BigNumberish | undefined, extraFee?: BigNumber.Value): Promise<Resp>;
     transferBatchNft<SignerF, RawNftF, Resp>(fromChain: FullChainBatch<SignerF, RawNftF, Resp>, toChain: FullChainBatch<never, unknown, unknown>, nft: NftInfo<RawNftF>[], sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
-    claimHederaNFT(serialNumber: number, contractAddress: string, sender: Wallet): Promise<any>;
-    listHederaClaimableNFT(mintWith: string, sender: Wallet): Promise<BigNumber[]>;
+    claimHederaNFT(serialNumber: ethers.BigNumberish, contractAddress: string, sender: Wallet): Promise<any>;
+    listHederaClaimableNFT(mintWith: string, sender: Wallet): Promise<ethers.BigNumber[]>;
     transferSft<SignerF, RawNftF, Resp>(fromChain: FullChainBatch<SignerF, RawNftF, Resp>, toChain: FullChainBatch<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, amt: bigint, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
     /**
      * Mints an NFT on the chain.
