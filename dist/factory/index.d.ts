@@ -13,6 +13,7 @@ import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { TonParams } from "../helpers/ton";
+import { Wallet } from "@hashgraph/hethers";
 export declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -20,7 +21,6 @@ export declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer,
 declare type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> & TransferNftForeignBatch<Signer, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, RawNft, Resp> & EstimateTxFeesBatch<RawNft>;
 /**
  * A type representing a chain factory.
- *
  */
 export declare type ChainFactory = {
     /**
@@ -56,6 +56,8 @@ export declare type ChainFactory = {
      */
     transferNft<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string, gasLimit?: ethers.BigNumberish | undefined, extraFee?: BigNumber.Value): Promise<Resp>;
     transferBatchNft<SignerF, RawNftF, Resp>(fromChain: FullChainBatch<SignerF, RawNftF, Resp>, toChain: FullChainBatch<never, unknown, unknown>, nft: NftInfo<RawNftF>[], sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
+    claimHederaNFT(serialNumber: number, contractAddress: string, sender: Wallet): Promise<any>;
+    listHederaClaimableNFT(mintWith: string, sender: Wallet): Promise<BigNumber[]>;
     transferSft<SignerF, RawNftF, Resp>(fromChain: FullChainBatch<SignerF, RawNftF, Resp>, toChain: FullChainBatch<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, amt: bigint, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
     /**
      * Mints an NFT on the chain.
@@ -80,14 +82,12 @@ export declare type ChainFactory = {
     estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
     estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>[], receiver: string): Promise<BigNumber>;
     /**
-     *
      * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
      * @param params : New Params to be set.
      */
     updateParams<T extends ChainNonce>(nonce: T, params: InferChainParam<T>): void;
     pkeyToSigner<S extends ChainNonce>(nonce: S, key: string): Promise<InferSigner<InferChainH<S>>>;
     /**
-     *
      * Get transaction in the destination chain
      * WARN: use claimAlgorandNft instead for algorand.
      *
@@ -99,9 +99,7 @@ export declare type ChainFactory = {
      */
     getDestinationTransaction<Txn>(chain: ExtractAction<Txn> & ExtractTxnStatus, destination: number, hash: Txn): Promise<[string, TransactionStatus]>;
     /**
-     *
      * Claim an algorand nft
-     *
      *
      * @param originChain chain from which the nft was transferred
      * @param txn Transaction Hash of the original
@@ -109,7 +107,6 @@ export declare type ChainFactory = {
      */
     waitAlgorandNft<Txn>(originChain: ExtractAction<Txn> & ChainNonceGet, txn: Txn, claimer: AlgoSignerH): Promise<ClaimNftInfo>;
     /**
-     *
      * @param claimer: the account which can claim the nfts
      */
     claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
