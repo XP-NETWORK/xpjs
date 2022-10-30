@@ -276,7 +276,7 @@ export async function secretHelperFactory(
         },
         {
           waitForCommit: true,
-          gasLimit: 30000,
+          gasLimit: 130000,
         }
       );
       return tx;
