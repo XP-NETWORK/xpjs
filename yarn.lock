@@ -3363,12 +3363,6 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#168cdfdef984ef482909d78c365f9b39aede0366":
-  version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#168cdfdef984ef482909d78c365f9b39aede0366"
-  dependencies:
-    axios "^0.21.1"
-
 "crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#master-dist":
   version "1.0.0"
   resolved "git+https://github.com/xp-network/exchange-rate#83c1506548400d824af5666ded33eaf55f499f80"
@@ -4783,6 +4777,11 @@ globby@^11.0.3:
     ignore "^5.2.0"
     merge2 "^1.4.1"
     slash "^3.0.0"
+
+google-protobuf@^3.14.0:
+  version "3.21.2"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.21.2.tgz#4580a2bea8bbb291ee579d1fefb14d6fa3070ea4"
+  integrity sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==
 
 google-protobuf@^3.20.1:
   version "3.21.0"
@@ -6929,10 +6928,10 @@ secp256k1@^4.0.1, secp256k1@^4.0.2:
     node-addon-api "^2.0.0"
     node-gyp-build "^4.2.0"
 
-secretjs@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.4.0.tgz#2d439df0134d9593ac71591994b31ae0b8a45260"
-  integrity sha512-GfQkNbxlmskU74zt90LlxudlpG8rm5eRt+6VqufUucxpYHCN8aT9xG6/KhtYrzh+46reTnTeiBiPpIv/c0SfpQ==
+secretjs@^1.4.5:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.4.5.tgz#c94098faace9932c5a39cc4622a7510daac44274"
+  integrity sha512-WbHzcDTL8VW8WwVMAPXZAMj6QutXBe1gjLhyjOT3lAQX5zU1TKh2h8EpAxNrM0BfLPMPRC24qtngrrkVrdW2CA==
   dependencies:
     "@cosmjs/encoding" "0.27.1"
     "@cosmjs/math" "0.27.1"
@@ -6947,6 +6946,7 @@ secretjs@^1.4.0:
     bip32 "2.0.6"
     bip39 "3.0.4"
     curve25519-js "0.0.4"
+    google-protobuf "^3.14.0"
     is-gzip "2.0.0"
     miscreant "0.3.2"
     pako "2.0.4"
