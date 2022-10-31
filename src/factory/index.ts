@@ -63,6 +63,7 @@ import {
   HEDERA_PROXY_BC,
   HEDERA_TOKEN_SERVICE_ABI,
 } from "../helpers/hedera/hts_abi";
+import { AptosParams } from "../helpers/aptos";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -290,6 +291,7 @@ export interface ChainParams {
   moonbeamParams: Web3Params;
   abeyChainParams: Web3Params;
   tonParams: TonParams;
+  aptosParams: AptosParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -345,6 +347,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.MOONBEAM, chainParams.moonbeamParams);
   cToP.set(Chain.ABEYCHAIN, chainParams.abeyChainParams);
   cToP.set(Chain.TON, chainParams.tonParams);
+  cToP.set(Chain.APTOS, chainParams.aptosParams);
   return cToP;
 }
 /**
