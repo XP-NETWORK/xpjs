@@ -8,21 +8,34 @@ import {
 import { BRIDGE_ABIS } from "./bridge_client_abis";
 
 interface BridgeData {
+  action_cnt: string;
+  burning_nfts: {
+    handle: string;
+  };
+  consumed_actions: {
+    handle: string;
+  };
   group_key: string;
   paused: boolean;
-  consumed_actions: any;
-  frozen_nfts: any;
+  frozen_nfts: {
+    handle: string;
+  };
+  whitelist: {
+    handle: string;
+  };
 }
 
 export class BridgeClient {
   aptosClient: AptosClient;
   transactionBuilder: TransactionBuilderABI;
+  address: string;
 
-  constructor(aptosClient: AptosClient) {
+  constructor(aptosClient: AptosClient, address: string) {
     this.aptosClient = aptosClient;
     this.transactionBuilder = new TransactionBuilderABI(
       BRIDGE_ABIS.map((abi) => new HexString(abi).toUint8Array())
     );
+    this.address = address;
   }
 
   async initialize(
@@ -30,7 +43,7 @@ export class BridgeClient {
     groupKey: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::initialize",
+      `${this.getAddress()}::bridge::initialize`,
       [],
       [groupKey]
     );
@@ -44,7 +57,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::pause",
+      `${this.getAddress()}::bridge::pause`,
       [],
       [actionId, signature]
     );
@@ -58,7 +71,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::unpause",
+      `${this.getAddress()}::bridge::unpause`,
       [],
       [actionId, signature]
     );
@@ -74,7 +87,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_whitelist",
+      `${this.getAddress()}::bridge::validate_whitelist`,
       [],
       [collectionCreator.toString(), collectionName, actionId, signature]
     );
@@ -90,7 +103,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_blacklist",
+      `${this.getAddress()}::bridge::validate_blacklist`,
       [],
       [collectionCreator.toString(), collectionName, actionId, signature]
     );
@@ -105,7 +118,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_withdraw_fees",
+      `${this.getAddress()}::bridge::validate_withdraw_fees`,
       [],
       [to.toString(), actionId, signature]
     );
@@ -132,7 +145,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_transfer_nft",
+      `${this.getAddress()}::bridge::validate_transfer_nft`,
       [],
       [
         collection,
@@ -145,7 +158,6 @@ export class BridgeClient {
         royaltyPointsNumerator,
         mutateSetting,
         propertyKeys,
-        propertyValues,
         propertyValues,
         propertyTypes,
         to.toString(),
@@ -170,7 +182,7 @@ export class BridgeClient {
     mintWith: string
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::withdraw_nft",
+      `${this.getAddress()}::bridge::withdraw_nft`,
       [],
       [
         bridgeAdmin.toString(),
@@ -198,7 +210,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_burn_nft",
+      `${this.getAddress()}::bridge::validate_burn_nft`,
       [],
       [
         collectionCreator.toString(),
@@ -215,21 +227,19 @@ export class BridgeClient {
 
   async freezeNft(
     account: AptosAccount,
-    bridgeAdmin: HexString,
     collectionCreator: HexString,
     collectionName: string,
     tokenName: string,
-    propertyVersion: string,
+    propertyVersion: number | bigint,
     price: number | bigint,
     chainNonce: number | bigint,
     to: string,
     mintWith: string
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::freeze_nft",
+      `${this.getAddress()}::bridge::freeze_nft`,
       [],
       [
-        bridgeAdmin.toString(),
         collectionCreator.toString(),
         collectionName,
         tokenName,
@@ -255,7 +265,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::validate_unfreeze_nft",
+      `${this.getAddress()}::bridge::validate_unfreeze_nft`,
       [],
       [
         collectionCreator.toString(),
@@ -278,7 +288,7 @@ export class BridgeClient {
     signature: Uint8Array
   ): Promise<string> {
     const payload = this.transactionBuilder.buildTransactionPayload(
-      "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::update_group_key",
+      `${this.getAddress()}::bridge::update_group_key`,
       [],
       [groupKey, actionId, signature]
     );
@@ -286,13 +296,35 @@ export class BridgeClient {
     return this.aptosClient.generateSignSubmitTransaction(account, payload);
   }
 
-  async getBridgeData(creator: MaybeHexString) {
-    const resources = await this.aptosClient.getAccountResources(creator);
+  async getBridgeData() {
+    const resources = await this.aptosClient.getAccountResources(
+      this.getAddress()
+    );
     const accountResource = resources.find(
-      (r) =>
-        r.type ==
-        "0x8ee4020133974b38ff869ba398faf8679a111a7e20bc9ff8d8c666a7d28f97a0::bridge::Bridge"
+      (r) => r.type == `${this.getAddress()}::bridge::Bridge`
     );
     return accountResource?.data as BridgeData;
+  }
+
+  getAddress() {
+    return this.address;
+  }
+
+  async isWhitelist(collectionCreator: MaybeHexString, collectionName: string) {
+    const data = await this.getBridgeData();
+    const { handle } = data.whitelist;
+    try {
+      const res = await this.aptosClient.getTableItem(handle, {
+        key_type: `${this.getAddress()}::bridge::CollectionId`,
+        value_type: "bool",
+        key: {
+          creator: collectionCreator.toString(),
+          name: collectionName,
+        },
+      });
+      return res;
+    } catch (e: any) {
+      return false;
+    }
   }
 }
