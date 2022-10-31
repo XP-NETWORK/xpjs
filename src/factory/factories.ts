@@ -423,6 +423,14 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.POLYGON,
         feeMargin,
       },
+      aptosParams: {
+        rpcUrl: MainNetRpcUri.APTOS,
+        bridge:
+          "0xf1528ec9c413e37f0ce63eb699fa6c7521b925ff4857b2c95e857e43078c916d",
+        XpNft: "XPNFT",
+        feeMargin,
+        notifier,
+      },
     };
   };
 
