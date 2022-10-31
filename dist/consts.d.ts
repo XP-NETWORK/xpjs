@@ -64,7 +64,8 @@ export declare enum MainNetRpcUri {
     NEAR = "https://rpc.mainnet.near.org",
     MOONBEAM = "https://rpc.api.moonbeam.network",
     ABEYCHAIN = "https://rpc.abeychain.com",
-    TON = "https://toncenter.com/api/v2/jsonRPC"
+    TON = "https://toncenter.com/api/v2/jsonRPC",
+    APTOS = "https://fullnode.mainnet.aptoslabs.com/"
 }
 declare type ElrondMeta = [ElrondHelper, ElrondParams];
 declare type Web3Meta = [Web3Helper, Web3Params];
