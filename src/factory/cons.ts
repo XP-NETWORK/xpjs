@@ -33,9 +33,9 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   fromChain: FullChain<SignerT, RawNftT, Resp>,
   toChain: FullChain<SignerT, RawNftT, Resp>
 ): string | undefined {
-  const defaultMintError = new Error(
-    `Transfer has been canceled. The NFT you are trying to send will be minted with a default NFT collection`
-  );
+  // const defaultMintError = new Error(
+  //   `Transfer has been canceled. The NFT you are trying to send will be minted with a default NFT collection`
+  // );
 
   const from = fromChain.getNonce();
   const to = toChain.getNonce();
@@ -63,25 +63,25 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     (from === Chain.VECHAIN && toType === ChainType.EVM) ||
     (to === Chain.VECHAIN && fromType === ChainType.EVM)
   ) {
-    throw defaultMintError;
+    // throw defaultMintError;
   }
 
   if (
     (fromType === ChainType.EVM && toType === ChainType.ELROND) ||
     (fromType === ChainType.ELROND && toType === ChainType.EVM)
   ) {
-    throw defaultMintError;
+    // throw defaultMintError;
   }
 
   if (
     (fromType === ChainType.EVM && toType === ChainType.TEZOS) ||
     (fromType === ChainType.TEZOS && toType === ChainType.EVM)
   ) {
-    throw defaultMintError;
+    // throw defaultMintError;
   }
-  
-    if (fromType === ChainType.TRON) {
-    throw defaultMintError;
+
+  if (fromType === ChainType.TRON) {
+    // throw defaultMintError;
   }
 
   return contract;
