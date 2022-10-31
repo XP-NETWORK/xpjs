@@ -14,6 +14,7 @@ import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { TonParams } from "../helpers/ton";
 import { Wallet } from "@hashgraph/hethers";
+import { AptosParams } from "../helpers/aptos";
 export declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -149,6 +150,7 @@ export interface ChainParams {
     moonbeamParams: Web3Params;
     abeyChainParams: Web3Params;
     tonParams: TonParams;
+    aptosParams: AptosParams;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
