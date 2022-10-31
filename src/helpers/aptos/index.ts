@@ -44,7 +44,7 @@ export async function aptosHelper({
 }: AptosParams): Promise<AptosHelper> {
   const client = new AptosClient(rpcUrl);
 
-  const bridgeClient = new BridgeClient(client);
+  const bridgeClient = new BridgeClient(client, bridge);
 
   return {
     getNonce() {
@@ -79,11 +79,10 @@ export async function aptosHelper({
     ) {
       const receipt = await bridgeClient.freezeNft(
         sender,
-        HexString.ensure(bridge),
         HexString.ensure(id.native.collection_creator),
         id.native.collection_name,
         id.native.token_name,
-        id.native.property_version.toString(),
+        id.native.property_version,
         BigInt(txFees.toString()),
         chain_nonce,
         to,
