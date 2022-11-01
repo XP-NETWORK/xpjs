@@ -1,7 +1,12 @@
-import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, MintNft, GetProvider, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, FeeMargins, GetFeeMargins, IsContractAddress } from "./chain";
-import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } from "ethers";
-import { TransactionResponse, Provider } from "@ethersproject/providers";
-import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftMinter } from "xpnet-web3-contracts";
+/**
+ * Web3 Implementation for cross chain traits
+ * @module
+ */
+import BigNumber from "bignumber.js";
+import { BalanceCheck, EstimateTxFeesBatch, FeeMargins, GetFeeMargins, GetProvider, IsContractAddress, MintNft, TransferNftForeign, TransferNftForeignBatch, UnfreezeForeignNft, UnfreezeForeignNftBatch } from "./chain";
+import { ContractTransaction, PopulatedTransaction, providers, Signer, Wallet } from "ethers";
+import { Provider, TransactionResponse } from "@ethersproject/providers";
+import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__factory } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
@@ -29,10 +34,10 @@ export declare type MintArgs = {
     uri: string;
 };
 export interface IsApproved<Sender> {
-    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<boolean>;
+    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFees?: BigNumber): Promise<boolean>;
 }
 export interface Approve<Sender> {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<string | undefined>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFees?: BigNumber): Promise<string | undefined>;
 }
 declare type NullableCustomData = Record<string, any> | undefined;
 /**
@@ -44,10 +49,8 @@ export declare type BaseWeb3Helper = BalanceCheck &
  *
  * @argument signer  owner of the smart contract
  * @argument args  See [[MintArgs]]
- */
-MintNft<Signer, MintArgs, ContractTransaction> & {
+ */ MintNft<Signer, MintArgs, ContractTransaction> & {
     /**
-     *
      * Deploy an ERC721 smart contract
      *
      * @argument owner  Owner of this smart contract
@@ -97,8 +100,8 @@ declare type NftMethodVal<T, Tx> = {
     approved: (umt: T, sender: string, minterAddr: string, tok: string, customData: NullableCustomData) => Promise<boolean>;
     approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData) => Promise<Tx>;
 };
-declare type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
-declare type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
+export declare type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
+export declare type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
 export declare const NFT_METHOD_MAP: NftMethodMap;
 export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
 export {};
