@@ -14,7 +14,6 @@ import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { TonParams } from "../helpers/ton";
 import { Wallet } from "@hashgraph/hethers";
-import { Web3ERC20Params } from "../helpers/web3_erc20";
 import { AptosParams } from "../helpers/aptos";
 export declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
@@ -145,7 +144,7 @@ export interface ChainParams {
     gateChainParams: Web3Params;
     secretParams: SecretParams;
     hederaParams: Web3Params;
-    skaleParams: Web3ERC20Params;
+    skaleParams: Web3Params;
     dfinityParams: DfinityParams;
     nearParams: NearParams;
     moonbeamParams: Web3Params;
