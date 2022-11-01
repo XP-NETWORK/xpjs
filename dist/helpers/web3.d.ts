@@ -1,3 +1,8 @@
+/**
+ * Web3 Implementation for cross chain traits
+ * @module
+ */
+import BigNumber from "bignumber.js";
 import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, MintNft, GetProvider, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, FeeMargins, GetFeeMargins, IsContractAddress } from "./chain";
 import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } from "ethers";
 import { TransactionResponse, Provider } from "@ethersproject/providers";
@@ -29,10 +34,10 @@ export declare type MintArgs = {
     uri: string;
 };
 export interface IsApproved<Sender> {
-    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<boolean>;
+    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber): Promise<boolean>;
 }
 export interface Approve<Sender> {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender): Promise<string | undefined>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber): Promise<string | undefined>;
 }
 declare type NullableCustomData = Record<string, any> | undefined;
 /**
