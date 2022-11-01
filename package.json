@@ -72,6 +72,6 @@
     "tronstation": "^1.0.1",
     "tronweb": "^4.1.0",
     "web3-providers-connex": "^0.3.1",
-    "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#65b3d13fb814ec8d8c4ea847c5915d763c0fec6f"
+    "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#aa9473ea3b0f748bba54f5755abcfd17e3548237"
   }
 }
