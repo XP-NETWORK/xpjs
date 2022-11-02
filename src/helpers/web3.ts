@@ -50,7 +50,7 @@ import {
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 import axios from "axios";
-import { hethers, utils } from "@hashgraph/hethers";
+import { hethers } from "@hashgraph/hethers";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -588,10 +588,18 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       mintWith: string,
-      _gasLimit: ethers.BigNumberish | undefined = undefined
+      gasLimit: ethers.BigNumberish | undefined = undefined
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
+
+      // Chain is Hedera
+      if (params.nonce === 0x1d) {
+        id.native.tokenId = ethers.utils.solidityPack(
+          ["uint160", "int96"],
+          [EthBN.from(id.collectionIdent), id.native.tokenId]
+        );
+      }
 
       const tx = await minter
         .connect(sender)
@@ -602,8 +610,8 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: utils.parseHbar("0.00000001"),
-            gasLimit: "100000",
+            value: EthBN.from(txFees.toString()),
+            gasLimit,
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -652,6 +660,16 @@ export async function web3HelperFactory(
       txFees: BigNumber,
       nonce
     ): Promise<TransactionResponse> {
+      await approveForMinter(id, sender);
+
+      // Chain is Hedera
+      if (params.nonce === 0x1d) {
+        id.native.tokenId = ethers.utils.solidityPack(
+          ["uint160", "int96"],
+          [EthBN.from(id.collectionIdent), id.native.tokenId]
+        );
+      }
+
       const txn = await minter
         .connect(sender)
         .populateTransaction.withdrawNft(
