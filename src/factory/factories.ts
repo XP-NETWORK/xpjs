@@ -370,6 +370,18 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      elrondParams: {
+        node_uri: MainNetRpcUri.ELROND,
+        minter_address:
+          "erd1qqqqqqqqqqqqqpgqacac9ux4uz0pjg8ck2sf0ugxre0feczzvcas2tsatn",
+        esdt_swap_address:
+          "erd1qqqqqqqqqqqqqpgqjlnfddgj2dl4kz3x4n55yhfv7v06mxhzvcas2ec5ps",
+        esdt_nft: "XPNFT-976581",
+        esdt_swap: "WEGLD-8c393e",
+        notifier,
+        nonce: Chain.ELROND,
+        feeMargin,
+      },
       secretParams: {
         bridge: {
           contractAddress: "secret1t0g8tvc0tyvpwdsdc5zepa9j2ptr3vfte26qhu",
