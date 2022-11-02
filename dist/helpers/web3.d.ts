@@ -3,10 +3,10 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { UnfreezeForeignNft, BalanceCheck, TransferNftForeign, MintNft, GetProvider, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, FeeMargins, GetFeeMargins, IsContractAddress } from "./chain";
-import { Signer, PopulatedTransaction, Wallet, providers, ContractTransaction } from "ethers";
-import { TransactionResponse, Provider } from "@ethersproject/providers";
-import { UserNftMinter__factory, Erc1155Minter__factory, Erc1155Minter, UserNftMinter } from "xpnet-web3-contracts";
+import { BalanceCheck, EstimateTxFeesBatch, FeeMargins, GetFeeMargins, GetProvider, IsContractAddress, MintNft, TransferNftForeign, TransferNftForeignBatch, UnfreezeForeignNft, UnfreezeForeignNftBatch } from "./chain";
+import { ContractTransaction, PopulatedTransaction, providers, Signer, Wallet } from "ethers";
+import { Provider, TransactionResponse } from "@ethersproject/providers";
+import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__factory } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
@@ -49,10 +49,8 @@ export declare type BaseWeb3Helper = BalanceCheck &
  *
  * @argument signer  owner of the smart contract
  * @argument args  See [[MintArgs]]
- */
-MintNft<Signer, MintArgs, ContractTransaction> & {
+ */ MintNft<Signer, MintArgs, ContractTransaction> & {
     /**
-     *
      * Deploy an ERC721 smart contract
      *
      * @argument owner  Owner of this smart contract
