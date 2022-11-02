@@ -4,38 +4,37 @@
  */
 import BigNumber from "bignumber.js";
 import {
-  UnfreezeForeignNft,
   BalanceCheck,
-  TransferNftForeign,
-  MintNft,
-  GetProvider,
-  TransferNftForeignBatch,
-  UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
   FeeMargins,
   GetFeeMargins,
+  GetProvider,
   IsContractAddress,
+  MintNft,
+  TransferNftForeign,
+  TransferNftForeignBatch,
+  UnfreezeForeignNft,
+  UnfreezeForeignNftBatch,
 } from "./chain";
 import {
-  Signer,
   BigNumber as EthBN,
-  PopulatedTransaction,
-  Wallet,
-  ethers,
-  VoidSigner,
-  providers,
   ContractTransaction,
+  ethers,
+  PopulatedTransaction,
+  providers,
+  Signer,
+  VoidSigner,
+  Wallet,
 } from "ethers";
-import { TransactionResponse, Provider } from "@ethersproject/providers";
+import { Provider, TransactionResponse } from "@ethersproject/providers";
 import {
-  Minter__factory,
-  UserNftMinter__factory,
-  Erc1155Minter__factory,
   Erc1155Minter,
+  Erc1155Minter__factory,
+  Minter__factory,
   UserNftMinter,
+  UserNftMinter__factory,
 } from "xpnet-web3-contracts";
 import {
-  Chain,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
@@ -51,8 +50,7 @@ import {
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 import axios from "axios";
-import { ContractFactory, hethers } from "@hashgraph/hethers";
-import { HEDERA_TOKEN_SERVICE_ABI } from "./hedera/hts_abi";
+import { hethers, utils } from "@hashgraph/hethers";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -109,10 +107,8 @@ export type BaseWeb3Helper = BalanceCheck &
    *
    * @argument signer  owner of the smart contract
    * @argument args  See [[MintArgs]]
-   */
-  MintNft<Signer, MintArgs, ContractTransaction> & {
+   */ MintNft<Signer, MintArgs, ContractTransaction> & {
     /**
-     *
      * Deploy an ERC721 smart contract
      *
      * @argument owner  Owner of this smart contract
@@ -304,7 +300,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       txnUp: (tx: PopulatedTransaction) => Promise<void>
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "100000",
+        gasLimit: "1000000",
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
@@ -405,10 +401,16 @@ export async function web3HelperFactory(
       id.native.contract,
       signer
     );
+    const toApprove =
+      params.nonce !== 0x1d
+        ? minter_addr
+        : id.native.uri.includes("herokuapp.com")
+        ? params.erc721_addr
+        : params.minter_addr;
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
       await signer.getAddress(),
-      minter_addr,
+      toApprove,
       id.native.tokenId,
       params.nonce === 0x1d ? {} : undefined
     );
@@ -424,60 +426,22 @@ export async function web3HelperFactory(
       sender
     );
 
+    const toApprove =
+      params.nonce !== 0x1d
+        ? minter_addr
+        : id.native.uri.includes("herokuapp.com")
+        ? params.erc721_addr
+        : params.minter_addr;
+
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
-      minter_addr,
+      toApprove,
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
       params.nonce === 0x1d ? {} : undefined
     );
     await receipt.wait();
     return receipt.hash;
-  };
-
-  const isApprovedForHedera = async (
-    id: NftInfo<EthNftInfo>,
-    signer: Signer
-  ) => {
-    const htsFactory = new ContractFactory(
-      HEDERA_TOKEN_SERVICE_ABI,
-      "0x",
-      signer as any
-    );
-    const hts = htsFactory.attach("0x0000000000000000000000000000000000000167");
-    const [, approvedAddress] = await hts.getApproved(
-      id.native.contract,
-      id.native.tokenId
-    );
-    const toApprove = id.uri.includes("xp.network")
-      ? params.erc721_addr
-      : params.minter_addr;
-    return approvedAddress === toApprove;
-  };
-
-  const approveForHedera = async (id: NftInfo<EthNftInfo>, sender: Signer) => {
-    if (params.nonce !== Chain.HEDERA)
-      throw new Error(`Used Hedera Specific Function for Non Hedera Chain`);
-
-    if (await isApprovedForHedera(id, sender)) return undefined;
-
-    const htsFactory = new ContractFactory(
-      HEDERA_TOKEN_SERVICE_ABI,
-      "0x",
-      sender as any
-    );
-    const hts = htsFactory.attach("0x0000000000000000000000000000000000000167");
-
-    const toApprove = id.uri.includes("xp.network")
-      ? params.erc721_addr
-      : params.minter_addr;
-
-    const receipt = await hts.functions.approveNFT(
-      id.native.contract,
-      toApprove,
-      id.native.tokenId
-    );
-    return receipt;
   };
 
   const base = await baseWeb3HelperFactory(params.provider);
@@ -495,12 +459,8 @@ export async function web3HelperFactory(
     getFeeMargin() {
       return params.feeMargin;
     },
-    isApprovedForMinter:
-      params.nonce === Chain.HEDERA ? isApprovedForHedera : isApprovedForMinter,
-    preTransfer: (s, id, _fee) =>
-      params.nonce === Chain.HEDERA
-        ? approveForHedera(id, s)
-        : approveForMinter(id, s),
+    isApprovedForMinter,
+    preTransfer: (s, id, _fee) => approveForMinter(id, s),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
@@ -628,7 +588,7 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       mintWith: string,
-      gasLimit: ethers.BigNumberish | undefined = undefined
+      _gasLimit: ethers.BigNumberish | undefined = undefined
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
@@ -642,8 +602,8 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString(10)),
-            gasLimit,
+            value: utils.parseHbar("0.00000001"),
+            gasLimit: "100000",
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
