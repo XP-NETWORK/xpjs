@@ -367,6 +367,7 @@ export async function web3HelperFactory(
     );
   }
 
+  //@ts-ignore
   async function getTransaction(hash: string) {
     let trx;
     let fails = 0;
@@ -405,8 +406,8 @@ export async function web3HelperFactory(
       params.nonce !== 0x1d
         ? minter_addr
         : id.native.uri.includes("herokuapp.com")
-        ? params.erc721_addr
-        : params.minter_addr;
+        ? params.minter_addr
+        : params.erc721_addr;
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
       await signer.getAddress(),
@@ -430,8 +431,8 @@ export async function web3HelperFactory(
       params.nonce !== 0x1d
         ? minter_addr
         : id.native.uri.includes("herokuapp.com")
-        ? params.erc721_addr
-        : params.minter_addr;
+        ? params.minter_addr
+        : params.erc721_addr;
 
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
@@ -597,8 +598,9 @@ export async function web3HelperFactory(
       if (params.nonce === 0x1d) {
         id.native.tokenId = ethers.utils.solidityPack(
           ["uint160", "int96"],
-          [EthBN.from(id.collectionIdent), id.native.tokenId]
+          [id.collectionIdent, id.native.tokenId]
         );
+        id.native.contract = params.erc721_addr;
       }
 
       const tx = await minter
@@ -627,8 +629,7 @@ export async function web3HelperFactory(
       if (params.nonce === 0x1d) {
         //@ts-ignore checked hedera
         txHash = txr["transactionId"];
-      }
-      if (params.nonce === 33) {
+      } else if (params.nonce === 33) {
         //@ts-ignore checked abeychain
         txHash = txr["returnedHash"] || txr.hash;
       } else {
@@ -638,20 +639,9 @@ export async function web3HelperFactory(
 
       await notifyValidator(
         //@ts-ignore
-        txHash,
-        await extractAction(await getTransaction(txHash)),
-        "Transfer",
-        chain_nonce,
-        txFees.toString(),
-        await sender.getAddress(),
-        to,
-        id.uri,
-        id.native.tokenId,
-        id.native.contract
+        txHash
       );
-      return params.nonce === 33
-        ? await provider.getTransaction(txHash)
-        : (txr as TransactionResponse);
+      return provider.getTransaction(txHash);
     },
     async unfreezeWrappedNft(
       sender: Signer,
