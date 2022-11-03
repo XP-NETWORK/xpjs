@@ -40,7 +40,7 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
  * @returns Transaction and the Identifier of this action to track the status
  */
 export interface UnfreezeForeignNft<Signer, RawNft, Resp> {
-    unfreezeWrappedNft(sender: Signer, to: string, id: NftInfo<RawNft>, txFees: BigNumber, nonce: string): Promise<Resp>;
+    unfreezeWrappedNft(sender: Signer, to: string, id: NftInfo<RawNft>, txFees: BigNumber, nonce: string, gasLimit: ethers.BigNumberish | undefined): Promise<Resp>;
 }
 /**
  * Get the balance of an address on the chain
