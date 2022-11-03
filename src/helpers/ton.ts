@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
+import { Cell as CellF } from "ton";
 import { Chain } from "../consts";
 import { EvNotifier } from "../notifier";
 import {
@@ -13,21 +14,40 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  BalanceCheck,
 } from "./chain";
 import { BridgeContract } from "./ton-bridge";
 
-export type TonSigner = { wallet?: TonWallet; accIdx: number };
+import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
+import { fromUint8Array } from "js-base64";
+import axios from "ton/node_modules/axios";
+
+export type TonSigner = {
+  wallet?: TonWallet;
+  accIdx: number;
+};
+
+export type TonHub = {
+  wallet: TonhubConnector;
+  config: {
+    seed: string;
+    appPublicKey: string;
+    address: string;
+  };
+};
 
 export type TonNft = {
   nftItemAddr: string;
 };
 
 export type TonHelper = ChainNonceGet &
+  BalanceCheck &
   TransferNftForeign<TonSigner, TonNft, string> &
   UnfreezeForeignNft<TonSigner, TonNft, string> &
   EstimateTxFees<TonNft> &
   ValidateAddress & { XpNft: string } & {
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
+    tonHubWrapper: (args: TonHub) => TonSigner;
   } & GetFeeMargins;
 
 export type TonParams = {
@@ -45,11 +65,18 @@ type MethodMap = {
   ton_getBalance: [undefined, string];
 };
 
+type ResponseUnionType =
+  | TonhubTransactionResponse
+  | {
+      hash: string;
+    };
+
 type TonWallet = {
   send<M extends keyof MethodMap>(
     method: M,
     params: MethodMap[M][0]
   ): Promise<MethodMap[M][1]>;
+  handleResponse(res: ResponseUnionType): Promise<string>;
 };
 
 export async function tonHelper(args: TonParams): Promise<TonHelper> {
@@ -62,9 +89,47 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
   ton.provider.sendBoc = (b) =>
     ton.provider.send("sendBocReturnHash", { boc: b });
 
+  async function waitTonTrx(exBodyMsg: string, address: string) {
+    console.log(exBodyMsg, "TON:exBodyMsg");
+
+    let body: string = "";
+
+    const noTrx = setTimeout(() => {
+      throw new Error("waitTonTrx timeout");
+    }, 60 * 1000 * 20);
+
+    while (!body) {
+      console.log("TON:tring to find the trx...");
+      await new Promise((r) => setTimeout(r, 10 * 1000));
+      //get last 20 trx of address
+      const trxs = await ton.provider.getTransactions(address, 20);
+      //find body of the trx
+      body = trxs.find(
+        (trx: any) => trx["in_msg"]["msg_data"].body === exBodyMsg
+      )?.data;
+    }
+
+    clearTimeout(noTrx);
+
+    const dict = CellF.fromBoc(Buffer.from(body, "base64"))[0].hash();
+
+    const exHash = dict.toString("base64");
+
+    const trxArr = await axios(
+      `https://toncenter.com/api/index/getTransactionByHash?tx_hash=${encodeURIComponent(
+        exHash
+      )}&include_msg_body=true`
+    );
+
+    return trxArr.data[0]["in_msg"].hash;
+  }
+
   return {
     getNonce: () => Chain.TON,
     XpNft: args.xpnftAddr,
+    async balance(address: string) {
+      return new BigNumber(await ton.getBalance(address));
+    },
     async estimateValidateTransferNft() {
       return new BigNumber(0); // TODO
     },
@@ -82,6 +147,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
       const txFeesFull = new BN(txFees.toString(10));
       const nftFee = TonWeb.utils.toNano("0.07");
+
       const payload = await bridge.createFreezeBody({
         amount: txFeesFull.sub(nftFee),
         to: Buffer.from(to),
@@ -89,16 +155,19 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         mintWith: Buffer.from(mintWith),
       });
 
-      const res = (await rSigner.send("ton_sendTransaction", {
-        value: txFeesFull.toString(10),
-        to: nft.native.nftItemAddr,
-        data: payload,
-      })) as { hash: string };
+      const res = (await rSigner
+        .send("ton_sendTransaction", {
+          value: txFeesFull.toString(10),
+          to: nft.native.nftItemAddr,
+          data: payload,
+        })
+        .catch((e) => console.log(e, "error"))) as ResponseUnionType;
 
-      await new Promise((r) => setTimeout(r, 10000));
-      await args.notifier.notifyTon(res.hash);
+      const hash = await rSigner.handleResponse(res);
 
-      return res.hash;
+      await args.notifier.notifyTon(hash);
+
+      return hash;
     },
     async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
@@ -115,12 +184,47 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         value: txFeesFull.toString(10),
         to: nft.native.nftItemAddr,
         data: payload,
-      })) as { hash: string };
+      })) as ResponseUnionType;
 
-      await new Promise((r) => setTimeout(r, 10000));
-      await args.notifier.notifyTon(res.hash);
+      const hash = await rSigner.handleResponse(res);
 
-      return res.hash;
+      await args.notifier.notifyTon(hash);
+
+      return hash;
+    },
+    tonHubWrapper(args: TonHub) {
+      const tonHub: TonWallet = {
+        async send(method, params) {
+          switch (method) {
+            case "ton_sendTransaction":
+              return await args.wallet.requestTransaction({
+                seed: args.config.seed,
+                appPublicKey: args.config.appPublicKey,
+                to: params!.to,
+                value: new BN(params!.value).toString(),
+                timeout: 5 * 60 * 1000,
+                text: `ton_sendTransaction to ${params!.to}`,
+                payload: fromUint8Array(await params!.data.toBoc(false)),
+              });
+
+            default:
+              return null;
+          }
+        },
+
+        async handleResponse(res: TonhubTransactionResponse) {
+          if (res.type === "success" && res.response != undefined) {
+            return await waitTonTrx(res.response, args.config.address);
+          } else {
+            throw new Error(`TonHub:${res.type}`);
+          }
+        },
+      };
+
+      return {
+        wallet: tonHub,
+        accIdx: 0,
+      };
     },
     tonKpWrapper(kp: TonWebMnemonic.KeyPair): TonSigner {
       const wallet = new TonWeb.Wallets.all.v3R2(ton.provider, {
@@ -148,6 +252,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
                 .send();
           }
         },
+        async handleResponse(res: { hash: string }) {
+          return res.hash;
+        },
       };
 
       return {
@@ -157,3 +264,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     },
   };
 }
+
+/**
+ * te6cckECAwEAARQAAZyePa86ljKS+MMbRkLZsLh935o2RzbAvKlW+XvT97HV6u6HnL6mzcE5OdFdHqB6cwLsoEhZpIqx073kjFPfO1YDKamjF2Nin6kAAAAFAAMBAc1iABROzGm51PmIt7opuWJmE0PhVJBiM8nYvb81g6py4r62IR4aMAAAAAAAAAAAAAAAAAAAX8w9FAAAAAAAAAAAgB7ixOeW0Iy6JEGWYW0eYTZcj8ahBsqDAEZEFe8gS8ggoQflyiAQAgCuBwAqMHg0N0JmMGRhZTZlOTJlNDlhM2M5NWU1YjBjNzE0MjI4OTFENWNkNEZFMHgyZDY5MDdkZjMxNkQ1OTYwZTkwNjQ0MTJhNzE4MTBBN2M5RDhmNGM3p4Mu7w==
+ */
