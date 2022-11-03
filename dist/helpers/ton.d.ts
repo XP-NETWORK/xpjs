@@ -3,6 +3,7 @@ import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { EvNotifier } from "../notifier";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "./chain";
+import { PreTransfer } from "..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 export declare type TonSigner = {
     wallet?: TonWallet;
@@ -19,7 +20,7 @@ export declare type TonHub = {
 export declare type TonNft = {
     nftItemAddr: string;
 };
-export declare type TonHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<TonSigner, TonNft, string> & UnfreezeForeignNft<TonSigner, TonNft, string> & EstimateTxFees<TonNft> & ValidateAddress & {
+export declare type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any> & TransferNftForeign<TonSigner, TonNft, string> & UnfreezeForeignNft<TonSigner, TonNft, string> & EstimateTxFees<TonNft> & ValidateAddress & {
     XpNft: string;
 } & {
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
@@ -51,7 +52,4 @@ declare type TonWallet = {
 };
 export declare function tonHelper(args: TonParams): Promise<TonHelper>;
 export {};
-/**
- * te6cckECAwEAARQAAZyePa86ljKS+MMbRkLZsLh935o2RzbAvKlW+XvT97HV6u6HnL6mzcE5OdFdHqB6cwLsoEhZpIqx073kjFPfO1YDKamjF2Nin6kAAAAFAAMBAc1iABROzGm51PmIt7opuWJmE0PhVJBiM8nYvb81g6py4r62IR4aMAAAAAAAAAAAAAAAAAAAX8w9FAAAAAAAAAAAgB7ixOeW0Iy6JEGWYW0eYTZcj8ahBsqDAEZEFe8gS8ggoQflyiAQAgCuBwAqMHg0N0JmMGRhZTZlOTJlNDlhM2M5NWU1YjBjNzE0MjI4OTFENWNkNEZFMHgyZDY5MDdkZjMxNkQ1OTYwZTkwNjQ0MTJhNzE4MTBBN2M5RDhmNGM3p4Mu7w==
- */
 //# sourceMappingURL=ton.d.ts.map
