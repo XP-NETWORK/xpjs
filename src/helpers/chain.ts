@@ -66,7 +66,8 @@ export interface UnfreezeForeignNft<Signer, RawNft, Resp> {
     to: string,
     id: NftInfo<RawNft>,
     txFees: BigNumber,
-    nonce: string
+    nonce: string,
+    gasLimit: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
 

@@ -137,12 +137,14 @@ export type ChainFactory = {
 
   claimHederaNFT(
     serialNumber: ethers.BigNumberish,
-    contractAddress: string,
+    proxyAddress: string,
+    htsToken: string,
     sender: Wallet
   ): Promise<any>;
 
   listHederaClaimableNFT(
-    mintWith: string,
+    proxyContract: string,
+    htsToken: string,
     sender: Wallet
   ): Promise<ethers.BigNumber[]>;
 
@@ -763,7 +765,8 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          toChain.getNonce().toString()
+          toChain.getNonce().toString(),
+          gasLimit
         );
 
         return res;
@@ -814,7 +817,7 @@ export function ChainFactory(
      * @param sender wallet of the sender
      * @returns txn response of the claimer
      */
-    async claimHederaNFT(serialNumber, contractAddress, sender) {
+    async claimHederaNFT(serialNumber, contractAddress, htsToken, sender) {
       const htscf = new ContractFactory(
         HEDERA_PROXY_ABI,
         HEDERA_PROXY_BC,
@@ -824,29 +827,32 @@ export function ChainFactory(
       const cf = new ContractFactory(HEDERA_TOKEN_SERVICE_ABI, "0x", sender);
       const contract = cf.attach("0x0000000000000000000000000000000000000167");
       (
-        await contract.associateToken(
-          await sender.getAddress(),
-          await hts_contract.htsToken({ gasLimit: 1000000 }),
-          { gasLimit: 1000000 }
-        )
+        await contract.associateToken(await sender.getAddress(), htsToken, {
+          gasLimit: 1000000,
+        })
       ).wait();
 
-      const res = await hts_contract.functions.claimNft(serialNumber, {
-        gasLimit: 1000000,
-      });
+      const res = await hts_contract.functions.claimNft(
+        serialNumber,
+        htsToken,
+        {
+          gasLimit: 1000000,
+        }
+      );
       return res;
     },
     /**
      *  Returns all the claimable NFTs of the contract
-     * @param htsContract the address of the HTS Proxy contract that was used as mintWith in the transfer
+     * @param proxyContract the address of the HTS Proxy contract that was used as mintWith in the transfer
      * @param sender wallet of the sender
      * @returns array of tokens that were minted
      */
-    async listHederaClaimableNFT(htsContract, sender) {
+    async listHederaClaimableNFT(proxyContract, htsToken, sender) {
       const cf = new ContractFactory(HEDERA_PROXY_ABI, HEDERA_PROXY_BC, sender);
-      const contract = cf.attach(htsContract);
+      const contract = cf.attach(proxyContract);
       const tokens = await contract.functions.getClaimableNfts(
         await sender.getAddress(),
+        htsToken,
         {
           gasLimit: 1000000,
         }
