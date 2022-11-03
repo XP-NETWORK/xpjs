@@ -16,6 +16,9 @@ import {
   ValidateAddress,
   BalanceCheck,
 } from "./chain";
+
+import { PreTransfer } from "..";
+
 import { BridgeContract } from "./ton-bridge";
 
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
@@ -42,6 +45,7 @@ export type TonNft = {
 
 export type TonHelper = ChainNonceGet &
   BalanceCheck &
+  PreTransfer<any, any, any> &
   TransferNftForeign<TonSigner, TonNft, string> &
   UnfreezeForeignNft<TonSigner, TonNft, string> &
   EstimateTxFees<TonNft> &
@@ -114,7 +118,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     const dict = CellF.fromBoc(Buffer.from(body, "base64"))[0].hash();
 
     const exHash = dict.toString("base64");
-
+    console.log(exHash, "exHash");
+    await new Promise((r) => setTimeout(r, 6 * 1000));
     const trxArr = await axios(
       `https://toncenter.com/api/index/getTransactionByHash?tx_hash=${encodeURIComponent(
         exHash
@@ -125,6 +130,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
   }
 
   return {
+    preTransfer: () => Promise.resolve(true),
+    preUnfreeze: () => Promise.resolve(true),
     getNonce: () => Chain.TON,
     XpNft: args.xpnftAddr,
     async balance(address: string) {
@@ -154,7 +161,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         chainNonce,
         mintWith: Buffer.from(mintWith),
       });
-
+      console.log("TON:transferNftToForeign");
       const res = (await rSigner
         .send("ton_sendTransaction", {
           value: txFeesFull.toString(10),
@@ -179,7 +186,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         chainNonce: parseInt(chainNonce),
         txFees: txFeesFull.sub(nftFee),
       });
-
+      console.log("TON:unfreezeWrappedNft");
       const res = (await rSigner.send("ton_sendTransaction", {
         value: txFeesFull.toString(10),
         to: nft.native.nftItemAddr,
@@ -192,6 +199,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
       return hash;
     },
+    /* tonWalletWrapper() {
+
+    },*/
     tonHubWrapper(args: TonHub) {
       const tonHub: TonWallet = {
         async send(method, params) {
@@ -264,7 +274,3 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     },
   };
 }
-
-/**
- * te6cckECAwEAARQAAZyePa86ljKS+MMbRkLZsLh935o2RzbAvKlW+XvT97HV6u6HnL6mzcE5OdFdHqB6cwLsoEhZpIqx073kjFPfO1YDKamjF2Nin6kAAAAFAAMBAc1iABROzGm51PmIt7opuWJmE0PhVJBiM8nYvb81g6py4r62IR4aMAAAAAAAAAAAAAAAAAAAX8w9FAAAAAAAAAAAgB7ixOeW0Iy6JEGWYW0eYTZcj8ahBsqDAEZEFe8gS8ggoQflyiAQAgCuBwAqMHg0N0JmMGRhZTZlOTJlNDlhM2M5NWU1YjBjNzE0MjI4OTFENWNkNEZFMHgyZDY5MDdkZjMxNkQ1OTYwZTkwNjQ0MTJhNzE4MTBBN2M5RDhmNGM3p4Mu7w==
- */
