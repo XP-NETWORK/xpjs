@@ -648,7 +648,8 @@ export async function web3HelperFactory(
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
-      nonce
+      nonce,
+      gasLimit = undefined
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
 
@@ -658,6 +659,7 @@ export async function web3HelperFactory(
           ["uint160", "int96"],
           [EthBN.from(id.collectionIdent), id.native.tokenId]
         );
+        id.native.contract = params.erc721_addr;
       }
 
       const txn = await minter
@@ -669,24 +671,26 @@ export async function web3HelperFactory(
           id.native.contract,
           {
             value: EthBN.from(txFees.toString(10)),
+            gasLimit,
           }
         );
 
       await txnUnderpricedPolyWorkaround(txn);
       const res = await sender.sendTransaction(txn);
 
-      await notifyValidator(
-        res.hash,
-        await extractAction(res),
-        "Unfreeze",
-        Number(nonce),
-        txFees.toString(),
-        await sender.getAddress(),
-        to,
-        id.uri,
-        id.native.tokenId,
-        id.native.contract
-      );
+      let txHash: string;
+      if (params.nonce === 0x1d) {
+        //@ts-ignore checked hedera
+        txHash = txr["transactionId"];
+      } else if (params.nonce === 33) {
+        //@ts-ignore checked abeychain
+        txHash = txr["returnedHash"] || txr.hash;
+      } else {
+        //@ts-ignore checked normal evm
+        txHash = txr.hash;
+      }
+
+      await notifyValidator(txHash);
 
       return res;
     },
