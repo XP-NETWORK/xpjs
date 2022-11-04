@@ -11,6 +11,7 @@ import { TonHelper, TonParams } from "./helpers/ton";
 import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams } from "./helpers/near";
 import { AptosHelper, AptosParams } from "./helpers/aptos";
+import { Web3ERC20Params } from "./helpers/web3_erc20";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.elrond.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -77,6 +78,7 @@ declare type SolanaMeta = [SolanaHelper, SolanaParams];
 declare type TonMeta = [TonHelper, TonParams];
 declare type DfinityMeta = [DfinityHelper, DfinityParams];
 declare type NearMeta = [NearHelper, NearParams];
+declare type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 declare type AptosMeta = [AptosHelper, AptosParams];
 declare type MetaMapAssert = {
     [idx in typeof Chain[keyof typeof Chain]]: unknown;
@@ -109,7 +111,7 @@ export declare type MetaMap = {
     0x1b: TonMeta;
     0x1c: DfinityMeta;
     0x1d: Web3Meta;
-    0x1e: Web3Meta;
+    0x1e: Web3ERC20Meta;
     0x1f: NearMeta;
     0x20: Web3Meta;
     0x21: Web3Meta;
