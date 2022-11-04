@@ -28,6 +28,7 @@ import {
 } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams, nearHelperFactory } from "./helpers/near";
 import { aptosHelper, AptosHelper, AptosParams } from "./helpers/aptos";
+import { web3ERC20HelperFactory, Web3ERC20Params } from "./helpers/web3_erc20";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -101,6 +102,7 @@ type SolanaMeta = [SolanaHelper, SolanaParams];
 type TonMeta = [TonHelper, TonParams];
 type DfinityMeta = [DfinityHelper, DfinityParams];
 type NearMeta = [NearHelper, NearParams];
+type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
@@ -134,7 +136,7 @@ export type MetaMap = {
   0x1b: TonMeta;
   0x1c: DfinityMeta;
   0x1d: Web3Meta;
-  0x1e: Web3Meta;
+  0x1e: Web3ERC20Meta;
   0x1f: NearMeta;
   0x20: Web3Meta;
   0x21: Web3Meta;
@@ -479,7 +481,7 @@ CHAIN_INFO.set(Chain.SKALE, {
   name: "Skale",
   blockExplorerUrl:
     "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/tx/",
-  constructor: web3HelperFactory,
+  constructor: web3ERC20HelperFactory,
   currency: SupportedCurrency.SKL,
   decimals: 1e18,
   chainId: 1564830818,

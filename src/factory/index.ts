@@ -64,6 +64,7 @@ import {
   HEDERA_TOKEN_SERVICE_ABI,
 } from "../helpers/hedera/hts_abi";
 import { AptosParams } from "../helpers/aptos";
+import { Web3ERC20Params } from "../helpers/web3_erc20";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -287,7 +288,7 @@ export interface ChainParams {
   gateChainParams: Web3Params;
   secretParams: SecretParams;
   hederaParams: Web3Params;
-  skaleParams: Web3Params;
+  skaleParams: Web3ERC20Params;
   dfinityParams: DfinityParams;
   nearParams: NearParams;
   moonbeamParams: Web3Params;
