@@ -121,8 +121,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       body = trxs.find((trx: any) => {
         const messages = trx[msgType];
         const message = Array.isArray(messages)
-          ? messages[0]["msg_data"].body
-          : messages["msg_data"].body;
+          ? messages?.at(0)?.msg_data?.body
+          : messages?.msg_data?.body;
+
         return message === exBodyMsg;
       })?.data;
     }
