@@ -302,15 +302,15 @@ async function web3HelperFactory(params) {
             let txHash;
             if (params.nonce === 0x1d) {
                 //@ts-ignore checked hedera
-                txHash = txr["transactionId"];
+                txHash = txn["transactionId"];
             }
             else if (params.nonce === 33) {
                 //@ts-ignore checked abeychain
-                txHash = txr["returnedHash"] || txr.hash;
+                txHash = txn["returnedHash"] || txn.hash;
             }
             else {
                 //@ts-ignore checked normal evm
-                txHash = txr.hash;
+                txHash = txn.hash;
             }
             await notifyValidator(txHash);
             return res;

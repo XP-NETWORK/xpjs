@@ -15,11 +15,12 @@ export declare type TonWalletProvider = {
     on(eventName: string, handler: (...data: any[]) => any): void;
 };
 export declare type TonArgs = {
-    wallet: TonhubConnector & TonWalletProvider;
+    wallet: TonhubConnector & TonWalletProvider & Function;
     config: {
         seed?: string;
         appPublicKey?: string;
         address?: string;
+        [x: string]: any;
     };
 };
 export declare type TonNft = {
@@ -31,6 +32,7 @@ export declare type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, 
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
+    tonKeeperWrapper: (args: TonArgs) => TonSigner;
 } & GetFeeMargins;
 export declare type TonParams = {
     tonweb: TonWeb;
