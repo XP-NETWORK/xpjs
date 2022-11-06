@@ -677,17 +677,17 @@ export async function web3HelperFactory(
 
       await txnUnderpricedPolyWorkaround(txn);
       const res = await sender.sendTransaction(txn);
-
+      console.log(res, "res");
       let txHash: string;
       if (params.nonce === 0x1d) {
         //@ts-ignore checked hedera
-        txHash = txn["transactionId"];
+        txHash = res["transactionId"];
       } else if (params.nonce === 33) {
         //@ts-ignore checked abeychain
-        txHash = txn["returnedHash"] || txn.hash;
+        txHash = res["returnedHash"] || res.hash;
       } else {
         //@ts-ignore checked normal evm
-        txHash = txn.hash;
+        txHash = res.hash;
       }
 
       await notifyValidator(txHash);
