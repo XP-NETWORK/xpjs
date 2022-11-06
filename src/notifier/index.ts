@@ -78,5 +78,8 @@ export function evNotifier(url: string) {
     async notifyTon(txHash: string) {
       await api.post("/tx/ton", { tx_hash: txHash });
     },
+    async notifyAptos(txHash: string) {
+      await api.post("/tx/aptos", { tx_hash: txHash });
+    },
   };
 }
