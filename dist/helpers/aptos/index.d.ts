@@ -1,5 +1,6 @@
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 import { AptosAccount } from "aptos";
+import { EvNotifier } from "../../notifier";
 export declare type AptosNFT = {
     collection_creator: string;
     collection_name: string;
@@ -14,6 +15,7 @@ export declare type AptosParams = {
     rpcUrl: string;
     xpnft: string;
     bridge: string;
+    notifier: EvNotifier;
 };
-export declare function aptosHelper({ feeMargin, rpcUrl, xpnft, bridge, }: AptosParams): Promise<AptosHelper>;
+export declare function aptosHelper({ feeMargin, rpcUrl, xpnft, bridge, notifier, }: AptosParams): Promise<AptosHelper>;
 //# sourceMappingURL=index.d.ts.map

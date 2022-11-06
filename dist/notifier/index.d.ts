@@ -10,5 +10,6 @@ export declare function evNotifier(url: string): {
     notifyNear(txHash: string): Promise<void>;
     notifyDfinity(actionId: string): Promise<void>;
     notifyTon(txHash: string): Promise<void>;
+    notifyAptos(txHash: string): Promise<void>;
 };
 //# sourceMappingURL=index.d.ts.map
