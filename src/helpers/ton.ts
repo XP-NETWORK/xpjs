@@ -37,11 +37,12 @@ export type TonWalletProvider = {
 };
 
 export type TonArgs = {
-  wallet: TonhubConnector & TonWalletProvider;
+  wallet: TonhubConnector & TonWalletProvider & Function;
   config: {
     seed?: string;
     appPublicKey?: string;
     address?: string;
+    [x: string]: any;
   };
 };
 
@@ -59,6 +60,7 @@ export type TonHelper = ChainNonceGet &
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
+    tonKeeperWrapper: (args: TonArgs) => TonSigner;
   } & GetFeeMargins;
 
 export type TonParams = {
@@ -213,6 +215,37 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       await args.notifier.notifyTon(hash);
 
       return hash;
+    },
+    tonKeeperWrapper(args: TonArgs) {
+      console.log(args, "args");
+      let payload: string = "";
+      const tonHub: TonWallet = {
+        async send(method, params) {
+          switch (method) {
+            case "ton_sendTransaction":
+              payload = fromUint8Array(await params!.data.toBoc(false));
+              return args.wallet.send(
+                `https://app.tonkeeper.com/transfer/${
+                  params!.to
+                }?amount=${new BN(
+                  params!.value
+                ).toString()}&text=NFTSend&bin=${payload}`
+              );
+            default:
+              return null;
+          }
+        },
+
+        async handleResponse(res: boolean) {
+          console.log(res);
+          return await waitTonTrx(payload, args.config.address!, "out_msgs");
+        },
+      };
+
+      return {
+        wallet: tonHub,
+        accIdx: 0,
+      };
     },
     tonWalletWrapper(args: TonArgs) {
       let payload: string = "";
