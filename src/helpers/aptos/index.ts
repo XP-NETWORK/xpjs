@@ -13,6 +13,7 @@ import { AptosAccount, AptosClient, HexString } from "aptos";
 import { Chain } from "../../consts";
 import BigNumber from "bignumber.js";
 import { BridgeClient } from "./bridge_client";
+import { EvNotifier } from "../../notifier";
 
 export type AptosNFT = {
   collection_creator: string;
@@ -34,6 +35,7 @@ export type AptosParams = {
   rpcUrl: string;
   xpnft: string;
   bridge: string;
+  notifier: EvNotifier;
 };
 
 export async function aptosHelper({
@@ -41,6 +43,7 @@ export async function aptosHelper({
   rpcUrl,
   xpnft,
   bridge,
+  notifier,
 }: AptosParams): Promise<AptosHelper> {
   const client = new AptosClient(rpcUrl);
 
@@ -88,6 +91,8 @@ export async function aptosHelper({
         to,
         mintWith
       );
+      await new Promise((r) => setTimeout(r, 10000));
+      await notifier.notifyAptos(receipt);
       return receipt;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
@@ -103,6 +108,8 @@ export async function aptosHelper({
         to,
         id.native.collection_creator
       );
+      await new Promise((r) => setTimeout(r, 10000));
+      await notifier.notifyAptos(receipt);
       return receipt;
     },
   };
