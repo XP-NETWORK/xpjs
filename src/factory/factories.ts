@@ -473,6 +473,19 @@ export namespace ChainFactoryConfigs {
     );
 
     return {
+      tonParams: {
+        bridgeAddr: "kQAhH1me417YvScu9Rn8BXjsW_9HcalciG5LmCDT04HMJt6L",
+        burnerAddr: "kQDuSGRY8g6TCLC4QhlhqgLr4G_nNXTGHoXy38Mwxx-r1aGY",
+        notifier,
+        tonweb: new TonWeb(
+          new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
+            apiKey:
+              "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
+          })
+        ),
+        xpnftAddr: "EQABqbZubs5e3QQF3lxVZMvdaxlaIdNQWq8W1rn8rvVvWHys",
+        feeMargin,
+      },
       elrondParams: {
         node_uri: MainNetRpcUri.ELROND,
         minter_address:
