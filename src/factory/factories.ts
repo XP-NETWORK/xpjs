@@ -131,6 +131,15 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
         minter_addr: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
       },
+      aptosParams: {
+        rpcUrl: TestNetRpcUri.APTOS,
+        bridge:
+          "0x34970140e78477dfd0e37d60cd82cc2392e0ffc8768124d8716b2d2f803287cb",
+        xpnft: "XPNFT",
+        notifier,
+        feeMargin,
+        nonce: Chain.APTOS,
+      },
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,
         notifier,
