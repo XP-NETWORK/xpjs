@@ -103,6 +103,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
   async function waitTonTrx(
     exBodyMsg: string,
+    value: string,
     address: string,
     msgType: "in_msg" | "out_msgs"
   ) {
@@ -122,11 +123,20 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       //find body of the trx
       body = trxs.find((trx: any) => {
         const messages = trx[msgType];
-        const message = Array.isArray(messages)
+        let message: string = "";
+        let msgVal: string = "";
+
+        message = Array.isArray(messages)
           ? messages?.at(0)?.msg_data?.body
           : messages?.msg_data?.body;
+        msgVal = Array.isArray(trx["out_msgs"])
+          ? trx.out_msgs?.at(0)?.value
+          : trx["out_msgs"].value;
 
-        return message === exBodyMsg;
+        trx.utime * 1000 >= +new Date(Date.now() - 1000 * 60 * 5) &&
+          console.log(trx.utime, "trx happend no more than 5 minutes ago");
+
+        return message === exBodyMsg && msgVal === value;
       })?.data;
     }
 
@@ -136,14 +146,21 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
     const exHash = dict.toString("base64");
     console.log(exHash, "exHash");
-    await new Promise((r) => setTimeout(r, 6 * 1000));
-    const trxArr = await axios(
-      `https://toncenter.com/api/index/getTransactionByHash?tx_hash=${encodeURIComponent(
-        exHash
-      )}&include_msg_body=true`
-    );
 
-    return trxArr.data[0]["in_msg"].hash;
+    let trxData: any = undefined;
+
+    while (trxData === undefined) {
+      await new Promise((r) => setTimeout(r, 6 * 1000));
+      const res = await axios(
+        `https://toncenter.com/api/index/getTransactionByHash?tx_hash=${encodeURIComponent(
+          exHash
+        )}&include_msg_body=true`
+      ).catch(() => undefined);
+
+      trxData = res?.data;
+    }
+
+    return trxData[0]["in_msg"].hash;
   }
 
   return {
@@ -169,7 +186,10 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async transferNftToForeign(signer, chainNonce, to, nft, txFees, mintWith) {
       const rSigner = signer.wallet || ton;
 
-      const txFeesFull = new BN(txFees.toString(10));
+      const txFeesFull = new BN(txFees.toString(10)).add(
+        TonWeb.utils.toNano((Math.random() * 0.01).toFixed(7))
+      );
+
       const nftFee = TonWeb.utils.toNano("0.07");
 
       const payload = await bridge.createFreezeBody({
@@ -178,6 +198,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         chainNonce,
         mintWith: Buffer.from(mintWith),
       });
+
+      console.log(txFeesFull.toString(10), "val");
 
       console.log("TON:transferNftToForeign");
       console.log(rSigner);
@@ -197,15 +219,23 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       const rSigner = signer.wallet || ton;
 
       const txFeesFull = TonWeb.utils.toNano("0.08");
+
       const nftFee = TonWeb.utils.toNano("0.05");
+
       const payload = await bridge.createWithdrawBody({
-        to: new Uint8Array(Buffer.from(to)),
+        to: Buffer.from(to),
         chainNonce: parseInt(chainNonce),
         txFees: txFeesFull.sub(nftFee),
       });
+      //random value between  0.08 and 0.09 with 8 digits after .
+      const value = TonWeb.utils.toNano(
+        (Math.random() * (0.09 - 0.08) + 0.08).toFixed(8)
+      );
+      console.log(value.toString(10), "v");
+
       console.log("TON:unfreezeWrappedNft");
       const res = (await rSigner.send("ton_sendTransaction", {
-        value: txFeesFull.toString(10),
+        value: new BN(value).toString(10),
         to: nft.native.nftItemAddr,
         data: payload,
       })) as ResponseUnionType;
@@ -219,17 +249,17 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     tonKeeperWrapper(args: TonArgs) {
       console.log(args, "args");
       let payload: string = "";
+      let value = "";
       const tonHub: TonWallet = {
         async send(method, params) {
           switch (method) {
             case "ton_sendTransaction":
               payload = fromUint8Array(await params!.data.toBoc(false));
+              value = new BN(params!.value).toString();
               return args.wallet.send(
                 `https://app.tonkeeper.com/transfer/${
                   params!.to
-                }?amount=${new BN(
-                  params!.value
-                ).toString()}&text=NFTSend&bin=${payload}`
+                }?amount=${value}&text=NFTSend&bin=${payload}`
               );
             default:
               return null;
@@ -238,7 +268,12 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
         async handleResponse(res: boolean) {
           console.log(res);
-          return await waitTonTrx(payload, args.config.address!, "out_msgs");
+          return await waitTonTrx(
+            payload,
+            value,
+            args.config.address!,
+            "out_msgs"
+          );
         },
       };
 
@@ -249,15 +284,19 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     },
     tonWalletWrapper(args: TonArgs) {
       let payload: string = "";
+      let value = "";
       const tonHub: TonWallet = {
         async send(method, params) {
           switch (method) {
             case "ton_sendTransaction":
+              value = params!.value;
+
               payload = fromUint8Array(await params!.data.toBoc(false));
+              console.log(payload, "payload");
               return await args.wallet.send("ton_sendTransaction", [
                 {
                   to: params!.to,
-                  value: new BN(params!.value).toString(),
+                  value,
                   dataType: "boc",
                   data: payload,
                 },
@@ -269,7 +308,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
         async handleResponse(res: boolean) {
           return (
-            res && (await waitTonTrx(payload, args.config.address!, "out_msgs"))
+            res &&
+            (await waitTonTrx(payload, value, args.config.address!, "out_msgs"))
           );
         },
       };
@@ -280,15 +320,17 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       };
     },
     tonHubWrapper(args: TonArgs) {
+      let value = "";
       const tonHub: TonWallet = {
         async send(method, params) {
           switch (method) {
             case "ton_sendTransaction":
+              value = new BN(params!.value).toString();
               return await args.wallet.requestTransaction({
                 seed: args.config.seed!,
                 appPublicKey: args.config.appPublicKey!,
                 to: params!.to,
-                value: new BN(params!.value).toString(),
+                value,
                 timeout: 5 * 60 * 1000,
                 text: `ton_sendTransaction to ${params!.to}`,
                 payload: fromUint8Array(await params!.data.toBoc(false)),
@@ -303,6 +345,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
           if (res.type === "success" && res.response != undefined) {
             return await waitTonTrx(
               res.response,
+              value,
               args.config.address!,
               "in_msg"
             );
