@@ -36,6 +36,7 @@ export type AptosParams = {
   xpnft: string;
   bridge: string;
   notifier: EvNotifier;
+  network: "mainnet" | "devnet";
 };
 
 export async function aptosHelper({
@@ -44,10 +45,11 @@ export async function aptosHelper({
   xpnft,
   bridge,
   notifier,
+  network,
 }: AptosParams): Promise<AptosHelper> {
   const client = new AptosClient(rpcUrl);
 
-  const bridgeClient = new BridgeClient(client, bridge);
+  const bridgeClient = new BridgeClient(client, bridge, network);
 
   return {
     getNonce() {

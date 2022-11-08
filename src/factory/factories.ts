@@ -139,6 +139,7 @@ export namespace ChainFactoryConfigs {
         notifier,
         feeMargin,
         nonce: Chain.APTOS,
+        network: "devnet",
       },
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,
@@ -453,6 +454,7 @@ export namespace ChainFactoryConfigs {
         notifier,
         feeMargin,
         nonce: Chain.APTOS,
+        network: "mainnet",
       },
     };
   };
