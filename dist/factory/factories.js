@@ -148,7 +148,7 @@ var ChainFactoryConfigs;
             },
             aptosParams: {
                 rpcUrl: consts_1.TestNetRpcUri.APTOS,
-                bridge: "0x6219629b29f24b342c42707328c079eb316c17cb632298842fdee7d8bbf8fc15",
+                bridge: "0x2110e9c5aa36817664a9251d1b3564cfb4678b1651005f1097fc5986366aaf0b",
                 xpnft: "XPNFT",
                 notifier,
                 feeMargin,
