@@ -754,9 +754,9 @@ export function ChainFactory(
         fee = await estimateFees(fromChain, toChain, nft, receiver, extraFee);
         console.log(new BigNumber(fee).toString());
       }
-      if (!(await toChain.validateAddress(receiver))) {
-        throw Error("invalid address");
-      }
+      // if (!(await toChain.validateAddress(receiver))) {
+      //   throw Error("invalid address");
+      // }
 
       if (await isWrappedNft(nft, fromChain.getNonce())) {
         await algoOptInCheck(nft, toChain, receiver);

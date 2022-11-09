@@ -26,9 +26,9 @@ interface BridgeData {
 }
 
 export class BridgeClient {
-  aptosClient: AptosClient;
-  transactionBuilder: TransactionBuilderABI;
-  address: string;
+  private aptosClient: AptosClient;
+  private transactionBuilder: TransactionBuilderABI;
+  private address: string;
 
   constructor(
     aptosClient: AptosClient,
@@ -143,9 +143,6 @@ export class BridgeClient {
     royaltyPointsDenominator: number | bigint,
     royaltyPointsNumerator: number | bigint,
     mutateSetting: boolean[],
-    propertyKeys: string[],
-    propertyValues: number[][],
-    propertyTypes: string[],
     to: HexString,
     actionId: number | bigint,
     signature: Uint8Array
@@ -160,12 +157,9 @@ export class BridgeClient {
         maximum,
         uri,
         royaltyPayeeAddress.toString(),
-        royaltyPointsDenominator,
-        royaltyPointsNumerator,
+        royaltyPointsDenominator.toString(),
+        royaltyPointsNumerator.toString(),
         mutateSetting,
-        propertyKeys,
-        propertyValues,
-        propertyTypes,
         to.toString(),
         actionId,
         signature,
