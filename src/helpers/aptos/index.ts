@@ -3,12 +3,14 @@ import {
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
+  GetProvider,
+  MintNft,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
 } from "../chain";
 
-import { AptosAccount, AptosClient, HexString } from "aptos";
+import { AptosAccount, AptosClient, HexString, TokenClient } from "aptos";
 
 import { Chain } from "../../consts";
 import BigNumber from "bignumber.js";
@@ -22,13 +24,30 @@ export type AptosNFT = {
   property_version: number;
 };
 
+/**
+ * @param collection name of the collection u already own. if u dont own any token, then set this as undefined
+ * @param name name of the NFT
+ * @param description description of the NFT
+ * @param uri The URI which the NFT points to
+ * @param createCollection set this as true if u set collection as undefined. it will create a new collection.
+ */
+export type AptosMintArgs = {
+  collection: string | undefined;
+  name: string;
+  description: string;
+  uri: string;
+  createCollection: boolean;
+};
+
 export type AptosHelper = ChainNonceGet &
   TransferNftForeign<AptosAccount, AptosNFT, string> &
   UnfreezeForeignNft<AptosAccount, AptosNFT, string> &
   EstimateTxFees<AptosNFT> &
   ValidateAddress & {
     XpNft: string;
-  } & GetFeeMargins;
+  } & GetFeeMargins &
+  MintNft<AptosAccount, AptosMintArgs, string> &
+  GetProvider<AptosClient>;
 
 export type AptosParams = {
   feeMargin: FeeMargins;
@@ -96,6 +115,54 @@ export async function aptosHelper({
       await new Promise((r) => setTimeout(r, 10000));
       await notifier.notifyAptos(receipt);
       return receipt;
+    },
+    getProvider() {
+      return client;
+    },
+    async mintNft(owner, options) {
+      const tc = new TokenClient(client);
+      if (options.createCollection) {
+        await tc.createCollection(
+          owner,
+          "UMT",
+          "UserNftMinter - Mint your NFTs Here To Test",
+          "https://example.com",
+          BigInt(2 ** 64) - BigInt(1)
+        );
+        const response = await tc.createToken(
+          owner,
+          "UMT",
+          options.name,
+          options.description,
+          1,
+          options.uri,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        );
+        return response;
+      } else {
+        const response = await tc.createToken(
+          owner,
+          options.collection!,
+          options.name,
+          options.description,
+          1,
+          options.uri,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        );
+        return response;
+      }
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       const receipt = await bridgeClient.withdrawNft(
