@@ -218,22 +218,24 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
 
-      const txFeesFull = TonWeb.utils.toNano("0.08");
-
-      const nftFee = TonWeb.utils.toNano("0.05");
-
-      const payload = await bridge.createWithdrawBody({
-        to: Buffer.from(to),
-        chainNonce: parseInt(chainNonce),
-        txFees: txFeesFull.sub(nftFee),
-      });
+      //const txFeesFull = TonWeb.utils.toNano("0.08");
       //random value between  0.08 and 0.09 with 8 digits after .
       const value = TonWeb.utils.toNano(
         (Math.random() * (0.09 - 0.08) + 0.08).toFixed(8)
       );
-      console.log(value.toString(10), "v");
 
+      const nftFee = TonWeb.utils.toNano("0.05");
+
+      const payload = await bridge.createWithdrawBody({
+        to: new Uint8Array(Buffer.from(to)),
+        chainNonce: parseInt(chainNonce),
+        txFees: value.sub(nftFee),
+      });
+
+      console.log(value.toString(10), "v");
+      console.log(nft.native.nftItemAddr);
       console.log("TON:unfreezeWrappedNft");
+
       const res = (await rSigner.send("ton_sendTransaction", {
         value: new BN(value).toString(10),
         to: nft.native.nftItemAddr,
