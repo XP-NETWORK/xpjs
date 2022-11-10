@@ -38,7 +38,8 @@ export declare enum TestNetRpcUri {
     NEAR = "https://rpc.testnet.near.org",
     MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
     ABEYCHAIN = "https://testrpc.abeychain.com",
-    APTOS = "https://fullnode.devnet.aptoslabs.com"
+    APTOS = "https://fullnode.devnet.aptoslabs.com",
+    TON = "https://testnet.toncenter.com/api/v2/jsonRPC"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
