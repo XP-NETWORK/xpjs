@@ -13,7 +13,6 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
 import { FeeMargins } from "../helpers/chain";
-import { HttpProvider } from "tonweb/dist/types/providers/http-provider";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -64,7 +63,7 @@ export namespace ChainFactoryConfigs {
       },
       tonParams: {
         tonweb: new TonWeb(
-          new HttpProvider(TestNetRpcUri.TON, {
+          new TonWeb.HttpProvider(TestNetRpcUri.TON, {
             apiKey:
               "9e899d38874458e92addb70d6f336ccbe51e21e378af5797486ba9a9d1a3c5c3",
           })
@@ -148,7 +147,7 @@ export namespace ChainFactoryConfigs {
       aptosParams: {
         rpcUrl: TestNetRpcUri.APTOS,
         bridge:
-          "0x2110e9c5aa36817664a9251d1b3564cfb4678b1651005f1097fc5986366aaf0b",
+          "7b30a9bd0407ec73cf1f089411fbb57a9517f0bff4a78da954c063481a4e14ba",
         xpnft: "XPNFT",
         notifier,
         feeMargin,
