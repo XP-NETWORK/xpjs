@@ -58,6 +58,7 @@ export enum TestNetRpcUri {
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
   ABEYCHAIN = "https://testrpc.abeychain.com",
   APTOS = "https://fullnode.devnet.aptoslabs.com",
+  TON = "https://testnet.toncenter.com/api/v2/jsonRPC",
   // TODO: Algorand
   // TODO: Fuse
 }
