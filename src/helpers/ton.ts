@@ -21,6 +21,8 @@ import { PreTransfer } from "..";
 
 import { BridgeContract } from "./ton-bridge";
 
+import { Emitter } from "../emitter";
+
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { fromUint8Array } from "js-base64";
 import axios from "ton/node_modules/axios";
@@ -110,14 +112,22 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     console.log(exBodyMsg, "TON:exBodyMsg");
 
     let body: string = "";
-
+    let stop = false;
+    const setStop = () => {
+      Emitter?.removeEventListener("cancel tonKeeper", setStop);
+      return (stop = true);
+    };
     const noTrx = setTimeout(() => {
+      stop = true;
       throw new Error("waitTonTrx timeout");
     }, 60 * 1000 * 20);
+
+    Emitter?.addEventListener("cancel tonKeeper", setStop);
 
     while (!body) {
       console.log("TON:tring to find the trx...");
       await new Promise((r) => setTimeout(r, 10 * 1000));
+      if (stop) return;
       //get last 20 trx of address
       const trxs = await ton.provider.getTransactions(address, 20);
       //find body of the trx
@@ -202,7 +212,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       console.log(txFeesFull.toString(10), "val");
 
       console.log("TON:transferNftToForeign");
-      console.log(rSigner);
+      console.log(nft.native.nftItemAddr);
       const res = (await rSigner.send("ton_sendTransaction", {
         value: txFeesFull.toString(10),
         to: nft.native.nftItemAddr,
@@ -218,8 +228,6 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
 
-      //const txFeesFull = TonWeb.utils.toNano("0.08");
-      //random value between  0.08 and 0.09 with 8 digits after .
       const value = TonWeb.utils.toNano(
         (Math.random() * (0.09 - 0.08) + 0.08).toFixed(8)
       );
@@ -257,12 +265,15 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
           switch (method) {
             case "ton_sendTransaction":
               payload = fromUint8Array(await params!.data.toBoc(false));
-              value = new BN(params!.value).toString();
+              value = params!.value;
               return args.wallet.send(
                 `https://app.tonkeeper.com/transfer/${
                   params!.to
-                }?amount=${value}&text=NFTSend&bin=${payload}`
+                }?amount=${new BN(value).toString(10)}&bin=${encodeURIComponent(
+                  payload
+                )}`
               );
+
             default:
               return null;
           }
