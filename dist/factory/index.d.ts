@@ -70,7 +70,7 @@ export declare type ChainFactory = {
     mint<Signer, Args, Ret>(chain: MintNft<Signer, Args, Ret>, owner: Signer, args: Args): Promise<Ret>;
     /**
      * Lists all the NFTs on the chain owner by {@param owner}.
-     * @param chain: {@link NftUriChain<RawNft>} Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
+     * @param chain: Chain on which the NFT was minted. Can be obtained from the `inner` method on the factory.
      * @param owner: Address of the owner of the NFT as a raw string.
      */
     nftList<T>(chain: ChainNonceGet & T, owner: string): Promise<NftInfo<InferNativeNft<T>>[]>;
