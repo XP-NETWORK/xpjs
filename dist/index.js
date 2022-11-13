@@ -19,7 +19,8 @@ __exportStar(require("./helpers/elrond"), exports);
 __exportStar(require("./helpers/web3"), exports);
 __exportStar(require("./helpers/tron"), exports);
 __exportStar(require("./socket"), exports);
+__exportStar(require("./emitter"), exports);
 __exportStar(require("./factory"), exports);
 __exportStar(require("./consts"), exports);
 __exportStar(require("./config"), exports);
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUFnQztBQUNoQyxtREFBaUM7QUFDakMsaURBQStCO0FBQy9CLGlEQUErQjtBQUMvQiwyQ0FBeUI7QUFDekIsNENBQTBCO0FBQzFCLDJDQUF5QjtBQUN6QiwyQ0FBeUIifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUFnQztBQUNoQyxtREFBaUM7QUFDakMsaURBQStCO0FBQy9CLGlEQUErQjtBQUMvQiwyQ0FBeUI7QUFDekIsNENBQTBCO0FBQzFCLDRDQUEwQjtBQUMxQiwyQ0FBeUI7QUFDekIsMkNBQXlCIn0=
