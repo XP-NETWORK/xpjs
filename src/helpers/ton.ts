@@ -114,8 +114,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     let body: string = "";
     let stop = false;
     const setStop = () => {
+      stop = true;
       Emitter?.removeEventListener("cancel tonKeeper", setStop);
-      return (stop = true);
+      throw new Error("User has declined transaction");
     };
     const noTrx = setTimeout(() => {
       stop = true;
