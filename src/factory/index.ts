@@ -780,7 +780,9 @@ export function ChainFactory(
             mintWith,
             toChain.getNonce(),
             fromChain.getNonce(),
-            tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
+            tokenId && !isNaN(Number(tokenId))
+              ? tokenId
+              : tokenId.match(/(?!-)[0-9]+$/gm)?.at(0)
           ))
             ? mintWith
             : getDefaultContract(nft, fromChain, toChain);
