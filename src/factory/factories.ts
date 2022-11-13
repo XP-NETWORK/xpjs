@@ -394,6 +394,17 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      algorandParams: {
+        algodApiKey:
+          "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
+        algodUri: "https://algorand-node.xp.network/",
+        indexerUri: "https://algoindexer.algoexplorerapi.io",
+        nonce: Chain.ALGORAND,
+        sendNftAppId: 942656248,
+        algodPort: 443,
+        notifier,
+        feeMargin,
+      },
       elrondParams: {
         node_uri: MainNetRpcUri.ELROND,
         minter_address:
