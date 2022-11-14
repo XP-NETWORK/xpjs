@@ -1,5 +1,5 @@
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
-import { AptosAccount, AptosClient } from "aptos";
+import { ChainNonceGet, ClaimNFT, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
+import { AptosAccount, AptosClient, HexString } from "aptos";
 import { EvNotifier } from "../../notifier";
 export declare type AptosNFT = {
     collection_creator: string;
@@ -21,9 +21,16 @@ export declare type AptosMintArgs = {
     uri: string;
     createCollection: boolean;
 };
+export declare type AptosClaimArgs = {
+    sender: HexString;
+    propertyVersion: number;
+    collectionName: string;
+    creator: string;
+    name: string;
+};
 export declare type AptosHelper = ChainNonceGet & TransferNftForeign<AptosAccount, AptosNFT, string> & UnfreezeForeignNft<AptosAccount, AptosNFT, string> & EstimateTxFees<AptosNFT> & ValidateAddress & {
     XpNft: string;
-} & GetFeeMargins & MintNft<AptosAccount, AptosMintArgs, string> & GetProvider<AptosClient>;
+} & GetFeeMargins & MintNft<AptosAccount, AptosMintArgs, string> & GetProvider<AptosClient> & ClaimNFT<AptosAccount, AptosClaimArgs, string>;
 export declare type AptosParams = {
     feeMargin: FeeMargins;
     rpcUrl: string;
