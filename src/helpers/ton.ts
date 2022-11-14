@@ -113,9 +113,11 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
     let body: string = "";
     let stop = false;
+    let fastResolve: any;
     const setStop = () => {
       stop = true;
       Emitter?.removeEventListener("cancel tonKeeper", setStop);
+      fastResolve(true);
       throw new Error("User has declined transaction");
     };
     const noTrx = setTimeout(() => {
@@ -127,7 +129,10 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
     while (!body) {
       console.log("TON:tring to find the trx...");
-      await new Promise((r) => setTimeout(r, 10 * 1000));
+      await new Promise((r) => {
+        fastResolve = r;
+        setTimeout(r, 10 * 1000);
+      });
       if (stop) return;
       //get last 20 trx of address
       const trxs = await ton.provider.getTransactions(address, 20);
@@ -272,7 +277,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
                   params!.to
                 }?amount=${new BN(value).toString(10)}&bin=${encodeURIComponent(
                   payload
-                )}`
+                )}&open=1`
               );
 
             default:
