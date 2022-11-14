@@ -171,7 +171,7 @@ export class BridgeClient {
 
   async withdrawNft(
     account: AptosAccount,
-    bridgeAdmin: HexString,
+    _bridgeAdmin: HexString,
     collectionCreator: HexString,
     collectionName: string,
     tokenName: string,
@@ -185,7 +185,6 @@ export class BridgeClient {
       `${this.getAddress()}::bridge::withdraw_nft`,
       [],
       [
-        bridgeAdmin.toString(),
         collectionCreator.toString(),
         collectionName,
         tokenName,

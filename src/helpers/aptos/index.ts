@@ -1,5 +1,6 @@
 import {
   ChainNonceGet,
+  ClaimNFT,
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
@@ -39,6 +40,14 @@ export type AptosMintArgs = {
   createCollection: boolean;
 };
 
+export type AptosClaimArgs = {
+  sender: HexString;
+  propertyVersion: number;
+  collectionName: string;
+  creator: string;
+  name: string;
+};
+
 export type AptosHelper = ChainNonceGet &
   TransferNftForeign<AptosAccount, AptosNFT, string> &
   UnfreezeForeignNft<AptosAccount, AptosNFT, string> &
@@ -47,7 +56,8 @@ export type AptosHelper = ChainNonceGet &
     XpNft: string;
   } & GetFeeMargins &
   MintNft<AptosAccount, AptosMintArgs, string> &
-  GetProvider<AptosClient>;
+  GetProvider<AptosClient> &
+  ClaimNFT<AptosAccount, AptosClaimArgs, string>;
 
 export type AptosParams = {
   feeMargin: FeeMargins;
@@ -163,6 +173,18 @@ export async function aptosHelper({
         );
         return response;
       }
+    },
+    async claimNFT(signer, params) {
+      const tokenClient = new TokenClient(client);
+      const claim = await tokenClient.claimToken(
+        signer,
+        params.sender,
+        params.creator,
+        params.collectionName,
+        params.name,
+        params.propertyVersion
+      );
+      return claim;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       const receipt = await bridgeClient.withdrawNft(

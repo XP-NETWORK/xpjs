@@ -198,3 +198,7 @@ export interface FeeMargins {
 export interface GetFeeMargins {
   getFeeMargin(): FeeMargins;
 }
+
+export interface ClaimNFT<Signer, ClaimArgs, Ret> {
+  claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;
+}
