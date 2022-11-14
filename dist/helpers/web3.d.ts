@@ -74,7 +74,7 @@ export declare type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, Eth
  *
  * @param provider An ethers.js provider object
  */
-export declare function baseWeb3HelperFactory(provider: Provider): Promise<BaseWeb3Helper>;
+export declare function baseWeb3HelperFactory(provider: Provider, nonce: number): Promise<BaseWeb3Helper>;
 /**
  * Create an object implementing cross chain utilities for a web3 chain
  *
