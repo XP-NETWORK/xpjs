@@ -155,7 +155,8 @@ export type Web3Helper = BaseWeb3Helper &
  * @param provider An ethers.js provider object
  */
 export async function baseWeb3HelperFactory(
-  provider: Provider
+  provider: Provider,
+  nonce: number
 ): Promise<BaseWeb3Helper> {
   const w3 = provider;
 
@@ -183,8 +184,18 @@ export async function baseWeb3HelperFactory(
       { contract, uri }: MintArgs
     ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
-
-      const txm = await erc721.mint(uri, { gasLimit: 1000000 });
+      const txm = await erc721
+        .mint(uri, { gasLimit: 1000000 })
+        .catch(async (e) => {
+          if (nonce === 33) {
+            let tx;
+            while (!tx) {
+              tx = await provider.getTransaction(e["returnedHash"]);
+            }
+            return tx;
+          }
+          throw e;
+        });
       return txm;
     },
   };
@@ -445,7 +456,7 @@ export async function web3HelperFactory(
     return receipt.hash;
   };
 
-  const base = await baseWeb3HelperFactory(params.provider);
+  const base = await baseWeb3HelperFactory(params.provider, params.nonce);
 
   return {
     ...base,
