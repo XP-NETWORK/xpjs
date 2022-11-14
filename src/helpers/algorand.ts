@@ -355,7 +355,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return new BigNumber(acc.amount);
     },
     async preTransfer(sender, nft, fee) {
-      if (await isOptIn(appAddr, nft.native.nftId)) {
+      if (await isOptIn(sender.address, nft.native.nftId)) {
         return undefined;
       }
 
