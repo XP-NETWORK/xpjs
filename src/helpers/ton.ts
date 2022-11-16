@@ -234,8 +234,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
       const rSigner = signer.wallet || ton;
 
-      const value = TonWeb.utils.toNano(
-        (Math.random() * (0.09 - 0.08) + 0.08).toFixed(8)
+      const value = new BN(_txFees.toString(10)).add(
+        TonWeb.utils.toNano((Math.random() * 0.01).toFixed(7))
       );
 
       const nftFee = TonWeb.utils.toNano("0.05");
