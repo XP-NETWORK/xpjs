@@ -149,7 +149,7 @@ export async function secretHelperFactory(
       },
       {
         waitForCommit: true,
-        gasLimit: 100_000,
+        gasLimit: 250_000,
       }
     );
     return res.transactionHash;
@@ -191,7 +191,7 @@ export async function secretHelperFactory(
         },
         {
           waitForCommit: true,
-          gasLimit: 50_000,
+          gasLimit: 500_000,
         }
       );
       return tx;
@@ -276,7 +276,7 @@ export async function secretHelperFactory(
         },
         {
           waitForCommit: true,
-          gasLimit: 130000,
+          gasLimit: 500_000,
         }
       );
       return tx;
@@ -310,7 +310,7 @@ export async function secretHelperFactory(
             },
           ],
         },
-        { waitForCommit: true, gasLimit: 150_000 }
+        { waitForCommit: true, gasLimit: 500_000 }
       );
 
       await p.notifier.notifySecret(tx.transactionHash, nft.native.vk);
@@ -339,7 +339,7 @@ export async function secretHelperFactory(
             },
           ],
         },
-        { waitForCommit: true, gasLimit: 100_000 }
+        { waitForCommit: true, gasLimit: 500_000 }
       );
 
       await p.notifier.notifySecret(tx.transactionHash, nft.native.vk);
