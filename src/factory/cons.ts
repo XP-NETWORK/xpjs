@@ -86,3 +86,21 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
 
   return contract;
 }
+
+export function prepareTokenId(tokenId: string | undefined, from: number) {
+  if (tokenId) {
+    const notNumber = isNaN(Number(tokenId));
+
+    if (notNumber) {
+      if (from === Chain.ELROND) {
+        return tokenId.match(/(?!-)[0-9]+$/gm)?.at(0);
+      }
+
+      if (from === Chain.TON) {
+        return "1";
+      }
+    } else {
+      return tokenId;
+    }
+  }
+}

@@ -21,7 +21,12 @@ import {
 import BigNumber from "bignumber.js";
 
 import axios from "axios";
-import { _headers, exchangeRateRepo, getDefaultContract } from "./cons";
+import {
+  _headers,
+  exchangeRateRepo,
+  getDefaultContract,
+  prepareTokenId,
+} from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
 import { ethers, utils } from "ethers";
@@ -780,9 +785,7 @@ export function ChainFactory(
             mintWith,
             toChain.getNonce(),
             fromChain.getNonce(),
-            tokenId && !isNaN(Number(tokenId))
-              ? tokenId
-              : tokenId.match(/(?!-)[0-9]+$/gm)?.at(0)
+            prepareTokenId(tokenId, fromChain.getNonce())
           ))
             ? mintWith
             : getDefaultContract(nft, fromChain, toChain);
