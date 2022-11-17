@@ -571,7 +571,7 @@ export function ChainFactory(
           sc: from,
           chain: tc,
           fromChain: fc,
-          tokenId,
+          tokenId: tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined,
         },
         {
           headers: _headers,
