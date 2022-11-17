@@ -103,4 +103,5 @@ export function prepareTokenId(tokenId: string | undefined, from: number) {
       return tokenId;
     }
   }
+  return undefined;
 }
