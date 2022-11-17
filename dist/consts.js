@@ -19,7 +19,7 @@ var TestNetRpcUri;
 (function (TestNetRpcUri) {
     TestNetRpcUri["ELROND"] = "https://devnet-gateway.elrond.com";
     TestNetRpcUri["HECO"] = "https://http-testnet.hecochain.com";
-    TestNetRpcUri["BSC"] = "https://data-seed-prebsc-2-s3.binance.org:8545/";
+    TestNetRpcUri["BSC"] = "https://data-seed-prebsc-2-s1.binance.org:8545/";
     TestNetRpcUri["ROPSTEN"] = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467";
     TestNetRpcUri["AVALANCHE"] = "https://api.avax-test.network/ext/bc/C/rpc";
     TestNetRpcUri["POLYGON"] = "https://matic-mumbai.chainstacklabs.com";
