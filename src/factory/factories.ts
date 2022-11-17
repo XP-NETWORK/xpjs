@@ -68,9 +68,9 @@ export namespace ChainFactoryConfigs {
               "9e899d38874458e92addb70d6f336ccbe51e21e378af5797486ba9a9d1a3c5c3",
           })
         ),
-        bridgeAddr: "kQB2Z2E1hONMjdPeT_TR9Z_er9BSYlLJ2b19WQCFZRm9EkdH",
-        burnerAddr: "kQDsnLX5GSPtnP4rmqcyQOk2oo9lRPZlT3DunnO6OLITQSVl",
-        xpnftAddr: "EQDxXt6uNCbuqHY5Kmccwj9qflFzUbkiHtS3IFAbcqxpH0XM",
+        bridgeAddr: "kQBkHF-IJdA_sDahXsFRAKBVyVYqdSGcCA_4MchBcvF2H4Oc",
+        burnerAddr: "kQD81vKt4GUHXQSRcyg5nduIypV6m9v5nHhs1L13er_L_bS8",
+        xpnftAddr: "EQCI--6AAwsa9jHj8amnFiycDOsuQZiZP0Rp5QVFwaeqUKeZ",
         feeMargin,
         notifier,
       },
