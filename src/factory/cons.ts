@@ -93,7 +93,8 @@ export function prepareTokenId(tokenId: string | undefined, from: number) {
 
     if (notNumber) {
       if (from === Chain.ELROND) {
-        return tokenId.match(/(?!-)[0-9]+$/gm)?.at(0);
+        const hex = tokenId.split("-")?.at(2);
+        return String(hex ? parseInt(hex, 16) : "");
       }
 
       if (from === Chain.TON) {
