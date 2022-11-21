@@ -152,6 +152,9 @@ const signer = new Wallet(
 |  DFinity  |  dfinityParams  |     28      |
 |  Hedera   |  hederaParams   |     29      |
 |   Skale   |   skaleParams   |     30      |
+|   NEAR    |   nearParams    |     31      |
+| Moonbeam  | moonbeamParams  |     32      |
+| Abeychain | abeychainParams |     33      |
 
 </center><br/>
 
@@ -216,6 +219,35 @@ import { TempleWallet } from "@temple-wallet/dapp";
 })();
 ```
 
+### 3.7 Example signer object for TON
+
+```ts
+import { config } from "dotenv";
+config();
+import {
+  AppConfigs,
+  Chain,
+  ChainFactory,
+  ChainFactoryConfigs,
+} from "xp.network";
+
+import { mnemonicToKeyPair } from "tonweb-mnemonic";
+
+(async () => {
+  const factory = ChainFactory(
+    AppConfigs.TestNet(),
+    await ChainFactoryConfigs.TestNet()
+  );
+
+  const ton = await factory.inner(Chain.TON);
+
+  const tonSigner = ton.tonKpWrapper(
+    // where TON_MNEMONIC="space separated mnemonic phrase ..."
+    await mnemonicToKeyPair(process.env.TON_MNEMONIC!.split())
+  );
+})();
+```
+
 <hr/>
 
 For the ways of connecting the wallets in the FE check-out our [bridge repository](https://github.com/xp-network/bridge-interface/blob/components-reorder/src/components/ConnectWallet.jsx)
@@ -243,6 +275,8 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
   const vechain = await factory.inner(Chain.VECHAIN); // 25
   const hedera = await factory.inner(Chain.HEDERA); // 29
   const skale = await factory.inner(Chain.SKALE); // 30
+  const moonbeam = await factory.inner(Chain.MOONBEAM); // 32
+  const abeychain = await factory.inner(Chain.ABEYCHAIN); // 33
 
   // Non-EVM chains:
   // Inner Object ====================================== Chain Nonce
@@ -253,6 +287,7 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
   const solana = await factory.inner(Chain.SOLANA); // 26
   const ton = await factory.inner(Chain.TON); // 27
   const dfinity = await factory.inner(Chain.DFINITY); // 28
+  const near = await factory.inner(Chain.NEAR); // 31
 })();
 ```
 
@@ -292,7 +327,13 @@ This operation does not depend on a wallet since reading operations are free and
   // Tezos:
   const tezosNfts = await factory.nftList(
     tezos, // Tezos chain internal object
-    "tz1..." // The public key of the NFT owner in Tezos
+    "EQB..." // The public key of the NFT owner in Tezos
+  );
+
+  // TON:
+  const tonNfts = await factory.nftList(
+    ton, // TON chain internal object
+    "tz1..." // The public key of the NFT owner in TON
   );
 })();
 ```
@@ -388,6 +429,9 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
     tezosSigner
   );
   console.log("Is Approved in Tezos:", isApprovedTezos);
+
+  // TON
+  // Approval is not required in TON...
 })();
 ```
 
@@ -441,11 +485,21 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
   const tezosResult = await factory.transferNft(
     tezos, // The Source Chain.
     velas, // The Destination Chain.
-    algoChosenOne, // Or the NFT object you have chosen from the list.
-    algorandSigner, // The Tron signer object (see p. 3.5 above).
+    tezosChosenOne, // Or the NFT object you have chosen from the list.
+    tezosrandSigner, // The Tron signer object (see p. 3.5 above).
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
   );
   console.log(tezosResult);
+
+  // TON example:
+  const tonResult = await factory.transferNft(
+    ton, // The Source Chain.
+    abeychain, // The Destination Chain.
+    tonChosenOne, // Or the NFT object you have chosen from the list.
+    tonSigner, // The Tron signer object (see p. 3.5 above).
+    "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
+  );
+  console.log(tonResult);
 })();
 ```
 
@@ -561,23 +615,4 @@ P.S. The library is a work in progress. More features will be added soon.
   );
   console.log(`The estimated fee on Tezos is: ${feeEstimation} Algos`);
 })();
-```
-
-<br/>
-
-## <center>Troubleshooting</center><br/>
-
-- In case you're using the library in a console application and getting errors, go to:
-- node_modules/xpnet-nft-list/dist/nft-list/model/moralis/MoralisNftListService.js
-
-Now your line #7 looks like this (to be used in the FE):
-
-```javascript
-7   const moralis_1 = __importDefault(require("moralis"));
-```
-
-Change it like so (for BE usage):
-
-```javascript
-7   const moralis_1 = __importDefault(require("moralis/node"));
 ```
