@@ -59,6 +59,7 @@ export enum TestNetRpcUri {
   ABEYCHAIN = "https://testrpc.abeychain.com",
   APTOS = "https://fullnode.devnet.aptoslabs.com",
   TON = "https://testnet.toncenter.com/api/v2/jsonRPC",
+  SOLANA = "https://api.devnet.solana.com",
   // TODO: Algorand
   // TODO: Fuse
 }

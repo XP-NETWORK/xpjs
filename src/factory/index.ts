@@ -70,6 +70,7 @@ import {
 } from "../helpers/hedera/hts_abi";
 import { AptosParams } from "../helpers/aptos";
 import { Web3ERC20Params } from "../helpers/web3_erc20";
+import { SolanaParams } from "../helpers/solana";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -300,6 +301,7 @@ export interface ChainParams {
   abeyChainParams: Web3Params;
   tonParams: TonParams;
   aptosParams: AptosParams;
+  solanaParams: SolanaParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -356,6 +358,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.ABEYCHAIN, chainParams.abeyChainParams);
   cToP.set(Chain.TON, chainParams.tonParams);
   cToP.set(Chain.APTOS, chainParams.aptosParams);
+  cToP.set(Chain.SOLANA, chainParams.solanaParams);
   return cToP;
 }
 /**

@@ -65,14 +65,21 @@ export namespace ChainFactoryConfigs {
         tonweb: new TonWeb(
           new TonWeb.HttpProvider(TestNetRpcUri.TON, {
             apiKey:
-              "9e899d38874458e92addb70d6f336ccbe51e21e378af5797486ba9a9d1a3c5c3",
+              "abe8c1222f19b0891a9a35889d112dc88562093467db8dda39961eeacd50f9b1",
           })
         ),
-        bridgeAddr: "kQBkHF-IJdA_sDahXsFRAKBVyVYqdSGcCA_4MchBcvF2H4Oc",
-        burnerAddr: "kQD81vKt4GUHXQSRcyg5nduIypV6m9v5nHhs1L13er_L_bS8",
-        xpnftAddr: "EQCI--6AAwsa9jHj8amnFiycDOsuQZiZP0Rp5QVFwaeqUKeZ",
+        bridgeAddr: "kQBwUu-b4O6qDYq3iDRvsYUnTD6l3WCxLXkv0aH6ywAaPs3c",
+        burnerAddr: "kQCbH9gGgqJzXuusUVajW_40brrl2fxTYqMkk6HUhJnIgOQA",
+        xpnftAddr: "EQDji0YH-SNT-qi6o5dQQBLeWL0Xmm46fnqj34EYhOL34WDc",
         feeMargin,
         notifier,
+      },
+      solanaParams: {
+        xpnftAddr: "5BMdpupRZAXab6rDjLcpPaCbfodq8toDutsqCvyetGcc",
+        bridgeContractAddr: "xpnetjVorSiEJ843gKhVJsm2XnQhQMFkPdAiHisw619",
+        endpoint: TestNetRpcUri.SOLANA,
+        notifier,
+        feeMargin,
       },
       vechainParams: {
         notifier,
