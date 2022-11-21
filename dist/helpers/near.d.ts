@@ -1,7 +1,7 @@
-import { Account, Near } from "near-api-js";
+import { Account, Near, WalletConnection, Contract } from "near-api-js";
 import { FinalExecutionOutcome } from "near-api-js/lib/providers";
 import { EvNotifier } from "../notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "./chain";
 declare type NearTxResult = [FinalExecutionOutcome, any];
 export declare type NearParams = {
     readonly networkId: string;
@@ -11,6 +11,8 @@ export declare type NearParams = {
     readonly xpnft: string;
     readonly feeMargin: FeeMargins;
     readonly notifier: EvNotifier;
+    readonly walletUrl: string;
+    readonly helperUrl: string;
 };
 export declare type NearNFT = {
     tokenId: string;
@@ -35,10 +37,15 @@ export interface NearMintArgs {
     token_owner_id: string;
     metadata: Metadata;
 }
-export declare type NearHelper = ChainNonceGet & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> & ValidateAddress & {
+interface BrowserMethods {
+    connectWallet(): Promise<WalletConnection>;
+    getContract(signer: Account, _contract: string): Promise<Contract>;
+    getUserMinter(keypair: string, address: string): Promise<Near>;
+}
+export declare type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> & ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
-} & GetFeeMargins & GetProvider<Near>;
-export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, }: NearParams): Promise<NearHelper>;
+} & GetFeeMargins & GetProvider<Near> & BrowserMethods;
+export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, walletUrl, helperUrl, }: NearParams): Promise<NearHelper>;
 export {};
 //# sourceMappingURL=near.d.ts.map
