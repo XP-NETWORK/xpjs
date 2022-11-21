@@ -1,4 +1,3 @@
-import { Balance } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
 
