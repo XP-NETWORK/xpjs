@@ -1,9 +1,4 @@
-import {
-  AnchorProvider,
-  BN,
-  Program,
-  setProvider,
-} from "@project-serum/anchor";
+import { AnchorProvider, BN, Program } from "@project-serum/anchor";
 import {
   Account,
   createAssociatedTokenAccountInstruction,
@@ -22,6 +17,8 @@ import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
+  FeeMargins,
+  GetFeeMargins,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -40,13 +37,14 @@ export type SolanaHelper = ChainNonceGet &
   EstimateTxFees<SolanaNft> &
   ValidateAddress & {
     connection: Connection;
-  };
+  } & { XpNft: string } & GetFeeMargins;
 
 export type SolanaParams = {
   endpoint: string;
   bridgeContractAddr: string;
   xpnftAddr: string;
   notifier: EvNotifier;
+  feeMargin: FeeMargins;
 };
 
 // Based on https://github.com/solana-labs/solana-program-library/blob/118bd047aa0f1ba1930b5bc4639d40aa2a375ccb/token/js/src/actions/getOrCreateAssociatedTokenAccount.ts
@@ -108,18 +106,18 @@ async function getOrCreateAssociatedTokenAccount(
 
 export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
   const conn = new Connection(args.endpoint);
-  const bridgeContract = new Program(BridgeIdl, args.bridgeContractAddr);
-
-  const [bridge] = await PublicKey.findProgramAddress(
-    [Buffer.from("bridge")],
-    bridgeContract.programId
-  );
 
   return {
+    XpNft: args.xpnftAddr,
     connection: conn,
     getNonce: () => Chain.SOLANA,
     async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
-      setProvider(sender);
+      const bridgeContract = new Program(BridgeIdl, args.bridgeContractAddr);
+
+      const [bridge] = await PublicKey.findProgramAddress(
+        [Buffer.from("bridge")],
+        bridgeContract.programId
+      );
 
       const mintAddr = new PublicKey(id.native.nftMint);
       const fromTokenAcc = await getOrCreateAssociatedTokenAccount(
@@ -150,8 +148,16 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
 
       return tx;
     },
+    getFeeMargin() {
+      return args.feeMargin;
+    },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
-      setProvider(sender);
+      const bridgeContract = new Program(BridgeIdl, args.bridgeContractAddr);
+
+      const [bridge] = await PublicKey.findProgramAddress(
+        [Buffer.from("bridge")],
+        bridgeContract.programId
+      );
 
       const mintAddr = new PublicKey(id.native.nftMint);
 
