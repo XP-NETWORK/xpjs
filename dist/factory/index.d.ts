@@ -16,6 +16,7 @@ import { TonParams } from "../helpers/ton";
 import { Wallet } from "@hashgraph/hethers";
 import { AptosParams } from "../helpers/aptos";
 import { Web3ERC20Params } from "../helpers/web3_erc20";
+import { SolanaParams } from "../helpers/solana";
 export declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -152,6 +153,7 @@ export interface ChainParams {
     abeyChainParams: Web3Params;
     tonParams: TonParams;
     aptosParams: AptosParams;
+    solanaParams: SolanaParams;
 }
 export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
