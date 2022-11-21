@@ -377,6 +377,8 @@ export namespace ChainFactoryConfigs {
         rpcUrl: TestNetRpcUri.NEAR,
         bridge: "xp_bridge_1.testnet",
         xpnft: "xp_nft_1.testnet",
+        walletUrl: "https://wallet.testnet.near.org",
+        helperUrl: "https://helper.testnet.near.org",
         feeMargin,
         notifier,
       },
@@ -812,6 +814,8 @@ export namespace ChainFactoryConfigs {
         xpnft: "",
         feeMargin,
         notifier,
+        walletUrl: "https://wallet.mainnet.near.org",
+        helperUrl: "https://helper.mainnet.near.org",
       },
     };
   };

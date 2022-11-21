@@ -1,7 +1,19 @@
+import { Balance } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
 
-import { Account, connect, DEFAULT_FUNCTION_CALL_GAS, Near } from "near-api-js";
+import {
+  Account,
+  connect,
+  DEFAULT_FUNCTION_CALL_GAS,
+  Near,
+  keyStores,
+  WalletConnection,
+  Contract,
+  KeyPair,
+  InMemorySigner,
+} from "near-api-js";
+
 import {
   FinalExecutionOutcome,
   getTransactionLastResult,
@@ -20,6 +32,7 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  BalanceCheck,
 } from "./chain";
 
 type NearTxResult = [FinalExecutionOutcome, any];
@@ -32,6 +45,8 @@ export type NearParams = {
   readonly xpnft: string;
   readonly feeMargin: FeeMargins;
   readonly notifier: EvNotifier;
+  readonly walletUrl: string;
+  readonly helperUrl: string;
 };
 export type NearNFT = {
   tokenId: string;
@@ -59,7 +74,14 @@ export interface NearMintArgs {
   metadata: Metadata;
 }
 
+interface BrowserMethods {
+  connectWallet(): Promise<WalletConnection>;
+  getContract(signer: Account, _contract: string): Promise<Contract>;
+  getUserMinter(keypair: string, address: string): Promise<Near>;
+}
+
 export type NearHelper = ChainNonceGet &
+  BalanceCheck &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
   MintNft<Account, NearMintArgs, NearTxResult> &
@@ -69,7 +91,9 @@ export type NearHelper = ChainNonceGet &
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
   } & GetFeeMargins &
-  GetProvider<Near>;
+  GetProvider<Near> &
+  BrowserMethods;
+
 export async function nearHelperFactory({
   networkId,
   bridge,
@@ -77,6 +101,8 @@ export async function nearHelperFactory({
   xpnft,
   feeMargin,
   notifier,
+  walletUrl,
+  helperUrl,
 }: NearParams): Promise<NearHelper> {
   const near = await connect({
     nodeUrl: rpcUrl,
@@ -111,6 +137,12 @@ export async function nearHelperFactory({
     },
     getNonce() {
       return Chain.NEAR;
+    },
+    async balance(address: string) {
+      const res = (
+        await new Account(near.connection, address).getAccountBalance()
+      ).available;
+      return new BigNumber(res);
     },
     async mintNft(owner, options) {
       const result = await owner.functionCall({
@@ -148,6 +180,7 @@ export async function nearHelperFactory({
       if (await isApproved(sender, nft)) {
         return undefined;
       }
+
       const result = await sender
         .functionCall({
           contractId: nft.native.contract,
@@ -221,6 +254,46 @@ export async function nearHelperFactory({
       } catch (e) {
         return false;
       }
+    },
+
+    async connectWallet() {
+      if (typeof window === "undefined") {
+        throw new Error("Browser method only");
+      }
+      const nearConnection = await connect({
+        networkId,
+        nodeUrl: rpcUrl,
+        keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+        headers: {},
+        walletUrl,
+        helperUrl,
+      });
+      const wc = new WalletConnection(nearConnection, "");
+      return wc;
+    },
+
+    async getContract(signer: Account, _contract: string) {
+      return new Contract(signer, _contract, {
+        viewMethods: [],
+        changeMethods: ["nft_mint"],
+      });
+    },
+
+    async getUserMinter(keypair: string, address: string) {
+      const keyStore = new keyStores.InMemoryKeyStore();
+      const keyPair = KeyPair.fromString(keypair);
+      keyStore.setKey(networkId, address, keyPair);
+
+      const signer = new InMemorySigner(keyStore);
+
+      const provider = await connect({
+        headers: {},
+        nodeUrl: rpcUrl,
+        networkId,
+        signer,
+      });
+
+      return provider;
     },
   };
 }
