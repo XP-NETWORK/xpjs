@@ -154,12 +154,12 @@ export namespace ChainFactoryConfigs {
       aptosParams: {
         rpcUrl: TestNetRpcUri.APTOS,
         bridge:
-          "0x7b30a9bd0407ec73cf1f089411fbb57a9517f0bff4a78da954c063481a4e14ba",
+          "0x467fbe95cf51893ce4526e0959771ac1e5b9c578d351aba35b98506476221f18",
         xpnft: "XPNFT",
         notifier,
         feeMargin,
         nonce: Chain.APTOS,
-        network: "devnet",
+        network: "testnet",
       },
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,

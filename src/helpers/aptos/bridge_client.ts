@@ -5,7 +5,7 @@ import {
   MaybeHexString,
   TransactionBuilderABI,
 } from "aptos";
-import { BRIDGE_ABIS, DEVNET_BRIDGE_ABIS } from "./bridge_client_abis";
+import { BRIDGE_ABIS, TESTNET_BRIDGE_ABIS } from "./bridge_client_abis";
 
 interface BridgeData {
   action_cnt: string;
@@ -33,11 +33,11 @@ export class BridgeClient {
   constructor(
     aptosClient: AptosClient,
     address: string,
-    network: "mainnet" | "devnet"
+    network: "mainnet" | "testnet"
   ) {
     this.aptosClient = aptosClient;
     this.transactionBuilder = new TransactionBuilderABI(
-      (network === "mainnet" ? BRIDGE_ABIS : DEVNET_BRIDGE_ABIS).map((abi) =>
+      (network === "mainnet" ? BRIDGE_ABIS : TESTNET_BRIDGE_ABIS).map((abi) =>
         new HexString(abi).toUint8Array()
       )
     );
