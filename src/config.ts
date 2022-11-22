@@ -1,4 +1,4 @@
-import { AppConfig } from ".";
+import { AppConfig, ChainFactory, ChainFactoryConfigs } from ".";
 
 export namespace AppConfigs {
   export const MainNet: () => AppConfig = () => {
@@ -43,5 +43,27 @@ export namespace AppConfigs {
       scVerifyUri: "https://bridge1.xp.network/sc-verify",
       network: "staging",
     };
+  };
+}
+
+export namespace ChainFactories {
+  export const MainNet = async () => {
+    return ChainFactory(
+      AppConfigs.MainNet(),
+      await ChainFactoryConfigs.MainNet()
+    );
+  };
+
+  export const TestNet = async () => {
+    return ChainFactory(
+      AppConfigs.TestNet(),
+      await ChainFactoryConfigs.TestNet()
+    );
+  };
+  export const Staging = async () => {
+    return ChainFactory(
+      AppConfigs.Staging(),
+      await ChainFactoryConfigs.Staging()
+    );
   };
 }
