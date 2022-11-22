@@ -428,7 +428,7 @@ export function ChainFactory(
 
     return feeR
       .times(toExRate / fromExRate)
-      .plus(feeProfit)
+      .plus(feeProfit * 0.5)
       .times(CHAIN_INFO.get(fromChain)!.decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
