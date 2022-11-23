@@ -65,7 +65,7 @@ export type AptosParams = {
   xpnft: string;
   bridge: string;
   notifier: EvNotifier;
-  network: "mainnet" | "testnet";
+  network: "mainnet" | "staging" | "testnet";
 };
 
 export async function aptosHelper({

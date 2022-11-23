@@ -5,7 +5,11 @@ import {
   MaybeHexString,
   TransactionBuilderABI,
 } from "aptos";
-import { BRIDGE_ABIS, TESTNET_BRIDGE_ABIS } from "./bridge_client_abis";
+import {
+  MAINNET_BRIDGE_ABIS,
+  STAGING_BRIDGE_ABIS,
+  TESTNET_BRIDGE_ABIS,
+} from "./bridge_client_abis";
 
 interface BridgeData {
   action_cnt: string;
@@ -33,13 +37,25 @@ export class BridgeClient {
   constructor(
     aptosClient: AptosClient,
     address: string,
-    network: "mainnet" | "testnet"
+    network: "mainnet" | "staging" | "testnet"
   ) {
     this.aptosClient = aptosClient;
+    let abi;
+    switch (network) {
+      case "mainnet":
+        abi = MAINNET_BRIDGE_ABIS;
+        break;
+      case "staging":
+        abi = STAGING_BRIDGE_ABIS;
+        break;
+      case "testnet":
+        abi = TESTNET_BRIDGE_ABIS;
+        break;
+      default:
+        throw new Error("Invalid network");
+    }
     this.transactionBuilder = new TransactionBuilderABI(
-      (network === "mainnet" ? BRIDGE_ABIS : TESTNET_BRIDGE_ABIS).map((abi) =>
-        new HexString(abi).toUint8Array()
-      )
+      abi.map((abi) => new HexString(abi).toUint8Array())
     );
     this.address = address;
   }
