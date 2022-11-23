@@ -478,12 +478,12 @@ var ChainFactoryConfigs;
             },
             aptosParams: {
                 rpcUrl: consts_1.MainNetRpcUri.APTOS,
-                bridge: "0xf1528ec9c413e37f0ce63eb699fa6c7521b925ff4857b2c95e857e43078c916d",
+                bridge: "0x813d070ca33bf08223e957257c25cb66072fa8960b0af4810c2e78990126ec37",
                 xpnft: "XPNFT",
                 notifier,
                 feeMargin,
                 nonce: consts_1.Chain.APTOS,
-                network: "mainnet",
+                network: "staging",
             },
         };
     };

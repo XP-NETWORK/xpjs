@@ -20,7 +20,7 @@ export declare class BridgeClient {
     private aptosClient;
     private transactionBuilder;
     private address;
-    constructor(aptosClient: AptosClient, address: string, network: "mainnet" | "testnet");
+    constructor(aptosClient: AptosClient, address: string, network: "mainnet" | "staging" | "testnet");
     initialize(account: AptosAccount, groupKey: Uint8Array): Promise<string>;
     pause(account: AptosAccount, actionId: number | bigint, signature: Uint8Array): Promise<string>;
     unpause(account: AptosAccount, actionId: number | bigint, signature: Uint8Array): Promise<string>;

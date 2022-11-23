@@ -37,7 +37,7 @@ export declare type AptosParams = {
     xpnft: string;
     bridge: string;
     notifier: EvNotifier;
-    network: "mainnet" | "testnet";
+    network: "mainnet" | "staging" | "testnet";
 };
 export declare function aptosHelper({ feeMargin, rpcUrl, xpnft, bridge, notifier, network, }: AptosParams): Promise<AptosHelper>;
 //# sourceMappingURL=index.d.ts.map
