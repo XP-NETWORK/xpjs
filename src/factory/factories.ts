@@ -479,6 +479,18 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.POLYGON,
         feeMargin,
       },
+      skaleParams: {
+        notifier,
+        feeMargin,
+        nonce: Chain.SKALE,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.SKALE),
+        erc721Minter: "0x0e02b55e1D0ec9023A04f1278F39685B53739010",
+        erc1155Minter: "0x90d38996B210D45bDF2FD54d091C6061dff0dA9F",
+        erc1155_addr: "0xE90105827d04522e52AdfA6BF695730E5706C0C2",
+        erc721_addr: "0x46Df0d0Dd629d61BDFA567dE61912FDeD883A60d",
+        minter_addr: "0x33DC209D33AddF60cf90Dd4B10f9a198A1A93f63",
+        paymentTokenAddress: "0x59ab97Ee239e02112652587F9Ef86CB6F762983b", // Euphoria ETH (ETH) Token
+      },
       aptosParams: {
         rpcUrl: MainNetRpcUri.APTOS,
         bridge:
