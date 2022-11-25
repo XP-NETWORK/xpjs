@@ -114,7 +114,7 @@ export async function nearHelperFactory({
     nft: NftInfo<NearNFT>
   ): Promise<boolean> => {
     const { tokenId: token_id, contract } = nft.native;
-    const result = await account.functionCall({
+    const result: boolean = await account.viewFunction({
       args: {
         token_id,
         approved_account_id: bridge,
@@ -123,8 +123,8 @@ export async function nearHelperFactory({
       contractId: contract,
       methodName: "nft_is_approved",
     });
-    const res = getTransactionLastResult(result) as boolean;
-    return res;
+    console.log(`Is approved: ${result}`);
+    return result;
   };
 
   return {
