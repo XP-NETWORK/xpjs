@@ -426,6 +426,17 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ELROND,
         feeMargin,
       },
+      bscParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BSC),
+        erc721Minter: "0x38AEDf581C90D8EA955FC9a124b0A2B4471A61DD",
+        erc1155_addr: "0x254f8fd82CAB39f016956428e7cA406e091D61af",
+        erc1155Minter: "0xAE078f8BC8Dc1B5E312F8F4f85eCdBfCD889eFc4",
+        erc721_addr: "0x22f27EE5C19491AdaE7cFDd9ac69f90289Fac855",
+        minter_addr: "0x6b3b43029dD4695f8780d7f16E0313dA02d9507B",
+        nonce: Chain.BSC,
+        feeMargin,
+      },
       secretParams: {
         bridge: {
           contractAddress: "secret1t0g8tvc0tyvpwdsdc5zepa9j2ptr3vfte26qhu",
