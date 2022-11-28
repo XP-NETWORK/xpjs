@@ -26,7 +26,6 @@ import {
   GetProvider,
   MintNft,
   NftInfo,
-  PreTransfer,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
@@ -78,13 +77,30 @@ interface BrowserMethods {
   getUserMinter(keypair: string, address: string): Promise<Near>;
 }
 
+interface PreTransferNear {
+  preTransfer(
+    sender: Account,
+    nft: NftInfo<NearNFT>,
+    fee: string,
+    to: number,
+    receiver: string
+  ): Promise<string | undefined>;
+  preUnfreeze(
+    sender: Account,
+    nft: NftInfo<NearNFT>,
+    fee: string,
+    to: number,
+    receiver: string
+  ): Promise<string | undefined>;
+}
+
 export type NearHelper = ChainNonceGet &
   BalanceCheck &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
   MintNft<Account, NearMintArgs, NearTxResult> &
   EstimateTxFees<NearNFT> &
-  Pick<PreTransfer<Account, NearNFT, string>, "preTransfer"> &
+  Pick<PreTransferNear, "preTransfer"> &
   ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
@@ -126,15 +142,13 @@ export async function nearHelperFactory({
     return result;
   };
 
-  const getWalletCallbackUrl = (tokenId: string, flag: string) => {
+  const getWalletCallbackUrl = (params: string) => {
     let walletCallbackUrl: string | undefined = undefined;
     if (typeof window?.location !== "undefined") {
       const network =
         location.pathname.match(/^\/(staging|testnet)\/.+/)?.at(1) || "";
 
-      walletCallbackUrl = `${location.protocol}://${
-        location.host
-      }/${network}/connect?${flag}&tokenId=${encodeURIComponent(tokenId)}`;
+      walletCallbackUrl = `${location.protocol}//${location.host}/${network}/connect?${params}`;
     }
     return walletCallbackUrl;
   };
@@ -187,13 +201,14 @@ export async function nearHelperFactory({
         };
       });
     },
-    async preTransfer(sender, nft, _fee) {
+    async preTransfer(sender, nft, _fee, to, receiver) {
       if (await isApproved(sender, nft)) {
         return undefined;
       }
       const walletCallbackUrl = getWalletCallbackUrl(
-        nft.native.tokenId,
-        "nearApprove=true"
+        `NEARTRX=true&type=approve&to=${to}&receiver=${encodeURIComponent(
+          receiver
+        )}&tokenId=${encodeURIComponent(nft.native.tokenId)}`
       );
 
       const result = await sender.functionCall({
@@ -211,8 +226,11 @@ export async function nearHelperFactory({
     XpNft: xpnft,
     async transferNftToForeign(sender, chain_nonce, to, id, txFees, mint_with) {
       const walletCallbackUrl = getWalletCallbackUrl(
-        id.native.tokenId,
-        "nearSend=true"
+        `NEARTRX=true&type=transfer&to=${chain_nonce}&receiver=${encodeURIComponent(
+          to
+        )}&tokenId=${encodeURIComponent(
+          id.native.tokenId
+        )}&contract=${encodeURIComponent(id.native.contract)}`
       );
 
       const result = await sender.functionCall({
@@ -241,8 +259,11 @@ export async function nearHelperFactory({
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       const walletCallbackUrl = getWalletCallbackUrl(
-        id.native.tokenId,
-        "nearSend=true"
+        `NEARTRX=true&type=unfreeze&to=${nonce}&receiver=${encodeURIComponent(
+          to
+        )}&tokenId=${encodeURIComponent(
+          id.native.tokenId
+        )}&contract=${encodeURIComponent(id.native.contract)}`
       );
 
       const result = await sender.functionCall({
