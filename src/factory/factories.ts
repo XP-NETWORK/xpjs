@@ -75,8 +75,8 @@ export namespace ChainFactoryConfigs {
         notifier,
       },
       solanaParams: {
-        xpnftAddr: "5BMdpupRZAXab6rDjLcpPaCbfodq8toDutsqCvyetGcc",
-        bridgeContractAddr: "xpnetjVorSiEJ843gKhVJsm2XnQhQMFkPdAiHisw619",
+        xpnftAddr: "C7bw5dJZwhjWd6TZE3LnE2b1RLqWDiy9XRMA1rajPKQY",
+        bridgeContractAddr: "FXaXLtmkuoJCJeX6BnLwQJWgT8cPdwuXN8BmmQzVvuRA",
         endpoint: TestNetRpcUri.SOLANA,
         notifier,
         feeMargin,
