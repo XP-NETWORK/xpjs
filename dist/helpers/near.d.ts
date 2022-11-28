@@ -42,7 +42,7 @@ interface BrowserMethods {
     getContract(signer: Account, _contract: string): Promise<Contract>;
     getUserMinter(keypair: string, address: string): Promise<Near>;
 }
-export declare type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> & ValidateAddress & {
+export declare type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, string>, "preTransfer"> & ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
 } & GetFeeMargins & GetProvider<Near> & BrowserMethods;
