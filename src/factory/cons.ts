@@ -28,6 +28,15 @@ export function exchangeRateRepo(
   );
 }
 
+export function checkBlockedContracts(to: any, contract: string) {
+  const chain = CHAIN_INFO.get(to);
+  if (chain?.rejectUnfreeze && chain?.rejectUnfreeze.includes(contract)) {
+    throw new Error(
+      `Transfering to ${chain.name} is prohibited by NFT project team`
+    );
+  }
+}
+
 export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   nft: NftInfo<RawNftF>,
   fromChain: FullChain<SignerT, RawNftT, Resp>,
