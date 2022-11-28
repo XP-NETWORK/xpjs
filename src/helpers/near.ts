@@ -4,7 +4,6 @@ import BN from "bn.js";
 import {
   Account,
   connect,
-  DEFAULT_FUNCTION_CALL_GAS,
   Near,
   keyStores,
   WalletConnection,
@@ -127,6 +126,19 @@ export async function nearHelperFactory({
     return result;
   };
 
+  const getWalletCallbackUrl = (tokenId: string, flag: string) => {
+    let walletCallbackUrl: string | undefined = undefined;
+    if (typeof window?.location !== "undefined") {
+      const network =
+        location.pathname.match(/^\/(staging|testnet)\/.+/)?.at(1) || "";
+
+      walletCallbackUrl = `${location.protocol}://${
+        location.host
+      }/${network}/connect?${flag}&tokenId=${encodeURIComponent(tokenId)}`;
+    }
+    return walletCallbackUrl;
+  };
+
   return {
     async estimateValidateTransferNft(_to, _metadata, _mintWith) {
       return new BigNumber(0); // TODO
@@ -179,6 +191,10 @@ export async function nearHelperFactory({
       if (await isApproved(sender, nft)) {
         return undefined;
       }
+      const walletCallbackUrl = getWalletCallbackUrl(
+        nft.native.tokenId,
+        "nearApprove=true"
+      );
 
       const result = await sender.functionCall({
         contractId: nft.native.contract,
@@ -188,19 +204,17 @@ export async function nearHelperFactory({
           account_id: bridge,
         },
         attachedDeposit: new BN("1000000000000000000000"), // 0.001 Near
+        ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
       return result.transaction_outcome.id;
     },
     XpNft: xpnft,
-    async transferNftToForeign(
-      sender,
-      chain_nonce,
-      to,
-      id,
-      txFees,
-      mint_with,
-      gasLimit
-    ) {
+    async transferNftToForeign(sender, chain_nonce, to, id, txFees, mint_with) {
+      const walletCallbackUrl = getWalletCallbackUrl(
+        id.native.tokenId,
+        "nearSend=true"
+      );
+
       const result = await sender.functionCall({
         contractId: bridge,
         args: {
@@ -213,7 +227,8 @@ export async function nearHelperFactory({
         },
         methodName: "freeze_nft",
         attachedDeposit: new BN(txFees.toString()),
-        gas: new BN(gasLimit?.toString() ?? DEFAULT_FUNCTION_CALL_GAS),
+        gas: new BN("30000000000000"),
+        ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
       await notifier.notifyNear(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
@@ -225,6 +240,11 @@ export async function nearHelperFactory({
       return near;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
+      const walletCallbackUrl = getWalletCallbackUrl(
+        id.native.tokenId,
+        "nearSend=true"
+      );
+
       const result = await sender.functionCall({
         contractId: bridge,
         args: {
@@ -236,7 +256,8 @@ export async function nearHelperFactory({
         },
         methodName: "withdraw_nft",
         attachedDeposit: new BN(txFees.toString()),
-        gas: DEFAULT_FUNCTION_CALL_GAS,
+        gas: new BN("30000000000000"),
+        ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
       await notifier.notifyNear(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
