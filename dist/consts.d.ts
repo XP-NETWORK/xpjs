@@ -166,6 +166,7 @@ interface ChainData<T extends ChainNonce> {
     type: string;
     blockExplorerUrlAddr?: string;
     tnBlockExplorerUrlAddr?: string;
+    rejectUnfreeze?: string[];
 }
 declare type ChainInfo = {
     set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
