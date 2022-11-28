@@ -26,6 +26,7 @@ import {
   exchangeRateRepo,
   getDefaultContract,
   prepareTokenId,
+  checkBlockedContracts,
 } from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { bridgeHeartbeat } from "../heartbeat";
@@ -523,7 +524,7 @@ export function ChainFactory(
     }
   }
 
-  async function isWrappedNft(nft: NftInfo<unknown>, fc: number) {
+  async function isWrappedNft(nft: NftInfo<unknown>, fc: number, tc?: number) {
     if (fc === Chain.TEZOS) {
       return (
         typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
@@ -536,10 +537,12 @@ export function ChainFactory(
       return false;
     }
 
-    return (
-      typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
-      "undefined"
-    );
+    const original = (await axios.get(nft.uri).catch(() => undefined))?.data
+      .wrapped;
+    const contract = original?.contract || original?.source_mint_ident;
+    tc && contract && checkBlockedContracts(tc, contract);
+
+    return typeof original !== "undefined";
   }
 
   async function algoOptInCheck(
@@ -766,7 +769,7 @@ export function ChainFactory(
       //   throw Error("invalid address");
       // }
 
-      if (await isWrappedNft(nft, fromChain.getNonce())) {
+      if (await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce())) {
         await algoOptInCheck(nft, toChain, receiver);
 
         const res = await fromChain.unfreezeWrappedNft(

@@ -193,6 +193,7 @@ interface ChainData<T extends ChainNonce> {
   type: string;
   blockExplorerUrlAddr?: string;
   tnBlockExplorerUrlAddr?: string;
+  rejectUnfreeze?: string[];
 }
 
 type ChainInfo = {
@@ -313,6 +314,10 @@ CHAIN_INFO.set(Chain.HARMONY, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ONE,
   type: ChainType.EVM,
+  rejectUnfreeze: [
+    "0xb90Dc9e354001e6260DE670EDD6aBaDb890C6aC9",
+    "0xAd6f94bDefB6D5ae941392Da5224ED083AE33adc",
+  ],
 });
 CHAIN_INFO.set(Chain.ONT, {
   name: "Ontology",
