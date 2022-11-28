@@ -85,7 +85,7 @@ export type NearHelper = ChainNonceGet &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
   MintNft<Account, NearMintArgs, NearTxResult> &
   EstimateTxFees<NearNFT> &
-  Pick<PreTransfer<Account, NearNFT, NearTxResult>, "preTransfer"> &
+  Pick<PreTransfer<Account, NearNFT, string>, "preTransfer"> &
   ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
@@ -180,21 +180,16 @@ export async function nearHelperFactory({
         return undefined;
       }
 
-      const result = await sender
-        .functionCall({
-          contractId: nft.native.contract,
-          methodName: "nft_approve",
-          args: {
-            token_id: nft.native.tokenId,
-            account_id: bridge,
-            msg: "Approval for NFT Transfer via XP Network Multichain NFT Bridge",
-          },
-          attachedDeposit: new BN("1000000000000000000000"), // 0.001 Near
-        })
-        .catch((e) => {
-          return e["transaction_outcome"]["id"];
-        });
-      return result;
+      const result = await sender.functionCall({
+        contractId: nft.native.contract,
+        methodName: "nft_approve",
+        args: {
+          token_id: nft.native.tokenId,
+          account_id: bridge,
+        },
+        attachedDeposit: new BN("1000000000000000000000"), // 0.001 Near
+      });
+      return result.transaction_outcome.id;
     },
     XpNft: xpnft,
     async transferNftToForeign(
