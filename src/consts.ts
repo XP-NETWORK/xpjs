@@ -510,7 +510,7 @@ CHAIN_INFO.set(Chain.NEAR, {
   blockExplorerUrl: "https://explorer.testnet.near.org/transactions/",
   constructor: nearHelperFactory,
   currency: SupportedCurrency.NEAR,
-  decimals: 1e8,
+  decimals: 1e24,
   name: "NEAR",
   nonce: Chain.NEAR,
   type: ChainType.NEAR,
