@@ -210,7 +210,7 @@ export enum ChainType {
   TRON = "TRON",
   TEZOS = "TEZOS",
   ALGORAND = "ALGORAND",
-  SECRET = "SECRET",
+  COSMOS = "COSMOS",
   DFINITY = "DFINITY",
   SOLANA = "SOLANA",
   TON = "TON",
@@ -448,7 +448,7 @@ CHAIN_INFO.set(Chain.SECRET, {
   nonce: Chain.SECRET,
   currency: SupportedCurrency.SCRT,
   decimals: 1e6,
-  type: ChainType.SECRET,
+  type: ChainType.COSMOS,
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",
