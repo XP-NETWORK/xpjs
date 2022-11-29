@@ -32,7 +32,7 @@ export function checkBlockedContracts(to: any, contract: string) {
   const chain = CHAIN_INFO.get(to);
   if (chain?.rejectUnfreeze && chain?.rejectUnfreeze.includes(contract)) {
     throw new Error(
-      `Transfering to ${chain.name} is prohibited by NFT project team`
+      `Transfering to ${chain.name} is prohibited by the NFT project team`
     );
   }
 }
