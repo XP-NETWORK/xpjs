@@ -122,7 +122,7 @@ var ChainType;
     ChainType["TRON"] = "TRON";
     ChainType["TEZOS"] = "TEZOS";
     ChainType["ALGORAND"] = "ALGORAND";
-    ChainType["SECRET"] = "SECRET";
+    ChainType["COSMOS"] = "COSMOS";
     ChainType["DFINITY"] = "DFINITY";
     ChainType["SOLANA"] = "SOLANA";
     ChainType["TON"] = "TON";
@@ -359,7 +359,7 @@ exports.CHAIN_INFO.set(Chain.SECRET, {
     nonce: Chain.SECRET,
     currency: domain_1.SupportedCurrency.SCRT,
     decimals: 1e6,
-    type: ChainType.SECRET,
+    type: ChainType.COSMOS,
 });
 exports.CHAIN_INFO.set(Chain.SOLANA, {
     name: "Solana",

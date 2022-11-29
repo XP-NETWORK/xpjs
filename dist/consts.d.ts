@@ -181,7 +181,7 @@ export declare enum ChainType {
     TRON = "TRON",
     TEZOS = "TEZOS",
     ALGORAND = "ALGORAND",
-    SECRET = "SECRET",
+    COSMOS = "COSMOS",
     DFINITY = "DFINITY",
     SOLANA = "SOLANA",
     TON = "TON",
