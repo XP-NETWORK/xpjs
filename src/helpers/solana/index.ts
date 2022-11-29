@@ -1,4 +1,4 @@
-import { AnchorProvider, BN, Program } from "@project-serum/anchor";
+import { Wallet, BN, Program, AnchorProvider } from "@project-serum/anchor";
 import {
   Account,
   createAssociatedTokenAccountInstruction,
@@ -12,20 +12,21 @@ import {
 } from "@solana/spl-token";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { Chain } from "..";
-import { EvNotifier } from "../notifier";
+import { Chain } from "../..";
+import { EvNotifier } from "../../notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
+  GetProvider,
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
-} from "./chain";
-import BridgeIdl from "./idl/xp_bridge";
+} from "../chain";
+import { IDL } from "./idl";
 
-export type SolanaSigner = AnchorProvider;
+export type SolanaSigner = Wallet;
 
 export type SolanaNft = {
   nftMint: string;
@@ -37,7 +38,8 @@ export type SolanaHelper = ChainNonceGet &
   EstimateTxFees<SolanaNft> &
   ValidateAddress & {
     connection: Connection;
-  } & { XpNft: string } & GetFeeMargins;
+  } & { XpNft: string } & GetFeeMargins &
+  GetProvider<Connection>;
 
 export type SolanaParams = {
   endpoint: string;
@@ -55,6 +57,7 @@ async function getOrCreateAssociatedTokenAccount(
   owner: PublicKey,
   allowOwnerOffCurve = false
 ) {
+  const provider = new AnchorProvider(connection, payer, {});
   const associatedToken = await getAssociatedTokenAddress(
     mint,
     owner,
@@ -85,7 +88,7 @@ async function getOrCreateAssociatedTokenAccount(
           )
         );
 
-        await payer.sendAndConfirm(transaction);
+        await provider.sendAndConfirm(transaction);
       } catch (error: unknown) {
         // Ignore all errors; for now there is no API-compatible way to selectively ignore the expected
         // instruction error if the associated account exists already.
@@ -112,9 +115,14 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
     connection: conn,
     getNonce: () => Chain.SOLANA,
     async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
-      const bridgeContract = new Program(BridgeIdl, args.bridgeContractAddr);
+      const provider = new AnchorProvider(conn, sender, {});
+      const bridgeContract = new Program(
+        IDL,
+        args.bridgeContractAddr,
+        provider
+      );
 
-      const [bridge] = await PublicKey.findProgramAddress(
+      const [bridge, bridgeBump] = await PublicKey.findProgramAddress(
         [Buffer.from("bridge")],
         bridgeContract.programId
       );
@@ -134,7 +142,13 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
         true
       );
       const tx = await bridgeContract.methods
-        .freezeNft(chain_nonce, to, new BN(txFees.toString(10)), mintWith)
+        .freezeNft(
+          chain_nonce,
+          to,
+          new BN(txFees.toString(10)),
+          mintWith,
+          bridgeBump
+        )
         .accounts({
           bridge,
           authority: sender.publicKey,
@@ -152,9 +166,15 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       return args.feeMargin;
     },
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
-      const bridgeContract = new Program(BridgeIdl, args.bridgeContractAddr);
+      console.log(`Unfreezing`);
+      const provider = new AnchorProvider(conn, sender, {});
+      const bridgeContract = new Program(
+        IDL,
+        args.bridgeContractAddr,
+        provider
+      );
 
-      const [bridge] = await PublicKey.findProgramAddress(
+      const [bridge, bridgeBump] = await PublicKey.findProgramAddress(
         [Buffer.from("bridge")],
         bridgeContract.programId
       );
@@ -166,10 +186,18 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
         sender,
         mintAddr,
         sender.publicKey
-      );
+      ).catch((e) => {
+        console.error(e);
+        throw e;
+      });
 
       const tx = await bridgeContract.methods
-        .withdrawNft(parseInt(nonce), to, new BN(txFees.toString(10)))
+        .withdrawNft(
+          parseInt(nonce),
+          to,
+          new BN(txFees.toString(10)),
+          bridgeBump
+        )
         .accounts({
           bridge,
           authority: sender.publicKey,
@@ -182,6 +210,9 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       await args.notifier.notifySolana(tx);
 
       return tx;
+    },
+    getProvider() {
+      return conn;
     },
     async estimateValidateTransferNft() {
       return new BigNumber(0); // TODO
