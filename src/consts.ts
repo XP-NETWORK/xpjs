@@ -60,6 +60,7 @@ export enum TestNetRpcUri {
   APTOS = "https://fullnode.testnet.aptoslabs.com",
   TON = "https://testnet.toncenter.com/api/v2/jsonRPC",
   SOLANA = "https://api.devnet.solana.com",
+  CADUCEUS = "https://galaxy.block.caduceus.foundation",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -143,6 +144,7 @@ export type MetaMap = {
   0x20: Web3Meta;
   0x21: Web3Meta;
   0x22: AptosMeta;
+  0x23: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -178,6 +180,7 @@ export namespace Chain {
   export const MOONBEAM = 0x20; // 32
   export const ABEYCHAIN = 0x21; // 33
   export const APTOS = 0x22; // 34
+  export const CADUCEUS = 0x23; // 35
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -554,4 +557,15 @@ CHAIN_INFO.set(Chain.TON, {
   nonce: Chain.TON,
   type: ChainType.TON,
   blockExplorerUrl: "https://testnet.tonscan.org/tx/",
+});
+CHAIN_INFO.set(Chain.CADUCEUS, {
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.CMP,
+  decimals: 1e18,
+  name: "Caduceus",
+  nonce: Chain.CADUCEUS,
+  blockExplorerUrl: "https://galaxy.scan.caduceus.foundation/tx/",
+  type: ChainType.EVM,
+  chainId: 256256,
+  tnChainId: 512512,
 });
