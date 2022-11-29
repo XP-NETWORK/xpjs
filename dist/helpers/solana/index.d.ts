@@ -1,8 +1,8 @@
-import { AnchorProvider } from "@project-serum/anchor";
+import { Wallet } from "@project-serum/anchor";
 import { Connection } from "@solana/web3.js";
-import { EvNotifier } from "../notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
-export declare type SolanaSigner = AnchorProvider;
+import { EvNotifier } from "../../notifier";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
+export declare type SolanaSigner = Wallet;
 export declare type SolanaNft = {
     nftMint: string;
 };
@@ -10,7 +10,7 @@ export declare type SolanaHelper = ChainNonceGet & TransferNftForeign<SolanaSign
     connection: Connection;
 } & {
     XpNft: string;
-} & GetFeeMargins;
+} & GetFeeMargins & GetProvider<Connection>;
 export declare type SolanaParams = {
     endpoint: string;
     bridgeContractAddr: string;
@@ -19,4 +19,4 @@ export declare type SolanaParams = {
     feeMargin: FeeMargins;
 };
 export declare function solanaHelper(args: SolanaParams): Promise<SolanaHelper>;
-//# sourceMappingURL=solana.d.ts.map
+//# sourceMappingURL=index.d.ts.map
