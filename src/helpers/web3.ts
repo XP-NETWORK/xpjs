@@ -138,7 +138,7 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo, string>, "preTransfer"> &
+  } & Pick<PreTransfer<Signer, EthNftInfo, string, undefined>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {

@@ -99,7 +99,7 @@ export type DfinityHelper = ChainNonceGet &
   UnfreezeForeignNft<DfinitySigner, DfinityNft, string> &
   EstimateTxFees<DfinityNft> &
   ValidateAddress & { XpNft: string } & Pick<
-    PreTransfer<DfinitySigner, DfinityNft, string>,
+    PreTransfer<DfinitySigner, DfinityNft, string, undefined>,
     "preTransfer"
   > &
   BalanceCheck &

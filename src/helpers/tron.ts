@@ -89,7 +89,7 @@ export type TronHelper = BaseTronHelper &
   ValidateAddress &
   IsApproved<TronSender> &
   ExtractAction<string> &
-  Pick<PreTransfer<TronSender, EthNftInfo, string>, "preTransfer"> &
+  Pick<PreTransfer<TronSender, EthNftInfo, string, undefined>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, TronRawTxn> &
   ExtractTxnStatus &
   WhitelistCheck<EthNftInfo> & {

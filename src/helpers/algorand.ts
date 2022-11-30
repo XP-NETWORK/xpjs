@@ -136,7 +136,7 @@ export type AlgorandHelper = ChainNonceGet &
     walletConnectSigner(connector: WalletConnect, address: string): AlgoSignerH;
     myAlgoSigner(myAlgo: MyAlgoConnect, address: string): AlgoSignerH;
   } & Pick<
-    PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams>,
+    PreTransfer<AlgoSignerH, AlgoNft, SuggestedParams, undefined>,
     "preTransfer"
   > & { XpNft: string } & GetFeeMargins &
   BalanceCheck &

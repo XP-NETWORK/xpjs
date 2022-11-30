@@ -59,7 +59,7 @@ export type TezosHelper = TransferNftForeign<
   ValidateAddress &
   EstimateTxFees<TezosNftInfo> &
   ChainNonceGet &
-  Pick<PreTransfer<Signer, TezosNftInfo, string>, "preTransfer"> & {
+  Pick<PreTransfer<Signer, TezosNftInfo, string, undefined>, "preTransfer"> & {
     isApprovedForMinter(
       nft: NftInfo<TezosNftInfo>,
       signer: TezosSigner

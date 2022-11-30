@@ -201,7 +201,7 @@ export type ElrondHelper = BalanceCheck &
   } & ChainNonceGet &
   ValidateAddress &
   ExtractAction<Transaction> &
-  PreTransfer<ElrondSigner, EsdtNftInfo, string> &
+  PreTransfer<ElrondSigner, EsdtNftInfo, string, undefined> &
   EstimateTxFees<EsdtNftInfo> &
   EstimateTxFeesBatch<EsdtNftInfo> &
   PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> &
