@@ -437,6 +437,17 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ELROND,
         feeMargin,
       },
+      harmonyParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HARMONY),
+        minter_addr: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
+        erc721_addr: "0x23d399368EF31ca950E4Fd2063F2e4A5ACC0f9c2",
+        erc1155_addr: "0xb3cE27eDadFE006f9f47C5ed5b62E63DFd9Cf3bD",
+        erc1155Minter: "0x28c43F505d210D6f8f78C58b450b76890dc76F21",
+        erc721Minter: "0x086815f8154e3cdD89cD3aEc78377e3197a572d0",
+        nonce: Chain.HARMONY,
+        feeMargin,
+      },
       velasParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
