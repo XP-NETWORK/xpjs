@@ -1,4 +1,10 @@
-import { Wallet, BN, Program, AnchorProvider } from "@project-serum/anchor";
+import {
+  Wallet,
+  BN,
+  Program,
+  AnchorProvider,
+  Spl,
+} from "@project-serum/anchor";
 import {
   Account,
   createAssociatedTokenAccountInstruction,
@@ -110,6 +116,53 @@ async function getOrCreateAssociatedTokenAccount(
 export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
   const conn = new Connection(args.endpoint);
 
+  async function getOrCreateTokenAccount(
+    mint: PublicKey,
+    owner: PublicKey,
+    provider: AnchorProvider
+  ) {
+    const tokenProgram = Spl.token(provider);
+    const program = Spl.associatedToken(provider);
+
+    const [associatedToken] = await PublicKey.findProgramAddress(
+      [owner.toBuffer(), tokenProgram.programId.toBuffer(), mint.toBuffer()],
+      program.programId
+    );
+
+    try {
+      const tokenAccount = await tokenProgram.account.token.fetch(
+        associatedToken
+      );
+      return {
+        address: associatedToken,
+        owner: tokenAccount.authority,
+        ...tokenAccount,
+      };
+    } catch (e) {
+      try {
+        await program.methods
+          .create()
+          .accounts({
+            mint,
+            owner,
+            associatedAccount: associatedToken,
+          })
+          .rpc();
+
+        const tokenAccount = await tokenProgram.account.token.fetch(
+          associatedToken
+        );
+        return {
+          address: associatedToken,
+          owner: tokenAccount.authority,
+          ...tokenAccount,
+        };
+      } catch (e) {
+        throw e;
+      }
+    }
+  }
+
   return {
     XpNft: args.xpnftAddr,
     connection: conn,
@@ -128,18 +181,15 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       );
 
       const mintAddr = new PublicKey(id.native.nftMint);
-      const fromTokenAcc = await getOrCreateAssociatedTokenAccount(
-        conn,
-        sender,
-        mintAddr,
-        sender.publicKey
-      );
-      const toTokenAcc = await getOrCreateAssociatedTokenAccount(
-        conn,
-        sender,
+      const fromTokenAcc = await getOrCreateTokenAccount(
         mintAddr,
         sender.publicKey,
-        true
+        provider
+      );
+      const toAccount = await getOrCreateTokenAccount(
+        mintAddr,
+        bridge,
+        provider
       );
       const tx = await bridgeContract.methods
         .freezeNft(
@@ -153,7 +203,7 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
           bridge,
           authority: sender.publicKey,
           from: fromTokenAcc.address,
-          to: toTokenAcc.address,
+          to: toAccount.address,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
         .rpc();
