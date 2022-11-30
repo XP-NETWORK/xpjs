@@ -26,7 +26,7 @@ export declare type TonArgs = {
 export declare type TonNft = {
     nftItemAddr: string;
 };
-export declare type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any> & TransferNftForeign<TonSigner, TonNft, string> & UnfreezeForeignNft<TonSigner, TonNft, string> & EstimateTxFees<TonNft> & ValidateAddress & {
+export declare type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any, undefined> & TransferNftForeign<TonSigner, TonNft, string> & UnfreezeForeignNft<TonSigner, TonNft, string> & EstimateTxFees<TonNft> & ValidateAddress & {
     XpNft: string;
 } & {
     tonKpWrapper: (kp: TonWebMnemonic.KeyPair) => TonSigner;

@@ -15,7 +15,7 @@ export declare type SecretMintArgs = {
     contract?: SecretContract;
 };
 declare type SecretSigner = SecretNetworkClient;
-export declare type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string> & BalanceCheck & GetFeeMargins & {
+export declare type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string, undefined> & BalanceCheck & GetFeeMargins & {
     XpNft: string;
 } & GetProvider<SecretNetworkClient> & MintNft<SecretSigner, SecretMintArgs, Tx> & {
     nftList(owner: string, viewingKey: string, contract: string, codeHash?: string): Promise<NftInfo<SecretNftInfo>[]>;

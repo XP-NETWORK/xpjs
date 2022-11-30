@@ -23,7 +23,7 @@ export interface MintRequest {
 }
 export declare type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, DfinityNft, string> & UnfreezeForeignNft<DfinitySigner, DfinityNft, string> & EstimateTxFees<DfinityNft> & ValidateAddress & {
     XpNft: string;
-} & Pick<PreTransfer<DfinitySigner, DfinityNft, string>, "preTransfer"> & BalanceCheck & GetFeeMargins & MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
+} & Pick<PreTransfer<DfinitySigner, DfinityNft, string, undefined>, "preTransfer"> & BalanceCheck & GetFeeMargins & MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
 };
 export declare type DfinityParams = {

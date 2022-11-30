@@ -100,7 +100,7 @@ export interface ElrondRawUnsignedTxn {
  */
 export declare type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigner, EsdtNftInfo, Transaction> & UnfreezeForeignNft<ElrondSigner, EsdtNftInfo, Transaction> & TransferNftForeignBatch<ElrondSigner, EsdtNftInfo, Transaction> & UnfreezeForeignNftBatch<ElrondSigner, EsdtNftInfo, Transaction> & IssueESDTNFT & MintNft<ElrondSigner, NftIssueArgs, string> & {
     mintableEsdts(address: Address): Promise<string[]>;
-} & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string> & EstimateTxFees<EsdtNftInfo> & EstimateTxFeesBatch<EsdtNftInfo> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & SetESDTRoles & {
+} & ChainNonceGet & ValidateAddress & ExtractAction<Transaction> & PreTransfer<ElrondSigner, EsdtNftInfo, string, undefined> & EstimateTxFees<EsdtNftInfo> & EstimateTxFeesBatch<EsdtNftInfo> & PreTransferRawTxn<EsdtNftInfo, ElrondRawUnsignedTxn> & ExtractTxnStatus & SetESDTRoles & {
     XpNft: string;
 } & GetFeeMargins & {
     wegldBalance(address: string): Promise<BigNumber>;
