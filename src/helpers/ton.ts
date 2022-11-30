@@ -54,7 +54,7 @@ export type TonNft = {
 
 export type TonHelper = ChainNonceGet &
   BalanceCheck &
-  PreTransfer<any, any, any> &
+  PreTransfer<any, any, any, undefined> &
   TransferNftForeign<TonSigner, TonNft, string> &
   UnfreezeForeignNft<TonSigner, TonNft, string> &
   EstimateTxFees<TonNft> &

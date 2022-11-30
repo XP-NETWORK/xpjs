@@ -30,9 +30,15 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
   BalanceCheck,
+  PreTransfer,
 } from "./chain";
 
 type NearTxResult = [FinalExecutionOutcome, any];
+
+type NearPreTransferArgs = {
+  to: string;
+  receiver: string;
+};
 
 export type NearParams = {
   readonly networkId: string;
@@ -77,30 +83,16 @@ interface BrowserMethods {
   getUserMinter(keypair: string, address: string): Promise<Near>;
 }
 
-interface PreTransferNear {
-  preTransfer(
-    sender: Account,
-    nft: NftInfo<NearNFT>,
-    fee: string,
-    to: number,
-    receiver: string
-  ): Promise<string | undefined>;
-  preUnfreeze(
-    sender: Account,
-    nft: NftInfo<NearNFT>,
-    fee: string,
-    to: number,
-    receiver: string
-  ): Promise<string | undefined>;
-}
-
 export type NearHelper = ChainNonceGet &
   BalanceCheck &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
   MintNft<Account, NearMintArgs, NearTxResult> &
   EstimateTxFees<NearNFT> &
-  Pick<PreTransferNear, "preTransfer"> &
+  Pick<
+    PreTransfer<Account, NearNFT, string, NearPreTransferArgs>,
+    "preTransfer"
+  > &
   ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
@@ -201,10 +193,14 @@ export async function nearHelperFactory({
         };
       });
     },
-    async preTransfer(sender, nft, _fee, to, receiver) {
+    async preTransfer(sender, nft, _fee, args) {
       if (await isApproved(sender, nft)) {
         return undefined;
       }
+      if (!args) {
+        throw new Error("Missing args");
+      }
+      const { receiver, to } = args;
       const walletCallbackUrl = getWalletCallbackUrl(
         `NEARTRX=true&type=approve&to=${to}&receiver=${encodeURIComponent(
           receiver

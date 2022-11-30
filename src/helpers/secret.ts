@@ -45,7 +45,7 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
-  PreTransfer<SecretSigner, SecretNftInfo, string> &
+  PreTransfer<SecretSigner, SecretNftInfo, string, undefined> &
   BalanceCheck &
   GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
   MintNft<SecretSigner, SecretMintArgs, Tx> & {

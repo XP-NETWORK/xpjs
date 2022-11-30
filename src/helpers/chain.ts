@@ -15,16 +15,18 @@ export type NftInfo<Raw> = {
 /**
  * Action to perform before transfer/unfreeze (if any)
  */
-export interface PreTransfer<Signer, Nft, Ret> {
+export interface PreTransfer<Signer, Nft, Ret, ExtraArgs> {
   preTransfer(
     sender: Signer,
     nft: NftInfo<Nft>,
-    fee: BigNumber
+    fee: BigNumber,
+    args?: ExtraArgs
   ): Promise<Ret | undefined>;
   preUnfreeze(
     sender: Signer,
     nft: NftInfo<Nft>,
-    fee: BigNumber
+    fee: BigNumber,
+    args?: ExtraArgs
   ): Promise<Ret | undefined>;
 }
 
