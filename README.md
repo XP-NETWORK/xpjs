@@ -1,6 +1,6 @@
 <center>
 
-# XP Network JS API
+# XP Network JS API v 4.0.2
 
 </center>
 
@@ -52,10 +52,10 @@ OR
 npm i --save xp.network @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
 ```
 
-To import the latest version of xp.network v.2.0 library:
+To import the latest version of xp.network library:
 
 ```bash
-yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge" @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge"
 ```
 
 <br/>
@@ -155,6 +155,8 @@ const signer = new Wallet(
 |   NEAR    |   nearParams    |     31      |
 | Moonbeam  | moonbeamParams  |     32      |
 | Abeychain | abeychainParams |     33      |
+|   Aptos   |   aptosParams   |     34      |
+| Caduceus  | caduceusParams  |     35      |
 
 </center><br/>
 
@@ -277,6 +279,7 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
   const skale = await factory.inner(Chain.SKALE); // 30
   const moonbeam = await factory.inner(Chain.MOONBEAM); // 32
   const abeychain = await factory.inner(Chain.ABEYCHAIN); // 33
+  const causeus = await factory.inner(Chain.CADUCEUS); //35
 
   // Non-EVM chains:
   // Inner Object ====================================== Chain Nonce
@@ -288,6 +291,7 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
   const ton = await factory.inner(Chain.TON); // 27
   const dfinity = await factory.inner(Chain.DFINITY); // 28
   const near = await factory.inner(Chain.NEAR); // 31
+  const aptos = await factory.inner(Chain.APTOS); //34
 })();
 ```
 
@@ -345,6 +349,7 @@ const elrondChosenOne = elrondNfts[0];
 const tronChosenOne = tronNfts[0];
 const algoChosenOne = algoNfts[0];
 const tezosChosenOne = tezosNfts[0];
+const tonChosenOne = tonNfts[0];
 
 // Checking the selected NFT object
 console.log("EVM Selected NFT:       ", web3ChosenOne);
@@ -352,6 +357,7 @@ console.log("Elrond Selected NFT:    ", elrondChosenOne);
 console.log("Tron Selected NFT:      ", tronChosenOne);
 console.log("Algorand Selected NFT:  ", algoChosenOne);
 console.log("Tezos Selected NFT:     ", tezosChosenOne);
+console.log("Ton Selected NFT:       ", tonChosenOne);
 ```
 
 ### 5.2 Example of console logged native BSC NFT object:
