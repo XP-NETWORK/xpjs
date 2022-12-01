@@ -652,7 +652,10 @@ export async function web3HelperFactory(
         //@ts-ignore
         txHash
       );
-      return provider.getTransaction(txHash);
+      if (params.nonce === 33) {
+        return await provider.getTransaction(txHash);
+      }
+      return txr as any;
     },
     async unfreezeWrappedNft(
       sender: Signer,
@@ -702,8 +705,10 @@ export async function web3HelperFactory(
       }
 
       await notifyValidator(txHash);
-
-      return res;
+      if (params.nonce === 33) {
+        return await provider.getTransaction(txHash);
+      }
+      return res as any;
     },
     async estimateValidateTransferNft(
       _to: string,
