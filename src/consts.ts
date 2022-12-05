@@ -92,6 +92,7 @@ export enum MainNetRpcUri {
   ABEYCHAIN = "https://rpc.abeychain.com",
   TON = "https://toncenter.com/api/v2/jsonRPC",
   APTOS = "https://fullnode.mainnet.aptoslabs.com/",
+  CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   // TODO: Algorand
 }
 
