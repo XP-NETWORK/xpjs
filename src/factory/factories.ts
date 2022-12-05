@@ -382,6 +382,7 @@ export namespace ChainFactoryConfigs {
         chainId: "24",
         feeMargin,
       },
+
       nearParams: {
         networkId: "testnet",
         nonce: Chain.NEAR,
@@ -597,6 +598,17 @@ export namespace ChainFactoryConfigs {
         notifier,
         nonce: Chain.ELROND,
         feeMargin,
+      },
+      caduceusParams: {
+        notifier,
+        feeMargin,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CADUCEUS),
+        erc1155_addr: "0x52e7D07DE51F8163E0f29061EaAa7D3FEaf6b47E",
+        erc721_addr: "0x3410b0e0b1aBAe452b3F031AdE8dab347f5Fb60b",
+        erc1155Minter: "0xcEFC9182e9AB181b3FED4e89CdA55E0B9010aFe1",
+        erc721Minter: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
+        minter_addr: "0xd3f55Dd3da582E8E55AcE14e28352a95334E8feb",
+        nonce: Chain.CADUCEUS,
       },
       dfinityParams: {
         agent: new HttpAgent({
