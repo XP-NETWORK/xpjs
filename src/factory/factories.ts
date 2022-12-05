@@ -414,6 +414,17 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      caduceusParams: {
+        notifier,
+        feeMargin,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CADUCEUS),
+        erc1155_addr: "0x820c0b504fe85b43E3c43D2EA24cb764ad78d52e",
+        erc721_addr: "0x086815f8154e3cdD89cD3aEc78377e3197a572d0",
+        erc1155Minter: "0xe3266d5181FffE43A205ce5bE9437B9f717Bad84",
+        erc721Minter: "0x8411EeadD374bDE549F61a166FFBeFca592bC60a",
+        minter_addr: "0x28c43F505d210D6f8f78C58b450b76890dc76F21",
+        nonce: Chain.CADUCEUS,
+      },
       algorandParams: {
         algodApiKey:
           "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
