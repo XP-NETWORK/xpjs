@@ -114,7 +114,7 @@ export type ChainFactory = {
    * @param mintWith an arbitrary address of the target chain minter contract
    * @param gasLimit an arbitrary gas limit value (required for some chains)
    */
-  transferNft<SignerF, RawNftF, Resp>(
+  transferNft<SignerF, RawNftF extends NftInfo<RawNftF>, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<never, unknown, unknown>,
     nft: NftInfo<RawNftF>,
@@ -783,15 +783,15 @@ export function ChainFactory(
             tokenId && !isNaN(Number(tokenId))
               ? tokenId
               : tokenId.match(/(?!-)[0-9]+$/gm)?.at(0)
-          ))
-            ? mintWith
-            : getDefaultContract(nft, fromChain, toChain);
+          )) &&
+          mintWith;
+        // : getDefaultContract(nft, fromChain, toChain);
 
         console.log(`Minting With : ${mw}`);
 
-        if (mw === undefined) {
-          throw new Error(`Mint with is not set`);
-        }
+        // if (mw === undefined) {
+        //   throw new Error(`Mint with is not set`);
+        // }
 
         const res = await fromChain.transferNftToForeign(
           sender,
@@ -799,7 +799,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          mw,
+          mw || "",
           gasLimit
         );
 

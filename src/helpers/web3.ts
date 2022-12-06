@@ -648,10 +648,7 @@ export async function web3HelperFactory(
         txHash = txr.hash;
       }
 
-      await notifyValidator(
-        //@ts-ignore
-        txHash
-      );
+      await notifyValidator(txHash);
       return provider.getTransaction(txHash);
     },
     async unfreezeWrappedNft(
