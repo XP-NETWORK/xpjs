@@ -226,7 +226,10 @@ CHAIN_INFO.set(Chain.ELROND, {
   nonce: 2,
   decimals: 1e18,
   constructor: elrondHelperFactory,
-  blockExplorerUrl: "https://devnet-explorer.elrond.com/transactions/",
+  blockExplorerUrl: "https://explorer.elrond.com/transactions/",
+  blockExplorerUrlAddr: "https://explorer.elrond.com/address/",
+  tnBlockExplorerUrl: "https://testnet-explorer.elrond.com/transactions/",
+  tnBlockExplorerUrlAddr: "https://testnet-explorer.elrond.com/address/",
   currency: SupportedCurrency.EGLD,
   type: ChainType.ELROND,
 });
@@ -245,7 +248,10 @@ CHAIN_INFO.set(Chain.BSC, {
   nonce: 4,
   chainId: 97,
   decimals: 1e18,
-  blockExplorerUrl: "https://testnet.bscscan.com/tx",
+  blockExplorerUrl: "https://bscscan.com/tx/",
+  blockExplorerUrlAddr: "https://bscscan.com/address/",
+  tnBlockExplorerUrl: "https://testnet.bscscan.com/tx/",
+  tnBlockExplorerUrlAddr: "https://testnet.bscscan.com/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.BNB,
   type: ChainType.EVM,
@@ -256,7 +262,10 @@ CHAIN_INFO.set(Chain.ETHEREUM, {
   currency: SupportedCurrency.ETH,
   chainId: 5,
   decimals: 1e18,
-  blockExplorerUrl: "https://goerli.etherscan.io/tx",
+  blockExplorerUrl: "https://etherscan.io/tx/",
+  blockExplorerUrlAddr: "https://etherscan.io/address/",
+  tnBlockExplorerUrl: "https://goerli.etherscan.io/tx/",
+  tnBlockExplorerUrlAddr: "https://goerli.etherscan.io/address/",
   constructor: web3HelperFactory,
   type: ChainType.EVM,
 });
@@ -265,7 +274,10 @@ CHAIN_INFO.set(Chain.AVALANCHE, {
   nonce: 6,
   chainId: 43113,
   decimals: 1e18,
-  blockExplorerUrl: "https://cchain.explorer.avax-test.network/tx",
+  blockExplorerUrl: "https://snowtrace.io/tx/",
+  tnBlockExplorerUrl: "https://testnet.snowtrace.io/tx/",
+  blockExplorerUrlAddr: "https://snowtrace.io/address/",
+  tnBlockExplorerUrlAddr: "https://testnet.snowtrace.io/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.AVAX,
   type: ChainType.EVM,
@@ -275,7 +287,10 @@ CHAIN_INFO.set(Chain.POLYGON, {
   nonce: 0x7,
   chainId: 80001,
   decimals: 1e18,
-  blockExplorerUrl: "https://mumbai.polygonscan.com/tx",
+  blockExplorerUrl: "https://mumbai.polygonscan.com/tx/",
+  tnBlockExplorerUrl: "https://mumbai.polygonscan.com/tx/",
+  blockExplorerUrlAddr: "https://polygonscan.com/address/",
+  tnBlockExplorerUrlAddr: "https://mumbai.polygonscan.com/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.MATIC,
   type: ChainType.EVM,
@@ -285,7 +300,10 @@ CHAIN_INFO.set(Chain.FANTOM, {
   nonce: 0x8,
   decimals: 1e18,
   chainId: 4002,
-  blockExplorerUrl: "https://explorer.testnet.fantom.network/transactions",
+  blockExplorerUrl: "https://ftmscan.com/tx/",
+  blockExplorerUrlAddr: "https://ftmscan.com/address/",
+  tnBlockExplorerUrlAddr: "https://testnet.ftmscan.com/address/",
+  tnBlockExplorerUrl: "https://testnet.ftmscan.com/tx/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.FTM,
   type: ChainType.EVM,
@@ -294,7 +312,10 @@ CHAIN_INFO.set(Chain.TRON, {
   name: "Tron",
   nonce: 0x9,
   decimals: 1e6,
-  blockExplorerUrl: "https://shasta.tronscan.org/#/transaction",
+  blockExplorerUrl: "https://shasta.tronscan.org/#/transaction/",
+  tnBlockExplorerUrl: "https://shasta.tronscan.org/#/transaction/",
+  blockExplorerUrlAddr: "https://tronscan.io/#/address/",
+  tnBlockExplorerUrlAddr: "https://shasta.tronscan.org/#/address/",
   constructor: tronHelperFactory,
   currency: SupportedCurrency.TRX,
   type: ChainType.TRON,
@@ -314,7 +335,10 @@ CHAIN_INFO.set(Chain.HARMONY, {
   nonce: 0xc,
   decimals: 1e18,
   chainId: 1666700000,
-  blockExplorerUrl: "https://explorer.pops.one/tx",
+  blockExplorerUrl: "https://explorer.harmony.one/tx/",
+  tnBlockExplorerUrl: "https://explorer.testnet.harmony.one/tx/",
+  blockExplorerUrlAddr: "https://explorer.harmony.one/address/",
+  tnBlockExplorerUrlAddr: "https://explorer.testnet.harmony.one/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ONE,
   type: ChainType.EVM,
@@ -338,7 +362,10 @@ CHAIN_INFO.set(Chain.XDAI, {
   nonce: 0xe,
   decimals: 1e18,
   chainId: 0x64,
-  blockExplorerUrl: "https://blockscout.com/xdai/mainnet/",
+  blockExplorerUrl: "https://blockscout.com/xdai/mainnet/tx/",
+  blockExplorerUrlAddr: "https://blockscout.com/xdai/mainnet/address/",
+  tnBlockExplorerUrl: "https://blockscout.com/xdai/testnet/tx/",
+  tnBlockExplorerUrlAddr: "https://blockscout.com/xdai/testnet/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.XDAI,
   type: ChainType.EVM,
@@ -348,7 +375,10 @@ CHAIN_INFO.set(Chain.ALGORAND, {
   nonce: 0xf,
   decimals: 1e6,
   chainId: undefined,
-  blockExplorerUrl: "https://algoexplorer.io/tx",
+  blockExplorerUrl: "https://algoexplorer.io/tx/",
+  tnBlockExplorerUrl: "https://testnet.algoexplorer.io/tx/",
+  blockExplorerUrlAddr: "https://algoexplorer.io/address/",
+  tnBlockExplorerUrlAddr: "https://testnet.algoexplorer.io/address/",
   currency: SupportedCurrency.ALGO,
   constructor: (p) => Promise.resolve(algorandHelper(p)),
   type: ChainType.ALGORAND,
@@ -358,7 +388,11 @@ CHAIN_INFO.set(Chain.FUSE, {
   nonce: 0x10,
   decimals: 1e18,
   chainId: undefined,
-  blockExplorerUrl: "https://explorer.fuse.io/tx",
+  blockExplorerUrl: "https://explorer.fuse.io/tx/",
+  tnBlockExplorerUrl: "https://explorer.fusespark.io/tx/",
+  blockExplorerUrlAddr: "https://explorer.fuse.io/address/",
+  tnBlockExplorerUrlAddr: "https://explorer.fusespark.io/address/",
+
   currency: SupportedCurrency.FUSE,
   constructor: web3HelperFactory,
   type: ChainType.EVM,
@@ -379,12 +413,18 @@ CHAIN_INFO.set(Chain.TEZOS, {
   decimals: 1e6,
   constructor: tezosHelperFactory,
   currency: SupportedCurrency.XTZ,
-  blockExplorerUrl: "https://tezblock.io/transaction",
+  blockExplorerUrl: "https://tzkt.io/",
+  tnBlockExplorerUrl: "https://ghostnet.tzkt.io/",
+  tnBlockExplorerUrlAddr: "https://ghostnet.tzkt.io/",
+  blockExplorerUrlAddr: "https://tzkt.io/",
   type: ChainType.TEZOS,
 });
 CHAIN_INFO.set(Chain.VELAS, {
   name: "Velas",
-  blockExplorerUrl: "https://explorer.velas.com/tx",
+  blockExplorerUrl: "https://explorer.velas.com/tx/",
+  tnBlockExplorerUrlAddr: "https://explorer.testnet.velas.com/address/",
+  blockExplorerUrlAddr: "https://explorer.velas.com/address/",
+  tnBlockExplorerUrl: "https://explorer.testnet.velas.com/tx/",
   nonce: 0x13,
   decimals: 1e18,
   constructor: web3HelperFactory,
@@ -394,7 +434,10 @@ CHAIN_INFO.set(Chain.VELAS, {
 });
 CHAIN_INFO.set(Chain.AURORA, {
   name: "Aurora",
-  blockExplorerUrl: "https://aurorascan.dev/tx",
+  blockExplorerUrl: "https://aurorascan.dev/tx/",
+  tnBlockExplorerUrl: "https://explore-testnet.vechain.org/tx/",
+  blockExplorerUrlAddr: "https://aurorascan.dev/address/",
+  tnBlockExplorerUrlAddr: "https://explore-testnet.vechain.org/address/",
   nonce: Chain.AURORA,
   decimals: 1e18,
   constructor: web3HelperFactory,
@@ -404,7 +447,10 @@ CHAIN_INFO.set(Chain.AURORA, {
 });
 CHAIN_INFO.set(Chain.IOTEX, {
   name: "IoTeX",
-  blockExplorerUrl: "https://iotexscan.io/tx",
+  blockExplorerUrl: "https://iotexscan.io/tx/",
+  blockExplorerUrlAddr: "https://iotexscan.io/address/",
+  tnBlockExplorerUrl: "https://testnet.iotexscan.io/tx/",
+  tnBlockExplorerUrlAddr: "https://testnet.iotexscan.io/address/",
   nonce: 0x14,
   decimals: 1e18,
   constructor: web3HelperFactory,
@@ -414,7 +460,10 @@ CHAIN_INFO.set(Chain.IOTEX, {
 });
 CHAIN_INFO.set(Chain.GODWOKEN, {
   name: "GodWoken",
-  blockExplorerUrl: "https://aggron.layerview.io/tx/",
+  blockExplorerUrl: "https://gwscan.com/tx/",
+  tnBlockExplorerUrl: "https://v1.testnet.gwscan.com/tx/",
+  blockExplorerUrlAddr: "https://gwscan.com/account/",
+  tnBlockExplorerUrlAddr: "https://v1.testnet.gwscan.com/account/",
   constructor: web3HelperFactory,
   nonce: 0x16,
   decimals: 1e18,
@@ -424,7 +473,11 @@ CHAIN_INFO.set(Chain.GODWOKEN, {
 });
 CHAIN_INFO.set(Chain.GATECHAIN, {
   name: "GateChain",
-  blockExplorerUrl: "https://gatescan.org/testnet/tx",
+
+  blockExplorerUrl: "https://gatescan.org/tx/",
+  tnBlockExplorerUrl: "https://gatescan.org/testnet/tx/",
+  blockExplorerUrlAddr: "https://gatescan.org/address/",
+  tnBlockExplorerUrlAddr: "https://gatescan.org/testnet/address/",
   constructor: web3HelperFactory,
   nonce: 0x17,
   decimals: 1e18,
@@ -434,7 +487,10 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
 });
 CHAIN_INFO.set(Chain.VECHAIN, {
   name: "VeChain",
-  blockExplorerUrl: "https://explore-testnet.vechain.org/transactions/",
+  tnBlockExplorerUrl: "https://explore-testnet.vechain.org/transactions/",
+  blockExplorerUrlAddr: "https://explore.vechain.org/accounts/",
+  blockExplorerUrl: "https://explore.vechain.org/transactions/",
+  tnBlockExplorerUrlAddr: "https://explore-testnet.vechain.org/accounts/",
   constructor: web3HelperFactory,
   nonce: 0x19,
   currency: SupportedCurrency.VET,
@@ -444,12 +500,14 @@ CHAIN_INFO.set(Chain.VECHAIN, {
 });
 CHAIN_INFO.set(Chain.SECRET, {
   name: "Secret",
-  blockExplorerUrl: "", // TODO
+  //blockExplorerUrl: "", // TODO
   constructor: secretHelperFactory,
   nonce: Chain.SECRET,
   currency: SupportedCurrency.SCRT,
   decimals: 1e6,
   type: ChainType.COSMOS,
+  blockExplorerUrl: "https://atomscan.com/secret-network/transactions/",
+  blockExplorerUrlAddr: "https://atomscan.com/secret-network/accounts/",
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",
@@ -460,7 +518,7 @@ CHAIN_INFO.set(Chain.SOLANA, {
   decimals: 1e9,
   type: ChainType.SOLANA,
 });
-CHAIN_INFO.set(Chain.TON, {
+/*CHAIN_INFO.set(Chain.TON, {
   name: "TON",
   blockExplorerUrl: "", // TODO
   constructor: tonHelper,
@@ -477,21 +535,32 @@ CHAIN_INFO.set(Chain.DFINITY, {
   currency: SupportedCurrency.ICP,
   decimals: 1e8,
   type: ChainType.DFINITY,
-});
+});*/
+
 CHAIN_INFO.set(Chain.HEDERA, {
-  blockExplorerUrl: "https://hashscan.io/#/testnet/transaction",
+  blockExplorerUrl: "https://hashscan.io/#/mainnet/transaction/",
+  tnBlockExplorerUrl: "https://hashscan.io/#/testnet/transaction/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.HBAR,
   decimals: 1e6,
   nonce: Chain.HEDERA,
   name: "Hedera",
   type: ChainType.HEDERA,
+  blockExplorerUrlAddr: "https://hashscan.io/#/mainnet/account/",
+  tnBlockExplorerUrlAddr: "https://hashscan.io/#/testnet/account/",
 });
 
 CHAIN_INFO.set(Chain.SKALE, {
   name: "Skale",
+  //needs additional query params
   blockExplorerUrl:
+    "https://honorable-steel-rasalhague.explorer.mainnet.skalenodes.com/tx/",
+  tnBlockExplorerUrl:
     "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/tx/",
+  blockExplorerUrlAddr:
+    "https://honorable-steel-rasalhague.explorer.mainnet.skalenodes.com/address/",
+  tnBlockExplorerUrlAddr:
+    "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/address/",
   constructor: web3ERC20HelperFactory,
   currency: SupportedCurrency.SKL,
   decimals: 1e18,
@@ -511,17 +580,19 @@ CHAIN_INFO.set(Chain.DFINITY, {
 });
 
 CHAIN_INFO.set(Chain.NEAR, {
-  blockExplorerUrl: "https://explorer.testnet.near.org/transactions/",
+  blockExplorerUrl: "https://explorer.mainnet.near.org/transactions/",
+  tnBlockExplorerUrl: "https://explorer.testnet.near.org/transactions/",
   constructor: nearHelperFactory,
   currency: SupportedCurrency.NEAR,
   decimals: 1e24,
   name: "NEAR",
   nonce: Chain.NEAR,
   type: ChainType.NEAR,
+  blockExplorerUrlAddr: "https://explorer.mainnet.near.org/accounts/",
+  tnBlockExplorerUrlAddr: "https://explorer.testnet.near.org/accounts/",
 });
 
 CHAIN_INFO.set(Chain.MOONBEAM, {
-  blockExplorerUrl: "https://moonbase.moonscan.io/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.GLMR,
   decimals: 1e18,
@@ -529,10 +600,17 @@ CHAIN_INFO.set(Chain.MOONBEAM, {
   nonce: Chain.MOONBEAM,
   chainId: 0x507,
   type: ChainType.EVM,
+  blockExplorerUrlAddr: "https://moonbeam.moonscan.io/address/",
+  tnBlockExplorerUrlAddr: "https://moonbase.moonscan.io/address/",
+  blockExplorerUrl: "https://moonscan.io/tx/",
+  tnBlockExplorerUrl: "https://moonbase.moonscan.io/tx/",
 });
 
 CHAIN_INFO.set(Chain.ABEYCHAIN, {
-  blockExplorerUrl: "https://testnet-explorer.abeychain.com/",
+  tnBlockExplorerUrl: "https://testnet-explorer.abeychain.com/tx/",
+  tnBlockExplorerUrlAddr: "https://testnet-explorer.abeychain.com/address/",
+  blockExplorerUrl: "https://scan.abeychain.com/tx/",
+  blockExplorerUrlAddr: "https://scan.abeychain.com/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ABEY,
   decimals: 1e18,
@@ -542,13 +620,17 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.APTOS, {
-  blockExplorerUrl: "https://explorer.aptoslabs.com/",
   constructor: aptosHelper,
   currency: SupportedCurrency.APTOS,
   decimals: 1e6,
   name: "Aptos",
   nonce: Chain.APTOS,
   type: ChainType.APTOS,
+  //needs additional query params
+  blockExplorerUrl: "https://explorer.aptoslabs.com/txn/",
+  blockExplorerUrlAddr: "https://explorer.aptoslabs.com/account/",
+  tnBlockExplorerUrl: "https://explorer.aptoslabs.com/txn/",
+  tnBlockExplorerUrlAddr: "https://explorer.aptoslabs.com/account/",
 });
 CHAIN_INFO.set(Chain.TON, {
   name: "TON",
@@ -557,7 +639,10 @@ CHAIN_INFO.set(Chain.TON, {
   decimals: 1e9,
   nonce: Chain.TON,
   type: ChainType.TON,
-  blockExplorerUrl: "https://testnet.tonscan.org/tx/",
+  tnBlockExplorerUrl: "https://testnet.tonscan.org/tx/",
+  blockExplorerUrl: "https://tonscan.org/tx/",
+  blockExplorerUrlAddr: "https://tonscan.org/address/",
+  tnBlockExplorerUrlAddr: "https://testnet.tonscan.org/address/",
 });
 CHAIN_INFO.set(Chain.CADUCEUS, {
   constructor: web3HelperFactory,
