@@ -1,4 +1,4 @@
-export declare type XpBridge = {
+export type XpBridge = {
     version: "0.1.0";
     name: "xp_bridge";
     instructions: [

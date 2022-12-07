@@ -1,4 +1,4 @@
-export declare type EvNotifier = ReturnType<typeof evNotifier>;
+export type EvNotifier = ReturnType<typeof evNotifier>;
 export declare function evNotifier(url: string): {
     notifyWeb3(fromChain: number, fromHash: string, actionId?: string, type?: string, toChain?: number, txFees?: string, senderAddress?: string, targetAddress?: string, nftUri?: string, tokenId?: string, contract?: string): Promise<void>;
     notifyTron(txHash: string): Promise<void>;

@@ -72,22 +72,22 @@ export declare enum MainNetRpcUri {
     APTOS = "https://fullnode.mainnet.aptoslabs.com/",
     CADUCEUS = "https://mainnet.block.caduceus.foundation/"
 }
-declare type ElrondMeta = [ElrondHelper, ElrondParams];
-declare type Web3Meta = [Web3Helper, Web3Params];
-declare type TronMeta = [TronHelper, TronParams];
-declare type AlgoMeta = [AlgorandHelper, AlgorandParams];
-declare type TezosMeta = [TezosHelper, TezosParams];
-declare type SecretMeta = [SecretHelper, SecretParams];
-declare type SolanaMeta = [SolanaHelper, SolanaParams];
-declare type TonMeta = [TonHelper, TonParams];
-declare type DfinityMeta = [DfinityHelper, DfinityParams];
-declare type NearMeta = [NearHelper, NearParams];
-declare type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
-declare type AptosMeta = [AptosHelper, AptosParams];
-declare type MetaMapAssert = {
+type ElrondMeta = [ElrondHelper, ElrondParams];
+type Web3Meta = [Web3Helper, Web3Params];
+type TronMeta = [TronHelper, TronParams];
+type AlgoMeta = [AlgorandHelper, AlgorandParams];
+type TezosMeta = [TezosHelper, TezosParams];
+type SecretMeta = [SecretHelper, SecretParams];
+type SolanaMeta = [SolanaHelper, SolanaParams];
+type TonMeta = [TonHelper, TonParams];
+type DfinityMeta = [DfinityHelper, DfinityParams];
+type NearMeta = [NearHelper, NearParams];
+type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
+type AptosMeta = [AptosHelper, AptosParams];
+type MetaMapAssert = {
     [idx in typeof Chain[keyof typeof Chain]]: unknown;
 };
-export declare type MetaMap = {
+export type MetaMap = {
     2: ElrondMeta;
     3: Web3Meta;
     4: Web3Meta;
@@ -172,7 +172,7 @@ interface ChainData<T extends ChainNonce> {
     tnBlockExplorerUrlAddr?: string;
     rejectUnfreeze?: string[];
 }
-declare type ChainInfo = {
+type ChainInfo = {
     set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
     get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
 } & Map<ChainNonce, ChainData<ChainNonce>>;

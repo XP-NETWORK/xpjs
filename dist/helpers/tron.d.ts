@@ -4,14 +4,14 @@ import { EthNftInfo, MintArgs } from "./web3";
 import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck, GetTokenURI } from "..";
 import { ChainNonceGet } from "..";
 import { EvNotifier } from "../notifier";
-declare type TronSender = string | undefined;
-export declare type MinterRes = {
+type TronSender = string | undefined;
+export type MinterRes = {
     minter: string;
     xpnft: string;
     xpnft1155: string;
     whitelist: string[];
 };
-export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, MintArgs, string> & {
+export type BaseTronHelper = BalanceCheck & MintNft<TronSender, MintArgs, string> & {
     /**
      *
      * Deploy an ERC721 user minter smart contract
@@ -31,7 +31,7 @@ export declare type BaseTronHelper = BalanceCheck & MintNft<TronSender, MintArgs
      */
     deployMinter(deployer: TronSender, frostGroupKey: string, xpnftPrefix: string, xpnftPrefix1155: string, whitelist?: string[]): Promise<MinterRes>;
 };
-export declare type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, string> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string, undefined>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo> & {
+export type TronHelper = BaseTronHelper & TransferNftForeign<TronSender, EthNftInfo, string> & UnfreezeForeignNft<TronSender, EthNftInfo, string> & EstimateTxFees<EthNftInfo> & ChainNonceGet & Approve<TronSender> & ValidateAddress & IsApproved<TronSender> & ExtractAction<string> & Pick<PreTransfer<TronSender, EthNftInfo, string, undefined>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, TronRawTxn> & ExtractTxnStatus & WhitelistCheck<EthNftInfo> & {
     XpNft: string;
     XpNft1155: string;
 } & GetFeeMargins & GetTokenURI;

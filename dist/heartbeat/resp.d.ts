@@ -1,16 +1,16 @@
-declare type DeathReason = {
+type DeathReason = {
     component: "node" | "validator" | "balance";
     error: string;
 };
-declare type ValidatorStatus = {
+type ValidatorStatus = {
     status: "alive" | "dead";
     death_reason?: DeathReason;
 };
-declare type ChainStatus = {
+type ChainStatus = {
     bridge_alive: boolean;
     validators: ValidatorStatus[];
 };
-export declare type StatusResp = {
+export type StatusResp = {
     [chainNonce: string]: ChainStatus;
 };
 export {};
