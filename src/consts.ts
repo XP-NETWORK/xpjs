@@ -287,7 +287,7 @@ CHAIN_INFO.set(Chain.POLYGON, {
   nonce: 0x7,
   chainId: 80001,
   decimals: 1e18,
-  blockExplorerUrl: "https://mumbai.polygonscan.com/tx/",
+  blockExplorerUrl: "https://polygonscan.com/tx/",
   tnBlockExplorerUrl: "https://mumbai.polygonscan.com/tx/",
   blockExplorerUrlAddr: "https://polygonscan.com/address/",
   tnBlockExplorerUrlAddr: "https://mumbai.polygonscan.com/address/",
