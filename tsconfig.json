@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "incremental": false,
-    "target": "es2017",
+    "target": "ES2022",
     "outDir": "./dist",
     //"outDir": "../bridge-interface/node_modules/xp.network/dist",
     "rootDir": "src",
@@ -40,7 +40,7 @@
     // "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
     // "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
 
-    "lib": ["es2019", "dom"], // elrdjs depends on dom?
+    "lib": ["ES2022", "dom"], // elrdjs depends on dom?
     "types": ["node"],
     "typeRoots": ["node_modules/@types", "src/types"]
   },
