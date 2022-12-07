@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Bech32, SecretNetworkClient, Tx } from "secretjs";
+import { Bech32, SecretNetworkClient, TxResponse } from "secretjs";
 import {
   Extension,
   Snip721MintOptions,
@@ -40,15 +40,19 @@ type GetOwnedTokensResponse = Snip721GetTokensResponse & {
   generic_err?: { msg: string };
 };
 
-export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
-  UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> &
+export type SecretHelper = TransferNftForeign<
+  SecretSigner,
+  SecretNftInfo,
+  TxResponse
+> &
+  UnfreezeForeignNft<SecretSigner, SecretNftInfo, TxResponse> &
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
   PreTransfer<SecretSigner, SecretNftInfo, string, undefined> &
   BalanceCheck &
   GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
-  MintNft<SecretSigner, SecretMintArgs, Tx> & {
+  MintNft<SecretSigner, SecretMintArgs, TxResponse> & {
     nftList(
       owner: string,
 
@@ -60,7 +64,7 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
       client: SecretNetworkClient,
       contract: string,
       vk: string
-    ): Promise<Tx>;
+    ): Promise<TxResponse>;
     isApprovedForMinter(
       sender: SecretSigner,
       nft: NftInfo<SecretNftInfo>
@@ -91,8 +95,8 @@ const UNFREEZE_GASL = new BigNumber(0);
 export async function secretHelperFactory(
   p: SecretParams
 ): Promise<SecretHelper> {
-  const queryClient = await SecretNetworkClient.create({
-    grpcWebUrl: p.rpcUrl,
+  const queryClient = new SecretNetworkClient({
+    url: p.rpcUrl,
     chainId: p.chainId,
   });
 
@@ -138,8 +142,8 @@ export async function secretHelperFactory(
     const res = await sender.tx.compute.executeContract(
       {
         sender: sender.address,
-        contractAddress: nft.native.contract,
-        codeHash: nft.native.contractHash,
+        contract_address: nft.native.contract,
+        code_hash: nft.native.contractHash,
         msg: {
           approve: {
             spender: p.bridge.contractAddress,
@@ -176,8 +180,8 @@ export async function secretHelperFactory(
       const minter = args.contract ? args.contract : p.umt;
       const tx = await signer.tx.compute.executeContract(
         {
-          contractAddress: minter.contractAddress,
-          codeHash: minter.codeHash,
+          contract_address: minter.contractAddress,
+          code_hash: minter.codeHash,
           msg: {
             mint_nft: {
               public_metadata: {
@@ -213,9 +217,11 @@ export async function secretHelperFactory(
         },
       };
       if (!codeHash) {
-        codeHash = await queryClient.query.compute.contractCodeHash(
-          contractAddress
-        );
+        codeHash = (
+          await queryClient.query.compute.codeHashByContractAddress({
+            contract_address: contractAddress,
+          })
+        ).code_hash;
       }
       const contract = {
         address: contractAddress,
@@ -266,7 +272,7 @@ export async function secretHelperFactory(
     async setViewingKey(client, contract, vk) {
       const tx = await client.tx.snip721.setViewingKey(
         {
-          contractAddress: contract,
+          contract_address: contract,
           msg: {
             set_viewing_key: {
               key: vk,
@@ -287,8 +293,8 @@ export async function secretHelperFactory(
       const tx = await wallet.tx.compute.executeContract(
         {
           sender: wallet.address,
-          contractAddress: p.bridge.contractAddress,
-          codeHash: p.bridge.codeHash,
+          contract_address: p.bridge.contractAddress,
+          code_hash: p.bridge.codeHash,
           msg: {
             freeze_nft: {
               contract: nft.native.contract,
@@ -303,7 +309,7 @@ export async function secretHelperFactory(
               minter: mw,
             },
           },
-          sentFunds: [
+          sent_funds: [
             {
               denom: "uscrt",
               amount: fee.toString(10),
@@ -321,8 +327,8 @@ export async function secretHelperFactory(
       const tx = await wallet.tx.compute.executeContract(
         {
           sender: wallet.address,
-          contractAddress: p.bridge.contractAddress,
-          codeHash: p.bridge.codeHash,
+          contract_address: p.bridge.contractAddress,
+          code_hash: p.bridge.codeHash,
           msg: {
             withdraw_nft: {
               burner: nft.native.contract,
@@ -332,7 +338,7 @@ export async function secretHelperFactory(
               chain_nonce: Number(chainNonce),
             },
           },
-          sentFunds: [
+          sent_funds: [
             {
               denom: "uscrt",
               amount: fee.toString(10),
