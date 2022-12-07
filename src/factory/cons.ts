@@ -53,6 +53,7 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   const toType = CHAIN_INFO.get(to)?.type;
 
   const contract =
+    //@ts-ignore contractType is checked
     "contractType" in nft.native &&
     //@ts-ignore contractType is checked
     nft.native.contractType === "ERC1155" &&

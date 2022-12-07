@@ -121,6 +121,7 @@ export type ChainFactory = {
    * @param mintWith an arbitrary address of the target chain minter contract
    * @param gasLimit an arbitrary gas limit value (required for some chains)
    */
+
   transferNft<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<never, unknown, unknown>,
@@ -786,6 +787,7 @@ export function ChainFactory(
         return res;
       } else {
         const mw =
+          //@ts-ignore contract is checked
           "contract" in nft.native &&
           mintWith &&
           (await checkMintWith(
