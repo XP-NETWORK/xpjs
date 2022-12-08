@@ -201,6 +201,12 @@ export type ChainFactory = {
     receiver: string
   ): Promise<BigNumber>;
 
+  estimateSFTfees<SignerF, RawNftF, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    amount: bigint,
+    price: number
+  ): Promise<BigNumber>;
+
   estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
@@ -464,6 +470,26 @@ export function ChainFactory(
     return conv;
   };
 
+  const estimateSFTfees = async <SignerF, RawNftF, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    amount: bigint,
+    price: number = 0.05
+  ) => {
+    const rate = await remoteExchangeRate.getBatchedRate([
+      CHAIN_INFO.get(fromChain.getNonce())!.currency,
+    ]);
+
+    const fromExRate = rate.get(
+      CHAIN_INFO.get(fromChain.getNonce())!.currency
+    )!;
+    const y = price / fromExRate;
+
+    const sftFees = Number(amount) <= 10 ? 0 : y * (Number(amount) - 10);
+    return new BigNumber(sftFees)
+      .multipliedBy(CHAIN_INFO.get(fromChain.getNonce())!.decimals)
+      .integerValue();
+  };
+
   async function bridgeStatus(): Promise<{ [x: number]: "alive" | "dead" }> {
     const res = await heartbeatRepo.status();
     return Object.fromEntries(
@@ -675,21 +701,8 @@ export function ChainFactory(
       if (!fee) {
         fee = await estimateFees(from, to, transfers[0], receiver);
       }
-
-      const rate = await remoteExchangeRate.getBatchedRate([
-        CHAIN_INFO.get(from.getNonce())!.currency,
-        CHAIN_INFO.get(to.getNonce())!.currency,
-      ]);
-
-      const fromExRate = rate.get(CHAIN_INFO.get(from.getNonce())!.currency)!;
-      const y = 0.05 / fromExRate;
-
-      const sftFees = Number(amt) <= 10 ? 0 : y * (Number(amt) - 10);
-      const feeS = new BigNumber(sftFees)
-        .multipliedBy(CHAIN_INFO.get(from.getNonce())!.decimals)
-        .integerValue();
-      console.log(sftFees);
-      const x = new BigNumber(fee).plus(feeS);
+      const sftFees = await estimateSFTfees(from, amt, 0.05);
+      const x = new BigNumber(fee).plus(sftFees);
 
       console.log(x.toNumber());
 
@@ -737,6 +750,7 @@ export function ChainFactory(
       }
     },
     estimateFees,
+    estimateSFTfees,
     inner,
     bridgeStatus,
     updateParams<T extends ChainNonce>(
