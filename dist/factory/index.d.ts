@@ -83,6 +83,7 @@ export type ChainFactory = {
      * @param receiver: Address of the receiver of the NFT in raw string..
      */
     estimateFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>, receiver: string): Promise<BigNumber>;
+    estimateSFTfees<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, amount: bigint, price: number): Promise<BigNumber>;
     estimateBatchFees<SignerF, RawNftF, SignerT, RawNftT, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<SignerT, RawNftT, Resp>, nft: NftInfo<RawNftF>[], receiver: string): Promise<BigNumber>;
     /**
      * @param nonce : {@link ChainNonce} could be a ElrondNonce, Web3Nonce, or TronNonce.
