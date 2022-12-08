@@ -669,17 +669,37 @@ export function ChainFactory(
     },
     estimateBatchFees,
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
+      if (Number(amt) > 50)
+        throw new Error("Currenly more that 50 SFTs is not supported");
       let transfers = Array(parseInt(amt.toString())).fill(nft);
       if (!fee) {
         fee = await estimateFees(from, to, transfers[0], receiver);
       }
+
+      const rate = await remoteExchangeRate.getBatchedRate([
+        CHAIN_INFO.get(from.getNonce())!.currency,
+        CHAIN_INFO.get(to.getNonce())!.currency,
+      ]);
+
+      const fromExRate = rate.get(CHAIN_INFO.get(from.getNonce())!.currency)!;
+      const y = 0.05 / fromExRate;
+
+      const sftFees = Number(amt) <= 10 ? 0 : y * (Number(amt) - 10);
+      const feeS = new BigNumber(sftFees)
+        .multipliedBy(CHAIN_INFO.get(from.getNonce())!.decimals)
+        .integerValue();
+      console.log(sftFees);
+      const x = new BigNumber(fee).plus(feeS);
+
+      console.log(x.toNumber());
+
       const response = this.transferBatchNft(
         from,
         to,
         transfers,
         sender,
         receiver,
-        new BigNumber(fee!).dividedToIntegerBy(5),
+        new BigNumber(x!).integerValue(),
         mintWith
       );
       return response;
