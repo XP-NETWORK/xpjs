@@ -706,6 +706,30 @@ export function ChainFactory(
 
       console.log(x.toNumber());
 
+      if (amt === BigInt(1)) {
+        const response = this.transferNft(
+          from,
+          to,
+          nft,
+          sender,
+          receiver,
+          new BigNumber(x!).integerValue(),
+          mintWith
+        );
+        return response as any;
+      } else {
+        const response = this.transferBatchNft(
+          from,
+          to,
+          transfers,
+          sender,
+          receiver,
+          new BigNumber(x!).integerValue(),
+          mintWith
+        );
+        return response as any;
+      }
+
       const response = this.transferBatchNft(
         from,
         to,
