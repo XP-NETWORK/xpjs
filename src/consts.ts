@@ -190,13 +190,13 @@ interface ChainData<T extends ChainNonce> {
   decimals: number;
   constructor: (p: InferChainParam<T>) => Promise<InferChainH<T>>;
   blockExplorerUrl: string;
-  tnBlockExplorerUrl?: string;
+  tnBlockExplorerUrl?: string | ((tx: string) => string);
   chainId?: number;
   tnChainId?: number;
   currency: SupportedCurrency;
   type: string;
   blockExplorerUrlAddr?: string;
-  tnBlockExplorerUrlAddr?: string;
+  tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
   rejectUnfreeze?: string[];
 }
 
@@ -511,7 +511,12 @@ CHAIN_INFO.set(Chain.SECRET, {
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",
-  blockExplorerUrl: "", // TODO
+  blockExplorerUrl: "https://solscan.io/tx/",
+  blockExplorerUrlAddr: "https://solscan.io/account/",
+  tnBlockExplorerUrl: (tx: string) =>
+    `https://solscan.io/tx/${tx}?cluster=devnet`,
+  tnBlockExplorerUrlAddr: (address: string) =>
+    `https://solscan.io/account/${address}?cluster=devnet`,
   constructor: solanaHelper,
   nonce: Chain.SOLANA,
   currency: SupportedCurrency.SOL,

@@ -16,7 +16,17 @@ import {
   TokenInvalidOwnerError,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  //LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+import {
+  Metaplex,
+  bundlrStorage,
+  walletAdapterIdentity,
+} from "@metaplex-foundation/js";
 import BigNumber from "bignumber.js";
 import { Chain } from "../..";
 import { EvNotifier } from "../../notifier";
@@ -29,6 +39,8 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  BalanceCheck,
+  MintNft,
 } from "../chain";
 import { IDL } from "./idl";
 
@@ -38,7 +50,13 @@ export type SolanaNft = {
   nftMint: string;
 };
 
+type SolanaMintArgs = {
+  uri: string;
+};
+
 export type SolanaHelper = ChainNonceGet &
+  BalanceCheck &
+  MintNft<SolanaSigner, SolanaMintArgs, string> &
   TransferNftForeign<SolanaSigner, SolanaNft, string> &
   UnfreezeForeignNft<SolanaSigner, SolanaNft, string> &
   EstimateTxFees<SolanaNft> &
@@ -166,6 +184,9 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
   return {
     XpNft: args.xpnftAddr,
     connection: conn,
+    async balance(address: string) {
+      return new BigNumber(await conn.getBalance(new PublicKey(address)));
+    },
     getNonce: () => Chain.SOLANA,
     async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
       const provider = new AnchorProvider(conn, sender, {});
@@ -263,6 +284,51 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
     },
     getProvider() {
       return conn;
+    },
+    async mintNft(sender, args) {
+      console.log(args, "args");
+      console.log(sender, "sender");
+      const provider = new AnchorProvider(conn, sender, {});
+      console.log(provider.wallet, "provider");
+
+      /*const txn = await conn.requestAirdrop(
+        sender.publicKey,
+        LAMPORTS_PER_SOL * 2
+      );
+      const block = await conn.getLatestBlockhash();
+      const sig = conn.confirmTransaction(
+        {
+          blockhash: block.blockhash,
+          lastValidBlockHeight: block.lastValidBlockHeight,
+          signature: txn,
+        },
+        "finalized"
+      );
+      console.log(`Airdrop: ${txn}`);
+      console.log(`sig ${sig}`);
+      console.log(`Waiting for 5s`);
+      await new Promise((r) => setTimeout(r, 5000));*/
+      //sender.payer.secretKey.
+      const metaplex = Metaplex.make(conn)
+        .use(walletAdapterIdentity(sender))
+        .use(bundlrStorage());
+      const nftc = metaplex.nfts();
+
+      const _col = await nftc.create(
+        {
+          name: "Uniair1",
+          symbol: "UNIAIRT",
+
+          uri: args.uri,
+          sellerFeeBasisPoints: 0,
+        },
+        {
+          commitment: "processed",
+        }
+      );
+
+      console.log(_col);
+      return "";
     },
     async estimateValidateTransferNft() {
       return new BigNumber(0); // TODO
