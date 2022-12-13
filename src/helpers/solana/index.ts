@@ -22,11 +22,13 @@ import {
   Transaction,
   //LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
+
 import {
   Metaplex,
   bundlrStorage,
   walletAdapterIdentity,
 } from "@metaplex-foundation/js";
+
 import BigNumber from "bignumber.js";
 import { Chain } from "../..";
 import { EvNotifier } from "../../notifier";
@@ -309,10 +311,10 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       console.log(`Waiting for 5s`);
       await new Promise((r) => setTimeout(r, 5000));*/
       //sender.payer.secretKey.
-      const metaplex = Metaplex.make(conn)
+      const _metaplex = Metaplex.make(conn)
         .use(walletAdapterIdentity(sender))
         .use(bundlrStorage());
-      const nftc = metaplex.nfts();
+      const nftc = _metaplex.nfts();
 
       const _col = await nftc.create(
         {
