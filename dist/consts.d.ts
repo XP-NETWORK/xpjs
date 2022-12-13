@@ -163,13 +163,13 @@ interface ChainData<T extends ChainNonce> {
     decimals: number;
     constructor: (p: InferChainParam<T>) => Promise<InferChainH<T>>;
     blockExplorerUrl: string;
-    tnBlockExplorerUrl?: string;
+    tnBlockExplorerUrl?: string | ((tx: string) => string);
     chainId?: number;
     tnChainId?: number;
     currency: SupportedCurrency;
     type: string;
     blockExplorerUrlAddr?: string;
-    tnBlockExplorerUrlAddr?: string;
+    tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
     rejectUnfreeze?: string[];
 }
 type ChainInfo = {
