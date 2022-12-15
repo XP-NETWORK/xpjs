@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import BN from "bn.js";
+import { BN } from "bn.js";
 
 import {
   Account,
@@ -240,7 +240,7 @@ export async function nearHelperFactory({
           token_contract: id.native.contract,
         },
         methodName: "freeze_nft",
-        attachedDeposit: new BN(txFees.toString()),
+        attachedDeposit: new BN(txFees.toString(10)),
         gas: new BN("30000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
@@ -272,7 +272,7 @@ export async function nearHelperFactory({
           token_contract: id.native.contract,
         },
         methodName: "withdraw_nft",
-        attachedDeposit: new BN(txFees.toString()),
+        attachedDeposit: new BN(txFees.toString(10)),
         gas: new BN("30000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
