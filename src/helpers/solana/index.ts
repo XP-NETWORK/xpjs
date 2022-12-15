@@ -1,3 +1,8 @@
+/*import {
+  Metaplex,
+  bundlrStorage,
+  walletAdapterIdentity,
+} from "@metaplex-foundation/js";*/
 import {
   Wallet,
   BN,
@@ -22,12 +27,6 @@ import {
   Transaction,
   //LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
-
-import {
-  Metaplex,
-  bundlrStorage,
-  walletAdapterIdentity,
-} from "@metaplex-foundation/js";
 
 import BigNumber from "bignumber.js";
 import { Chain } from "../..";
@@ -287,7 +286,8 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
     getProvider() {
       return conn;
     },
-    async mintNft(sender, args) {
+    async mintNft() {
+      /*console.log(Metaplex, walletAdapterIdentity, bundlrStorage);
       console.log(args, "args");
       console.log(sender, "sender");
       const provider = new AnchorProvider(conn, sender, {});
@@ -309,7 +309,7 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       console.log(`Airdrop: ${txn}`);
       console.log(`sig ${sig}`);
       console.log(`Waiting for 5s`);
-      await new Promise((r) => setTimeout(r, 5000));*/
+      await new Promise((r) => setTimeout(r, 5000));
       //sender.payer.secretKey.
       const _metaplex = Metaplex.make(conn)
         .use(walletAdapterIdentity(sender))
@@ -329,7 +329,7 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
         }
       );
 
-      console.log(_col);
+      console.log(_col);*/
       return "";
     },
     async estimateValidateTransferNft() {

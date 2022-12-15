@@ -435,9 +435,9 @@ CHAIN_INFO.set(Chain.VELAS, {
 CHAIN_INFO.set(Chain.AURORA, {
   name: "Aurora",
   blockExplorerUrl: "https://aurorascan.dev/tx/",
-  tnBlockExplorerUrl: "https://explore-testnet.vechain.org/tx/",
+  tnBlockExplorerUrl: "hhttps://testnet.aurorascan.dev/tx/",
   blockExplorerUrlAddr: "https://aurorascan.dev/address/",
-  tnBlockExplorerUrlAddr: "https://explore-testnet.vechain.org/address/",
+  tnBlockExplorerUrlAddr: "https://testnet.aurorascan.dev/address",
   nonce: Chain.AURORA,
   decimals: 1e18,
   constructor: web3HelperFactory,
