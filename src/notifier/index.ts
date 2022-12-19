@@ -81,5 +81,8 @@ export function evNotifier(url: string) {
     async notifyAptos(txHash: string) {
       await api.post("/tx/aptos", { tx_hash: txHash });
     },
+    async notifyEVM(nonce: number, address: string) {
+      await api.post("/whitelist", { contract: address, chain_nonce: nonce });
+    },
   };
 }
