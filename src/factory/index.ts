@@ -1,11 +1,12 @@
+import { Chain, CHAIN_INFO } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
-import { Chain, CHAIN_INFO } from "../consts";
-import * as crypto from "node:crypto";
 
+export * from "./cons";
 export * from "./factories";
 
+import BigNumber from "bignumber.js";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -19,19 +20,14 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "..";
-import BigNumber from "bignumber.js";
 
-import axios from "axios";
-import {
-  _headers,
-  exchangeRateRepo,
-  getDefaultContract,
-  prepareTokenId,
-  checkBlockedContracts,
-} from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
-import { bridgeHeartbeat } from "../heartbeat";
+import { ContractFactory, Wallet } from "@hashgraph/hethers";
+import algosdk from "algosdk";
+import axios from "axios";
 import { ethers, utils } from "ethers";
+import { Base64 } from "js-base64";
+import { bridgeHeartbeat } from "../heartbeat";
 import {
   AlgorandHelper,
   AlgorandParams,
@@ -39,9 +35,7 @@ import {
   algoSignerWrapper,
   ClaimNftInfo,
 } from "../helpers/algorand";
-import algosdk from "algosdk";
-import { Base64 } from "js-base64";
-import { TezosParams } from "../helpers/tezos";
+import { AptosParams } from "../helpers/aptos";
 import {
   BalanceCheck,
   EstimateTxFeesBatch,
@@ -51,6 +45,18 @@ import {
   UnfreezeForeignNftBatch,
   WhitelistCheck,
 } from "../helpers/chain";
+import { DfinityParams } from "../helpers/dfinity/dfinity";
+import {
+  HEDERA_PROXY_ABI,
+  HEDERA_PROXY_BC,
+  HEDERA_TOKEN_SERVICE_ABI,
+} from "../helpers/hedera/hts_abi";
+import { NearParams } from "../helpers/near";
+import { SecretParams } from "../helpers/secret";
+import { SolanaParams } from "../helpers/solana";
+import { TezosParams } from "../helpers/tezos";
+import { TonParams } from "../helpers/ton";
+import { Web3ERC20Params } from "../helpers/web3_erc20";
 import {
   ChainNonce,
   HelperMap,
@@ -60,19 +66,13 @@ import {
   InferSigner,
   ParamMap,
 } from "../type-utils";
-import { SecretParams } from "../helpers/secret";
-import { DfinityParams } from "../helpers/dfinity/dfinity";
-import { NearParams } from "../helpers/near";
-import { TonParams } from "../helpers/ton";
-import { ContractFactory, Wallet } from "@hashgraph/hethers";
 import {
-  HEDERA_PROXY_ABI,
-  HEDERA_PROXY_BC,
-  HEDERA_TOKEN_SERVICE_ABI,
-} from "../helpers/hedera/hts_abi";
-import { AptosParams } from "../helpers/aptos";
-import { Web3ERC20Params } from "../helpers/web3_erc20";
-import { SolanaParams } from "../helpers/solana";
+  checkBlockedContracts,
+  exchangeRateRepo,
+  getDefaultContract,
+  prepareTokenId,
+  _headers,
+} from "./cons";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -709,11 +709,11 @@ export function ChainFactory(
       // if (!params) throw new Error("An error occured");
       // const isAddressValid = await params.validateAddress(address);
       // if (!isAddressValid) throw new Error("Address is not valid");
-      const actionIdRaw = crypto.randomBytes(16).toString("hex");
-      const actionId = new BigNumber(actionIdRaw, 16);
-      console.log({ actionId, actionIdRaw });
+      // const actionIdRaw = crypto.randomBytes(16).toString("hex");
+      // const actionId = new BigNumber(actionIdRaw, 16);
+      // console.log({ actionId, actionIdRaw });
       try {
-        await chainLocal.notifier.notifyEVM(chain, address, actionId);
+        await chainLocal.notifier.notifyEVM(chain, address);
         return { success: true };
       } catch (error) {
         throw new Error("An error occured");
@@ -985,6 +985,3 @@ export function ChainFactory(
     setProvider,
   };
 }
-
-export * from "./factories";
-export * from "./cons";
