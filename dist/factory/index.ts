@@ -704,16 +704,16 @@ export function ChainFactory(
       const chainLocal = cToP.get(chain);
 
       if (!chainLocal) throw new Error("Chain not found");
-      const params = await CHAIN_INFO.get(chain)?.constructor(chainLocal);
-      if (!params) throw new Error("Unable to get params");
-      const isAddressValid = await params.validateAddress(address);
-      if (!isAddressValid) throw new Error("Address is not valid");
+      // const params = await CHAIN_INFO.get(chain)?.constructor(chainLocal);
+      // if (!params) throw new Error("Unable to get params");
+      // const isAddressValid = await params.validateAddress(address);
+      // if (!isAddressValid) throw new Error("Address is not valid");
 
       try {
         await chainLocal.notifier.notifyEVM(chain, address);
         return { success: true };
       } catch (error) {
-        throw new Error("An error occured: " + error);
+        throw new Error("An error occured: " + error.message);
       }
     },
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
