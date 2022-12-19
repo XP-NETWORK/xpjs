@@ -272,6 +272,12 @@ export type ChainFactory = {
   isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
 
   setProvider(fromChain: number, provider: any): Promise<void>;
+
+  whitelistEVM<T extends ChainNonce>(
+    chain: T,
+    address: string,
+    nonce: number
+  ): Promise<{ success: true }>;
 };
 
 /**
@@ -694,6 +700,22 @@ export function ChainFactory(
       return await Promise.all(result);
     },
     estimateBatchFees,
+    async whitelistEVM<T extends ChainNonce>(chain: T, address: string) {
+      const chainLocal = cToP.get(chain);
+
+      if (!chainLocal) throw new Error("Chain not found");
+      const params = await CHAIN_INFO.get(chain)?.constructor(chainLocal);
+      if (!params) throw new Error("An error occured");
+      const isAddressValid = await params.validateAddress(address);
+      if (!isAddressValid) throw new Error("Address is not valid");
+
+      try {
+        await chainLocal.notifier.notifyEVM(chain, address);
+        return { success: true };
+      } catch (error) {
+        throw new Error("An error occured");
+      }
+    },
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
       if (Number(amt) > 50)
         throw new Error("Currenly more that 50 SFTs is not supported");
