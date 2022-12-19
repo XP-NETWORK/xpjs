@@ -2,6 +2,7 @@ import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
 import { Chain, CHAIN_INFO } from "../consts";
+import * as crypto from "node:crypto";
 
 export * from "./factories";
 
@@ -708,9 +709,11 @@ export function ChainFactory(
       // if (!params) throw new Error("An error occured");
       // const isAddressValid = await params.validateAddress(address);
       // if (!isAddressValid) throw new Error("Address is not valid");
-
+      const actionIdRaw = crypto.randomBytes(16).toString("hex");
+      const actionId = new BigNumber(actionIdRaw, 16);
+      console.log({ actionId, actionIdRaw });
       try {
-        await chainLocal.notifier.notifyEVM(chain, address);
+        await chainLocal.notifier.notifyEVM(chain, address, actionId);
         return { success: true };
       } catch (error) {
         throw new Error("An error occured");

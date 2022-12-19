@@ -1,4 +1,5 @@
 import axios from "axios";
+import BigNumber from "bignumber.js";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 
@@ -81,8 +82,12 @@ export function evNotifier(url: string) {
     async notifyAptos(txHash: string) {
       await api.post("/tx/aptos", { tx_hash: txHash });
     },
-    async notifyEVM(nonce: number, address: string) {
-      await api.post("/whitelist", { contract: address, chain_nonce: nonce });
+    async notifyEVM(nonce: number, address: string, actionId: BigNumber) {
+      await api.post("/whitelist", {
+        contract: address,
+        chain_nonce: nonce,
+        action_id: actionId,
+      });
     },
   };
 }
