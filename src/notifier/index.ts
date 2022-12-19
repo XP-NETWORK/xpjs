@@ -85,7 +85,6 @@ export function evNotifier(url: string) {
       await api.post("/whitelist", {
         contract: address,
         chain_nonce: nonce,
-        // action_id: actionId,
       });
     },
   };

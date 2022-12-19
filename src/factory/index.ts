@@ -705,13 +705,11 @@ export function ChainFactory(
       const chainLocal = cToP.get(chain);
 
       if (!chainLocal) throw new Error("Chain not found");
-      // const params = await CHAIN_INFO.get(chain)?.constructor(chainLocal);
-      // if (!params) throw new Error("An error occured");
-      // const isAddressValid = await params.validateAddress(address);
-      // if (!isAddressValid) throw new Error("Address is not valid");
-      // const actionIdRaw = crypto.randomBytes(16).toString("hex");
-      // const actionId = new BigNumber(actionIdRaw, 16);
-      // console.log({ actionId, actionIdRaw });
+      const params = await CHAIN_INFO.get(chain)?.constructor(chainLocal);
+      if (!params) throw new Error("An error occured");
+      const isAddressValid = await params.validateAddress(address);
+      if (!isAddressValid) throw new Error("Address is not valid");
+
       try {
         await chainLocal.notifier.notifyEVM(chain, address);
         return { success: true };
