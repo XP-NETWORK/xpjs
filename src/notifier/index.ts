@@ -1,5 +1,4 @@
 import axios from "axios";
-import BigNumber from "bignumber.js";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 

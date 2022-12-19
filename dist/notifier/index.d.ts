@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 export type EvNotifier = ReturnType<typeof evNotifier>;
 export declare function evNotifier(url: string): {
   notifyWeb3(
@@ -29,6 +28,6 @@ export declare function evNotifier(url: string): {
   notifyDfinity(actionId: string): Promise<void>;
   notifyTon(txHash: string): Promise<void>;
   notifyAptos(txHash: string): Promise<void>;
-  notifyEVM(nonce: number, address: string, actionId: BigNumber): Promise<void>;
+  notifyEVM(nonce: number, address: string): Promise<void>;
 };
 //# sourceMappingURL=index.d.ts.map
