@@ -57,7 +57,7 @@ export type ChainFactory = {
      * @param mintWith an arbitrary address of the target chain minter contract
      * @param gasLimit an arbitrary gas limit value (required for some chains)
      */
-    transferNft<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string, gasLimit?: ethers.BigNumberish | undefined, extraFee?: BigNumber.Value): Promise<Resp>;
+    transferNft<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string, gasLimit?: ethers.BigNumberish | undefined, extraFee?: BigNumber.Value, gasPrice?: ethers.BigNumberish | undefined): Promise<Resp>;
     transferBatchNft<SignerF, RawNftF, Resp>(fromChain: FullChainBatch<SignerF, RawNftF, Resp>, toChain: FullChainBatch<never, unknown, unknown>, nft: NftInfo<RawNftF>[], sender: SignerF, receiver: string, fee?: BigNumber.Value, mintWith?: string): Promise<Resp[]>;
     claimHederaNFT(serialNumber: ethers.BigNumberish, proxyAddress: string, htsToken: string, sender: Wallet): Promise<any>;
     listHederaClaimableNFT(proxyContract: string, htsToken: string, sender: Wallet): Promise<ethers.BigNumber[]>;
