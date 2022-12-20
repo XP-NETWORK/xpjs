@@ -61,6 +61,7 @@ export enum TestNetRpcUri {
   TON = "https://testnet.toncenter.com/api/v2/jsonRPC",
   SOLANA = "https://api.devnet.solana.com",
   CADUCEUS = "https://galaxy.block.caduceus.foundation",
+  OKC = "https://exchaintestrpc.okex.org",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -146,6 +147,7 @@ export type MetaMap = {
   0x21: Web3Meta;
   0x22: AptosMeta;
   0x23: Web3Meta;
+  0x24: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -182,6 +184,7 @@ export namespace Chain {
   export const ABEYCHAIN = 0x21; // 33
   export const APTOS = 0x22; // 34
   export const CADUCEUS = 0x23; // 35
+  export const OKC = 0x24; // 36
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -662,4 +665,18 @@ CHAIN_INFO.set(Chain.CADUCEUS, {
   type: ChainType.EVM,
   chainId: 256256,
   tnChainId: 512512,
+});
+CHAIN_INFO.set(Chain.OKC, {
+  blockExplorerUrl: "https://www.oklink.com/okc/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.OKT,
+  decimals: 1e18,
+  name: "OKC",
+  nonce: Chain.OKC,
+  type: ChainType.EVM,
+  chainId: 66,
+  blockExplorerUrlAddr: "https://www.oklink.com/en/okc/address/",
+  tnBlockExplorerUrl: "https://www.oklink.com/okc-test/",
+  tnBlockExplorerUrlAddr: "https://www.oklink.com/en/okc-test/address/",
+  tnChainId: 65,
 });

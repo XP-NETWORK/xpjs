@@ -238,6 +238,17 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ETHEREUM,
         feeMargin,
       },
+      okcParams: {
+        erc721Minter: "0xaB9eD7b9734471249255B4d969B32995015116d9",
+        erc1155Minter: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
+        erc1155_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
+        erc721_addr: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
+        minter_addr: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
+        feeMargin,
+        nonce: Chain.OKC,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OKC),
+      },
       xDaiParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
