@@ -131,7 +131,8 @@ export type ChainFactory = {
     fee?: BigNumber.Value,
     mintWith?: string,
     gasLimit?: ethers.BigNumberish | undefined,
-    extraFee?: BigNumber.Value
+    extraFee?: BigNumber.Value,
+    gasPrice?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
@@ -804,7 +805,8 @@ export function ChainFactory(
       fee,
       mintWith,
       gasLimit,
-      extraFee
+      extraFee,
+      gasPrice
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
@@ -839,7 +841,8 @@ export function ChainFactory(
           nft,
           new BigNumber(fee),
           toChain.getNonce().toString(),
-          gasLimit
+          gasLimit,
+          gasPrice
         );
 
         return res;
@@ -871,7 +874,8 @@ export function ChainFactory(
           nft,
           new BigNumber(fee),
           mw,
-          gasLimit
+          gasLimit,
+          gasPrice
         );
 
         return res;
