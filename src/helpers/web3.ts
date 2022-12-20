@@ -600,7 +600,8 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       mintWith: string,
-      gasLimit: ethers.BigNumberish | undefined = undefined
+      gasLimit: ethers.BigNumberish | undefined = undefined,
+      gasPrice
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
@@ -625,6 +626,7 @@ export async function web3HelperFactory(
           {
             value: EthBN.from(txFees.toString()),
             gasLimit,
+            gasPrice,
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -663,7 +665,8 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       nonce,
-      gasLimit = undefined
+      gasLimit = undefined,
+      gasPrice
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender);
 
@@ -686,6 +689,7 @@ export async function web3HelperFactory(
           {
             value: EthBN.from(txFees.toString(10)),
             gasLimit,
+            gasPrice,
           }
         );
 
