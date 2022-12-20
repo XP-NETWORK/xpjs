@@ -156,6 +156,7 @@ export interface ChainParams {
     aptosParams: AptosParams;
     solanaParams: SolanaParams;
     caduceusParams: Web3Params;
+    okcParams: Web3Params;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**

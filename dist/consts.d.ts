@@ -41,7 +41,8 @@ export declare enum TestNetRpcUri {
     APTOS = "https://fullnode.testnet.aptoslabs.com",
     TON = "https://testnet.toncenter.com/api/v2/jsonRPC",
     SOLANA = "https://api.devnet.solana.com",
-    CADUCEUS = "https://galaxy.block.caduceus.foundation"
+    CADUCEUS = "https://galaxy.block.caduceus.foundation",
+    OKC = "https://exchaintestrpc.okex.org"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -121,6 +122,7 @@ export type MetaMap = {
     0x21: Web3Meta;
     0x22: AptosMeta;
     0x23: Web3Meta;
+    0x24: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -156,6 +158,7 @@ export declare namespace Chain {
     const ABEYCHAIN = 33;
     const APTOS = 34;
     const CADUCEUS = 35;
+    const OKC = 36;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
