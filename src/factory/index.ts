@@ -312,6 +312,7 @@ export interface ChainParams {
   aptosParams: AptosParams;
   solanaParams: SolanaParams;
   caduceusParams: Web3Params;
+  okcParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -370,6 +371,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.APTOS, chainParams.aptosParams);
   cToP.set(Chain.SOLANA, chainParams.solanaParams);
   cToP.set(Chain.CADUCEUS, chainParams.caduceusParams);
+  cToP.set(Chain.OKC, chainParams.okcParams);
   return cToP;
 }
 /**
