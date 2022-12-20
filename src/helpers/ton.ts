@@ -127,6 +127,11 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
     Emitter?.addEventListener("cancel tonKeeper", setStop);
 
+    await new Promise((r) => {
+      fastResolve = r;
+      setTimeout(r, 30 * 1000);
+    });
+
     while (!body) {
       console.log("TON:tring to find the trx...");
       await new Promise((r) => {
