@@ -414,7 +414,7 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        bridgeAddr: "kQD3Fic8toRl0SIMswto8wmy5H41CDZUGAIyIK95Al5BBUiX",
+        bridgeAddr: "kQCFhew-rg17dlBjJ4VmU8nkyMlijUtGh-xMG7Gb438LJgZK",
         burnerAddr: "kQBCnW4TO466p7YzKGZebnsylUSHTyxTKuwMDXo5JEQbIEOF",
         notifier,
         tonweb: new TonWeb(
