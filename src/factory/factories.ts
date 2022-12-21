@@ -403,8 +403,8 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        bridgeAddr: "kQCFhew-rg17dlBjJ4VmU8nkyMlijUtGh-xMG7Gb438LJgZK",
-        burnerAddr: "kQBCnW4TO466p7YzKGZebnsylUSHTyxTKuwMDXo5JEQbIEOF",
+        bridgeAddr: "kQDuN8nvYr2yjsbV9jQIricuGUECtY-z21uOeZFVfPAAnAuy",
+        burnerAddr: "kQDUmYu97JTNB6o4bUmnUq3fPq7LQWinU7HqdjVgopPn5dx7",
         notifier,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
