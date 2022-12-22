@@ -128,7 +128,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     Emitter?.addEventListener("cancel tonKeeper", setStop);
 
     await new Promise((r) => {
-      setTimeout(r, 30 * 1000);
+      setTimeout(r, 10 * 1000);
     });
 
     async function getUserTrxs(address: string): Promise<any> {
