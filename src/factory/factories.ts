@@ -437,6 +437,17 @@ export namespace ChainFactoryConfigs {
         notifier,
         feeMargin,
       },
+      fantomParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
+        erc721Minter: "",
+        erc1155Minter: "",
+        erc1155_addr: "0xAE3bF9a0abd3D753aBB579c6E8BFD5D5F5e89c70",
+        erc721_addr: "0x3CF207B7E4633400B8A29B3c758296d290a51345",
+        minter_addr: "0xD0060e9d327fCeF5A0B0919e3624eABa56565348",
+        nonce: Chain.FANTOM,
+        feeMargin,
+      },
       elrondParams: {
         node_uri: MainNetRpcUri.ELROND,
         minter_address:
