@@ -71,7 +71,8 @@ export declare enum MainNetRpcUri {
     ABEYCHAIN = "https://rpc.abeychain.com",
     TON = "https://toncenter.com/api/v2/jsonRPC",
     APTOS = "https://fullnode.mainnet.aptoslabs.com/",
-    CADUCEUS = "https://mainnet.block.caduceus.foundation/"
+    CADUCEUS = "https://mainnet.block.caduceus.foundation/",
+    OKC = "https://exchainrpc.okex.org/"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
