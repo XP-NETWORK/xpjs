@@ -95,6 +95,7 @@ export enum MainNetRpcUri {
   TON = "https://toncenter.com/api/v2/jsonRPC",
   APTOS = "https://fullnode.mainnet.aptoslabs.com/",
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
+  OKC = "https://exchainrpc.okex.org/",
   // TODO: Algorand
 }
 
