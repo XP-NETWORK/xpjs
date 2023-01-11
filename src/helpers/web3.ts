@@ -529,6 +529,8 @@ export async function web3HelperFactory(
     async getTokenURI(contract, tokenId) {
       if (ethers.utils.isAddress(contract) && tokenId) {
         const erc721 = UserNftMinter__factory.connect(contract!, provider);
+        //const erc1155 = Erc1155Minter__factory.connect(contract!, provider)
+        //erc1155.uri()
         return await erc721.tokenURI(tokenId).catch(() => "");
       }
       return "";
