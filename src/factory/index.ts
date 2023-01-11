@@ -818,10 +818,6 @@ export function ChainFactory(
         }
       }
 
-      const tokenId =
-        //@ts-ignore
-        nft.native && "tokenId" in nft.native && nft.native.tokenId.toString();
-
       if (appConfig.network === "mainnet") {
         await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
       }
@@ -858,7 +854,7 @@ export function ChainFactory(
             mintWith,
             toChain.getNonce(),
             fromChain.getNonce(),
-            prepareTokenId(tokenId, fromChain.getNonce())
+            prepareTokenId(nft, fromChain.getNonce())
           ))
             ? mintWith
             : getDefaultContract(nft, fromChain, toChain);
