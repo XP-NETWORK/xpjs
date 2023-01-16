@@ -80,7 +80,8 @@ export interface IsApproved<Sender> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber
+    txFee: BigNumber,
+    gasPrice?: ethers.BigNumber
   ): Promise<boolean>;
 }
 
@@ -88,7 +89,8 @@ export interface Approve<Sender> {
   approveForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber
+    txFee: BigNumber,
+    gasPrice?: ethers.BigNumber
   ): Promise<string | undefined>;
 }
 
@@ -122,6 +124,8 @@ export type BaseWeb3Helper = BalanceCheck &
     ): Promise<ContractTransaction>;
   };
 
+type ExtraArgs = { gasPrice: ethers.BigNumber };
+
 /**
  * Traits implemented by this module
  */
@@ -138,7 +142,7 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo, string, undefined>, "preTransfer"> &
+  } & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
@@ -236,7 +240,8 @@ type NftMethodVal<T, Tx> = {
     forAddr: string,
     tok: string,
     txnUp: (tx: PopulatedTransaction) => Promise<void>,
-    customData: NullableCustomData
+    customData: NullableCustomData,
+    gasPrice: ethers.BigNumberish | undefined
   ) => Promise<Tx>;
 };
 
@@ -428,7 +433,12 @@ export async function web3HelperFactory(
     );
   };
 
-  const approveForMinter = async (id: NftInfo<EthNftInfo>, sender: Signer) => {
+  const approveForMinter = async (
+    id: NftInfo<EthNftInfo>,
+    sender: Signer,
+    _txFees: BigNumber,
+    gasPrice: ethers.BigNumberish | undefined
+  ) => {
     const isApproved = await isApprovedForMinter(id, sender);
     if (isApproved) {
       return undefined;
@@ -450,7 +460,8 @@ export async function web3HelperFactory(
       toApprove,
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
-      params.nonce === 0x1d ? {} : undefined
+      params.nonce === 0x1d ? {} : undefined,
+      gasPrice
     );
     await receipt.wait();
     return receipt.hash;
@@ -472,7 +483,8 @@ export async function web3HelperFactory(
       return params.feeMargin;
     },
     isApprovedForMinter,
-    preTransfer: (s, id, _fee) => approveForMinter(id, s),
+    preTransfer: (s, id, fee, args) =>
+      approveForMinter(id, s, fee, args?.gasPrice),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
@@ -517,6 +529,8 @@ export async function web3HelperFactory(
     async getTokenURI(contract, tokenId) {
       if (ethers.utils.isAddress(contract) && tokenId) {
         const erc721 = UserNftMinter__factory.connect(contract!, provider);
+        //const erc1155 = Erc1155Minter__factory.connect(contract!, provider)
+        //erc1155.uri()
         return await erc721.tokenURI(tokenId).catch(() => "");
       }
       return "";
@@ -600,9 +614,10 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       mintWith: string,
-      gasLimit: ethers.BigNumberish | undefined = undefined
+      gasLimit: ethers.BigNumberish | undefined = undefined,
+      gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender);
+      await approveForMinter(id, sender, txFees, gasPrice);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       // Chain is Hedera
@@ -625,6 +640,7 @@ export async function web3HelperFactory(
           {
             value: EthBN.from(txFees.toString()),
             gasLimit,
+            gasPrice,
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -663,9 +679,10 @@ export async function web3HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       nonce,
-      gasLimit = undefined
+      gasLimit = undefined,
+      gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender);
+      await approveForMinter(id, sender, txFees, gasPrice);
 
       // Chain is Hedera
       if (params.nonce === 0x1d) {
@@ -686,6 +703,7 @@ export async function web3HelperFactory(
           {
             value: EthBN.from(txFees.toString(10)),
             gasLimit,
+            gasPrice,
           }
         );
 

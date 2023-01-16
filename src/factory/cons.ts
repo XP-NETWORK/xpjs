@@ -97,12 +97,17 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   return contract;
 }
 
-export function prepareTokenId(tokenId: string | undefined, from: number) {
+export function prepareTokenId(nft: NftInfo<any>, from: number) {
+  const tokenId =
+    //@ts-ignore
+    nft.native && "tokenId" in nft.native && nft.native.tokenId.toString();
+
   if (tokenId) {
     const notNumber = isNaN(Number(tokenId));
 
     if (notNumber) {
       if (from === Chain.ELROND) {
+        if (nft.native.nonce) return String(nft.native.nonce);
         const hex = tokenId.split("-")?.at(2);
         return String(hex ? parseInt(hex, 16) : "");
       }

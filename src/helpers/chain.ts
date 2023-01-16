@@ -48,7 +48,8 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     id: NftInfo<RawNft>,
     txFees: BigNumber,
     mintWith: string,
-    gasLimit?: ethers.BigNumberish | undefined
+    gasLimit?: ethers.BigNumberish | undefined,
+    gasPrice?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
 
@@ -69,7 +70,8 @@ export interface UnfreezeForeignNft<Signer, RawNft, Resp> {
     id: NftInfo<RawNft>,
     txFees: BigNumber,
     nonce: string,
-    gasLimit: ethers.BigNumberish | undefined
+    gasLimit: ethers.BigNumberish | undefined,
+    gasPrice: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
 
