@@ -13,8 +13,5 @@ export declare function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
   fromChain: FullChain<SignerT, RawNftT, Resp>,
   toChain: FullChain<SignerT, RawNftT, Resp>
 ): string | undefined;
-export declare function prepareTokenId(
-  tokenId: string | undefined,
-  from: number
-): string | undefined;
+export declare function prepareTokenId(nft: NftInfo<any>, from: number): any;
 //# sourceMappingURL=cons.d.ts.map

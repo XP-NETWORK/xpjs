@@ -18,6 +18,7 @@ import {
 } from "./chain";
 import {
   ContractTransaction,
+  ethers,
   PopulatedTransaction,
   providers,
   Signer,
@@ -71,14 +72,16 @@ export interface IsApproved<Sender> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber
+    txFee: BigNumber,
+    gasPrice?: ethers.BigNumber
   ): Promise<boolean>;
 }
 export interface Approve<Sender> {
   approveForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber
+    txFee: BigNumber,
+    gasPrice?: ethers.BigNumber
   ): Promise<string | undefined>;
 }
 type NullableCustomData = Record<string, any> | undefined;
@@ -105,6 +108,9 @@ export type BaseWeb3Helper = BalanceCheck &
       options: MintArgs
     ): Promise<ContractTransaction>;
   };
+type ExtraArgs = {
+  gasPrice: ethers.BigNumber;
+};
 /**
  * Traits implemented by this module
  */
@@ -121,7 +127,7 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo, string, undefined>, "preTransfer"> &
+  } & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
@@ -174,7 +180,8 @@ type NftMethodVal<T, Tx> = {
     forAddr: string,
     tok: string,
     txnUp: (tx: PopulatedTransaction) => Promise<void>,
-    customData: NullableCustomData
+    customData: NullableCustomData,
+    gasPrice: ethers.BigNumberish | undefined
   ) => Promise<Tx>;
 };
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
