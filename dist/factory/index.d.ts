@@ -102,7 +102,8 @@ export type ChainFactory = {
     fee?: BigNumber.Value,
     mintWith?: string,
     gasLimit?: ethers.BigNumberish | undefined,
-    extraFee?: BigNumber.Value
+    extraFee?: BigNumber.Value,
+    gasPrice?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
   transferBatchNft<SignerF, RawNftF, Resp>(
     fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
@@ -278,6 +279,7 @@ export interface ChainParams {
   aptosParams: AptosParams;
   solanaParams: SolanaParams;
   caduceusParams: Web3Params;
+  okcParams: Web3Params;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**
