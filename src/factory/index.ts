@@ -132,7 +132,8 @@ export type ChainFactory = {
     fee?: BigNumber.Value,
     mintWith?: string,
     gasLimit?: ethers.BigNumberish | undefined,
-    extraFee?: BigNumber.Value
+    extraFee?: BigNumber.Value,
+    gasPrice?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
@@ -318,6 +319,7 @@ export interface ChainParams {
   aptosParams: AptosParams;
   solanaParams: SolanaParams;
   caduceusParams: Web3Params;
+  okcParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -376,6 +378,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.APTOS, chainParams.aptosParams);
   cToP.set(Chain.SOLANA, chainParams.solanaParams);
   cToP.set(Chain.CADUCEUS, chainParams.caduceusParams);
+  cToP.set(Chain.OKC, chainParams.okcParams);
   return cToP;
 }
 /**
@@ -827,7 +830,8 @@ export function ChainFactory(
       fee,
       mintWith,
       gasLimit,
-      extraFee
+      extraFee,
+      gasPrice
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
@@ -836,10 +840,6 @@ export function ChainFactory(
           checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
         }
       }
-
-      const tokenId =
-        //@ts-ignore
-        nft.native && "tokenId" in nft.native && nft.native.tokenId.toString();
 
       if (appConfig.network === "mainnet") {
         await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
@@ -862,7 +862,8 @@ export function ChainFactory(
           nft,
           new BigNumber(fee),
           toChain.getNonce().toString(),
-          gasLimit
+          gasLimit,
+          gasPrice
         );
 
         return res;
@@ -876,7 +877,7 @@ export function ChainFactory(
             mintWith,
             toChain.getNonce(),
             fromChain.getNonce(),
-            prepareTokenId(tokenId, fromChain.getNonce())
+            prepareTokenId(nft, fromChain.getNonce())
           ))
             ? mintWith
             : getDefaultContract(nft, fromChain, toChain);
@@ -894,7 +895,8 @@ export function ChainFactory(
           nft,
           new BigNumber(fee),
           mw,
-          gasLimit
+          gasLimit,
+          gasPrice
         );
 
         return res;

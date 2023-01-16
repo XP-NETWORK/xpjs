@@ -182,7 +182,8 @@ export async function web3ERC20HelperFactory(
   const approveForMinter = async (
     id: NftInfo<EthNftInfo>,
     sender: Signer,
-    txFees: BigNumber
+    txFees: BigNumber,
+    gasPrice: ethers.BigNumberish | undefined
   ) => {
     const isApproved = await isApprovedForMinter(id, sender, txFees);
     if (isApproved) {
@@ -198,7 +199,8 @@ export async function web3ERC20HelperFactory(
       minter_addr,
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
-      params.nonce === 0x1d ? {} : undefined
+      params.nonce === 0x1d ? {} : undefined,
+      gasPrice
     );
     await receipt.wait();
 
@@ -230,7 +232,8 @@ export async function web3ERC20HelperFactory(
       return params.feeMargin;
     },
     isApprovedForMinter,
-    preTransfer: (s, id, _fee) => approveForMinter(id, s, _fee),
+    preTransfer: (s, id, _fee, args) =>
+      approveForMinter(id, s, _fee, args?.gasPrice),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
@@ -355,9 +358,10 @@ export async function web3ERC20HelperFactory(
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
       mintWith: string,
-      gasLimit: ethers.BigNumberish | undefined = undefined
+      gasLimit: ethers.BigNumberish | undefined = undefined,
+      gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees);
+      await approveForMinter(id, sender, txFees, gasPrice);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       const tx = await minter
