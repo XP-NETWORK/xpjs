@@ -39,7 +39,7 @@ export enum TestNetRpcUri {
   ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://matic-mumbai.chainstacklabs.com",
-  FANTOM = "https://rpc.testnet.fantom.network/",
+  FANTOM = "https://fantom-testnet.public.blastapi.io",
   TRON = "https://api.shasta.trongrid.io/",
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
@@ -63,6 +63,7 @@ export enum TestNetRpcUri {
   SOLANA = "https://api.devnet.solana.com",
   CADUCEUS = "https://galaxy.block.caduceus.foundation",
   OKC = "https://exchaintestrpc.okex.org",
+  ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -96,6 +97,7 @@ export enum MainNetRpcUri {
   APTOS = "https://fullnode.mainnet.aptoslabs.com/",
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   OKC = "https://exchainrpc.okex.org/",
+  ARBITRUM = "string",
   // TODO: Algorand
 }
 
@@ -150,6 +152,7 @@ export type MetaMap = {
   0x22: AptosMeta;
   0x23: Web3Meta;
   0x24: Web3Meta;
+  0x25: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -187,6 +190,7 @@ export namespace Chain {
   export const APTOS = 0x22; // 34
   export const CADUCEUS = 0x23; // 35
   export const OKC = 0x24; // 36
+  export const ARBITRUM = 0x25; //37
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -681,4 +685,18 @@ CHAIN_INFO.set(Chain.OKC, {
   tnBlockExplorerUrl: "https://www.oklink.com/okc-test/",
   tnBlockExplorerUrlAddr: "https://www.oklink.com/en/okc-test/address/",
   tnChainId: 65,
+});
+CHAIN_INFO.set(Chain.ARBITRUM, {
+  blockExplorerUrl: "https://explorer.arbitrum.io/tx/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ETH,
+  decimals: Decimals.ETH,
+  name: "Arbitrum",
+  nonce: Chain.ARBITRUM,
+  type: ChainType.EVM,
+  chainId: 42161,
+  blockExplorerUrlAddr: "https://explorer.arbitrum.io/address/",
+  tnBlockExplorerUrl: "https://goerli-rollup-explorer.arbitrum.io/tx/",
+  tnBlockExplorerUrlAddr: "https://goerli-rollup-explorer.arbitrum.io/address/",
+  tnChainId: 421613,
 });
