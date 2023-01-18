@@ -18,14 +18,14 @@ export namespace AppConfigs {
   export const TestNet: () => AppConfig = () => {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
-      nftListUri: "https://testnet-notifier.xp.network/testnet-indexer/",
+      nftListUri: "http://localhost:3066",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
-      txSocketUri: "https://testnet-tx-socket.herokuapp.com",
+      txSocketUri: "http://localhost:3062",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
-      wrappedNftPrefix: "https://testnet-w-nft-api.herokuapp.com/",
-      scVerifyUri: "https://testnet-sc-verify.herokuapp.com",
+      wrappedNftPrefix: "http://localhost:3064",
+      scVerifyUri: "http://localhost:3063",
       network: "testnet",
     };
   };

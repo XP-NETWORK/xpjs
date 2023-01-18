@@ -39,7 +39,7 @@ export enum TestNetRpcUri {
   ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://matic-mumbai.chainstacklabs.com",
-  FANTOM = "https://rpc.testnet.fantom.network/",
+  FANTOM = "https://fantom-testnet.public.blastapi.io",
   TRON = "https://api.shasta.trongrid.io/",
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",

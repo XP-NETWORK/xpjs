@@ -31,8 +31,7 @@ import { FeeMargins } from "../helpers/chain";
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri =
-  "https://testnet-notifier.xp.network/notify-test/";
+const testnet_middleware_uri = "http://localhost:3061";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
@@ -122,11 +121,11 @@ export namespace ChainFactoryConfigs {
       avalancheParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AVALANCHE),
-        minter_addr: "0xDdF1f6B8Ae8cd26dBE7C4C3ed9ac8E6D8B3a4FdC",
-        erc721_addr: "0xE1D8Df2e06797F22e7ce25c95A7ddccb926f8A1E",
-        erc1155Minter: "0xfA9214AEe59a6631A400DC039808457524dE70A2",
-        erc721Minter: "0x54Db938575DD089702822F191AEbB25C2Af7D1Ef",
-        erc1155_addr: "0xfA9214AEe59a6631A400DC039808457524dE70A2",
+        minter_addr: "0xd6E954E5963Bd450201aB9394BfE5cc1A3bbcF4E",
+        erc721_addr: "0x1F996F65b27958C03C07f37E364afA3d3131003F",
+        erc1155Minter: "0xfcE58D9680e05e32378C05062E026682FbE69953",
+        erc721Minter: "0xA6Ca1F114Ef5D114c1B855B702Cfde813B1213cD",
+        erc1155_addr: "0xF5D1B7798Aad84Beb789508E12ADB66654756Eb0",
         nonce: Chain.AVALANCHE,
         feeMargin,
       },
@@ -156,11 +155,11 @@ export namespace ChainFactoryConfigs {
         notifier,
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.MOONBEAM),
-        erc721Minter: "0x1F71E80E1E785dbDB34c69909C11b71bAd8D9802",
-        erc1155Minter: "0x10E3EE8526Cc7610393E2f6e25dEee0bD38d057e",
-        erc1155_addr: "0xd023739a76Df4cC6260A1Ba25e8BEbCe8389D60D",
-        erc721_addr: "0x42027aF22E36e839e138dc387F1b7428a85553Cc",
-        minter_addr: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
+        erc721Minter: "0x9cBD8BA634F165C69149a3Ac35d75062725EfB75",
+        erc1155Minter: "0x247164810ff181EB4eF92052b40F6C92b7A72F6C",
+        erc1155_addr: "0xA6Ca1F114Ef5D114c1B855B702Cfde813B1213cD",
+        erc721_addr: "0xfcE58D9680e05e32378C05062E026682FbE69953",
+        minter_addr: "0xF5D1B7798Aad84Beb789508E12ADB66654756Eb0",
       },
       aptosParams: {
         rpcUrl: TestNetRpcUri.APTOS,
@@ -186,22 +185,22 @@ export namespace ChainFactoryConfigs {
       fantomParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FANTOM),
-        minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
-        erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
-        erc1155Minter: "string",
-        erc1155_addr: "0xE657b66d683bF4295325c5E66F6bb0fb6D1F7551",
-        erc721Minter: "string",
+        minter_addr: "0xBB840fC6C649Eb61Fd474886998e65DA80AfEFF2",
+        erc721_addr: "0xb0801bffD146c21EF91E86625756aAa7f74aDB3a",
+        erc1155Minter: "0xf11db8Cd2A24d203E28e440D26664ed48a263D4c",
+        erc1155_addr: "0x7b7Bb6ba1796f2C766cFae6A2C60463766615c69",
+        erc721Minter: "0xf185759aDb97977b419e3bc25b14E751c93865eA",
         nonce: Chain.FANTOM,
         feeMargin,
       },
       bscParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BSC),
-        minter_addr: "0x3Dd26fFf61D2a79f5fB77100d6daDBF073F334E6",
-        erc721_addr: "0x783eF7485DCF27a3Cf59F5A0A406eEe3f9b2AaeB",
-        erc1155Minter: "0x5dA3b7431f4581a7d35aEc2f3429174DC0f2A2E1",
-        erc721Minter: "0x97CD6fD6cbFfaa24f5c858843955C2601cc7F2b9",
-        erc1155_addr: "0xb5278A4808e2345A3B9d08bAc8909A121aFaEBB3",
+        minter_addr: "0xF5D33f8eAeE70069055C5510cDef322fa0d6A814",
+        erc721_addr: "0x55a17b072149c53953574206CCbf4C84BB59E568",
+        erc1155Minter: "0x38a20Ac6663b58F30D49A3094A04615F8f3fD708",
+        erc721Minter: "0x9c8Fb248CF523F21079cF82E3A3bE0eAaF6D3F3E",
+        erc1155_addr: "0x3d0D2C235A1119329Fe3dcDF786A9a19ee27e6b3",
         nonce: Chain.BSC,
         feeMargin,
       },
