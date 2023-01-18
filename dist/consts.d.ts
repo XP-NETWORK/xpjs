@@ -19,7 +19,7 @@ export declare enum TestNetRpcUri {
     ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
     POLYGON = "https://matic-mumbai.chainstacklabs.com",
-    FANTOM = "https://rpc.testnet.fantom.network/",
+    FANTOM = "https://fantom-testnet.public.blastapi.io",
     TRON = "https://api.shasta.trongrid.io/",
     CELO = "https://alfajores-forno.celo-testnet.org",
     HARMONY = "https://api.s0.b.hmny.io",
@@ -42,7 +42,8 @@ export declare enum TestNetRpcUri {
     TON = "https://testnet.toncenter.com/api/v2/jsonRPC",
     SOLANA = "https://api.devnet.solana.com",
     CADUCEUS = "https://galaxy.block.caduceus.foundation",
-    OKC = "https://exchaintestrpc.okex.org"
+    OKC = "https://exchaintestrpc.okex.org",
+    ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -72,7 +73,8 @@ export declare enum MainNetRpcUri {
     TON = "https://toncenter.com/api/v2/jsonRPC",
     APTOS = "https://fullnode.mainnet.aptoslabs.com/",
     CADUCEUS = "https://mainnet.block.caduceus.foundation/",
-    OKC = "https://exchainrpc.okex.org/"
+    OKC = "https://exchainrpc.okex.org/",
+    ARBITRUM = "string"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -124,6 +126,7 @@ export type MetaMap = {
     0x22: AptosMeta;
     0x23: Web3Meta;
     0x24: Web3Meta;
+    0x25: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -160,6 +163,7 @@ export declare namespace Chain {
     const APTOS = 34;
     const CADUCEUS = 35;
     const OKC = 36;
+    const ARBITRUM = 37;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
