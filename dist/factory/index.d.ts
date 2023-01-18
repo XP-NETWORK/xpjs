@@ -280,6 +280,7 @@ export interface ChainParams {
   solanaParams: SolanaParams;
   caduceusParams: Web3Params;
   okcParams: Web3Params;
+  arbitrumParams: Web3Params;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**
