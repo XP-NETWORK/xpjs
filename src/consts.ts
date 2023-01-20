@@ -53,7 +53,7 @@ export enum TestNetRpcUri {
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
-  SKALE = "https://staging-v2.skalenodes.com/v1/actual-secret-cebalrai",
+  SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
@@ -576,9 +576,9 @@ CHAIN_INFO.set(Chain.SKALE, {
   tnBlockExplorerUrlAddr:
     "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/address/",
   constructor: web3ERC20HelperFactory,
-  currency: SupportedCurrency.SKL,
-  decimals: Decimals.SKL,
-  chainId: 1564830818,
+  currency: SupportedCurrency.ETH,
+  decimals: Decimals.ETH,
+  tnChainId: 0x1482a7b2,
   nonce: Chain.SKALE,
   type: ChainType.EVM,
 });
