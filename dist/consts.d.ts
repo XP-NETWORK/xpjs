@@ -33,7 +33,7 @@ export declare enum TestNetRpcUri {
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
-  SKALE = "https://staging-v2.skalenodes.com/v1/actual-secret-cebalrai",
+  SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
@@ -44,6 +44,7 @@ export declare enum TestNetRpcUri {
   CADUCEUS = "https://galaxy.block.caduceus.foundation",
   OKC = "https://exchaintestrpc.okex.org",
   ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
+  BITGERT = "https://testnet-rpc.brisescan.com",
 }
 export declare enum MainNetRpcUri {
   ELROND = "https://gateway.elrond.com",
@@ -75,6 +76,7 @@ export declare enum MainNetRpcUri {
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   OKC = "https://exchainrpc.okex.org/",
   ARBITRUM = "string",
+  BITGERT = "https://dedicated.brisescan.com",
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -127,6 +129,7 @@ export type MetaMap = {
   0x23: Web3Meta;
   0x24: Web3Meta;
   0x25: Web3Meta;
+  0x26: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
   const ELROND = 2;
@@ -164,6 +167,7 @@ export declare namespace Chain {
   const CADUCEUS = 35;
   const OKC = 36;
   const ARBITRUM = 37;
+  const BITGERT = 38;
 }
 interface ChainData<T extends ChainNonce> {
   name: string;
