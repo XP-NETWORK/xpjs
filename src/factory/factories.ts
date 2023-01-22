@@ -260,6 +260,17 @@ export namespace ChainFactoryConfigs {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ARBITRUM),
       },
+      bitgertParams: {
+        erc721Minter: "0xf185759aDb97977b419e3bc25b14E751c93865e",
+        erc1155Minter: "0xb0801bffD146c21EF91E86625756aAa7f74aDB3a",
+        erc1155_addr: "0x7b7Bb6ba1796f2C766cFae6A2C60463766615c69",
+        erc721_addr: "0x56E5298Ba72125DbF8180b199f74aC2B51d31Deb",
+        minter_addr: "0x39d4F26213245D33f506ECA1ce68D08dCF4d8d14",
+        feeMargin,
+        nonce: Chain.BITGERT,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BITGERT),
+      },
       xDaiParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
@@ -663,6 +674,17 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ARBITRUM,
         notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ARBITRUM),
+      },
+      bitgertParams: {
+        erc721Minter: "string",
+        erc1155Minter: "string",
+        erc1155_addr: "string",
+        erc721_addr: "string",
+        minter_addr: "string",
+        feeMargin,
+        nonce: Chain.BITGERT,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BITGERT),
       },
       dfinityParams: {
         agent: new HttpAgent({
