@@ -321,6 +321,7 @@ export interface ChainParams {
   caduceusParams: Web3Params;
   okcParams: Web3Params;
   arbitrumParams: Web3Params;
+  bitgertParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -381,6 +382,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.CADUCEUS, chainParams.caduceusParams);
   cToP.set(Chain.OKC, chainParams.okcParams);
   cToP.set(Chain.ARBITRUM, chainParams.arbitrumParams);
+  cToP.set(Chain.BITGERT, chainParams.bitgertParams);
   return cToP;
 }
 /**

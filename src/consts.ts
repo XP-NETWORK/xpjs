@@ -53,7 +53,7 @@ export enum TestNetRpcUri {
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
   SECRET = "https://pulsar-2.api.trivium.network:9091/",
-  SKALE = "https://staging-v2.skalenodes.com/v1/actual-secret-cebalrai",
+  SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
@@ -64,6 +64,7 @@ export enum TestNetRpcUri {
   CADUCEUS = "https://galaxy.block.caduceus.foundation",
   OKC = "https://exchaintestrpc.okex.org",
   ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
+  BITGERT = "https://testnet-rpc.brisescan.com",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -98,6 +99,7 @@ export enum MainNetRpcUri {
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   OKC = "https://exchainrpc.okex.org/",
   ARBITRUM = "string",
+  BITGERT = "https://dedicated.brisescan.com",
   // TODO: Algorand
 }
 
@@ -153,6 +155,7 @@ export type MetaMap = {
   0x23: Web3Meta;
   0x24: Web3Meta;
   0x25: Web3Meta;
+  0x26: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -191,6 +194,7 @@ export namespace Chain {
   export const CADUCEUS = 0x23; // 35
   export const OKC = 0x24; // 36
   export const ARBITRUM = 0x25; //37
+  export const BITGERT = 0x26; //37
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -576,9 +580,9 @@ CHAIN_INFO.set(Chain.SKALE, {
   tnBlockExplorerUrlAddr:
     "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/address/",
   constructor: web3ERC20HelperFactory,
-  currency: SupportedCurrency.SKL,
-  decimals: Decimals.SKL,
-  chainId: 1564830818,
+  currency: SupportedCurrency.ETH,
+  decimals: Decimals.ETH,
+  tnChainId: 0x1482a7b2,
   nonce: Chain.SKALE,
   type: ChainType.EVM,
 });
@@ -699,4 +703,18 @@ CHAIN_INFO.set(Chain.ARBITRUM, {
   tnBlockExplorerUrl: "https://goerli-rollup-explorer.arbitrum.io/tx/",
   tnBlockExplorerUrlAddr: "https://goerli-rollup-explorer.arbitrum.io/address/",
   tnChainId: 421613,
+});
+CHAIN_INFO.set(Chain.BITGERT, {
+  blockExplorerUrl: "https://brisescan.com/tx/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.BRISE,
+  decimals: Decimals.ETH,
+  name: "Bitgert",
+  nonce: Chain.BITGERT,
+  type: ChainType.EVM,
+  chainId: 3250,
+  blockExplorerUrlAddr: "https://brisescan.com/address/",
+  tnBlockExplorerUrl: "https://testnet-explorer.brisescan.com/tx/",
+  tnBlockExplorerUrlAddr: "https://testnet-explorer.brisescan.com/address/",
+  tnChainId: 64668,
 });
