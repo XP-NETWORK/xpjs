@@ -158,6 +158,7 @@ export interface ChainParams {
     caduceusParams: Web3Params;
     okcParams: Web3Params;
     arbitrumParams: Web3Params;
+    bitgertParams: Web3Params;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**

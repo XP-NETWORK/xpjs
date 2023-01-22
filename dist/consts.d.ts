@@ -43,7 +43,8 @@ export declare enum TestNetRpcUri {
     SOLANA = "https://api.devnet.solana.com",
     CADUCEUS = "https://galaxy.block.caduceus.foundation",
     OKC = "https://exchaintestrpc.okex.org",
-    ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc"
+    ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
+    BITGERT = "https://testnet-rpc.brisescan.com"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.elrond.com",
@@ -74,7 +75,8 @@ export declare enum MainNetRpcUri {
     APTOS = "https://fullnode.mainnet.aptoslabs.com/",
     CADUCEUS = "https://mainnet.block.caduceus.foundation/",
     OKC = "https://exchainrpc.okex.org/",
-    ARBITRUM = "string"
+    ARBITRUM = "string",
+    BITGERT = "https://dedicated.brisescan.com"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -127,6 +129,7 @@ export type MetaMap = {
     0x23: Web3Meta;
     0x24: Web3Meta;
     0x25: Web3Meta;
+    0x26: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -164,6 +167,7 @@ export declare namespace Chain {
     const CADUCEUS = 35;
     const OKC = 36;
     const ARBITRUM = 37;
+    const BITGERT = 38;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
