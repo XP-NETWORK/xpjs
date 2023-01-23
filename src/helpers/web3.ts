@@ -265,7 +265,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       customData: NullableCustomData
     ) => {
       return umt.isApprovedForAll(sender, minterAddr, {
-        gasLimit: "100000",
+        gasLimit: "60000",
         customData,
       });
     },
@@ -280,7 +280,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         forAddr,
         true,
         {
-          gasLimit: "100000",
+          gasLimit: "60000",
           customData,
         }
       );
@@ -302,7 +302,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       return (
         (
           await umt.getApproved(tok, {
-            gasLimit: "100000",
+            gasLimit: "60000",
             customData,
             //@ts-ignore
           })
@@ -316,7 +316,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       txnUp: (tx: PopulatedTransaction) => Promise<void>
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "100000",
+        gasLimit: "60000",
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
