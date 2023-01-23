@@ -545,7 +545,7 @@ export async function web3HelperFactory(
           new Array(nfts.length).fill(1),
           nfts[0].native.contract,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -583,7 +583,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -638,7 +638,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
             gasLimit,
             gasPrice,
           }
@@ -701,7 +701,7 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value: EthBN.from(txFees.toString(10)),
+            value: EthBN.from(txFees.toFixed(0)),
             gasLimit,
             gasPrice,
           }
