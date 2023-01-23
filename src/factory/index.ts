@@ -829,6 +829,10 @@ export function ChainFactory(
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver, extraFee);
         console.log(new BigNumber(fee).toString());
+        if (new BigNumber(fee).toString().includes("e")) {
+          fee = new BigNumber(fee).toFixed();
+        }
+        console.log(fee);
       }
       // if (!(await toChain.validateAddress(receiver))) {
       //   throw Error("invalid address");

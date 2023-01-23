@@ -74,6 +74,7 @@ export type EthNftInfo = {
 export type MintArgs = {
   contract: string;
   uri: string;
+  walletNonce?: number;
 };
 
 export interface IsApproved<Sender> {
@@ -185,11 +186,14 @@ export async function baseWeb3HelperFactory(
     },
     async mintNft(
       owner: Signer,
-      { contract, uri }: MintArgs
+      { contract, uri, walletNonce }: MintArgs
     ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
       const txm = await erc721
-        .mint(uri, { gasLimit: 1000000 })
+        .mint(uri, {
+          gasLimit: 1000000,
+          ...(walletNonce ? { nonce: walletNonce } : {}),
+        })
         .catch(async (e) => {
           if (nonce === 33) {
             let tx;
@@ -545,7 +549,7 @@ export async function web3HelperFactory(
           new Array(nfts.length).fill(1),
           nfts[0].native.contract,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -583,7 +587,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -629,6 +633,9 @@ export async function web3HelperFactory(
         id.native.contract = params.erc721_addr;
       }
 
+      console.log(txFees.toString());
+      console.log(txFees.toFixed(0), "x");
+
       const tx = await minter
         .connect(sender)
         .populateTransaction[method](
@@ -638,7 +645,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)).div(1e7),
             gasLimit,
             gasPrice,
           }
@@ -701,7 +708,7 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value: EthBN.from(txFees.toString(10)),
+            value: EthBN.from(txFees.toFixed(0)).div(1e7),
             gasLimit,
             gasPrice,
           }
