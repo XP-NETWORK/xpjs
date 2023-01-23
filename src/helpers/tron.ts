@@ -415,7 +415,7 @@ export async function tronHelperFactory(
       setSigner(sender);
       const res = await minter
         .withdrawNft(to, nonce, id.native.tokenId, id.native.contract)
-        .send({ callValue: EthBN.from(txFees.toString(10)) });
+        .send({ callValue: EthBN.from(txFees.toFixed(0)) });
 
       await notifyValidator(res);
       return res;
@@ -442,7 +442,7 @@ export async function tronHelperFactory(
           to,
           mintWith
         )
-        .send({ callValue: EthBN.from(txFees.toString(10)) });
+        .send({ callValue: EthBN.from(txFees.toFixed(0)) });
 
       await notifyValidator(txr);
       return txr;
