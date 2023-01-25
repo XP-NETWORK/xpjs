@@ -1,4 +1,4 @@
-import { SecretNetworkClient, Tx } from "secretjs";
+import { SecretNetworkClient, TxResponse } from "secretjs";
 import { Extension } from "secretjs/dist/extensions/snip721/types";
 import { EvNotifier } from "../notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
@@ -15,11 +15,11 @@ export type SecretMintArgs = {
     contract?: SecretContract;
 };
 type SecretSigner = SecretNetworkClient;
-export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string, undefined> & BalanceCheck & GetFeeMargins & {
+export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, TxResponse> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, TxResponse> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string, undefined> & BalanceCheck & GetFeeMargins & {
     XpNft: string;
-} & GetProvider<SecretNetworkClient> & MintNft<SecretSigner, SecretMintArgs, Tx> & {
+} & GetProvider<SecretNetworkClient> & MintNft<SecretSigner, SecretMintArgs, TxResponse> & {
     nftList(owner: string, viewingKey: string, contract: string, codeHash?: string): Promise<NftInfo<SecretNftInfo>[]>;
-    setViewingKey(client: SecretNetworkClient, contract: string, vk: string): Promise<Tx>;
+    setViewingKey(client: SecretNetworkClient, contract: string, vk: string): Promise<TxResponse>;
     isApprovedForMinter(sender: SecretSigner, nft: NftInfo<SecretNftInfo>): Promise<boolean>;
 };
 export type SecretContract = {

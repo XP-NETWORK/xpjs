@@ -32,7 +32,7 @@ export declare enum TestNetRpcUri {
     GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
     GATECHAIN = "https://meteora-evm.gatenode.cc",
     VECHAIN = "https://sync-testnet.veblocks.net",
-    SECRET = "https://pulsar-2.api.trivium.network:9091/",
+    SECRET = "https://api.pulsar.scrttestnet.com",
     SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
     HEDERA = "https://0.testnet.hedera.com/",
     NEAR = "https://rpc.testnet.near.org",
