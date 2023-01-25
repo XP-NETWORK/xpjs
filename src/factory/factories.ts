@@ -412,7 +412,7 @@ export namespace ChainFactoryConfigs {
           codeHash:
             "af076a49141264ec048270318f1358c9be193893c3f829425cab53ee5eb05e5c",
         },
-        chainId: "24",
+        chainId: "pulsar-2",
         feeMargin,
       },
 
