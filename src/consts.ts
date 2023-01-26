@@ -35,7 +35,7 @@ import { web3ERC20HelperFactory, Web3ERC20Params } from "./helpers/web3_erc20";
 export enum TestNetRpcUri {
   ELROND = "https://devnet-gateway.elrond.com",
   HECO = "https://http-testnet.hecochain.com",
-  BSC = "https://data-seed-prebsc-2-s2.binance.org:8545/",
+  BSC = "https://data-seed-prebsc-2-s3.binance.org:8545/",
   ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://matic-mumbai.chainstacklabs.com",
