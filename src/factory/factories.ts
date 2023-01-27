@@ -30,8 +30,8 @@ import { FeeMargins } from "../helpers/chain";
 //   "0x5002258315873AdCbdEF25a8E71C715A4f701dF5",
 // ];
 
-const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri = "https://notifier.xp.network/";
+const middleware_uri = "https://bridge1.xp.network";
+const testnet_middleware_uri = "https://bridge1.xp.network/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
