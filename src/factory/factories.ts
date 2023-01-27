@@ -31,8 +31,7 @@ import { FeeMargins } from "../helpers/chain";
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri =
-  "https://testnet-notifier.xp.network/notify-test/";
+const testnet_middleware_uri = "https://notifier.xp.network/";
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
@@ -132,12 +131,12 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.POLYGON),
-        minter_addr: "0x224f78681099D66ceEdf4E52ee62E5a98CCB4b9e",
-        erc721_addr: "0xb678b13E41a47e46A4046a4D8315b32E0F34389c",
-        erc1155Minter: "0x5A768f8dDC67ccCA1431879BcA28E93a6c7722bb",
-        erc1155_addr: "0xc1D778Ce89154357471bA6c4C6E51f0e590FFe57",
-        erc721Minter: "0x6516E2D3387A9CF4E5e868E7842D110c95A9f3B4",
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
+        erc721Minter: "0x32732607F67f9FC2007AF84e54B2ea9042327ed3",
+        erc1155Minter: "0x62E26979F555Ec475981D8D1A7e269f747643f22",
+        erc721_addr: "0x54024A9351B7aD68921914942f776489E71c467e",
+        erc1155_addr: "0x8D3e050555356a2eD4ad8cfFb189994035F5803C",
+        minter_addr: "0xF712f9De44425d8845A1d597a247Fe88F4A23b6f",
         nonce: Chain.POLYGON,
         feeMargin,
       },
