@@ -459,6 +459,17 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x28c43F505d210D6f8f78C58b450b76890dc76F21",
         nonce: Chain.CADUCEUS,
       },
+      avalancheParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
+        erc721Minter: "0xb3cE27eDadFE006f9f47C5ed5b62E63DFd9Cf3bD",
+        erc1155Minter: "0x23d399368EF31ca950E4Fd2063F2e4A5ACC0f9c2",
+        erc721_addr: "0xcEFC9182e9AB181b3FED4e89CdA55E0B9010aFe1",
+        minter_addr: "0x52e7D07DE51F8163E0f29061EaAa7D3FEaf6b47E",
+        erc1155_addr: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
+        nonce: Chain.AVALANCHE,
+        feeMargin,
+      },
       algorandParams: {
         algodApiKey: "kZWDAxYR7Y6S6RoyfGIi28SATZ5DfTIs5pF0UMW4",
         algodUri: "https://mainnet-algorand.api.purestake.io/ps2",
