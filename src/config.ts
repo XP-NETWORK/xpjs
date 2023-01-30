@@ -18,7 +18,7 @@ export namespace AppConfigs {
   export const TestNet: () => AppConfig = () => {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
-      nftListUri: "http://138.201.202.51:8898/notifier/",
+      nftListUri: "https://testnet-notifier.xp.network/testnet-indexer/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
       txSocketUri: "https://testnet-tx-socket.herokuapp.com",
