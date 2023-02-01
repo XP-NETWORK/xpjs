@@ -265,7 +265,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       customData: NullableCustomData
     ) => {
       return umt.isApprovedForAll(sender, minterAddr, {
-        gasLimit: "1000000",
+        gasLimit: "60000",
         customData,
       });
     },
@@ -280,7 +280,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         forAddr,
         true,
         {
-          gasLimit: "1000000",
+          gasLimit: "60000",
           customData,
         }
       );
@@ -302,7 +302,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       return (
         (
           await umt.getApproved(tok, {
-            gasLimit: "1000000",
+            gasLimit: "60000",
             customData,
             //@ts-ignore
           })
@@ -316,7 +316,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       txnUp: (tx: PopulatedTransaction) => Promise<void>
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "1000000",
+        gasLimit: "60000",
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
@@ -545,7 +545,7 @@ export async function web3HelperFactory(
           new Array(nfts.length).fill(1),
           nfts[0].native.contract,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -583,7 +583,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -638,7 +638,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toString()),
+            value: EthBN.from(txFees.toFixed(0)),
             gasLimit,
             gasPrice,
           }
@@ -701,7 +701,7 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value: EthBN.from(txFees.toString(10)),
+            value: EthBN.from(txFees.toFixed(0)),
             gasLimit,
             gasPrice,
           }
