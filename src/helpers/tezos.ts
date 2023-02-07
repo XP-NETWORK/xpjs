@@ -32,6 +32,9 @@ import {
   GetFeeMargins,
   WhitelistCheck,
   GetTokenURI,
+  TransferNftForeignBatch,
+  UnfreezeForeignNftBatch,
+  EstimateTxFeesBatch,
 } from "./chain";
 
 type TezosSigner = WalletProvider | Signer;
@@ -39,6 +42,7 @@ type TezosSigner = WalletProvider | Signer;
 export type TezosNftInfo = {
   contract: string;
   token_id: string;
+  amt: number;
 };
 
 type TezosMintArgs = {
@@ -56,6 +60,9 @@ export type TezosHelper = TransferNftForeign<
   MintNft<TezosSigner, TezosMintArgs, string> &
   BalanceCheck &
   UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> &
+  TransferNftForeignBatch<TezosSigner, TezosNftInfo, string> &
+  UnfreezeForeignNftBatch<TezosSigner, TezosNftInfo, string> &
+  EstimateTxFeesBatch<TezosNftInfo> &
   ValidateAddress &
   EstimateTxFees<TezosNftInfo> &
   ChainNonceGet &
@@ -199,46 +206,81 @@ export async function tezosHelperFactory({
     );
   }
 
+  let transferNft = async (
+    sender: TezosSigner,
+    chain: number,
+    to: string,
+    nft: NftInfo<TezosNftInfo>,
+    fee: BigNumber,
+    mw: string,
+    amt: number
+  ) => {
+    //       await preTransfer(sender, nft);
+    const hash = await withBridge(
+      sender,
+      (bridge) =>
+        bridge.methods.freeze_fa2(
+          chain,
+          nft.collectionIdent,
+          mw,
+          to,
+          parseInt(nft.native.token_id),
+          amt
+        ),
+      { amount: fee.toNumber() / 1e6 }
+    );
+
+    notifyValidator(hash);
+    return hash;
+  };
+
+  let unfreezeWrappedNft = async (
+    sender: TezosSigner,
+    to: string,
+    nft: NftInfo<TezosNftInfo>,
+    fee: BigNumber,
+    nonce: number,
+    amt: number
+  ) => {
+    const hash = await withBridge(
+      sender,
+      (bridge) => {
+        return bridge.methods.withdraw_nft(
+          nft.native.contract,
+          nonce,
+          to,
+          parseInt(nft.native.token_id),
+          amt
+        );
+      },
+      { amount: fee.toNumber() / 1e6 }
+    );
+
+    notifyValidator(hash);
+    return hash;
+  };
+
   return {
     XpNft: xpnftAddress,
-    async transferNftToForeign(sender, chain, to, nft, fee, mw) {
-      //       await preTransfer(sender, nft);
-      const hash = await withBridge(
-        sender,
-        (bridge) =>
-          bridge.methods.freeze_fa2(
-            chain,
-            nft.collectionIdent,
-            mw,
-            to,
-            parseInt(nft.native.token_id)
-          ),
-        { amount: fee.toNumber() / 1e6 }
-      );
+    transferNftToForeign: (sender, chain, to, nft, fee, mw) =>
+      transferNft(sender, chain, to, nft, fee, mw, 1),
 
-      notifyValidator(hash);
-      return hash;
-    },
+    transferNftBatchToForeign: (
+      sender,
+      chain_nonce,
+      to,
+      id,
+      mintWith,
+      txFees
+    ) =>
+      transferNft(sender, chain_nonce, to, id[0], txFees, mintWith, id.length),
     async balance(address) {
       return new BigNumber((await Tezos.tz.getBalance(address)).toString(10));
     },
-    async unfreezeWrappedNft(sender, to, nft, fee, nonce) {
-      const hash = await withBridge(
-        sender,
-        (bridge) => {
-          return bridge.methods.withdraw_nft(
-            nft.native.contract,
-            nonce,
-            to,
-            parseInt(nft.native.token_id)
-          );
-        },
-        { amount: fee.toNumber() / 1e6 }
-      );
-
-      notifyValidator(hash);
-      return hash;
-    },
+    unfreezeWrappedNftBatch: (sender, chainNonce, to, nfts, txFees) =>
+      unfreezeWrappedNft(sender, to, nfts[0], txFees, chainNonce, nfts.length),
+    unfreezeWrappedNft: (sender, to, nft, txFees, chainNonce) =>
+      unfreezeWrappedNft(sender, to, nft, txFees, parseInt(chainNonce), 1),
     async mintNft(signer, { identifier, attrs, contract, uri }) {
       return await withContract(signer, xpnftAddress, (xpnft) =>
         xpnft.methods.mint({
@@ -268,6 +310,12 @@ export async function tezosHelperFactory({
     },
     async estimateValidateUnfreezeNft() {
       return estimateGas(validators, 1.2e4);
+    },
+    async estimateValidateTransferNftBatch(_, ids) {
+      return estimateGas(validators, 1.2e5 * ids.length);
+    },
+    async estimateValidateUnfreezeNftBatch(_, ids) {
+      return estimateGas(validators, 1.2e4 * ids.length);
     },
     preTransfer,
     isApprovedForMinter,
