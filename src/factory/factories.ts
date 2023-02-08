@@ -316,10 +316,10 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       tezosParams: {
-        bridgeAddress: "KT1KbL9kWPM8GkMr5M38vF1eHdsNxTc4WkyQ",
+        bridgeAddress: "KT1NJG7j4Z5LbU3obL5TUaJPGNT45ukRTQrH",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1WR4fe9wFGPgNViK5feigMGyXKG9gCX8n4",
+        xpnftAddress: "KT1EDdaYT3aAbWCfGXfC3RGLqyQgsHYasZXw",
         validators: [
           "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
