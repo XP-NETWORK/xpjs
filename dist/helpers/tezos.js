@@ -136,7 +136,7 @@ async function tezosHelperFactory({ Tezos, notifier, xpnftAddress, bridgeAddress
     };
     return {
         XpNft: xpnftAddress,
-        transferNftToForeign: (sender, chain, to, nft, fee, mw) => transferNft(sender, chain, to, nft, fee, mw, 0),
+        transferNftToForeign: (sender, chain, to, nft, fee, mw) => transferNft(sender, chain, to, nft, fee, mw, 1),
         transferNftBatchToForeign: (sender, chain_nonce, to, id, mintWith, txFees) => transferNft(sender, chain_nonce, to, id[0], txFees, mintWith, id.length),
         async balance(address) {
             return new bignumber_js_1.default((await Tezos.tz.getBalance(address)).toString(10));
