@@ -10,9 +10,10 @@ export type TezosNftInfo = {
 };
 type TezosMintArgs = {
     identifier: string;
-    attrs: string;
     contract: string;
     uri: string;
+    to: string;
+    amt: number;
 };
 export type TezosHelper = TransferNftForeign<TezosSigner, TezosNftInfo, string> & MintNft<TezosSigner, TezosMintArgs, string> & BalanceCheck & UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> & TransferNftForeignBatch<TezosSigner, TezosNftInfo, string> & UnfreezeForeignNftBatch<TezosSigner, TezosNftInfo, string> & EstimateTxFeesBatch<TezosNftInfo> & ValidateAddress & EstimateTxFees<TezosNftInfo> & ChainNonceGet & Pick<PreTransfer<Signer, TezosNftInfo, string, undefined>, "preTransfer"> & {
     isApprovedForMinter(nft: NftInfo<TezosNftInfo>, signer: TezosSigner): Promise<boolean>;
