@@ -15,6 +15,7 @@ import {
   ContractAbstraction,
   ContractMethod,
   ContractProvider,
+  MichelsonMap,
   SendParams,
   Signer,
   TezosToolkit,
@@ -47,9 +48,10 @@ export type TezosNftInfo = {
 
 type TezosMintArgs = {
   identifier: string;
-  attrs: string;
   contract: string;
   uri: string;
+  to: string;
+  amt: number;
 };
 
 export type TezosHelper = TransferNftForeign<
@@ -219,14 +221,14 @@ export async function tezosHelperFactory({
     const hash = await withBridge(
       sender,
       (bridge) =>
-        bridge.methods.freeze_fa2(
-          chain,
-          nft.collectionIdent,
-          mw,
+        bridge.methodsObject.freeze_fa2({
+          fa2_address: nft.collectionIdent,
+          token_id: parseInt(nft.native.token_id),
+          chain_nonce: chain,
           to,
-          parseInt(nft.native.token_id),
-          amt
-        ),
+          mint_with: mw,
+          amt,
+        }) as any,
       { amount: fee.toNumber() / 1e6 }
     );
 
@@ -245,13 +247,14 @@ export async function tezosHelperFactory({
     const hash = await withBridge(
       sender,
       (bridge) => {
-        return bridge.methods.withdraw_nft(
-          nft.native.contract,
-          nonce,
+        console.log({ amt });
+        return bridge.methodsObject.withdraw_nft({
+          amt,
+          burner: nft.native.contract,
+          chain_nonce: nonce,
           to,
-          parseInt(nft.native.token_id),
-          amt
-        );
+          token_id: parseInt(nft.native.token_id),
+        }) as any;
       },
       { amount: fee.toNumber() / 1e6 }
     );
@@ -281,17 +284,11 @@ export async function tezosHelperFactory({
       unfreezeWrappedNft(sender, to, nfts[0], txFees, chainNonce, nfts.length),
     unfreezeWrappedNft: (sender, to, nft, txFees, chainNonce) =>
       unfreezeWrappedNft(sender, to, nft, txFees, parseInt(chainNonce), 1),
-    async mintNft(signer, { identifier, attrs, contract, uri }) {
-      return await withContract(signer, xpnftAddress, (xpnft) =>
-        xpnft.methods.mint({
-          token_id: identifier,
-          address: contract,
-          metadata: {
-            uri: uri,
-            attrs,
-          },
-          amount: 1,
-        })
+    async mintNft(signer, { identifier, contract, uri, to, amt }) {
+      const metadata = new MichelsonMap();
+      metadata.set("", utils.char2Bytes(uri));
+      return await withContract(signer, contract, (umt) =>
+        umt.methods.mint(to, amt, metadata, identifier)
       );
     },
     async validateAddress(adr) {
