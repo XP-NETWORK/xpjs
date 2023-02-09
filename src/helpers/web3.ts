@@ -645,8 +645,8 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toFixed(0)).div(1e7),
-            gasLimit,
+            value: EthBN.from(txFees.toFixed(0)).div(1e5),
+            gasLimit: gasLimit || 300_000,
             gasPrice,
           }
         );
@@ -708,8 +708,8 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value: EthBN.from(txFees.toFixed(0)).div(1e7),
-            gasLimit,
+            value: EthBN.from(txFees.toFixed(0)).div(1e5),
+            gasLimit: gasLimit || 300_00,
             gasPrice,
           }
         );
