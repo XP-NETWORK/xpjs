@@ -527,8 +527,8 @@ var ChainFactoryConfigs;
     );
     return {
       tonParams: {
-        burnerAddr: "kQDWMQUnXO9pg6ca6clVPw5nhujzlP9s5TIC7bbmr0c6_dVA",
-        bridgeAddr: "kQBNaMiK1HAfv4uNcHyo3IkJTNc03SzKy1r4qxDqYFcGGEjp",
+        burnerAddr: "kQD_DFwdIY_qSdMIqxa3Ggn5TjigEtI8otEyhTCn8-uu-jRO",
+        bridgeAddr: "kQCTDo3bmL5ZlMexVlSaDhWJifkWzy3K1h5oN8k5nl_fAZfu",
         notifier,
         tonweb: new tonweb_1.default(
           new tonweb_1.default.HttpProvider(
