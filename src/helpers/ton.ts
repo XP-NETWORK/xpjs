@@ -35,6 +35,7 @@ export type TonSigner = {
 export type TonWalletProvider = {
   isTonWallet: boolean;
   send(method: string, params?: any[]): Promise<any>;
+  onSuccess?(): Promise<any>;
   on(eventName: string, handler: (...data: any[]) => any): void;
 };
 
@@ -90,6 +91,7 @@ type TonWallet = {
     method: M,
     params: MethodMap[M][0]
   ): Promise<MethodMap[M][1]>;
+  onSuccess?(): Function;
   handleResponse(res: ResponseUnionType): Promise<string>;
 };
 
@@ -300,7 +302,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
                   payload
                 )}&open=1`
               );
-
+            //!
             default:
               return null;
           }
@@ -308,12 +310,14 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
         async handleResponse(res: boolean) {
           console.log(res);
-          return await waitTonTrx(
+          const result = await waitTonTrx(
             payload,
             value,
             args.config.address!,
             "out_msgs"
           );
+          args.wallet.onSuccess && args.wallet.onSuccess();
+          return result;
         },
       };
 
