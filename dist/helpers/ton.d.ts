@@ -21,6 +21,7 @@ export type TonSigner = {
 export type TonWalletProvider = {
   isTonWallet: boolean;
   send(method: string, params?: any[]): Promise<any>;
+  onSuccess?(): Promise<any>;
   on(eventName: string, handler: (...data: any[]) => any): void;
 };
 export type TonArgs = {
@@ -78,6 +79,7 @@ type TonWallet = {
     method: M,
     params: MethodMap[M][0]
   ): Promise<MethodMap[M][1]>;
+  onSuccess?(): Function;
   handleResponse(res: ResponseUnionType): Promise<string>;
 };
 export declare function tonHelper(args: TonParams): Promise<TonHelper>;
