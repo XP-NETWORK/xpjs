@@ -448,6 +448,13 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      solanaParams: {
+        xpnftAddr: "",
+        bridgeContractAddr: "CHgXhvxk3dVyMh8kTVjvPboBfgiCH1ajkdKyWMpo6dn6",
+        endpoint: TestNetRpcUri.SOLANA,
+        notifier,
+        feeMargin,
+      },
       caduceusParams: {
         notifier,
         feeMargin,
@@ -676,11 +683,11 @@ export namespace ChainFactoryConfigs {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
       },
       arbitrumParams: {
-        erc721Minter: "string",
-        erc1155Minter: "string",
-        erc1155_addr: "string",
-        erc721_addr: "string",
-        minter_addr: "string",
+        erc721Minter: "0x536dDc3Be14A980d3cd15635b3D05985C297FD07",
+        erc1155Minter: "0x4F4F48f70892475b0D4863f61F47157Dd1Db9F1a",
+        erc1155_addr: "0xBd2005050a99142d7B77B415e7b603633f3B3746",
+        erc721_addr: "0x445712E8dcf35E42FFAbb79b900aADcE2284fB65",
+        minter_addr: "0x72d270bb71A90B82260b12c31D427C3F33AC0692",
         feeMargin,
         nonce: Chain.ARBITRUM,
         notifier,
@@ -952,6 +959,7 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x55B1D1891ABb21A5d245d149B49007b55Bd3746D",
         minter_addr: "0x4ceDb46481d7118E1D292C318E37510E5919bBe6",
       },
+
       secretParams: {
         notifier,
         rpcUrl: MainNetRpcUri.SECRET,
