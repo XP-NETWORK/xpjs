@@ -98,8 +98,9 @@ export enum MainNetRpcUri {
   APTOS = "https://fullnode.mainnet.aptoslabs.com/",
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   OKC = "https://exchainrpc.okex.org/",
-  ARBITRUM = "string",
+  ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
+  SOLANA = "https://api.mainnet-beta.solana.com",
   // TODO: Algorand
 }
 

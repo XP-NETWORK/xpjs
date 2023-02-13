@@ -75,8 +75,9 @@ export declare enum MainNetRpcUri {
   APTOS = "https://fullnode.mainnet.aptoslabs.com/",
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   OKC = "https://exchainrpc.okex.org/",
-  ARBITRUM = "string",
+  ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
+  SOLANA = "https://api.mainnet-beta.solana.com",
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
