@@ -1,23 +1,22 @@
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
-export * from "./cons";
 export * from "./factories";
-import BigNumber from "bignumber.js";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, NftInfo, TransactionStatus, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
-import { Wallet } from "@hashgraph/hethers";
+import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
-import { AptosParams } from "../helpers/aptos";
+import { TezosParams } from "../helpers/tezos";
 import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
+import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
+import { SecretParams } from "../helpers/secret";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
-import { SecretParams } from "../helpers/secret";
-import { SolanaParams } from "../helpers/solana";
-import { TezosParams } from "../helpers/tezos";
 import { TonParams } from "../helpers/ton";
+import { Wallet } from "@hashgraph/hethers";
+import { AptosParams } from "../helpers/aptos";
 import { Web3ERC20Params } from "../helpers/web3_erc20";
-import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
+import { SolanaParams } from "../helpers/solana";
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -119,9 +118,6 @@ export type ChainFactory = {
     checkWhitelist<RawNft>(chain: Partial<WhitelistCheck<RawNft>> & ChainNonceGet, nft: NftInfo<RawNft>): Promise<boolean>;
     isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
     setProvider(fromChain: number, provider: any): Promise<void>;
-    whitelistEVM<T extends ChainNonce>(chain: T, address: string, nonce: number): Promise<{
-        success: true;
-    }>;
 };
 /**
  * A type representing all the supported chain params.
@@ -190,4 +186,6 @@ export interface AppConfig {
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
 export declare function ChainFactory(appConfig: AppConfig, chainParams: Partial<ChainParams>): ChainFactory;
+export * from "./factories";
+export * from "./cons";
 //# sourceMappingURL=index.d.ts.map
