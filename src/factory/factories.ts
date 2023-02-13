@@ -319,7 +319,7 @@ export namespace ChainFactoryConfigs {
         bridgeAddress: "KT1NJG7j4Z5LbU3obL5TUaJPGNT45ukRTQrH",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1EDdaYT3aAbWCfGXfC3RGLqyQgsHYasZXw",
+        xpnftAddress: "KT1GRqXuUpGJGDLCRsgQ9nDvVu7tap6LPxTC",
         validators: [
           "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",

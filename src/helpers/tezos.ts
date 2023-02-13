@@ -80,6 +80,7 @@ export type TezosHelper = TransferNftForeign<
     ): Promise<string | undefined>;
   } & {
     XpNft: string;
+    XpNft1155: string;
   } & GetFeeMargins &
   WhitelistCheck<TezosNftInfo> &
   GetTokenURI;
@@ -247,7 +248,6 @@ export async function tezosHelperFactory({
     const hash = await withBridge(
       sender,
       (bridge) => {
-        console.log({ amt });
         return bridge.methodsObject.withdraw_nft({
           amt,
           burner: nft.native.contract,
@@ -265,6 +265,7 @@ export async function tezosHelperFactory({
 
   return {
     XpNft: xpnftAddress,
+    XpNft1155: xpnftAddress,
     transferNftToForeign: (sender, chain, to, nft, fee, mw) =>
       transferNft(sender, chain, to, nft, fee, mw, 1),
 
