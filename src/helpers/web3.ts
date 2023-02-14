@@ -2,6 +2,7 @@
  * Web3 Implementation for cross chain traits
  * @module
  */
+import Web3 from "web3";
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
@@ -36,6 +37,7 @@ import {
 } from "xpnet-web3-contracts";
 import {
   ChainNonceGet,
+  CHAIN_INFO,
   EstimateTxFees,
   ExtractAction,
   ExtractTxnStatus,
@@ -49,6 +51,8 @@ import {
 } from "..";
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
+import { erc721 } from "../factory/erc721";
+import { erc721Abi } from "../factory/eerc721Abi";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 /**
@@ -731,11 +735,46 @@ export async function web3HelperFactory(
     async estimateValidateTransferNft(
       _to: string,
       _nftUri: NftInfo<EthNftInfo>,
-      _mintWith
+      _mintWith,
+      _toNonce: any
     ): Promise<BigNumber> {
-      const gas = await provider.getGasPrice();
-
-      return new BigNumber(gas.mul(150_000).toString());
+      try {
+        const resp = await axios.get(
+          `https://sc-verify.xp.network/verify/list?from=${
+            _nftUri.collectionIdent
+          }&targetChain=${_toNonce.getNonce()}&fromChain=${
+            _nftUri.chainId
+          }&tokenId=${_nftUri.tokenId}`
+        );
+        if (resp.data.code === 200) {
+          const gas = await provider.getGasPrice();
+          return new BigNumber(gas.mul(150_000).toString());
+        } else {
+          //user will need to deploy on dest
+          const web3 = new Web3(
+            new Web3.providers.HttpProvider(_toNonce.getProvider(), {
+              timeout: 5000,
+            })
+          );
+          const myContract = new web3.eth.Contract(erc721Abi);
+          const gasPrice = await myContract
+            .deploy({
+              data: erc721,
+              arguments: ["testing", "test", "https://nft.xp.network/w/"],
+            })
+            .estimateGas({
+              from: web3.utils.toChecksumAddress(
+                "0xd62812C6867aA10fb33e0aD853492f8EfEa5d6C8"
+              ),
+            });
+          const gas = await provider.getGasPrice();
+          return new BigNumber(gas.mul(150_000).add(gasPrice).toString());
+        }
+      } catch (error: any) {
+        console.log(error.message);
+        const gas = await provider.getGasPrice();
+        return new BigNumber(gas.mul(150_000).toString());
+      }
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));

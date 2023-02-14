@@ -466,7 +466,8 @@ export function ChainFactory(
     const estimate = await toChain.estimateValidateTransferNft(
       receiver,
       nft as any,
-      ""
+      "",
+      toChain
     );
 
     let conv = await calcExchangeFees(

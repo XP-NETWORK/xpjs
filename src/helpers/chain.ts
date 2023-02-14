@@ -8,6 +8,8 @@ import { ChainNonce } from "../type-utils";
  */
 export type NftInfo<Raw> = {
   readonly uri: string;
+  readonly chainId: string;
+  readonly tokenId: string;
   readonly native: Raw;
   readonly collectionIdent: string;
 };
@@ -99,7 +101,8 @@ export interface EstimateTxFees<RawNftF> {
   estimateValidateTransferNft(
     to: string,
     metadata: NftInfo<RawNftF>,
-    mintWith: string
+    mintWith: string,
+    toNonce: any
   ): Promise<BigNumber>;
   estimateValidateUnfreezeNft(
     to: string,
