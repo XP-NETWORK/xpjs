@@ -52,7 +52,7 @@ import {
 import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../notifier";
 import { erc721 } from "../factory/erc721";
-import { erc721Abi } from "../factory/eerc721Abi";
+import { erc721Abi } from "../factory/erc721Abi";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 /**
@@ -746,6 +746,7 @@ export async function web3HelperFactory(
             _nftUri.chainId
           }&tokenId=${_nftUri.tokenId}`
         );
+        console.log("sc-verify@!!!1", { resp: resp.data });
         if (resp.data.code === 200) {
           const gas = await provider.getGasPrice();
           return new BigNumber(gas.mul(150_000).toString());
@@ -756,7 +757,10 @@ export async function web3HelperFactory(
               timeout: 5000,
             })
           );
+          console.log("created web3");
+          //@ts-ignore
           const myContract = new web3.eth.Contract(erc721Abi);
+          console.log("created contract");
           const gasPrice = await myContract
             .deploy({
               data: erc721,
@@ -767,7 +771,10 @@ export async function web3HelperFactory(
                 "0xd62812C6867aA10fb33e0aD853492f8EfEa5d6C8"
               ),
             });
+          console.log({ gasPrice });
           const gas = await provider.getGasPrice();
+          console.log({ gas });
+          console.log(new BigNumber(gas.mul(150_000).add(gasPrice).toString()));
           return new BigNumber(gas.mul(150_000).add(gasPrice).toString());
         }
       } catch (error: any) {
