@@ -77,7 +77,7 @@ exports.NFT_METHOD_MAP = {
     umt: xpnet_web3_contracts_1.Erc1155Minter__factory,
     approved: (umt, sender, minterAddr, _tok, customData) => {
       return umt.isApprovedForAll(sender, minterAddr, {
-        gasLimit: "60000",
+        gasLimit: "85000",
         customData,
       });
     },
@@ -86,7 +86,7 @@ exports.NFT_METHOD_MAP = {
         forAddr,
         true,
         {
-          gasLimit: "60000",
+          gasLimit: "85000",
           customData,
         }
       );
@@ -102,7 +102,7 @@ exports.NFT_METHOD_MAP = {
       return (
         (
           await umt.getApproved(tok, {
-            gasLimit: "60000",
+            gasLimit: "85000",
             customData,
             //@ts-ignore
           })
@@ -111,7 +111,7 @@ exports.NFT_METHOD_MAP = {
     },
     approve: async (umt, forAddr, tok, txnUp) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "60000",
+        gasLimit: "85000",
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
