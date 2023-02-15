@@ -765,7 +765,7 @@ export async function web3HelperFactory(
           const estimateGas = await myContract
             .deploy({
               data: erc721,
-              arguments: ["testing", "test", "https://nft.xp.network/w/"],
+              arguments: [["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"]],
             })
             .estimateGas();
           const gas = await provider.getGasPrice();
