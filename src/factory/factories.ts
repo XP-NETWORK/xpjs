@@ -316,10 +316,10 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       tezosParams: {
-        bridgeAddress: "KT1KbL9kWPM8GkMr5M38vF1eHdsNxTc4WkyQ",
+        bridgeAddress: "KT1NJG7j4Z5LbU3obL5TUaJPGNT45ukRTQrH",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1WR4fe9wFGPgNViK5feigMGyXKG9gCX8n4",
+        xpnftAddress: "KT1GRqXuUpGJGDLCRsgQ9nDvVu7tap6LPxTC",
         validators: [
           "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
@@ -420,8 +420,8 @@ export namespace ChainFactoryConfigs {
         networkId: "testnet",
         nonce: Chain.NEAR,
         rpcUrl: TestNetRpcUri.NEAR,
-        bridge: "xp_bridge_1.testnet",
-        xpnft: "xp_nft_1.testnet",
+        bridge: "xp_new_bridge.testnet",
+        xpnft: "xp_new_nft.testnet",
         walletUrl: "https://wallet.testnet.near.org",
         helperUrl: "https://helper.testnet.near.org",
         feeMargin,
