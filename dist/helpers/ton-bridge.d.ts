@@ -4,38 +4,45 @@ import { HttpProvider } from "tonweb/dist/types/providers/http-provider";
 declare const Contract: typeof import("tonweb/dist/types/contract/contract").Contract;
 declare type SeqnoMethod = () => SeqnoMethodResult;
 interface SeqnoMethodResult {
-    call: () => Promise<number>;
+  call: () => Promise<number>;
 }
 interface BridgeOptions extends ContractOptions {
-    burner: string;
+  burner: string;
 }
 interface BridgeMethods extends ContractMethods {
-    seqno: SeqnoMethod;
-    getPublicKey: () => Promise<BN>;
-    isInitialized: () => Promise<BN>;
-    getActionId: () => Promise<BN>;
-    getWhitelist: () => Promise<BN>;
+  seqno: SeqnoMethod;
+  getPublicKey: () => Promise<BN>;
+  isInitialized: () => Promise<BN>;
+  getActionId: () => Promise<BN>;
+  getWhitelist: () => Promise<BN>;
 }
 interface WithdrawParams {
-    chainNonce: number;
-    to: Uint8Array;
-    txFees: BN;
+  chainNonce: number;
+  to: Uint8Array;
+  txFees: BN;
 }
 interface FreezeParams {
-    chainNonce: number;
-    to: Uint8Array;
-    mintWith: Uint8Array;
-    amount?: number | BN;
+  chainNonce: number;
+  to: Uint8Array;
+  mintWith: Uint8Array;
+  amount?: number | BN;
 }
-export declare class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
-    constructor(provider: HttpProvider, options: BridgeOptions);
-    serializeUri(uri: string): Uint8Array;
-    createWithdrawBody(params: WithdrawParams): Promise<import("tonweb/dist/types/boc/cell").Cell>;
-    createFreezeBody(params: FreezeParams): Promise<import("tonweb/dist/types/boc/cell").Cell>;
-    getPublicKey: () => Promise<any>;
-    isInitialized: () => Promise<any>;
-    getActionId: () => Promise<any>;
-    getWhitelist: () => Promise<any>;
+export declare class BridgeContract extends Contract<
+  BridgeOptions,
+  BridgeMethods
+> {
+  constructor(provider: HttpProvider, options: BridgeOptions);
+  serializeUri(uri: string): Uint8Array;
+  createWithdrawBody(
+    params: WithdrawParams
+  ): Promise<import("tonweb/dist/types/boc/cell").Cell>;
+  createFreezeBody(
+    params: FreezeParams
+  ): Promise<import("tonweb/dist/types/boc/cell").Cell>;
+  getPublicKey: () => Promise<any>;
+  isInitialized: () => Promise<any>;
+  getActionId: () => Promise<any>;
+  getWhitelist: () => Promise<any>;
 }
 export {};
 //# sourceMappingURL=ton-bridge.d.ts.map
