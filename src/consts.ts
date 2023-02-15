@@ -103,6 +103,45 @@ export enum MainNetRpcUri {
   SOLANA = "https://api.mainnet-beta.solana.com",
   // TODO: Algorand
 }
+export const MainNetRpcUriArray = [
+  { chainNumber: 2, rpc: "https://gateway.elrond.com" },
+  { chainNumber: 3, rpc: "https://http-mainnet-node.huobichain.com" },
+  { chainNumber: 4, rpc: "https://bsc-dataseed.binance.org/" },
+  {
+    chainNumber: 5,
+    rpc: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+  },
+  { chainNumber: 6, rpc: "https://api.avax.network/ext/bc/C/rpc" },
+  { chainNumber: 7, rpc: "https://polygon-rpc.com" },
+  { chainNumber: 8, rpc: "https://rpc.ftm.tools/" },
+  { chainNumber: 9, rpc: "https://api.trongrid.io/" },
+  { chainNumber: 11, rpc: "https://forno.celo.org" },
+  { chainNumber: 12, rpc: "https://rpc.s0.t.hmny.io" },
+  { chainNumber: 14, rpc: "https://gnosischain-rpc.gateway.pokt.network/" },
+  { chainNumber: 16, rpc: "https://rpc.fuse.io/" },
+  { chainNumber: 19, rpc: "https://mainnet.velas.com/rpc" },
+  { chainNumber: 18, rpc: "https://mainnet.smartpy.io" },
+  { chainNumber: 20, rpc: "https://babel-api.mainnet.iotex.io" },
+  { chainNumber: 21, rpc: "https://mainnet.aurora.dev" },
+  { chainNumber: 22, rpc: "https://v1.mainnet.godwoken.io/rpc" },
+  { chainNumber: 23, rpc: "https://evm.gatenode.cc" },
+  { chainNumber: 25, rpc: "https://sync-mainnet.veblocks.net" },
+  { chainNumber: 24, rpc: "https://secret-4.api.trivium.network:1317" },
+  {
+    chainNumber: 30,
+    rpc: "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+  },
+  { chainNumber: 31, rpc: "https://rpc.mainnet.near.org" },
+  { chainNumber: 32, rpc: "https://rpc.api.moonbeam.network" },
+  { chainNumber: 33, rpc: "https://rpc.abeychain.com" },
+  { chainNumber: 27, rpc: "https://toncenter.com/api/v2/jsonRPC" },
+  { chainNumber: 34, rpc: "https://fullnode.mainnet.aptoslabs.com/" },
+  { chainNumber: 35, rpc: "https://mainnet.block.caduceus.foundation/" },
+  { chainNumber: 36, rpc: "https://exchainrpc.okex.org/" },
+  { chainNumber: 37, rpc: "https://nova.arbitrum.io/rpc" },
+  { chainNumber: 26, rpc: "https://api.mainnet-beta.solana.com" },
+  // TODO: Algorand
+];
 
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];

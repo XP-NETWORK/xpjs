@@ -3,6 +3,9 @@
  * @module
  */
 import BigNumber from "bignumber.js";
+import Web3 from "web3";
+import { erc721 } from "../factory/erc721";
+import { erc721Abi } from "../factory/erc721Abi";
 import {
   BalanceCheck,
   EstimateTxFeesBatch,
@@ -40,6 +43,7 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   GetTokenURI,
+  MainNetRpcUriArray,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
@@ -731,11 +735,56 @@ export async function web3HelperFactory(
     async estimateValidateTransferNft(
       _to: string,
       _nftUri: NftInfo<EthNftInfo>,
-      _mintWith
+      _mintWith,
+      _toNonce: any
     ): Promise<BigNumber> {
-      const gas = await provider.getGasPrice();
+      try {
+        const resp = await axios.get(
+          `https://sc-verify.xp.network/verify/list?from=${
+            _nftUri.collectionIdent
+          }&targetChain=${_toNonce.getNonce()}&fromChain=${
+            _nftUri.chainId
+          }&tokenId=${_nftUri.tokenId}`
+        );
+        if (resp.data.data.length > 0) {
+          const gas = await provider.getGasPrice();
+          return new BigNumber(gas.mul(150_000).toString());
+        } else {
+          //@ts-ignore
+          const node = MainNetRpcUriArray.find(
+            (item) => item.chainNumber === _toNonce.getNonce()
+          ).rpc;
+          console.log({ node });
+          const web3 = new Web3(
+            new Web3.providers.HttpProvider(node, {
+              timeout: 5000,
+            })
+          );
+          //@ts-ignore
+          const myContract = new web3.eth.Contract(erc721Abi);
+          const estimateGas = await myContract
+            .deploy({
+              data: erc721,
+              arguments: ["testing", "test", "https://nft.xp.network/w/"],
+            })
+            .estimateGas();
+          const gas = await provider.getGasPrice();
 
-      return new BigNumber(gas.mul(150_000).toString());
+          const contractFee = gas.mul(estimateGas);
+          const trxFee = gas.mul(150_000);
+          const sum = new BigNumber(contractFee.add(trxFee).toString());
+          console.log({
+            contractFee: new BigNumber(contractFee.toString()),
+            trxFee: new BigNumber(trxFee.toString()),
+            sum,
+          });
+          return sum;
+        }
+      } catch (error: any) {
+        console.log(error.message);
+        const gas = await provider.getGasPrice();
+        return new BigNumber(gas.mul(150_000).toString());
+      }
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));

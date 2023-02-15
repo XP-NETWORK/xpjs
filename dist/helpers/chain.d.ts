@@ -8,6 +8,8 @@ export type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
   readonly collectionIdent: string;
+  readonly chainId?: string;
+  readonly tokenId?: string;
 };
 /**
  * Action to perform before transfer/unfreeze (if any)
@@ -90,7 +92,8 @@ export interface EstimateTxFees<RawNftF> {
   estimateValidateTransferNft(
     to: string,
     metadata: NftInfo<RawNftF>,
-    mintWith: string
+    mintWith: string,
+    _toNonce: any
   ): Promise<BigNumber>;
   estimateValidateUnfreezeNft(
     to: string,

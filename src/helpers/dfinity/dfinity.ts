@@ -272,6 +272,8 @@ export async function dfinityHelper(
                     uri: Buffer.from(
                       metadata["nonfungible"]["metadata"][0] ?? []
                     ).toString("utf-8"),
+                    chainId: "",
+                    tokenId: "",
                   });
                 }
               }
