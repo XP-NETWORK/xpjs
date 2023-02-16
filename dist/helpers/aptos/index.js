@@ -85,7 +85,7 @@ async function aptosHelper({
         );
         const response = await tc.createToken(
           owner,
-          "UMT",
+          "XPNFT",
           options.name,
           options.description,
           1,
