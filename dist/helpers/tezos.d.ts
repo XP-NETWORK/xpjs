@@ -16,17 +16,22 @@ import {
   GetFeeMargins,
   WhitelistCheck,
   GetTokenURI,
+  TransferNftForeignBatch,
+  UnfreezeForeignNftBatch,
+  EstimateTxFeesBatch,
 } from "./chain";
 type TezosSigner = WalletProvider | Signer;
 export type TezosNftInfo = {
   contract: string;
   token_id: string;
+  amt: number;
 };
 type TezosMintArgs = {
   identifier: string;
-  attrs: string;
   contract: string;
   uri: string;
+  to: string;
+  amt: number;
 };
 export type TezosHelper = TransferNftForeign<
   TezosSigner,
@@ -36,6 +41,9 @@ export type TezosHelper = TransferNftForeign<
   MintNft<TezosSigner, TezosMintArgs, string> &
   BalanceCheck &
   UnfreezeForeignNft<TezosSigner, TezosNftInfo, string> &
+  TransferNftForeignBatch<TezosSigner, TezosNftInfo, string> &
+  UnfreezeForeignNftBatch<TezosSigner, TezosNftInfo, string> &
+  EstimateTxFeesBatch<TezosNftInfo> &
   ValidateAddress &
   EstimateTxFees<TezosNftInfo> &
   ChainNonceGet &
@@ -51,6 +59,7 @@ export type TezosHelper = TransferNftForeign<
     ): Promise<string | undefined>;
   } & {
     XpNft: string;
+    XpNft1155: string;
   } & GetFeeMargins &
   WhitelistCheck<TezosNftInfo> &
   GetTokenURI;
