@@ -15,16 +15,16 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "../chain";
-export type DfinitySigner = Identity;
-export type DfinityNft = {
+export declare type DfinitySigner = Identity;
+export declare type DfinityNft = {
   canisterId: string;
   tokenId: string;
 };
-export type DfinityMintArgs = {
+export declare type DfinityMintArgs = {
   canisterId?: string;
   uri: string;
 };
-export type User =
+export declare type User =
   | {
       principal: Principal;
     }
@@ -35,7 +35,7 @@ export interface MintRequest {
   to: User;
   metadata: [] | [Array<number>];
 }
-export type DfinityHelper = ChainNonceGet &
+export declare type DfinityHelper = ChainNonceGet &
   TransferNftForeign<DfinitySigner, DfinityNft, string> &
   UnfreezeForeignNft<DfinitySigner, DfinityNft, string> &
   EstimateTxFees<DfinityNft> &
@@ -50,7 +50,7 @@ export type DfinityHelper = ChainNonceGet &
   MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
   };
-export type DfinityParams = {
+export declare type DfinityParams = {
   agent: HttpAgent;
   bridgeContract: Principal;
   xpnftId: Principal;

@@ -3,7 +3,7 @@ import { ClaimNftInfo } from "./helpers/algorand";
 /**
  * Tracker for cross chain transaction
  */
-export type TxnSocketHelper = {
+export declare type TxnSocketHelper = {
   /**
    *
    * @param chain  Nonce of the target chain
@@ -12,7 +12,7 @@ export type TxnSocketHelper = {
    */
   waitTxHash(chain: number, action_id: string): Promise<string>;
 };
-export type AlgorandSocketHelper = {
+export declare type AlgorandSocketHelper = {
   waitAlgorandNft(
     sourceChain: number,
     receiver: string,
@@ -21,7 +21,7 @@ export type AlgorandSocketHelper = {
   claimNfts(receiver: string): Promise<DbClaimInfo[]>;
   cleanNfts(owner: string): Promise<void>;
 };
-type DbClaimInfo = {
+declare type DbClaimInfo = {
   receiver: string;
   app_id: string;
   nft_id: string;

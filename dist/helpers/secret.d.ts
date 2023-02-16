@@ -15,7 +15,7 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "./chain";
-export type SecretNftInfo = {
+export declare type SecretNftInfo = {
   contract: string;
   contractHash: string;
   chainId: string;
@@ -23,12 +23,12 @@ export type SecretNftInfo = {
   vk: string;
   metadata: Extension | undefined;
 };
-export type SecretMintArgs = {
+export declare type SecretMintArgs = {
   url: string;
   contract?: SecretContract;
 };
-type SecretSigner = SecretNetworkClient;
-export type SecretHelper = TransferNftForeign<
+declare type SecretSigner = SecretNetworkClient;
+export declare type SecretHelper = TransferNftForeign<
   SecretSigner,
   SecretNftInfo,
   TxResponse
@@ -59,11 +59,11 @@ export type SecretHelper = TransferNftForeign<
       nft: NftInfo<SecretNftInfo>
     ): Promise<boolean>;
   };
-export type SecretContract = {
+export declare type SecretContract = {
   contractAddress: string;
   codeHash: string;
 };
-export type SecretParams = {
+export declare type SecretParams = {
   rpcUrl: string;
   chainId: string;
   notifier: EvNotifier;

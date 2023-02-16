@@ -22,14 +22,14 @@ import {
 } from "..";
 import { ChainNonceGet } from "..";
 import { EvNotifier } from "../notifier";
-type TronSender = string | undefined;
-export type MinterRes = {
+declare type TronSender = string | undefined;
+export declare type MinterRes = {
   minter: string;
   xpnft: string;
   xpnft1155: string;
   whitelist: string[];
 };
-export type BaseTronHelper = BalanceCheck &
+export declare type BaseTronHelper = BalanceCheck &
   MintNft<TronSender, MintArgs, string> & {
     /**
      *
@@ -56,7 +56,7 @@ export type BaseTronHelper = BalanceCheck &
       whitelist?: string[]
     ): Promise<MinterRes>;
   };
-export type TronHelper = BaseTronHelper &
+export declare type TronHelper = BaseTronHelper &
   TransferNftForeign<TronSender, EthNftInfo, string> &
   UnfreezeForeignNft<TronSender, EthNftInfo, string> &
   EstimateTxFees<EthNftInfo> &
