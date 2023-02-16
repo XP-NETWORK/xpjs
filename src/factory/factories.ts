@@ -165,7 +165,7 @@ export namespace ChainFactoryConfigs {
       aptosParams: {
         rpcUrl: TestNetRpcUri.APTOS,
         bridge:
-          "0x467fbe95cf51893ce4526e0959771ac1e5b9c578d351aba35b98506476221f18",
+          "0x2b9c2009290f6a291df678bca9b03aa55f909cbdbbcc215d4868f5bd8e5a7d58",
         xpnft: "XPNFT",
         notifier,
         feeMargin,
