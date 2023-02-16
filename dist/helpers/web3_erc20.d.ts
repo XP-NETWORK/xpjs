@@ -8,7 +8,7 @@ import { BaseWeb3Helper, Web3Helper, Web3Params } from "..";
 export declare function baseWeb3HelperFactory(
   provider: Provider
 ): Promise<BaseWeb3Helper>;
-export type Web3ERC20Params = Web3Params & {
+export declare type Web3ERC20Params = Web3Params & {
   paymentTokenAddress: string;
 };
 export declare function web3ERC20HelperFactory(

@@ -35,15 +35,15 @@ import {
   ValidateAddress,
 } from "..";
 import { EvNotifier } from "../notifier";
-type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
+declare type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 /**
  * Information associated with an ESDT Token
  */
-export type EsdtTokenInfo = {
+export declare type EsdtTokenInfo = {
   readonly balance: 1 | string;
   readonly tokenIdentifier: string;
 };
-type BEsdtNftInfo = {
+declare type BEsdtNftInfo = {
   readonly attributes?: string[];
   readonly creator: string;
   readonly name: string;
@@ -54,11 +54,11 @@ type BEsdtNftInfo = {
 /**
  * Information associated with an ESDT NFT
  */
-export type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
+export declare type EsdtNftInfo = EsdtTokenInfo & BEsdtNftInfo;
 /**
  * arguments required to issue an NFT
  */
-export type NftIssueArgs = {
+export declare type NftIssueArgs = {
   readonly identifier: string;
   readonly uris: Array<string>;
   readonly name: string;
@@ -99,7 +99,7 @@ export interface IssueESDTNFT {
  * ESDTRoleNFTBurn: Allow burning NFTs
  * ESDTRoleNFTAddQuanitity: Allowing minting >1 NFTs (SFT)
  */
-export type ESDTRole =
+export declare type ESDTRole =
   | "ESDTRoleNFTCreate"
   | "ESDTRoleNFTBurn"
   | "ESDTRoleNFTAddQuantity";
@@ -143,7 +143,7 @@ export interface ElrondRawUnsignedTxn {
 /**
  * Traits implemented by this module
  */
-export type ElrondHelper = BalanceCheck &
+export declare type ElrondHelper = BalanceCheck &
   TransferNftForeign<ElrondSigner, EsdtNftInfo, Transaction> &
   UnfreezeForeignNft<ElrondSigner, EsdtNftInfo, Transaction> &
   TransferNftForeignBatch<ElrondSigner, EsdtNftInfo, Transaction> &

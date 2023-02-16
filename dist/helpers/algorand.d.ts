@@ -12,10 +12,10 @@ import {
 import MyAlgoConnect from "@randlabs/myalgo-connect";
 import { EvNotifier } from "../notifier";
 import { BalanceCheck, FeeMargins, GetFeeMargins, GetTokenURI } from "./chain";
-type TxResp = {
+declare type TxResp = {
   txId: string;
 };
-type AlgoNft = {
+declare type AlgoNft = {
   "metadata-hash"?: string;
   name?: string;
   "unit-name"?: string;
@@ -23,12 +23,12 @@ type AlgoNft = {
   creator: string;
   nftId: number;
 };
-type SignedTxn = {
+declare type SignedTxn = {
   txID?: string;
   blob: string;
 };
-type Ledger = "MainNet" | "TestNet" | "any";
-type BrowserSigner = {
+declare type Ledger = "MainNet" | "TestNet" | "any";
+declare type BrowserSigner = {
   accounts(args: { ledger: Ledger }): Promise<
     {
       address: string;
@@ -41,14 +41,14 @@ type BrowserSigner = {
   ): Promise<SignedTxn[]>;
   send(info: { ledger: Ledger; tx: string }): Promise<TxResp>;
 };
-export type ClaimNftInfo = {
+export declare type ClaimNftInfo = {
   appId: number;
   nftId: number;
 };
 /**
  * Selected address & ledger must be given explicitly
  */
-export type AlgoSignerH = {
+export declare type AlgoSignerH = {
   readonly algoSigner: BrowserSigner;
   readonly address: string;
   readonly ledger: Ledger;
@@ -64,11 +64,11 @@ export declare function algoSignerWrapper(
   algod: algosdk.Algodv2,
   acc: algosdk.Account
 ): AlgoSignerH;
-export type FullClaimNft = ClaimNftInfo & {
+export declare type FullClaimNft = ClaimNftInfo & {
   name: string;
   uri: string;
 };
-export type AlgorandHelper = ChainNonceGet &
+export declare type AlgorandHelper = ChainNonceGet &
   TransferNftForeign<AlgoSignerH, AlgoNft, string> &
   UnfreezeForeignNft<AlgoSignerH, AlgoNft, string> &
   EstimateTxFees<AlgoNft> &
@@ -94,7 +94,7 @@ export type AlgorandHelper = ChainNonceGet &
   } & GetFeeMargins &
   BalanceCheck &
   GetTokenURI;
-export type AlgorandParams = {
+export declare type AlgorandParams = {
   algodApiKey: string;
   algodUri: string;
   indexerUri: string;

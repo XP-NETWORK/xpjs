@@ -13,14 +13,14 @@ import {
   BalanceCheck,
   MintNft,
 } from "../chain";
-export type SolanaSigner = Wallet;
-export type SolanaNft = {
+export declare type SolanaSigner = Wallet;
+export declare type SolanaNft = {
   nftMint: string;
 };
-type SolanaMintArgs = {
+declare type SolanaMintArgs = {
   uri: string;
 };
-export type SolanaHelper = ChainNonceGet &
+export declare type SolanaHelper = ChainNonceGet &
   BalanceCheck &
   MintNft<SolanaSigner, SolanaMintArgs, string> &
   TransferNftForeign<SolanaSigner, SolanaNft, string> &
@@ -32,7 +32,7 @@ export type SolanaHelper = ChainNonceGet &
     XpNft: string;
   } & GetFeeMargins &
   GetProvider<Connection>;
-export type SolanaParams = {
+export declare type SolanaParams = {
   endpoint: string;
   bridgeContractAddr: string;
   xpnftAddr: string;

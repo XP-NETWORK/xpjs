@@ -1,7 +1,10 @@
 import { ElrondParams, ElrondHelper } from "./helpers/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
-import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
+import {
+  SupportedCurrency,
+  SupportedCurrencyName,
+} from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { TezosHelper, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
@@ -79,22 +82,22 @@ export declare enum MainNetRpcUri {
   BITGERT = "https://dedicated.brisescan.com",
   SOLANA = "https://api.mainnet-beta.solana.com",
 }
-type ElrondMeta = [ElrondHelper, ElrondParams];
-type Web3Meta = [Web3Helper, Web3Params];
-type TronMeta = [TronHelper, TronParams];
-type AlgoMeta = [AlgorandHelper, AlgorandParams];
-type TezosMeta = [TezosHelper, TezosParams];
-type SecretMeta = [SecretHelper, SecretParams];
-type SolanaMeta = [SolanaHelper, SolanaParams];
-type TonMeta = [TonHelper, TonParams];
-type DfinityMeta = [DfinityHelper, DfinityParams];
-type NearMeta = [NearHelper, NearParams];
-type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
-type AptosMeta = [AptosHelper, AptosParams];
-type MetaMapAssert = {
+declare type ElrondMeta = [ElrondHelper, ElrondParams];
+declare type Web3Meta = [Web3Helper, Web3Params];
+declare type TronMeta = [TronHelper, TronParams];
+declare type AlgoMeta = [AlgorandHelper, AlgorandParams];
+declare type TezosMeta = [TezosHelper, TezosParams];
+declare type SecretMeta = [SecretHelper, SecretParams];
+declare type SolanaMeta = [SolanaHelper, SolanaParams];
+declare type TonMeta = [TonHelper, TonParams];
+declare type DfinityMeta = [DfinityHelper, DfinityParams];
+declare type NearMeta = [NearHelper, NearParams];
+declare type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
+declare type AptosMeta = [AptosHelper, AptosParams];
+declare type MetaMapAssert = {
   [idx in typeof Chain[keyof typeof Chain]]: unknown;
 };
-export type MetaMap = {
+export declare type MetaMap = {
   2: ElrondMeta;
   3: Web3Meta;
   4: Web3Meta;
@@ -180,12 +183,13 @@ interface ChainData<T extends ChainNonce> {
   chainId?: number;
   tnChainId?: number;
   currency: SupportedCurrency;
+  currencySymbol: SupportedCurrencyName;
   type: string;
   blockExplorerUrlAddr?: string;
   tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
   rejectUnfreeze?: string[];
 }
-type ChainInfo = {
+declare type ChainInfo = {
   set<T extends ChainNonce>(k: T, v: ChainData<T> | undefined): void;
   get<T extends ChainNonce>(k: T): ChainData<T> | undefined;
 } & Map<ChainNonce, ChainData<ChainNonce>>;

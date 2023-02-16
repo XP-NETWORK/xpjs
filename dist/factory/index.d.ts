@@ -42,7 +42,7 @@ import {
   InferNativeNft,
   InferSigner,
 } from "../type-utils";
-export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
+export declare type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
   RawNft,
   Resp
@@ -54,14 +54,18 @@ export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
     XpNft: string;
     XpNft1155?: string;
   } & GetFeeMargins;
-type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
+declare type FullChainBatch<Signer, RawNft, Resp> = FullChain<
+  Signer,
+  RawNft,
+  Resp
+> &
   TransferNftForeignBatch<Signer, RawNft, Resp> &
   UnfreezeForeignNftBatch<Signer, RawNft, Resp> &
   EstimateTxFeesBatch<RawNft>;
 /**
  * A type representing a chain factory.
  */
-export type ChainFactory = {
+export declare type ChainFactory = {
   /**
    * Creates an helper factory for a given chain
    * @param chain: {@link ChainNonce} to create the helper for.
@@ -283,7 +287,7 @@ export interface ChainParams {
   arbitrumParams: Web3Params;
   bitgertParams: Web3Params;
 }
-export type MoralisNetwork = "mainnet" | "testnet";
+export declare type MoralisNetwork = "mainnet" | "testnet";
 /**
  * A struct for the configuration of the library.
  * @field exchangeRateUri: The URI of the exchange rate service.
