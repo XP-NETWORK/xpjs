@@ -57,7 +57,7 @@ export declare enum MainNetRpcUri {
     TRON = "https://api.trongrid.io/",
     CELO = "https://forno.celo.org",
     HARMONY = "https://rpc.s0.t.hmny.io",
-    XDAI = "https://gnosischain-rpc.gateway.pokt.network/",
+    XDAI = "https://gnosis.xp.network/node",
     FUSE = "https://rpc.fuse.io/",
     VELAS = "https://mainnet.velas.com/rpc",
     TEZOS = "https://mainnet.smartpy.io",
@@ -75,9 +75,8 @@ export declare enum MainNetRpcUri {
     APTOS = "https://fullnode.mainnet.aptoslabs.com/",
     CADUCEUS = "https://mainnet.block.caduceus.foundation/",
     OKC = "https://exchainrpc.okex.org/",
-    ARBITRUM = "https://nova.arbitrum.io/rpc",
-    BITGERT = "https://dedicated.brisescan.com",
-    SOLANA = "https://api.mainnet-beta.solana.com"
+    ARBITRUM = "string",
+    BITGERT = "https://dedicated.brisescan.com"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
