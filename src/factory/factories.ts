@@ -13,7 +13,7 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
 import { FeeMargins } from "../helpers/chain";
-
+//sdf
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
   "0x837b2eb764860b442c971f98f505e7c5f419edd7",
