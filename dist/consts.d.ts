@@ -1,7 +1,7 @@
 import { ElrondParams, ElrondHelper } from "./helpers/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/web3";
-import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
+import { SupportedCurrency, SupportedCurrencyName } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { TezosHelper, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
@@ -180,6 +180,7 @@ interface ChainData<T extends ChainNonce> {
     chainId?: number;
     tnChainId?: number;
     currency: SupportedCurrency;
+    currencySymbol: SupportedCurrencyName;
     type: string;
     blockExplorerUrlAddr?: string;
     tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
