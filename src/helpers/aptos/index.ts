@@ -104,7 +104,8 @@ export async function aptosHelper({
         _: AptosAccount,
         payload: any
       ) {
-        return signer.signAndSubmitTransaction(payload);
+        const trx = await signer.signAndSubmitTransaction(payload);
+        return trx.hash;
       };
     },
     balance: async (address) => {
