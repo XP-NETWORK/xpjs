@@ -1,9 +1,7 @@
 "use strict";
-var __importDefault =
-  (this && this.__importDefault) ||
-  function (mod) {
-    return mod && mod.__esModule ? mod : { default: mod };
-  };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tonHelper = void 0;
 const anchor_1 = require("@project-serum/anchor");
@@ -16,306 +14,276 @@ const emitter_1 = require("../emitter");
 const js_base64_1 = require("js-base64");
 const axios_1 = __importDefault(require("ton/node_modules/axios"));
 async function tonHelper(args) {
-  const bridge = new ton_bridge_1.BridgeContract(args.tonweb.provider, {
-    address: args.bridgeAddr,
-    burner: args.burnerAddr,
-  });
-  const ton = args.tonweb;
-  ton.provider.sendBoc = (b) =>
-    ton.provider.send("sendBocReturnHash", { boc: b });
-  async function waitTonTrx(exBodyMsg, value, address, msgType) {
-    console.log(exBodyMsg, "TON:exBodyMsg");
-    let body = "";
-    let stop = false;
-    let fastResolve;
-    const setStop = () => {
-      stop = true;
-      emitter_1.Emitter?.removeEventListener("cancel tonKeeper", setStop);
-      fastResolve(true);
-      throw new Error("User has declined transaction");
-    };
-    const noTrx = setTimeout(() => {
-      stop = true;
-      throw new Error("waitTonTrx timeout");
-    }, 60 * 1000 * 20);
-    emitter_1.Emitter?.addEventListener("cancel tonKeeper", setStop);
-    await new Promise((r) => {
-      setTimeout(r, 10 * 1000);
+    const bridge = new ton_bridge_1.BridgeContract(args.tonweb.provider, {
+        address: args.bridgeAddr,
+        burner: args.burnerAddr,
     });
-    async function getUserTrxs(address) {
-      try {
+    const ton = args.tonweb;
+    ton.provider.sendBoc = (b) => ton.provider.send("sendBocReturnHash", { boc: b });
+    async function waitTonTrx(exBodyMsg, value, address, msgType) {
+        console.log(exBodyMsg, "TON:exBodyMsg");
+        let body = "";
+        let stop = false;
+        let fastResolve;
+        const setStop = () => {
+            stop = true;
+            emitter_1.Emitter?.removeEventListener("cancel tonKeeper", setStop);
+            fastResolve(true);
+            throw new Error("User has declined transaction");
+        };
+        const noTrx = setTimeout(() => {
+            stop = true;
+            throw new Error("waitTonTrx timeout");
+        }, 60 * 1000 * 20);
+        emitter_1.Emitter?.addEventListener("cancel tonKeeper", setStop);
         await new Promise((r) => {
-          setTimeout(r, 30 * 1000);
+            setTimeout(r, 10 * 1000);
         });
-        const trxs = await ton.provider.getTransactions(address, 20);
-        return trxs;
-      } catch (e) {
-        console.log(e, "new iterration 30 sec");
-        return await getUserTrxs(address);
-      }
+        async function getUserTrxs(address) {
+            try {
+                await new Promise((r) => {
+                    setTimeout(r, 30 * 1000);
+                });
+                const trxs = await ton.provider.getTransactions(address, 20);
+                return trxs;
+            }
+            catch (e) {
+                console.log(e, "new iterration 30 sec");
+                return await getUserTrxs(address);
+            }
+        }
+        while (!body) {
+            console.log("TON:tring to find the trx...");
+            if (stop)
+                return;
+            //get last 20 trx of address
+            const timeout = setTimeout(() => {
+                throw new Error("TON: timeout when trying to send trx");
+            }, 60 * 1000 * 10);
+            const trxs = await getUserTrxs(address);
+            if (trxs) {
+                clearTimeout(timeout);
+            }
+            //find body of the trx
+            body = trxs.find((trx) => {
+                const messages = trx[msgType];
+                let message = "";
+                let msgVal = "";
+                message = Array.isArray(messages)
+                    ? messages?.at(0)?.msg_data?.body
+                    : messages?.msg_data?.body;
+                msgVal = Array.isArray(trx["out_msgs"])
+                    ? trx.out_msgs?.at(0)?.value
+                    : trx["out_msgs"].value;
+                trx.utime * 1000 >= +new Date(Date.now() - 1000 * 60 * 5) &&
+                    console.log(trx.utime, "trx happend no more than 5 minutes ago");
+                return message === exBodyMsg && msgVal === value;
+            })?.data;
+        }
+        clearTimeout(noTrx);
+        const dict = ton_1.Cell.fromBoc(Buffer.from(body, "base64"))[0].hash();
+        const exHash = dict.toString("base64");
+        console.log(exHash, "exHash");
+        let trxData = undefined;
+        while (trxData === undefined) {
+            await new Promise((r) => setTimeout(r, 6 * 1000));
+            const res = await (0, axios_1.default)(`https://toncenter.com/api/index/getTransactionByHash?tx_hash=${encodeURIComponent(exHash)}&include_msg_body=true`).catch(() => undefined);
+            trxData = res?.data;
+        }
+        return trxData[0]["in_msg"].hash;
     }
-    while (!body) {
-      console.log("TON:tring to find the trx...");
-      if (stop) return;
-      //get last 20 trx of address
-      const timeout = setTimeout(() => {
-        throw new Error("TON: timeout when trying to send trx");
-      }, 60 * 1000 * 10);
-      const trxs = await getUserTrxs(address);
-      if (trxs) {
-        clearTimeout(timeout);
-      }
-      //find body of the trx
-      body = trxs.find((trx) => {
-        const messages = trx[msgType];
-        let message = "";
-        let msgVal = "";
-        message = Array.isArray(messages)
-          ? messages?.at(0)?.msg_data?.body
-          : messages?.msg_data?.body;
-        msgVal = Array.isArray(trx["out_msgs"])
-          ? trx.out_msgs?.at(0)?.value
-          : trx["out_msgs"].value;
-        trx.utime * 1000 >= +new Date(Date.now() - 1000 * 60 * 5) &&
-          console.log(trx.utime, "trx happend no more than 5 minutes ago");
-        return message === exBodyMsg && msgVal === value;
-      })?.data;
-    }
-    clearTimeout(noTrx);
-    const dict = ton_1.Cell.fromBoc(Buffer.from(body, "base64"))[0].hash();
-    const exHash = dict.toString("base64");
-    console.log(exHash, "exHash");
-    let trxData = undefined;
-    while (trxData === undefined) {
-      await new Promise((r) => setTimeout(r, 6 * 1000));
-      const res = await (0, axios_1.default)(
-        `https://toncenter.com/api/index/getTransactionByHash?tx_hash=${encodeURIComponent(
-          exHash
-        )}&include_msg_body=true`
-      ).catch(() => undefined);
-      trxData = res?.data;
-    }
-    return trxData[0]["in_msg"].hash;
-  }
-  return {
-    preTransfer: () => Promise.resolve(true),
-    preUnfreeze: () => Promise.resolve(true),
-    getNonce: () => consts_1.Chain.TON,
-    XpNft: args.xpnftAddr,
-    async balance(address) {
-      return new bignumber_js_1.default(await ton.getBalance(address));
-    },
-    async estimateValidateTransferNft() {
-      return new bignumber_js_1.default(0); // TODO
-    },
-    async estimateValidateUnfreezeNft() {
-      return new bignumber_js_1.default(0); // TODO
-    },
-    async validateAddress(adr) {
-      return tonweb_1.default.Address.isValid(adr);
-    },
-    getFeeMargin() {
-      return args.feeMargin;
-    },
-    async transferNftToForeign(signer, chainNonce, to, nft, txFees, mintWith) {
-      const rSigner = signer.wallet || ton;
-      const txFeesFull = new anchor_1.BN(txFees.toString(10)).add(
-        tonweb_1.default.utils.toNano((Math.random() * 0.01).toFixed(7))
-      );
-      const nftFee = tonweb_1.default.utils.toNano("0.07");
-      const payload = await bridge.createFreezeBody({
-        amount: txFeesFull.sub(nftFee),
-        to: Buffer.from(to),
-        chainNonce,
-        mintWith: Buffer.from(mintWith),
-      });
-      console.log(txFeesFull.toString(10), "val");
-      console.log("TON:transferNftToForeign");
-      console.log(nft.native.nftItemAddr);
-      const res = await rSigner.send("ton_sendTransaction", {
-        value: txFeesFull.toString(10),
-        to: nft.native.nftItemAddr,
-        data: payload,
-      });
-      const hash = await rSigner.handleResponse(res);
-      await args.notifier.notifyTon(hash);
-      return hash;
-    },
-    async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
-      const rSigner = signer.wallet || ton;
-      const value = new anchor_1.BN(_txFees.toString(10)).add(
-        tonweb_1.default.utils.toNano((Math.random() * 0.01).toFixed(7))
-      );
-      const nftFee = tonweb_1.default.utils.toNano("0.05");
-      const payload = await bridge.createWithdrawBody({
-        to: new Uint8Array(Buffer.from(to)),
-        chainNonce: parseInt(chainNonce),
-        txFees: value.sub(nftFee),
-      });
-      console.log(value.toString(10), "v");
-      console.log(nft.native.nftItemAddr);
-      console.log("TON:unfreezeWrappedNft");
-      const res = await rSigner.send("ton_sendTransaction", {
-        value: new anchor_1.BN(value).toString(10),
-        to: nft.native.nftItemAddr,
-        data: payload,
-      });
-      const hash = await rSigner.handleResponse(res);
-      await args.notifier.notifyTon(hash);
-      return hash;
-    },
-    tonKeeperWrapper(args) {
-      console.log(args, "args");
-      let payload = "";
-      let value = "";
-      const tonHub = {
-        async send(method, params) {
-          switch (method) {
-            case "ton_sendTransaction":
-              payload = (0, js_base64_1.fromUint8Array)(
-                await params.data.toBoc(false)
-              );
-              value = params.value;
-              return args.wallet.send(
-                `https://app.tonkeeper.com/transfer/${
-                  params.to
-                }?amount=${new anchor_1.BN(value).toString(
-                  10
-                )}&bin=${encodeURIComponent(payload)}&open=1`
-              );
-            //!
-            default:
-              return null;
-          }
+    return {
+        preTransfer: () => Promise.resolve(true),
+        preUnfreeze: () => Promise.resolve(true),
+        getNonce: () => consts_1.Chain.TON,
+        XpNft: args.xpnftAddr,
+        async balance(address) {
+            return new bignumber_js_1.default(await ton.getBalance(address));
         },
-        async handleResponse(res) {
-          console.log(res);
-          const result = await waitTonTrx(
-            payload,
-            value,
-            args.config.address,
-            "out_msgs"
-          );
-          args.wallet.onSuccess && args.wallet.onSuccess();
-          return result;
+        async estimateValidateTransferNft() {
+            return new bignumber_js_1.default(0); // TODO
         },
-      };
-      return {
-        wallet: tonHub,
-        accIdx: 0,
-      };
-    },
-    tonWalletWrapper(args) {
-      let payload = "";
-      let value = "";
-      const tonHub = {
-        async send(method, params) {
-          switch (method) {
-            case "ton_sendTransaction":
-              value = params.value;
-              payload = (0, js_base64_1.fromUint8Array)(
-                await params.data.toBoc(false)
-              );
-              console.log(payload, "payload");
-              return await args.wallet.send("ton_sendTransaction", [
-                {
-                  to: params.to,
-                  value,
-                  dataType: "boc",
-                  data: payload,
+        async estimateValidateUnfreezeNft() {
+            return new bignumber_js_1.default(0); // TODO
+        },
+        async validateAddress(adr) {
+            return tonweb_1.default.Address.isValid(adr);
+        },
+        getFeeMargin() {
+            return args.feeMargin;
+        },
+        async transferNftToForeign(signer, chainNonce, to, nft, txFees, mintWith) {
+            const rSigner = signer.wallet || ton;
+            const txFeesFull = new anchor_1.BN(txFees.toString(10)).add(tonweb_1.default.utils.toNano((Math.random() * 0.01).toFixed(7)));
+            const nftFee = tonweb_1.default.utils.toNano("0.07");
+            const payload = await bridge.createFreezeBody({
+                amount: txFeesFull.sub(nftFee),
+                to: Buffer.from(to),
+                chainNonce,
+                mintWith: Buffer.from(mintWith),
+            });
+            console.log(txFeesFull.toString(10), "val");
+            console.log("TON:transferNftToForeign");
+            console.log(nft.native.nftItemAddr);
+            const res = (await rSigner.send("ton_sendTransaction", {
+                value: txFeesFull.toString(10),
+                to: nft.native.nftItemAddr,
+                data: payload,
+            }));
+            const hash = await rSigner.handleResponse(res);
+            await args.notifier.notifyTon(hash);
+            return hash;
+        },
+        async unfreezeWrappedNft(signer, to, nft, _txFees, chainNonce) {
+            const rSigner = signer.wallet || ton;
+            const value = new anchor_1.BN(_txFees.toString(10)).add(tonweb_1.default.utils.toNano((Math.random() * 0.01).toFixed(7)));
+            const nftFee = tonweb_1.default.utils.toNano("0.05");
+            const payload = await bridge.createWithdrawBody({
+                to: new Uint8Array(Buffer.from(to)),
+                chainNonce: parseInt(chainNonce),
+                txFees: value.sub(nftFee),
+            });
+            console.log(value.toString(10), "v");
+            console.log(nft.native.nftItemAddr);
+            console.log("TON:unfreezeWrappedNft");
+            const res = (await rSigner.send("ton_sendTransaction", {
+                value: new anchor_1.BN(value).toString(10),
+                to: nft.native.nftItemAddr,
+                data: payload,
+            }));
+            const hash = await rSigner.handleResponse(res);
+            await args.notifier.notifyTon(hash);
+            return hash;
+        },
+        tonKeeperWrapper(args) {
+            console.log(args, "args");
+            let payload = "";
+            let value = "";
+            const tonHub = {
+                async send(method, params) {
+                    switch (method) {
+                        case "ton_sendTransaction":
+                            payload = (0, js_base64_1.fromUint8Array)(await params.data.toBoc(false));
+                            value = params.value;
+                            return args.wallet.send(`https://app.tonkeeper.com/transfer/${params.to}?amount=${new anchor_1.BN(value).toString(10)}&bin=${encodeURIComponent(payload)}&open=1`);
+                        //!
+                        default:
+                            return null;
+                    }
                 },
-              ]);
-            default:
-              return null;
-          }
+                async handleResponse(res) {
+                    console.log(res);
+                    const result = await waitTonTrx(payload, value, args.config.address, "out_msgs");
+                    args.wallet.onSuccess && args.wallet.onSuccess();
+                    return result;
+                },
+            };
+            return {
+                wallet: tonHub,
+                accIdx: 0,
+            };
         },
-        async handleResponse(res) {
-          return (
-            res &&
-            (await waitTonTrx(payload, value, args.config.address, "out_msgs"))
-          );
+        tonWalletWrapper(args) {
+            let payload = "";
+            let value = "";
+            const tonHub = {
+                async send(method, params) {
+                    switch (method) {
+                        case "ton_sendTransaction":
+                            value = params.value;
+                            payload = (0, js_base64_1.fromUint8Array)(await params.data.toBoc(false));
+                            console.log(payload, "payload");
+                            return await args.wallet.send("ton_sendTransaction", [
+                                {
+                                    to: params.to,
+                                    value,
+                                    dataType: "boc",
+                                    data: payload,
+                                },
+                            ]);
+                        default:
+                            return null;
+                    }
+                },
+                async handleResponse(res) {
+                    return (res &&
+                        (await waitTonTrx(payload, value, args.config.address, "out_msgs")));
+                },
+            };
+            return {
+                wallet: tonHub,
+                accIdx: 0,
+            };
         },
-      };
-      return {
-        wallet: tonHub,
-        accIdx: 0,
-      };
-    },
-    tonHubWrapper(args) {
-      let value = "";
-      const tonHub = {
-        async send(method, params) {
-          switch (method) {
-            case "ton_sendTransaction":
-              value = new anchor_1.BN(params.value).toString();
-              return await args.wallet.requestTransaction({
-                seed: args.config.seed,
-                appPublicKey: args.config.appPublicKey,
-                to: params.to,
-                value,
-                timeout: 5 * 60 * 1000,
-                text: `ton_sendTransaction to ${params.to}`,
-                payload: (0, js_base64_1.fromUint8Array)(
-                  await params.data.toBoc(false)
-                ),
-              });
-            default:
-              return null;
-          }
+        tonHubWrapper(args) {
+            let value = "";
+            const tonHub = {
+                async send(method, params) {
+                    switch (method) {
+                        case "ton_sendTransaction":
+                            value = new anchor_1.BN(params.value).toString();
+                            return await args.wallet.requestTransaction({
+                                seed: args.config.seed,
+                                appPublicKey: args.config.appPublicKey,
+                                to: params.to,
+                                value,
+                                timeout: 5 * 60 * 1000,
+                                text: `ton_sendTransaction to ${params.to}`,
+                                payload: (0, js_base64_1.fromUint8Array)(await params.data.toBoc(false)),
+                            });
+                        default:
+                            return null;
+                    }
+                },
+                async handleResponse(res) {
+                    if (res.type === "success" && res.response != undefined) {
+                        return await waitTonTrx(res.response, value, args.config.address, "in_msg");
+                    }
+                    else {
+                        throw new Error(`TonHub:${res.type}`);
+                    }
+                },
+            };
+            return {
+                wallet: tonHub,
+                accIdx: 0,
+            };
         },
-        async handleResponse(res) {
-          if (res.type === "success" && res.response != undefined) {
-            return await waitTonTrx(
-              res.response,
-              value,
-              args.config.address,
-              "in_msg"
-            );
-          } else {
-            throw new Error(`TonHub:${res.type}`);
-          }
+        tonKpWrapper(kp) {
+            const wallet = new tonweb_1.default.Wallets.all.v3R2(ton.provider, {
+                publicKey: kp.publicKey,
+                wc: 0,
+            });
+            const wWallet = {
+                async send(method, params) {
+                    switch (method) {
+                        case "ton_getBalance":
+                            return await ton.getBalance(await wallet.getAddress());
+                        case "ton_requestAccounts":
+                            return [await wallet.getAddress()];
+                        case "ton_sendTransaction":
+                            return await wallet.methods
+                                .transfer({
+                                secretKey: kp.secretKey,
+                                toAddress: params.to,
+                                amount: new anchor_1.BN(params.value),
+                                seqno: (await wallet.methods.seqno().call()) || 0,
+                                sendMode: 3,
+                                payload: params.data,
+                            })
+                                .send();
+                    }
+                },
+                async handleResponse(res) {
+                    return res.hash;
+                },
+            };
+            return {
+                wallet: wWallet,
+                accIdx: 0,
+            };
         },
-      };
-      return {
-        wallet: tonHub,
-        accIdx: 0,
-      };
-    },
-    tonKpWrapper(kp) {
-      const wallet = new tonweb_1.default.Wallets.all.v3R2(ton.provider, {
-        publicKey: kp.publicKey,
-        wc: 0,
-      });
-      const wWallet = {
-        async send(method, params) {
-          switch (method) {
-            case "ton_getBalance":
-              return await ton.getBalance(await wallet.getAddress());
-            case "ton_requestAccounts":
-              return [await wallet.getAddress()];
-            case "ton_sendTransaction":
-              return await wallet.methods
-                .transfer({
-                  secretKey: kp.secretKey,
-                  toAddress: params.to,
-                  amount: new anchor_1.BN(params.value),
-                  seqno: (await wallet.methods.seqno().call()) || 0,
-                  sendMode: 3,
-                  payload: params.data,
-                })
-                .send();
-          }
-        },
-        async handleResponse(res) {
-          return res.hash;
-        },
-      };
-      return {
-        wallet: wWallet,
-        accIdx: 0,
-      };
-    },
-  };
+    };
 }
 exports.tonHelper = tonHelper;
 /**
