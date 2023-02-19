@@ -62,7 +62,7 @@
     "bignumber.js": "=9.0.1",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
-    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#aedf7b2c152d6d25e9e6cec5d222c63a3ade18ab",
+    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#bec675e143f6a54209b1a546279aa64e029903aa",
     "ethers": "^5.5.4",
     "google-protobuf": "^3.20.1",
     "js-base64": "^3.6.1",
@@ -74,6 +74,7 @@
     "tonweb-mnemonic": "^1.0.1",
     "tronstation": "^1.0.1",
     "tronweb": "^4.1.0",
+    "web3": "^1.8.2",
     "web3-providers-connex": "^0.3.1",
     "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#aa9473ea3b0f748bba54f5755abcfd17e3548237"
   }
