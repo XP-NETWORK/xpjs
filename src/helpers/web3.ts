@@ -3,7 +3,7 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
+
 import { erc721 } from "../factory/erc721";
 import { erc721Abi } from "../factory/erc721Abi";
 import {
@@ -750,19 +750,15 @@ export async function web3HelperFactory(
           return new BigNumber(gas.mul(150_000).toString());
         } else {
           const pro = _toNonce.getProvider();
-          const web3 = new Web3(
-            new Web3.providers.HttpProvider(pro.connection.url, {
-              timeout: 5000,
-            })
+          console.log({ pro });
+          const constructorArgs = [
+            "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE",
+          ];
+          const factory = new ethers.ContractFactory(erc721Abi, erc721);
+          const estimateGas = await pro.estimateGas(
+            factory.getDeployTransaction(constructorArgs)
           );
-          //@ts-ignore
-          const myContract = new web3.eth.Contract(erc721Abi);
-          const estimateGas = await myContract
-            .deploy({
-              data: erc721,
-              arguments: [["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"]],
-            })
-            .estimateGas();
+
           const gas = await provider.getGasPrice();
           const contractFee = gas.mul(estimateGas);
           const trxFee = gas.mul(150_000);
