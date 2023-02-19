@@ -43,7 +43,6 @@ import {
   ExtractAction,
   ExtractTxnStatus,
   GetTokenURI,
-  MainNetRpcUriArray,
   NftInfo,
   PreTransfer,
   PreTransferRawTxn,
@@ -750,13 +749,9 @@ export async function web3HelperFactory(
           const gas = await provider.getGasPrice();
           return new BigNumber(gas.mul(150_000).toString());
         } else {
-          //@ts-ignore
-          const node = MainNetRpcUriArray.find(
-            (item) => item.chainNumber === _toNonce.getNonce()
-          ).rpc;
-          console.log({ node });
+          const pro = _toNonce.getProvider();
           const web3 = new Web3(
-            new Web3.providers.HttpProvider(node, {
+            new Web3.providers.HttpProvider(pro.connection.url, {
               timeout: 5000,
             })
           );
@@ -769,7 +764,6 @@ export async function web3HelperFactory(
             })
             .estimateGas();
           const gas = await provider.getGasPrice();
-
           const contractFee = gas.mul(estimateGas);
           const trxFee = gas.mul(150_000);
           const sum = new BigNumber(contractFee.add(trxFee).toString());
