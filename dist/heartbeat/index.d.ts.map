@@ -1,1 +1,0 @@
-{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/heartbeat/index.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,UAAU,EAAE,MAAM,QAAQ,CAAC;AAEpC,oBAAY,eAAe,GAAG;IAC5B,MAAM,IAAI,OAAO,CAAC,UAAU,CAAC,CAAC;CAC/B,CAAC;AAEF,wBAAgB,eAAe,CAAC,OAAO,EAAE,MAAM,GAAG,eAAe,CAWhE"}
