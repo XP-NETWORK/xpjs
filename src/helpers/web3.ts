@@ -738,15 +738,17 @@ export async function web3HelperFactory(
       _toNonce: any
     ): Promise<BigNumber> {
       try {
-        const resp = await axios.get(
-          `https://sc-verify.xp.network/verify/list?from=${
-            _nftUri.collectionIdent
-          }&targetChain=${_toNonce.getNonce()}&fromChain=${
-            _nftUri.chainId
-          }&tokenId=${_nftUri.tokenId}`
-        );
-        if (resp.data.data.length > 0) {
-          const gas = await provider.getGasPrice();
+        const [axiosResult, gas] = await Promise.all([
+          axios.get(
+            `https://sc-verify.xp.network/verify/list?from=${
+              _nftUri.collectionIdent
+            }&targetChain=${_toNonce.getNonce()}&fromChain=${
+              _nftUri.chainId
+            }&tokenId=${_nftUri.tokenId}`
+          ),
+          provider.getGasPrice(),
+        ]);
+        if (axiosResult.data.data.length > 0) {
           return new BigNumber(gas.mul(150_000).toString());
         } else {
           const pro = _toNonce.getProvider();
@@ -758,8 +760,6 @@ export async function web3HelperFactory(
           const estimateGas = await pro.estimateGas(
             factory.getDeployTransaction(constructorArgs)
           );
-
-          const gas = await provider.getGasPrice();
           const contractFee = gas.mul(estimateGas);
           const trxFee = gas.mul(150_000);
           const sum = new BigNumber(contractFee.add(trxFee).toString());
