@@ -739,12 +739,12 @@ export async function web3HelperFactory(
     },
     async estimateContractDep(toChain: any): Promise<BigNumber> {
       try {
+        console.log("NEED TO DEPLOY CONTRACT");
         const gas = await provider.getGasPrice();
         const pro = toChain.getProvider();
         const wl = ["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"];
         const gk = 123;
         const gkx = 42;
-        console.log(Minter__factory.abi, Minter__factory.bytecode);
         const factory = new ethers.ContractFactory(
           Minter__factory.abi,
           Minter__factory.bytecode
@@ -755,11 +755,6 @@ export async function web3HelperFactory(
         const contractFee = gas.mul(estimateGas);
         const trxFee = gas.mul(150_000);
         const sum = new BigNumber(contractFee.add(trxFee).toString());
-        console.log({
-          contractFee: new BigNumber(contractFee.toString()),
-          trxFee: new BigNumber(trxFee.toString()),
-          sum,
-        });
         return sum;
       } catch (error: any) {
         console.log(error.message);
