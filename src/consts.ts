@@ -710,7 +710,7 @@ CHAIN_INFO.set(Chain.OKC, {
   tnChainId: 65,
 });
 CHAIN_INFO.set(Chain.ARBITRUM, {
-  blockExplorerUrl: "https://explorer.arbitrum.io/tx/",
+  blockExplorerUrl: "https://nova.arbiscan.io/tx/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ETH,
   currencySymbol: SupportedCurrencyName.ETH,
@@ -719,7 +719,7 @@ CHAIN_INFO.set(Chain.ARBITRUM, {
   nonce: Chain.ARBITRUM,
   type: ChainType.EVM,
   chainId: 42161,
-  blockExplorerUrlAddr: "https://explorer.arbitrum.io/address/",
+  blockExplorerUrlAddr: "https://nova.arbiscan.io/address/",
   tnBlockExplorerUrl: "https://goerli-rollup-explorer.arbitrum.io/tx/",
   tnBlockExplorerUrlAddr: "https://goerli-rollup-explorer.arbitrum.io/address/",
   tnChainId: 421613,
