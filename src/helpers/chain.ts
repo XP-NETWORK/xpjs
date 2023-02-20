@@ -12,6 +12,7 @@ export type NftInfo<Raw> = {
   readonly collectionIdent: string;
   readonly chainId?: string;
   readonly tokenId?: string;
+  readonly originChain?: string;
 };
 
 /**
@@ -102,7 +103,7 @@ export interface EstimateTxFees<RawNftF> {
     to: string,
     metadata: NftInfo<RawNftF>,
     mintWith: string,
-    _toNonce: any
+    toChain: any
   ): Promise<BigNumber>;
   estimateValidateUnfreezeNft(
     to: string,

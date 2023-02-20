@@ -734,25 +734,27 @@ export async function web3HelperFactory(
     async estimateValidateTransferNft(
       _to: string,
       _nftUri: NftInfo<EthNftInfo>,
-      _mintWith,
-      _toNonce: any
+      _mintWith: any,
+      toChain: any
     ): Promise<BigNumber> {
       try {
         const [axiosResult, gas] = await Promise.all([
           axios.get(
             `https://sc-verify.xp.network/verify/list?from=${
               _nftUri.collectionIdent
-            }&targetChain=${_toNonce.getNonce()}&fromChain=${
+            }&targetChain=${toChain.getNonce()}&fromChain=${
               _nftUri.chainId
             }&tokenId=${_nftUri.tokenId}`
           ),
           provider.getGasPrice(),
         ]);
-        if (axiosResult.data.data.length > 0) {
+        if (
+          axiosResult.data.data.length > 0 ||
+          _nftUri.originChain == toChain.getNonce()
+        ) {
           return new BigNumber(gas.mul(150_000).toString());
         } else {
-          const pro = _toNonce.getProvider();
-          console.log({ pro });
+          const pro = toChain.getProvider();
           const constructorArgs = [
             "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE",
           ];

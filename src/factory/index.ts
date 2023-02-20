@@ -463,11 +463,14 @@ export function ChainFactory(
     receiver: string,
     extraFee?: BigNumber.Value
   ) => {
-    console.log(
-      { receiver, nft, toChain, fromChain },
-      fromChain.getNonce(),
-      toChain.getNonce()
-    );
+    console.log({
+      fromChain,
+      toChain,
+      nft,
+      receiver,
+      extraFee,
+    });
+
     const estimate = await toChain.estimateValidateTransferNft(
       receiver,
       nft as any,
