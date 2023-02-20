@@ -450,8 +450,8 @@ export namespace ChainFactoryConfigs {
       },
       solanaParams: {
         xpnftAddr: "",
-        bridgeContractAddr: "CHgXhvxk3dVyMh8kTVjvPboBfgiCH1ajkdKyWMpo6dn6",
-        endpoint: TestNetRpcUri.SOLANA,
+        bridgeContractAddr: "kVvEBTB1h9GWEC7GcuDNTEmk6uxbCM11GvSmwvuCAwx",
+        endpoint: MainNetRpcUri.SOLANA,
         notifier,
         feeMargin,
       },
