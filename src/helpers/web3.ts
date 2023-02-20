@@ -737,6 +737,36 @@ export async function web3HelperFactory(
 
       return new BigNumber(gas.mul(150_000).toString());
     },
+    async estimateContractDep(toChain: any): Promise<BigNumber> {
+      try {
+        const gas = await provider.getGasPrice();
+        const pro = toChain.getProvider();
+        const wl = ["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"];
+        const gk = 123;
+        const gkx = 42;
+        console.log(Minter__factory.abi, Minter__factory.bytecode);
+        const factory = new ethers.ContractFactory(
+          Minter__factory.abi,
+          Minter__factory.bytecode
+        );
+        const estimateGas = await pro.estimateGas(
+          factory.getDeployTransaction(gk, gkx, wl)
+        );
+        const contractFee = gas.mul(estimateGas);
+        const trxFee = gas.mul(150_000);
+        const sum = new BigNumber(contractFee.add(trxFee).toString());
+        console.log({
+          contractFee: new BigNumber(contractFee.toString()),
+          trxFee: new BigNumber(trxFee.toString()),
+          sum,
+        });
+        return sum;
+      } catch (error: any) {
+        console.log(error.message);
+        const gas = await provider.getGasPrice();
+        return new BigNumber(gas.mul(150_000).toString());
+      }
+    },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
