@@ -1,22 +1,11 @@
-import {
-  ChainNonceGet,
-  ClaimNFT,
-  EstimateTxFees,
-  FeeMargins,
-  GetFeeMargins,
-  GetProvider,
-  MintNft,
-  TransferNftForeign,
-  UnfreezeForeignNft,
-  ValidateAddress,
-} from "../chain";
+import { ChainNonceGet, ClaimNFT, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "../chain";
 import { AptosAccount, AptosClient, HexString } from "aptos";
 import { EvNotifier } from "../../notifier";
 export type AptosNFT = {
-  collection_creator: string;
-  collection_name: string;
-  token_name: string;
-  property_version: number;
+    collection_creator: string;
+    collection_name: string;
+    token_name: string;
+    property_version: number;
 };
 /**
  * @param collection name of the collection u already own. if u dont own any token, then set this as undefined
@@ -26,43 +15,31 @@ export type AptosNFT = {
  * @param createCollection set this as true if u set collection as undefined. it will create a new collection.
  */
 export type AptosMintArgs = {
-  collection: string | undefined;
-  name: string;
-  description: string;
-  uri: string;
-  createCollection: boolean;
+    collection: string | undefined;
+    name: string;
+    description: string;
+    uri: string;
+    createCollection: boolean;
 };
 export type AptosClaimArgs = {
-  sender: HexString;
-  propertyVersion: number;
-  collectionName: string;
-  creator: string;
-  name: string;
+    sender: HexString;
+    propertyVersion: number;
+    collectionName: string;
+    creator: string;
+    name: string;
 };
-export type AptosHelper = ChainNonceGet &
-  TransferNftForeign<AptosAccount, AptosNFT, string> &
-  UnfreezeForeignNft<AptosAccount, AptosNFT, string> &
-  EstimateTxFees<AptosNFT> &
-  ValidateAddress & {
+export type AptosHelper = ChainNonceGet & TransferNftForeign<AptosAccount, AptosNFT, string> & UnfreezeForeignNft<AptosAccount, AptosNFT, string> & EstimateTxFees<AptosNFT> & ValidateAddress & {
     XpNft: string;
-  } & GetFeeMargins &
-  MintNft<AptosAccount, AptosMintArgs, string> &
-  GetProvider<AptosClient> &
-  ClaimNFT<AptosAccount, AptosClaimArgs, string>;
-export type AptosParams = {
-  feeMargin: FeeMargins;
-  rpcUrl: string;
-  xpnft: string;
-  bridge: string;
-  notifier: EvNotifier;
-  network: "mainnet" | "staging" | "testnet";
+} & GetFeeMargins & MintNft<AptosAccount, AptosMintArgs, string> & GetProvider<AptosClient> & ClaimNFT<AptosAccount, AptosClaimArgs, string> & BalanceCheck & {
+    setPetraSigner(signer: any): void;
 };
-export declare function aptosHelper({
-  feeMargin,
-  rpcUrl,
-  xpnft,
-  bridge,
-  notifier,
-  network,
-}: AptosParams): Promise<AptosHelper>;
+export type AptosParams = {
+    feeMargin: FeeMargins;
+    rpcUrl: string;
+    xpnft: string;
+    bridge: string;
+    notifier: EvNotifier;
+    network: "mainnet" | "staging" | "testnet";
+};
+export declare function aptosHelper({ feeMargin, rpcUrl, xpnft, bridge, notifier, network, }: AptosParams): Promise<AptosHelper>;
 //# sourceMappingURL=index.d.ts.map
