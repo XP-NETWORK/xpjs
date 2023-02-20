@@ -610,7 +610,7 @@ exports.CHAIN_INFO.set(Chain.ARBITRUM, {
     name: "Arbitrum",
     nonce: Chain.ARBITRUM,
     type: ChainType.EVM,
-    chainId: 42161,
+    chainId: 42170,
     blockExplorerUrlAddr: "https://nova.arbiscan.io/address/",
     tnBlockExplorerUrl: "https://goerli-rollup-explorer.arbitrum.io/tx/",
     tnBlockExplorerUrlAddr: "https://goerli-rollup-explorer.arbitrum.io/address/",
