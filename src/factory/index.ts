@@ -463,25 +463,64 @@ export function ChainFactory(
     receiver: string,
     extraFee?: BigNumber.Value
   ) => {
-    const estimate = await toChain.estimateValidateTransferNft(
-      receiver,
-      nft as any,
-      ""
-    );
+    try {
+      const axiosResult = await axios.get(
+        `https://sc-verify.xp.network/verify/list?from=${
+          nft.collectionIdent
+        }&targetChain=${toChain.getNonce()}&fromChain=${fromChain.getNonce()}&tokenId=${
+          nft.tokenId
+        }`
+      );
+      console.log(
+        axiosResult?.data?.data?.length > 0 ||
+          nft?.originChain == toChain?.getNonce()
+      );
+      const estimate =
+        axiosResult?.data?.data?.length > 0 ||
+        nft?.originChain == toChain?.getNonce()
+          ? await toChain?.estimateValidateTransferNft(receiver, nft as any, "")
+          : toChain?.estimateContractDep
+          ? await toChain?.estimateContractDep(toChain)
+          : await toChain?.estimateValidateTransferNft(
+              receiver,
+              nft as any,
+              ""
+            );
 
-    let conv = await calcExchangeFees(
-      fromChain.getNonce(),
-      toChain.getNonce(),
-      estimate,
-      toChain.getFeeMargin()
-    );
+      console.log({ estimate });
 
-    if (extraFee) {
-      conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
-      console.log("extra conv");
+      let conv = await calcExchangeFees(
+        fromChain.getNonce(),
+        toChain.getNonce(),
+        estimate,
+        toChain.getFeeMargin()
+      );
+
+      if (extraFee) {
+        conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
+        console.log("extra conv");
+      }
+
+      return conv;
+    } catch (err: any) {
+      console.log(err.message);
+      const estimate = await toChain?.estimateValidateTransferNft(
+        receiver,
+        nft as any,
+        ""
+      );
+      let conv = await calcExchangeFees(
+        fromChain.getNonce(),
+        toChain.getNonce(),
+        estimate,
+        toChain.getFeeMargin()
+      );
+      if (extraFee) {
+        conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
+        console.log("extra conv");
+      }
+      return conv;
     }
-
-    return conv;
   };
 
   const estimateSFTfees = async <SignerF, RawNftF, Resp>(
