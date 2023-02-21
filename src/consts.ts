@@ -103,7 +103,7 @@ export enum MainNetRpcUri {
   OKC = "https://exchainrpc.okex.org/",
   ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
-  SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
+  SOLANA = "https://misty-rough-moon.solana-devnet.discover.quiknode.pro/af581f92338f671c86cf6fad96a9aa3451448ffd/",
   // TODO: Algorand
 }
 
@@ -121,7 +121,7 @@ type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
-type MetaMapAssert = { [idx in (typeof Chain)[keyof typeof Chain]]: unknown };
+type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
 
 export type MetaMap = {
   2: ElrondMeta;
