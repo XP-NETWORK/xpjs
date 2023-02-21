@@ -459,22 +459,24 @@ export function ChainFactory(
   const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
-    nft: NftInfo<RawNftF>,
+    nft: NftInfo<any>,
     receiver: string,
     extraFee?: BigNumber.Value
   ) => {
     try {
-      if (toChain?.isNftWhitelisted && fromChain?.isNftWhitelisted) {
-        console.log({ fromChain, toChain });
-        console.log({ from: await fromChain?.isNftWhitelisted(nft) });
-        console.log({ tochain: await toChain?.isNftWhitelisted(nft) });
-        console.log(nft?.native);
-      }
       const axiosResult = await axios.get(
         `https://sc-verify.xp.network/verify/list?from=${nft.collectionIdent.toLowerCase()}&targetChain=${fromChain.getNonce()}&fromChain=${
           nft?.originChain
-        }&tokenId=${nft.tokenId}`
+        }&tokenId=${nft?.native?.tokenId}`
       );
+      console.log({ nft });
+      console.log(
+        nft.collectionIdent.toLowerCase(),
+        fromChain.getNonce(),
+        nft?.originChain,
+        nft?.native?.tokenId
+      );
+      console.log(axiosResult?.data?.data);
       let estimate: BigNumber;
       if (
         axiosResult?.data?.data?.length == 0 &&
