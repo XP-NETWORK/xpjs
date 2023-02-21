@@ -839,9 +839,9 @@ export function ChainFactory(
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
-        if (![9, 18, 24, 31, 27].includes(fromChain.getNonce())) {
+        if (![9, 18, 24, 31, 27, 26].includes(fromChain.getNonce())) {
           //@ts-ignore
-          checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
+          checkNotOldWrappedNft(utils.getAddress(nft.native.contract));
         }
       }
 
