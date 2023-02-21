@@ -77,7 +77,7 @@ export declare enum MainNetRpcUri {
     OKC = "https://exchainrpc.okex.org/",
     ARBITRUM = "https://nova.arbitrum.io/rpc",
     BITGERT = "https://dedicated.brisescan.com",
-    SOLANA = "https://api.mainnet-beta.solana.com"
+    SOLANA = "https://misty-rough-moon.solana-devnet.discover.quiknode.pro/af581f92338f671c86cf6fad96a9aa3451448ffd/"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
