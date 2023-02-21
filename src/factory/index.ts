@@ -464,22 +464,28 @@ export function ChainFactory(
     extraFee?: BigNumber.Value
   ) => {
     try {
-      const axiosResult = await axios.get(
-        `https://sc-verify.xp.network/verify/list?from=${nft.collectionIdent.toLowerCase()}&targetChain=${fromChain.getNonce()}&fromChain=${
-          nft?.originChain
-        }&tokenId=${nft?.native?.tokenId}`
-      );
-      console.log({ nft });
-      console.log(
-        nft.collectionIdent.toLowerCase(),
+      const isWrapped = await isWrappedNft(
+        nft,
         fromChain.getNonce(),
-        nft?.originChain,
-        nft?.native?.tokenId
+        toChain.getNonce()
       );
-      console.log(axiosResult?.data?.data);
+      let originalContract, originalChain;
+      if (isWrapped) {
+        const resp = await axios.get(nft.uri);
+        originalContract = resp.data.wrapped.contract.toLowerCase();
+        originalChain = resp.data.wrapped.origin;
+      } else {
+        originalContract = nft.native.contract.toLowerCase();
+        originalChain = nft.native.chainId;
+      }
+      const axiosResult = await axios.get(
+        `https://sc-verify.xp.network/verify/list?from=${originalContract}&targetChain=${fromChain.getNonce()}&fromChain=${originalChain}`
+      );
+
       let estimate: BigNumber;
       if (
-        axiosResult?.data?.data?.length == 0 &&
+        (axiosResult?.data?.data?.length == 0 ||
+          axiosResult?.data?.code != 200) &&
         nft?.originChain != toChain?.getNonce() &&
         toChain?.estimateContractDep
       ) {
