@@ -77,7 +77,7 @@ export declare enum MainNetRpcUri {
     OKC = "https://exchainrpc.okex.org/",
     ARBITRUM = "https://nova.arbitrum.io/rpc",
     BITGERT = "https://dedicated.brisescan.com",
-    SOLANA = "https://misty-rough-moon.solana-devnet.discover.quiknode.pro/af581f92338f671c86cf6fad96a9aa3451448ffd/"
+    SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -92,7 +92,7 @@ type NearMeta = [NearHelper, NearParams];
 type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
 type MetaMapAssert = {
-    [idx in typeof Chain[keyof typeof Chain]]: unknown;
+    [idx in (typeof Chain)[keyof typeof Chain]]: unknown;
 };
 export type MetaMap = {
     2: ElrondMeta;
