@@ -464,30 +464,31 @@ export function ChainFactory(
     extraFee?: BigNumber.Value
   ) => {
     try {
+      if (toChain?.isNftWhitelisted && fromChain?.isNftWhitelisted) {
+        console.log({ fromChain, toChain });
+        console.log({ from: await fromChain?.isNftWhitelisted(nft) });
+        console.log({ tochain: await toChain?.isNftWhitelisted(nft) });
+        console.log(nft?.native);
+      }
       const axiosResult = await axios.get(
-        `https://sc-verify.xp.network/verify/list?from=${
-          nft.collectionIdent
-        }&targetChain=${toChain.getNonce()}&fromChain=${fromChain.getNonce()}&tokenId=${
-          nft.tokenId
-        }`
+        `https://sc-verify.xp.network/verify/list?from=${nft.collectionIdent.toLowerCase()}&targetChain=${fromChain.getNonce()}&fromChain=${
+          nft?.originChain
+        }&tokenId=${nft.tokenId}`
       );
-      console.log(
-        axiosResult?.data?.data?.length > 0 ||
-          nft?.originChain == toChain?.getNonce()
-      );
-      const estimate =
-        axiosResult?.data?.data?.length > 0 ||
-        nft?.originChain == toChain?.getNonce()
-          ? await toChain?.estimateValidateTransferNft(receiver, nft as any, "")
-          : toChain?.estimateContractDep
-          ? await toChain?.estimateContractDep(toChain)
-          : await toChain?.estimateValidateTransferNft(
-              receiver,
-              nft as any,
-              ""
-            );
-
-      console.log({ estimate });
+      let estimate: BigNumber;
+      if (
+        axiosResult?.data?.data?.length == 0 &&
+        nft?.originChain != toChain?.getNonce() &&
+        toChain?.estimateContractDep
+      ) {
+        estimate = await toChain?.estimateContractDep(toChain);
+      } else {
+        estimate = await toChain?.estimateValidateTransferNft(
+          receiver,
+          nft as any,
+          ""
+        );
+      }
 
       let conv = await calcExchangeFees(
         fromChain.getNonce(),

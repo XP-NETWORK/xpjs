@@ -104,6 +104,7 @@ export interface EstimateTxFees<RawNftF> {
     mintWith: string
   ): Promise<BigNumber>;
   estimateContractDep?(toChain: any): Promise<BigNumber>;
+  isNftWhitelisted?(nft: any): Promise<Boolean>;
   estimateValidateUnfreezeNft(
     to: string,
     metadata: NftInfo<RawNftF>,
