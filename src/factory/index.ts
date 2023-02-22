@@ -208,7 +208,7 @@ export type ChainFactory = {
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
     receiver: string
-  ): Promise<{ calcTransfer: BigNumber; calcContractDep: BigNumber | number }>;
+  ): Promise<{ calcContractDep: BigNumber }>;
 
   estimateSFTfees<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
@@ -278,7 +278,10 @@ export type ChainFactory = {
     nft: NftInfo<RawNft>
   ): Promise<boolean>;
 
-  isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
+  isWrappedNft(
+    nft: NftInfo<unknown>,
+    fromChain: number
+  ): Promise<{ bool: boolean; wrapped: any }>;
 
   setProvider(fromChain: number, provider: any): Promise<void>;
 
@@ -490,6 +493,7 @@ export function ChainFactory(
 
     return conv;
   };
+
   const estimateWithContractDep = async <
     SignerF,
     RawNftF,
@@ -499,24 +503,21 @@ export function ChainFactory(
   >(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
-    nft: NftInfo<any>,
-    receiver: string,
-    extraFee?: BigNumber.Value
+    nft: NftInfo<any>
   ) => {
+    let calcContractDep: BigNumber = new BigNumber("0"),
+      originalContract,
+      originalChain;
     try {
-      let calcContractDep: BigNumber | number = 0,
-        originalContract,
-        originalChain;
+      const { bool, wrapped } = await isWrappedNft(
+        nft,
+        fromChain.getNonce(),
+        toChain.getNonce()
+      );
 
-      const [isWrapped, estimate] = await Promise.all([
-        await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce()),
-        await toChain?.estimateValidateTransferNft(receiver, nft as any, ""),
-      ]);
-
-      if (isWrapped) {
-        const resp = await axios.get(nft.uri);
-        originalContract = resp?.data?.wrapped?.contract?.toLowerCase();
-        originalChain = resp?.data?.wrapped?.origin;
+      if (bool) {
+        originalContract = wrapped?.contract?.toLowerCase();
+        originalChain = wrapped?.origin;
       } else {
         originalContract = nft.native.contract.toLowerCase();
         originalChain = nft.native.chainId;
@@ -535,7 +536,7 @@ export function ChainFactory(
         })
         .catch(() => false);
 
-      if (!axiosResult) {
+      if (!axiosResult && toChain?.estimateContractDep) {
         //@ts-ignore
         const contractFee = await toChain?.estimateContractDep(toChain);
         calcContractDep = await calcExchangeFees(
@@ -546,40 +547,13 @@ export function ChainFactory(
         );
       }
 
-      let calcTransfer = await calcExchangeFees(
-        fromChain.getNonce(),
-        toChain.getNonce(),
-        estimate,
-        toChain.getFeeMargin()
-      );
-
-      if (extraFee) {
-        calcTransfer = calcTransfer
-          .multipliedBy(extraFee)
-          .integerValue(BigNumber.ROUND_CEIL);
-        console.log("extra conv");
-      }
-      return { calcTransfer, calcContractDep };
+      return { calcContractDep };
     } catch (error: any) {
-      console.log(error.message);
-      const estimate = await toChain?.estimateValidateTransferNft(
-        receiver,
-        nft as any,
-        ""
+      console.log(
+        error.message,
+        console.log("error in estimateWithContractDep")
       );
-      let calcTransfer = await calcExchangeFees(
-        fromChain.getNonce(),
-        toChain.getNonce(),
-        estimate,
-        toChain.getFeeMargin()
-      );
-      if (extraFee) {
-        calcTransfer = calcTransfer
-          .multipliedBy(extraFee)
-          .integerValue(BigNumber.ROUND_CEIL);
-        console.log("extra conv");
-      }
-      return { calcTransfer, calcContractDep: 0 };
+      return { calcContractDep };
     }
   };
 
@@ -668,23 +642,25 @@ export function ChainFactory(
 
   async function isWrappedNft(nft: NftInfo<unknown>, fc: number, tc?: number) {
     if (fc === Chain.TEZOS) {
-      return (
-        typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
-        "undefined"
-      );
+      return {
+        bool:
+          typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
+          "undefined",
+        wrapped: undefined,
+      };
     }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
     } catch (_) {
-      return false;
+      return { bool: false, wrapped: undefined };
     }
 
-    const original = (await axios.get(nft.uri).catch(() => undefined))?.data
+    const wrapped = (await axios.get(nft.uri).catch(() => undefined))?.data
       .wrapped;
-    const contract = original?.contract || original?.source_mint_ident;
+    const contract = wrapped?.contract || wrapped?.source_mint_ident;
     tc && contract && checkBlockedContracts(tc, contract);
 
-    return typeof original !== "undefined";
+    return { bool: typeof wrapped !== "undefined", wrapped };
   }
 
   async function algoOptInCheck(
@@ -777,7 +753,7 @@ export function ChainFactory(
           if (e.native.contractType && e.native.contractType === "ERC721") {
             throw new Error(`ERC721 is not supported`);
           }
-          if (await isWrappedNft(e, from.getNonce())) {
+          if ((await isWrappedNft(e, from.getNonce())).bool) {
             wrapped.push(e);
           } else {
             unwrapped.push(e);
@@ -957,7 +933,9 @@ export function ChainFactory(
       //   throw Error("invalid address");
       // }
 
-      if (await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce())) {
+      if (
+        (await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce())).bool
+      ) {
         await algoOptInCheck(nft, toChain, receiver);
 
         const res = await fromChain.unfreezeWrappedNft(
@@ -1078,7 +1056,7 @@ export function ChainFactory(
     async checkWhitelist(chain, nft) {
       if (
         !chain.isNftWhitelisted ||
-        (await isWrappedNft(nft, chain.getNonce()))
+        (await isWrappedNft(nft, chain.getNonce())).bool
       ) {
         return true;
       }

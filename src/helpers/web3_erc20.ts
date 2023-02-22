@@ -222,6 +222,7 @@ export async function web3ERC20HelperFactory(
     ...base,
     XpNft: params.erc721_addr,
     XpNft1155: params.erc1155_addr,
+    getParams: () => params,
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
