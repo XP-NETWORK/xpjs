@@ -203,6 +203,13 @@ export type ChainFactory = {
     receiver: string
   ): Promise<BigNumber>;
 
+  estimateWithContractDep<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<RawNftF>,
+    receiver: string
+  ): Promise<{ calcTransfer: BigNumber; calcContractDep: BigNumber | number }>;
+
   estimateSFTfees<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     amount: bigint,
@@ -459,46 +466,87 @@ export function ChainFactory(
   const estimateFees = async <SignerF, RawNftF, SignerT, RawNftT, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<RawNftF>,
+    receiver: string,
+    extraFee?: BigNumber.Value
+  ) => {
+    const estimate = await toChain.estimateValidateTransferNft(
+      receiver,
+      nft as any,
+      ""
+    );
+
+    let conv = await calcExchangeFees(
+      fromChain.getNonce(),
+      toChain.getNonce(),
+      estimate,
+      toChain.getFeeMargin()
+    );
+
+    if (extraFee) {
+      conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
+      console.log("extra conv");
+    }
+
+    return conv;
+  };
+  const estimateWithContractDep = async <
+    SignerF,
+    RawNftF,
+    SignerT,
+    RawNftT,
+    Resp
+  >(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<any>,
     receiver: string,
     extraFee?: BigNumber.Value
   ) => {
     try {
-      const isWrapped = await isWrappedNft(
-        nft,
-        fromChain.getNonce(),
-        toChain.getNonce()
-      );
-      let originalContract, originalChain;
+      let calcContractDep: BigNumber | number = 0,
+        originalContract,
+        originalChain;
+
+      const [isWrapped, estimate] = await Promise.all([
+        await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce()),
+        await toChain?.estimateValidateTransferNft(receiver, nft as any, ""),
+      ]);
+
       if (isWrapped) {
         const resp = await axios.get(nft.uri);
-        originalContract = resp.data.wrapped.contract.toLowerCase();
-        originalChain = resp.data.wrapped.origin;
+        originalContract = resp?.data?.wrapped?.contract?.toLowerCase();
+        originalChain = resp?.data?.wrapped?.origin;
       } else {
         originalContract = nft.native.contract.toLowerCase();
         originalChain = nft.native.chainId;
       }
-      const axiosResult = await axios.get(
-        `https://sc-verify.xp.network/verify/list?from=${originalContract}&targetChain=${fromChain.getNonce()}&fromChain=${originalChain}`
-      );
 
-      let estimate: BigNumber;
-      if (
-        (axiosResult?.data?.data?.length == 0 ||
-          axiosResult?.data?.code != 200) &&
-        nft?.originChain != toChain?.getNonce() &&
-        toChain?.estimateContractDep
-      ) {
-        estimate = await toChain?.estimateContractDep(toChain);
-      } else {
-        estimate = await toChain?.estimateValidateTransferNft(
-          receiver,
-          nft as any,
-          ""
+      const axiosResult = await axios
+        .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
+          fromChain: Number(originalChain),
+          chain:
+            fromChain?.getNonce() == originalChain //if first time sending
+              ? Number(toChain.getNonce())
+              : toChain.getNonce() == originalChain //if sending back
+              ? Number(fromChain.getNonce())
+              : Number(toChain.getNonce()), //all the rest
+          sc: originalContract,
+        })
+        .catch(() => false);
+
+      if (!axiosResult) {
+        //@ts-ignore
+        const contractFee = await toChain?.estimateContractDep(toChain);
+        calcContractDep = await calcExchangeFees(
+          fromChain.getNonce(),
+          toChain.getNonce(),
+          contractFee,
+          toChain.getFeeMargin()
         );
       }
 
-      let conv = await calcExchangeFees(
+      let calcTransfer = await calcExchangeFees(
         fromChain.getNonce(),
         toChain.getNonce(),
         estimate,
@@ -506,29 +554,32 @@ export function ChainFactory(
       );
 
       if (extraFee) {
-        conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
+        calcTransfer = calcTransfer
+          .multipliedBy(extraFee)
+          .integerValue(BigNumber.ROUND_CEIL);
         console.log("extra conv");
       }
-
-      return conv;
-    } catch (err: any) {
-      console.log(err.message);
+      return { calcTransfer, calcContractDep };
+    } catch (error: any) {
+      console.log(error.message);
       const estimate = await toChain?.estimateValidateTransferNft(
         receiver,
         nft as any,
         ""
       );
-      let conv = await calcExchangeFees(
+      let calcTransfer = await calcExchangeFees(
         fromChain.getNonce(),
         toChain.getNonce(),
         estimate,
         toChain.getFeeMargin()
       );
       if (extraFee) {
-        conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
+        calcTransfer = calcTransfer
+          .multipliedBy(extraFee)
+          .integerValue(BigNumber.ROUND_CEIL);
         console.log("extra conv");
       }
-      return conv;
+      return { calcTransfer, calcContractDep: 0 };
     }
   };
 
@@ -701,6 +752,7 @@ export function ChainFactory(
   }
 
   return {
+    estimateWithContractDep,
     getVerifiedContract,
     balance: (i, a) => i.balance(a),
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
