@@ -1,19 +1,16 @@
-import axios from "axios";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { ChainNonce } from "../type-utils";
-
 /**
  * NFT Info
  */
-export type NftInfo<Raw> = {
+export declare type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
   readonly collectionIdent: string;
   readonly tokenId?: any;
   readonly originChain?: any;
 };
-
 /**
  * Action to perform before transfer/unfreeze (if any)
  */
@@ -31,7 +28,6 @@ export interface PreTransfer<Signer, Nft, Ret, ExtraArgs> {
     args?: ExtraArgs
   ): Promise<Ret | undefined>;
 }
-
 /**
  * Transfer NFT to a foreign chain, freezing the original one
  *
@@ -54,7 +50,6 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     gasPrice?: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
-
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
  * chain_nonce is automatically derived
@@ -76,14 +71,12 @@ export interface UnfreezeForeignNft<Signer, RawNft, Resp> {
     gasPrice: ethers.BigNumberish | undefined
   ): Promise<Resp>;
 }
-
 /**
  * Get the balance of an address on the chain
  */
 export interface BalanceCheck {
   balance(address: string): Promise<BigNumber>;
 }
-
 /**
  * Create a new NFT on this chain
  *
@@ -92,11 +85,9 @@ export interface BalanceCheck {
 export interface MintNft<Signer, Args, Identifier> {
   mintNft(owner: Signer, options: Args): Promise<Identifier>;
 }
-
 export interface ValidateAddress {
   validateAddress(adr: string): Promise<boolean>;
 }
-
 export interface EstimateTxFees<RawNftF> {
   estimateValidateTransferNft(
     to: string,
@@ -111,11 +102,7 @@ export interface EstimateTxFees<RawNftF> {
     mintWith: string
   ): Promise<BigNumber>;
 }
-
-export function ConcurrentSendError(): Error {
-  return new Error("concurrent_send");
-}
-
+export declare function ConcurrentSendError(): Error;
 export interface PreTransferRawTxn<NativeNft, Ret> {
   preTransferRawTxn(
     id: NftInfo<NativeNft>,
@@ -123,16 +110,13 @@ export interface PreTransferRawTxn<NativeNft, Ret> {
     value?: BigNumber
   ): Promise<Ret | undefined>;
 }
-
 export interface ChainNonceGet {
   getNonce(): ChainNonce;
 }
-
 export interface ExtractAction<Txn> {
   extractAction(txn: Txn): Promise<string>;
 }
-
-export enum TransactionStatus {
+export declare enum TransactionStatus {
   PENDING = "pending",
   SUCCESS = "success",
   FAILURE = "failure",
@@ -141,11 +125,9 @@ export enum TransactionStatus {
 export interface ExtractTxnStatus {
   extractTxnStatus(txn: string): Promise<TransactionStatus>;
 }
-
 export interface GetTokenURI {
   getTokenURI(contract: string, tokenId: string): Promise<string>;
 }
-
 export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
   transferNftBatchToForeign(
     sender: Signer,
@@ -156,7 +138,6 @@ export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
     txFees: BigNumber
   ): Promise<Resp>;
 }
-
 export interface UnfreezeForeignNftBatch<Signer, RawNft, Resp> {
   unfreezeWrappedNftBatch(
     sender: Signer,
@@ -166,7 +147,6 @@ export interface UnfreezeForeignNftBatch<Signer, RawNft, Resp> {
     txFees: BigNumber
   ): Promise<Resp>;
 }
-
 export interface EstimateTxFeesBatch<RawNftF> {
   estimateValidateTransferNftBatch(
     to: string,
@@ -178,39 +158,27 @@ export interface EstimateTxFeesBatch<RawNftF> {
     metadatas: NftInfo<RawNftF>[]
   ): Promise<BigNumber>;
 }
-
-export type WhitelistCheck<RawNft> = {
+export declare type WhitelistCheck<RawNft> = {
   isNftWhitelisted(nft: NftInfo<RawNft>): Promise<boolean>;
 };
-
 export interface GetProvider<Provider> {
   getProvider(): Provider;
 }
-
-export async function isWrappedNft(nft: NftInfo<unknown>) {
-  return (
-    typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
-    "undefined"
-  );
-}
-
+export declare function isWrappedNft(nft: NftInfo<unknown>): Promise<boolean>;
 export interface IsContractAddress {
   isContractAddress(address: string): Promise<boolean>;
 }
-
 export interface ParamsGetter<T> {
   getParams(): T;
 }
-
 export interface FeeMargins {
   min: number;
   max: number;
 }
-
 export interface GetFeeMargins {
   getFeeMargin(): FeeMargins;
 }
-
 export interface ClaimNFT<Signer, ClaimArgs, Ret> {
   claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;
 }
+//# sourceMappingURL=chain.d.ts.map

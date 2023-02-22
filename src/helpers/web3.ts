@@ -15,6 +15,7 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
+  ParamsGetter,
 } from "./chain";
 import {
   BigNumber as EthBN,
@@ -151,7 +152,8 @@ export type Web3Helper = BaseWeb3Helper &
   } & WhitelistCheck<EthNftInfo> &
   GetFeeMargins &
   IsContractAddress &
-  GetTokenURI;
+  GetTokenURI &
+  ParamsGetter<Web3Params>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -352,6 +354,7 @@ export async function web3HelperFactory(
           }
         }
       : () => Promise.resolve();
+
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
@@ -473,6 +476,7 @@ export async function web3HelperFactory(
     ...base,
     XpNft: params.erc721_addr,
     XpNft1155: params.erc1155_addr,
+    getParams: () => params,
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
