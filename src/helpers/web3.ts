@@ -753,8 +753,7 @@ export async function web3HelperFactory(
           factory.getDeployTransaction(gk, gkx, wl)
         );
         const contractFee = gas.mul(estimateGas);
-        const trxFee = gas.mul(150_000);
-        const sum = new BigNumber(contractFee.add(trxFee).toString());
+        const sum = new BigNumber(contractFee.toString());
         return sum;
       } catch (error: any) {
         console.log(error.message);
