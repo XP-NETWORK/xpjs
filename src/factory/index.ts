@@ -1,10 +1,12 @@
+import { Chain, CHAIN_INFO } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
-import { Chain, CHAIN_INFO } from "../consts";
 
+export * from "./cons";
 export * from "./factories";
 
+import BigNumber from "bignumber.js";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -18,19 +20,14 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "..";
-import BigNumber from "bignumber.js";
 
-import axios from "axios";
-import {
-  _headers,
-  exchangeRateRepo,
-  getDefaultContract,
-  prepareTokenId,
-  checkBlockedContracts,
-} from "./cons";
 import { UserSigner } from "@elrondnetwork/erdjs/out";
-import { bridgeHeartbeat } from "../heartbeat";
+import { ContractFactory, Wallet } from "@hashgraph/hethers";
+import algosdk from "algosdk";
+import axios from "axios";
 import { ethers, utils } from "ethers";
+import { Base64 } from "js-base64";
+import { bridgeHeartbeat } from "../heartbeat";
 import {
   AlgorandHelper,
   AlgorandParams,
@@ -38,9 +35,7 @@ import {
   algoSignerWrapper,
   ClaimNftInfo,
 } from "../helpers/algorand";
-import algosdk from "algosdk";
-import { Base64 } from "js-base64";
-import { TezosParams } from "../helpers/tezos";
+import { AptosParams } from "../helpers/aptos";
 import {
   BalanceCheck,
   EstimateTxFeesBatch,
@@ -50,6 +45,18 @@ import {
   UnfreezeForeignNftBatch,
   WhitelistCheck,
 } from "../helpers/chain";
+import { DfinityParams } from "../helpers/dfinity/dfinity";
+import {
+  HEDERA_PROXY_ABI,
+  HEDERA_PROXY_BC,
+  HEDERA_TOKEN_SERVICE_ABI,
+} from "../helpers/hedera/hts_abi";
+import { NearParams } from "../helpers/near";
+import { SecretParams } from "../helpers/secret";
+import { SolanaParams } from "../helpers/solana";
+import { TezosParams } from "../helpers/tezos";
+import { TonParams } from "../helpers/ton";
+import { Web3ERC20Params } from "../helpers/web3_erc20";
 import {
   ChainNonce,
   HelperMap,
@@ -59,19 +66,13 @@ import {
   InferSigner,
   ParamMap,
 } from "../type-utils";
-import { SecretParams } from "../helpers/secret";
-import { DfinityParams } from "../helpers/dfinity/dfinity";
-import { NearParams } from "../helpers/near";
-import { TonParams } from "../helpers/ton";
-import { ContractFactory, Wallet } from "@hashgraph/hethers";
 import {
-  HEDERA_PROXY_ABI,
-  HEDERA_PROXY_BC,
-  HEDERA_TOKEN_SERVICE_ABI,
-} from "../helpers/hedera/hts_abi";
-import { AptosParams } from "../helpers/aptos";
-import { Web3ERC20Params } from "../helpers/web3_erc20";
-import { SolanaParams } from "../helpers/solana";
+  checkBlockedContracts,
+  exchangeRateRepo,
+  getDefaultContract,
+  prepareTokenId,
+  _headers,
+} from "./cons";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -202,6 +203,13 @@ export type ChainFactory = {
     receiver: string
   ): Promise<BigNumber>;
 
+  estimateWithContractDep<SignerF, RawNftF, SignerT, RawNftT, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<RawNftF>,
+    receiver: string
+  ): Promise<{ calcContractDep: BigNumber }>;
+
   estimateSFTfees<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
     amount: bigint,
@@ -270,9 +278,18 @@ export type ChainFactory = {
     nft: NftInfo<RawNft>
   ): Promise<boolean>;
 
-  isWrappedNft(nft: NftInfo<unknown>, fromChain: number): Promise<boolean>;
+  isWrappedNft(
+    nft: NftInfo<unknown>,
+    fromChain: number
+  ): Promise<{ bool: boolean; wrapped: any }>;
 
   setProvider(fromChain: number, provider: any): Promise<void>;
+
+  whitelistEVM<T extends ChainNonce>(
+    chain: T,
+    address: string,
+    nonce: number
+  ): Promise<{ success: true }>;
 };
 
 /**
@@ -434,6 +451,7 @@ export function ChainFactory(
       CHAIN_INFO.get(toChain)!.currency,
       CHAIN_INFO.get(fromChain)!.currency,
     ]);
+
     const feeR = val.dividedBy(CHAIN_INFO.get(toChain)!.decimals);
     const fromExRate = rate.get(CHAIN_INFO.get(fromChain)!.currency)!;
     const toExRate = rate.get(CHAIN_INFO.get(toChain)!.currency)!;
@@ -475,6 +493,69 @@ export function ChainFactory(
     }
 
     return conv;
+  };
+
+  const estimateWithContractDep = async <
+    SignerF,
+    RawNftF,
+    SignerT,
+    RawNftT,
+    Resp
+  >(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<SignerT, RawNftT, Resp>,
+    nft: NftInfo<any>
+  ) => {
+    let calcContractDep: BigNumber = new BigNumber("0"),
+      originalContract,
+      originalChain;
+    try {
+      const { bool, wrapped } = await isWrappedNft(
+        nft,
+        fromChain.getNonce(),
+        toChain.getNonce()
+      );
+
+      if (bool) {
+        originalContract = wrapped?.contract?.toLowerCase();
+        originalChain = wrapped?.origin;
+      } else {
+        originalContract = nft.native.contract.toLowerCase();
+        originalChain = nft.native.chainId;
+      }
+
+      const axiosResult = await axios
+        .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
+          fromChain: Number(originalChain),
+          chain:
+            fromChain?.getNonce() == originalChain //if first time sending
+              ? Number(toChain.getNonce())
+              : toChain.getNonce() == originalChain //if sending back
+              ? Number(fromChain.getNonce())
+              : Number(toChain.getNonce()), //all the rest
+          sc: originalContract,
+        })
+        .catch(() => false);
+
+      if (!axiosResult && toChain?.estimateContractDep) {
+        //@ts-ignore
+        const contractFee = await toChain?.estimateContractDep(toChain);
+        calcContractDep = await calcExchangeFees(
+          fromChain.getNonce(),
+          toChain.getNonce(),
+          contractFee,
+          toChain.getFeeMargin()
+        );
+      }
+
+      return { calcContractDep };
+    } catch (error: any) {
+      console.log(
+        error.message,
+        console.log("error in estimateWithContractDep")
+      );
+      return { calcContractDep };
+    }
   };
 
   const estimateSFTfees = async <SignerF, RawNftF, Resp>(
@@ -562,23 +643,25 @@ export function ChainFactory(
 
   async function isWrappedNft(nft: NftInfo<unknown>, fc: number, tc?: number) {
     if (fc === Chain.TEZOS) {
-      return (
-        typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
-        "undefined"
-      );
+      return {
+        bool:
+          typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
+          "undefined",
+        wrapped: undefined,
+      };
     }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
     } catch (_) {
-      return false;
+      return { bool: false, wrapped: undefined };
     }
 
-    const original = (await axios.get(nft.uri).catch(() => undefined))?.data
+    const wrapped = (await axios.get(nft.uri).catch(() => undefined))?.data
       .wrapped;
-    const contract = original?.contract || original?.source_mint_ident;
+    const contract = wrapped?.contract || wrapped?.source_mint_ident;
     tc && contract && checkBlockedContracts(tc, contract);
 
-    return typeof original !== "undefined";
+    return { bool: typeof wrapped !== "undefined", wrapped };
   }
 
   async function algoOptInCheck(
@@ -646,6 +729,7 @@ export function ChainFactory(
   }
 
   return {
+    estimateWithContractDep,
     getVerifiedContract,
     balance: (i, a) => i.balance(a),
     async transferBatchNft(from, to, nfts, signer, receiver, fee, mw) {
@@ -670,7 +754,7 @@ export function ChainFactory(
           if (e.native.contractType && e.native.contractType === "ERC721") {
             throw new Error(`ERC721 is not supported`);
           }
-          if (await isWrappedNft(e, from.getNonce())) {
+          if ((await isWrappedNft(e, from.getNonce())).bool) {
             wrapped.push(e);
           } else {
             unwrapped.push(e);
@@ -701,6 +785,22 @@ export function ChainFactory(
       return await Promise.all(result);
     },
     estimateBatchFees,
+    async whitelistEVM<T extends ChainNonce>(chain: T, address: string) {
+      const chainLocal = cToP.get(chain);
+
+      if (!chainLocal) throw new Error("Chain not found");
+      const params = await CHAIN_INFO.get(chain)?.constructor(chainLocal);
+      if (!params) throw new Error("An error occured");
+      const isAddressValid = await params.validateAddress(address);
+      if (!isAddressValid) throw new Error("Address is not valid");
+
+      try {
+        await chainLocal.notifier.notifyEVM(chain, address);
+        return { success: true };
+      } catch (error) {
+        throw new Error("An error occured");
+      }
+    },
     async transferSft(from, to, nft, sender, receiver, amt, fee?, mintWith?) {
       if (Number(amt) > 50)
         throw new Error("Currenly more that 50 SFTs is not supported");
@@ -816,9 +916,9 @@ export function ChainFactory(
     ) => {
       //@ts-ignore
       if (nft.native.contract) {
-        if (![9, 18, 24, 31, 27].includes(fromChain.getNonce())) {
+        if (![9, 18, 24, 31, 27, 26].includes(fromChain.getNonce())) {
           //@ts-ignore
-          checkNotOldWrappedNft(new utils.getAddress(nft.native.contract));
+          checkNotOldWrappedNft(utils.getAddress(nft.native.contract));
         }
       }
 
@@ -838,7 +938,9 @@ export function ChainFactory(
       //   throw Error("invalid address");
       // }
 
-      if (await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce())) {
+      if (
+        (await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce())).bool
+      ) {
         await algoOptInCheck(nft, toChain, receiver);
 
         const res = await fromChain.unfreezeWrappedNft(
@@ -959,7 +1061,7 @@ export function ChainFactory(
     async checkWhitelist(chain, nft) {
       if (
         !chain.isNftWhitelisted ||
-        (await isWrappedNft(nft, chain.getNonce()))
+        (await isWrappedNft(nft, chain.getNonce())).bool
       ) {
         return true;
       }
@@ -970,6 +1072,3 @@ export function ChainFactory(
     setProvider,
   };
 }
-
-export * from "./factories";
-export * from "./cons";

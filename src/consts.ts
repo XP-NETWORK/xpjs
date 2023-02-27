@@ -6,7 +6,10 @@ import {
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
 
-import { SupportedCurrency } from "crypto-exchange-rate/dist/model/domain";
+import {
+  SupportedCurrency,
+  SupportedCurrencyName,
+} from "crypto-exchange-rate/dist/model/domain";
 import { DecimalsByCurrency as Decimals } from "crypto-exchange-rate/dist/model/domain/Decimals";
 import {
   AlgorandParams,
@@ -35,7 +38,7 @@ import { web3ERC20HelperFactory, Web3ERC20Params } from "./helpers/web3_erc20";
 export enum TestNetRpcUri {
   ELROND = "https://devnet-gateway.elrond.com",
   HECO = "https://http-testnet.hecochain.com",
-  BSC = "https://data-seed-prebsc-2-s2.binance.org:8545/",
+  BSC = "https://data-seed-prebsc-2-s3.binance.org:8545/",
   ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://matic-mumbai.chainstacklabs.com",
@@ -52,7 +55,7 @@ export enum TestNetRpcUri {
   GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
   GATECHAIN = "https://meteora-evm.gatenode.cc",
   VECHAIN = "https://sync-testnet.veblocks.net",
-  SECRET = "https://pulsar-2.api.trivium.network:9091/",
+  SECRET = "https://api.pulsar.scrttestnet.com",
   SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
   HEDERA = "https://0.testnet.hedera.com/",
   NEAR = "https://rpc.testnet.near.org",
@@ -80,7 +83,7 @@ export enum MainNetRpcUri {
   TRON = "https://api.trongrid.io/",
   CELO = "https://forno.celo.org",
   HARMONY = "https://rpc.s0.t.hmny.io",
-  XDAI = "https://gnosis.xp.network/node",
+  XDAI = "https://gnosischain-rpc.gateway.pokt.network/",
   FUSE = "https://rpc.fuse.io/",
   VELAS = "https://mainnet.velas.com/rpc",
   TEZOS = "https://mainnet.smartpy.io",
@@ -89,7 +92,7 @@ export enum MainNetRpcUri {
   GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
-  SECRET = "https://grpc.mainnet.secretsaturn.net",
+  SECRET = "https://secret-4.api.trivium.network:1317",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
   NEAR = "https://rpc.mainnet.near.org",
   MOONBEAM = "https://rpc.api.moonbeam.network",
@@ -98,8 +101,9 @@ export enum MainNetRpcUri {
   APTOS = "https://fullnode.mainnet.aptoslabs.com/",
   CADUCEUS = "https://mainnet.block.caduceus.foundation/",
   OKC = "https://exchainrpc.okex.org/",
-  ARBITRUM = "string",
+  ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
+  SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
   // TODO: Algorand
 }
 
@@ -117,7 +121,7 @@ type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
-type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
+type MetaMapAssert = { [idx in (typeof Chain)[keyof typeof Chain]]: unknown };
 
 export type MetaMap = {
   2: ElrondMeta;
@@ -207,6 +211,7 @@ interface ChainData<T extends ChainNonce> {
   chainId?: number;
   tnChainId?: number;
   currency: SupportedCurrency;
+  currencySymbol: SupportedCurrencyName;
   type: string;
   blockExplorerUrlAddr?: string;
   tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
@@ -244,6 +249,7 @@ CHAIN_INFO.set(Chain.ELROND, {
   tnBlockExplorerUrl: "https://testnet-explorer.elrond.com/transactions/",
   tnBlockExplorerUrlAddr: "https://testnet-explorer.elrond.com/address/",
   currency: SupportedCurrency.EGLD,
+  currencySymbol: SupportedCurrencyName.EGLD,
   type: ChainType.ELROND,
 });
 CHAIN_INFO.set(Chain.HECO, {
@@ -254,6 +260,7 @@ CHAIN_INFO.set(Chain.HECO, {
   blockExplorerUrl: "https://testnet.hecoinfo.com/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.HT,
+  currencySymbol: SupportedCurrencyName.HT,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.BSC, {
@@ -267,12 +274,14 @@ CHAIN_INFO.set(Chain.BSC, {
   tnBlockExplorerUrlAddr: "https://testnet.bscscan.com/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.BNB,
+  currencySymbol: SupportedCurrencyName.BNB,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.ETHEREUM, {
   name: "Ethereum",
   nonce: 5,
   currency: SupportedCurrency.ETH,
+  currencySymbol: SupportedCurrencyName.ETH,
   chainId: 5,
   decimals: Decimals.ETH,
   blockExplorerUrl: "https://etherscan.io/tx/",
@@ -293,6 +302,7 @@ CHAIN_INFO.set(Chain.AVALANCHE, {
   tnBlockExplorerUrlAddr: "https://testnet.snowtrace.io/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.AVAX,
+  currencySymbol: SupportedCurrencyName.AVAX,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.POLYGON, {
@@ -306,6 +316,7 @@ CHAIN_INFO.set(Chain.POLYGON, {
   tnBlockExplorerUrlAddr: "https://mumbai.polygonscan.com/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.MATIC,
+  currencySymbol: SupportedCurrencyName.MATIC,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.FANTOM, {
@@ -319,6 +330,7 @@ CHAIN_INFO.set(Chain.FANTOM, {
   tnBlockExplorerUrl: "https://testnet.ftmscan.com/tx/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.FTM,
+  currencySymbol: SupportedCurrencyName.FTM,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.TRON, {
@@ -331,6 +343,7 @@ CHAIN_INFO.set(Chain.TRON, {
   tnBlockExplorerUrlAddr: "https://shasta.tronscan.org/#/address/",
   constructor: tronHelperFactory,
   currency: SupportedCurrency.TRX,
+  currencySymbol: SupportedCurrencyName.TRX,
   type: ChainType.TRON,
 });
 CHAIN_INFO.set(Chain.CELO, {
@@ -341,6 +354,7 @@ CHAIN_INFO.set(Chain.CELO, {
   blockExplorerUrl: "https://alfajores-blockscout.celo-testnet.org/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.CELO,
+  currencySymbol: SupportedCurrencyName.CELO,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.HARMONY, {
@@ -354,6 +368,7 @@ CHAIN_INFO.set(Chain.HARMONY, {
   tnBlockExplorerUrlAddr: "https://explorer.testnet.harmony.one/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ONE,
+  currencySymbol: SupportedCurrencyName.ONE,
   type: ChainType.EVM,
   rejectUnfreeze: [
     "0xb90Dc9e354001e6260DE670EDD6aBaDb890C6aC9",
@@ -368,6 +383,7 @@ CHAIN_INFO.set(Chain.ONT, {
   blockExplorerUrl: "https://explorer.pops.one/tx",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ONT,
+  currencySymbol: SupportedCurrencyName.ONT,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.XDAI, {
@@ -381,6 +397,7 @@ CHAIN_INFO.set(Chain.XDAI, {
   tnBlockExplorerUrlAddr: "https://blockscout.com/xdai/testnet/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.XDAI,
+  currencySymbol: SupportedCurrencyName.XDAI,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.ALGORAND, {
@@ -393,6 +410,7 @@ CHAIN_INFO.set(Chain.ALGORAND, {
   blockExplorerUrlAddr: "https://algoexplorer.io/address/",
   tnBlockExplorerUrlAddr: "https://testnet.algoexplorer.io/address/",
   currency: SupportedCurrency.ALGO,
+  currencySymbol: SupportedCurrencyName.ALGO,
   constructor: (p) => Promise.resolve(algorandHelper(p)),
   type: ChainType.ALGORAND,
 });
@@ -405,7 +423,7 @@ CHAIN_INFO.set(Chain.FUSE, {
   tnBlockExplorerUrl: "https://explorer.fusespark.io/tx/",
   blockExplorerUrlAddr: "https://explorer.fuse.io/address/",
   tnBlockExplorerUrlAddr: "https://explorer.fusespark.io/address/",
-
+  currencySymbol: SupportedCurrencyName.FUSE,
   currency: SupportedCurrency.FUSE,
   constructor: web3HelperFactory,
   type: ChainType.EVM,
@@ -418,6 +436,7 @@ CHAIN_INFO.set(Chain.UNIQUE, {
   blockExplorerUrl: "CANT FIND",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.OPL,
+  currencySymbol: SupportedCurrencyName.OPL,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.TEZOS, {
@@ -426,6 +445,7 @@ CHAIN_INFO.set(Chain.TEZOS, {
   decimals: Decimals.XTZ,
   constructor: tezosHelperFactory,
   currency: SupportedCurrency.XTZ,
+  currencySymbol: SupportedCurrencyName.XTZ,
   blockExplorerUrl: "https://tzkt.io/",
   tnBlockExplorerUrl: "https://ghostnet.tzkt.io/",
   tnBlockExplorerUrlAddr: "https://ghostnet.tzkt.io/",
@@ -442,6 +462,7 @@ CHAIN_INFO.set(Chain.VELAS, {
   decimals: Decimals.VLX,
   constructor: web3HelperFactory,
   currency: SupportedCurrency.VLX,
+  currencySymbol: SupportedCurrencyName.VLX,
   chainId: 111,
   type: ChainType.EVM,
 });
@@ -455,6 +476,7 @@ CHAIN_INFO.set(Chain.AURORA, {
   decimals: Decimals.AURORA,
   constructor: web3HelperFactory,
   currency: SupportedCurrency.AURORA,
+  currencySymbol: SupportedCurrencyName.AURORA,
   chainId: 1313161554,
   type: ChainType.EVM,
 });
@@ -468,6 +490,7 @@ CHAIN_INFO.set(Chain.IOTEX, {
   decimals: Decimals.IOTX,
   constructor: web3HelperFactory,
   currency: SupportedCurrency.IOTX,
+  currencySymbol: SupportedCurrencyName.IOTX,
   chainId: 4689,
   type: ChainType.EVM,
 });
@@ -481,12 +504,12 @@ CHAIN_INFO.set(Chain.GODWOKEN, {
   nonce: 0x16,
   decimals: Decimals.CKB,
   currency: SupportedCurrency.CKB,
+  currencySymbol: SupportedCurrencyName.CKB,
   chainId: 868455272153094,
   type: ChainType.EVM,
 });
 CHAIN_INFO.set(Chain.GATECHAIN, {
   name: "GateChain",
-
   blockExplorerUrl: "https://gatescan.org/tx/",
   tnBlockExplorerUrl: "https://gatescan.org/testnet/tx/",
   blockExplorerUrlAddr: "https://gatescan.org/address/",
@@ -495,6 +518,7 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
   nonce: 0x17,
   decimals: Decimals.GT,
   currency: SupportedCurrency.GT,
+  currencySymbol: SupportedCurrencyName.GT,
   chainId: 85,
   type: ChainType.EVM,
 });
@@ -507,6 +531,7 @@ CHAIN_INFO.set(Chain.VECHAIN, {
   constructor: web3HelperFactory,
   nonce: 0x19,
   currency: SupportedCurrency.VET,
+  currencySymbol: SupportedCurrencyName.VET,
   decimals: Decimals.VET,
   chainId: 39,
   type: ChainType.EVM,
@@ -517,6 +542,7 @@ CHAIN_INFO.set(Chain.SECRET, {
   constructor: secretHelperFactory,
   nonce: Chain.SECRET,
   currency: SupportedCurrency.SCRT,
+  currencySymbol: SupportedCurrencyName.SCRT,
   decimals: Decimals.SCRT,
   type: ChainType.COSMOS,
   blockExplorerUrl: "https://atomscan.com/secret-network/transactions/",
@@ -533,33 +559,17 @@ CHAIN_INFO.set(Chain.SOLANA, {
   constructor: solanaHelper,
   nonce: Chain.SOLANA,
   currency: SupportedCurrency.SOL,
+  currencySymbol: SupportedCurrencyName.SOL,
   decimals: Decimals.SOL,
   type: ChainType.SOLANA,
 });
-/*CHAIN_INFO.set(Chain.TON, {
-  name: "TON",
-  blockExplorerUrl: "", // TODO
-  constructor: tonHelper,
-  nonce: Chain.TON,
-  currency: SupportedCurrency.TON,
-  decimals: 1e9,
-  type: ChainType.TON,
-});
-CHAIN_INFO.set(Chain.DFINITY, {
-  name: "DFINITY",
-  blockExplorerUrl: "", // TODO
-  constructor: dfinityHelper,
-  nonce: Chain.DFINITY,
-  currency: SupportedCurrency.ICP,
-  decimals: 1e8,
-  type: ChainType.DFINITY,
-});*/
 
 CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/mainnet/transaction/",
   tnBlockExplorerUrl: "https://hashscan.io/#/testnet/transaction/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.HBAR,
+  currencySymbol: SupportedCurrencyName.HBAR,
   decimals: Decimals.HBAR,
   nonce: Chain.HEDERA,
   name: "Hedera",
@@ -581,6 +591,7 @@ CHAIN_INFO.set(Chain.SKALE, {
     "https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/address/",
   constructor: web3ERC20HelperFactory,
   currency: SupportedCurrency.ETH,
+  currencySymbol: SupportedCurrencyName.ETH,
   decimals: Decimals.ETH,
   tnChainId: 0x1482a7b2,
   nonce: Chain.SKALE,
@@ -591,6 +602,7 @@ CHAIN_INFO.set(Chain.DFINITY, {
   blockExplorerUrl: "", // TODO
   constructor: dfinityHelper,
   currency: SupportedCurrency.ICP,
+  currencySymbol: SupportedCurrencyName.ICP,
   decimals: Decimals.ICP,
   name: "DFINITY",
   nonce: Chain.DFINITY,
@@ -602,6 +614,7 @@ CHAIN_INFO.set(Chain.NEAR, {
   tnBlockExplorerUrl: "https://explorer.testnet.near.org/transactions/",
   constructor: nearHelperFactory,
   currency: SupportedCurrency.NEAR,
+  currencySymbol: SupportedCurrencyName.NEAR,
   decimals: Decimals.NEAR,
   name: "NEAR",
   nonce: Chain.NEAR,
@@ -613,6 +626,7 @@ CHAIN_INFO.set(Chain.NEAR, {
 CHAIN_INFO.set(Chain.MOONBEAM, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.GLMR,
+  currencySymbol: SupportedCurrencyName.GLMR,
   decimals: Decimals.GLMR,
   name: "MoonBeam",
   nonce: Chain.MOONBEAM,
@@ -631,6 +645,7 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
   blockExplorerUrlAddr: "https://scan.abeychain.com/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ABEY,
+  currencySymbol: SupportedCurrencyName.ABEY,
   decimals: Decimals.ABEY,
   name: "AbeyChain",
   nonce: Chain.ABEYCHAIN,
@@ -640,6 +655,7 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
 CHAIN_INFO.set(Chain.APTOS, {
   constructor: aptosHelper,
   currency: SupportedCurrency.APTOS,
+  currencySymbol: SupportedCurrencyName.APTOS,
   decimals: Decimals.APTOS,
   name: "Aptos",
   nonce: Chain.APTOS,
@@ -654,6 +670,7 @@ CHAIN_INFO.set(Chain.TON, {
   name: "TON",
   constructor: tonHelper,
   currency: SupportedCurrency.TON,
+  currencySymbol: SupportedCurrencyName.TON,
   decimals: Decimals.TON,
   nonce: Chain.TON,
   type: ChainType.TON,
@@ -665,6 +682,7 @@ CHAIN_INFO.set(Chain.TON, {
 CHAIN_INFO.set(Chain.CADUCEUS, {
   constructor: web3HelperFactory,
   currency: SupportedCurrency.CMP,
+  currencySymbol: SupportedCurrencyName.CMP,
   decimals: Decimals.CMP,
   name: "Caduceus",
   nonce: Chain.CADUCEUS,
@@ -680,6 +698,7 @@ CHAIN_INFO.set(Chain.OKC, {
   blockExplorerUrl: "https://www.oklink.com/okc/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.OKT,
+  currencySymbol: SupportedCurrencyName.OKT,
   decimals: Decimals.OKT,
   name: "OKC",
   nonce: Chain.OKC,
@@ -691,15 +710,16 @@ CHAIN_INFO.set(Chain.OKC, {
   tnChainId: 65,
 });
 CHAIN_INFO.set(Chain.ARBITRUM, {
-  blockExplorerUrl: "https://explorer.arbitrum.io/tx/",
+  blockExplorerUrl: "https://nova.arbiscan.io/tx/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ETH,
+  currencySymbol: SupportedCurrencyName.ETH,
   decimals: Decimals.ETH,
   name: "Arbitrum",
   nonce: Chain.ARBITRUM,
   type: ChainType.EVM,
-  chainId: 42161,
-  blockExplorerUrlAddr: "https://explorer.arbitrum.io/address/",
+  chainId: 42170,
+  blockExplorerUrlAddr: "https://nova.arbiscan.io/address/",
   tnBlockExplorerUrl: "https://goerli-rollup-explorer.arbitrum.io/tx/",
   tnBlockExplorerUrlAddr: "https://goerli-rollup-explorer.arbitrum.io/address/",
   tnChainId: 421613,
@@ -708,6 +728,7 @@ CHAIN_INFO.set(Chain.BITGERT, {
   blockExplorerUrl: "https://brisescan.com/tx/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.BRISE,
+  currencySymbol: SupportedCurrencyName.BRISE,
   decimals: Decimals.ETH,
   name: "Bitgert",
   nonce: Chain.BITGERT,

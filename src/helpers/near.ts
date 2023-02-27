@@ -130,13 +130,12 @@ export async function nearHelperFactory({
       contractId: contract,
       methodName: "nft_is_approved",
     });
-    console.log(`Is approved: ${result}`);
     return result;
   };
 
   const getWalletCallbackUrl = (params: string) => {
     let walletCallbackUrl: string | undefined = undefined;
-    if (typeof window?.location !== "undefined") {
+    if (globalThis.window !== undefined) {
       const network =
         location.pathname.match(/^\/(staging|testnet)\/.+/)?.at(1) || "";
 
@@ -241,7 +240,7 @@ export async function nearHelperFactory({
         },
         methodName: "freeze_nft",
         attachedDeposit: new BN(txFees.toString(10)),
-        gas: new BN("30000000000000"),
+        gas: new BN("46000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
       await notifier.notifyNear(result.transaction.hash);
@@ -273,7 +272,7 @@ export async function nearHelperFactory({
         },
         methodName: "withdraw_nft",
         attachedDeposit: new BN(txFees.toString(10)),
-        gas: new BN("30000000000000"),
+        gas: new BN(65_000_000_000_000),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
       await notifier.notifyNear(result.transaction.hash);

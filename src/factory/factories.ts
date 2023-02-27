@@ -164,7 +164,7 @@ export namespace ChainFactoryConfigs {
       aptosParams: {
         rpcUrl: TestNetRpcUri.APTOS,
         bridge:
-          "0x467fbe95cf51893ce4526e0959771ac1e5b9c578d351aba35b98506476221f18",
+          "0x2b9c2009290f6a291df678bca9b03aa55f909cbdbbcc215d4868f5bd8e5a7d58",
         xpnft: "XPNFT",
         notifier,
         feeMargin,
@@ -238,11 +238,11 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       okcParams: {
-        erc721Minter: "0xaB9eD7b9734471249255B4d969B32995015116d9",
-        erc1155Minter: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
-        erc1155_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
-        erc721_addr: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
-        minter_addr: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
+        erc721Minter: "0x43137cE294e3b853523783c19d28b5842D90E2C9",
+        erc1155Minter: "0x7192F5d0396846099E92015c78807046d57Cc6C1",
+        erc1155_addr: "0x00cf6EfcB02c9A71d764B23A9edb19f1e1DAC0e7",
+        erc721_addr: "0x6b36761FdcB92e6b4B760A31187750415D56Cd04",
+        minter_addr: "0x2bFD4f93e5046dc41C288d314c3ECFE3659332C4",
         feeMargin,
         nonce: Chain.OKC,
         notifier,
@@ -315,10 +315,10 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       tezosParams: {
-        bridgeAddress: "KT1KbL9kWPM8GkMr5M38vF1eHdsNxTc4WkyQ",
+        bridgeAddress: "KT1NJG7j4Z5LbU3obL5TUaJPGNT45ukRTQrH",
         notifier,
         Tezos: new TezosToolkit(TestNetRpcUri.TEZOS),
-        xpnftAddress: "KT1WR4fe9wFGPgNViK5feigMGyXKG9gCX8n4",
+        xpnftAddress: "KT1GRqXuUpGJGDLCRsgQ9nDvVu7tap6LPxTC",
         validators: [
           "tz1iKCCYmhayfpp1HvVA8Fmp4PkY5Z7XnDdX",
           "tz1g4CJW1mzVLvN8ycHFg9JScpuzYrJhZcnD",
@@ -411,7 +411,7 @@ export namespace ChainFactoryConfigs {
           codeHash:
             "af076a49141264ec048270318f1358c9be193893c3f829425cab53ee5eb05e5c",
         },
-        chainId: "24",
+        chainId: "pulsar-2",
         feeMargin,
       },
 
@@ -419,8 +419,8 @@ export namespace ChainFactoryConfigs {
         networkId: "testnet",
         nonce: Chain.NEAR,
         rpcUrl: TestNetRpcUri.NEAR,
-        bridge: "xp_bridge_1.testnet",
-        xpnft: "xp_nft_1.testnet",
+        bridge: "xp_new_bridge.testnet",
+        xpnft: "xp_new_nft.testnet",
         walletUrl: "https://wallet.testnet.near.org",
         helperUrl: "https://helper.testnet.near.org",
         feeMargin,
@@ -435,8 +435,8 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        bridgeAddr: "kQCFhew-rg17dlBjJ4VmU8nkyMlijUtGh-xMG7Gb438LJgZK",
-        burnerAddr: "kQBCnW4TO466p7YzKGZebnsylUSHTyxTKuwMDXo5JEQbIEOF",
+        bridgeAddr: "kQBGFgZOXaF7LPRxWrjd9l6Iws6KGhWiMs3BKzAZGyeMq2AS",
+        burnerAddr: "kQAee5m2tk_-ipbrq40Geey7_yZmjZwAYZFjuKy9CbWvVykL",
         notifier,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
@@ -445,6 +445,13 @@ export namespace ChainFactoryConfigs {
           })
         ),
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
+        feeMargin,
+      },
+      solanaParams: {
+        xpnftAddr: "",
+        bridgeContractAddr: "kVvEBTB1h9GWEC7GcuDNTEmk6uxbCM11GvSmwvuCAwx",
+        endpoint: MainNetRpcUri.SOLANA,
+        notifier,
         feeMargin,
       },
       caduceusParams: {
@@ -457,6 +464,17 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x8411EeadD374bDE549F61a166FFBeFca592bC60a",
         minter_addr: "0x28c43F505d210D6f8f78C58b450b76890dc76F21",
         nonce: Chain.CADUCEUS,
+      },
+      avalancheParams: {
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
+        erc721Minter: "0xb3cE27eDadFE006f9f47C5ed5b62E63DFd9Cf3bD",
+        erc1155Minter: "0x23d399368EF31ca950E4Fd2063F2e4A5ACC0f9c2",
+        erc721_addr: "0xcEFC9182e9AB181b3FED4e89CdA55E0B9010aFe1",
+        minter_addr: "0x52e7D07DE51F8163E0f29061EaAa7D3FEaf6b47E",
+        erc1155_addr: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
+        nonce: Chain.AVALANCHE,
+        feeMargin,
       },
       algorandParams: {
         algodApiKey: "kZWDAxYR7Y6S6RoyfGIi28SATZ5DfTIs5pF0UMW4",
@@ -617,8 +635,8 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        bridgeAddr: "kQAhH1me417YvScu9Rn8BXjsW_9HcalciG5LmCDT04HMJt6L",
-        burnerAddr: "kQDuSGRY8g6TCLC4QhlhqgLr4G_nNXTGHoXy38Mwxx-r1aGY",
+        bridgeAddr: "kQAV8Z_aSl_e3PUMwXAb-mdE9l5Bsf83vn40NKc2LtsiFlGm",
+        burnerAddr: "kQDsF-yKhKqg4ygCynLfYRaw_QJeSoK2BeRpamO-nXeuuSiT",
         notifier,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
@@ -664,11 +682,11 @@ export namespace ChainFactoryConfigs {
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
       },
       arbitrumParams: {
-        erc721Minter: "string",
-        erc1155Minter: "string",
-        erc1155_addr: "string",
-        erc721_addr: "string",
-        minter_addr: "string",
+        erc721Minter: "0x536dDc3Be14A980d3cd15635b3D05985C297FD07",
+        erc1155Minter: "0x4F4F48f70892475b0D4863f61F47157Dd1Db9F1a",
+        erc1155_addr: "0xBd2005050a99142d7B77B415e7b603633f3B3746",
+        erc721_addr: "0x445712E8dcf35E42FFAbb79b900aADcE2284fB65",
+        minter_addr: "0x72d270bb71A90B82260b12c31D427C3F33AC0692",
         feeMargin,
         nonce: Chain.ARBITRUM,
         notifier,
@@ -907,16 +925,16 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       skaleParams: {
-        nonce: Chain.SKALE,
         notifier,
-        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.SKALE),
         feeMargin,
-        erc1155_addr: "0x48B218C9f626F079b82f572E3c5B46251c40fc47",
-        erc1155Minter: "0xaB9eD7b9734471249255B4d969B32995015116d9",
-        erc721Minter: "0x0F00f81162ABC95Ee6741a802A1218C67C42e714",
-        erc721_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
-        minter_addr: "0xbED4a5b36fae07943589a0b34CC2Ec3a1c208E53",
-        paymentTokenAddress: "0x0000000000000000000000000000000000000000",
+        nonce: Chain.SKALE,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.SKALE),
+        erc721Minter: "0xC71C2e7b5Ee01f2cb08b41E240976E8Be6012fB0",
+        erc1155Minter: "0xbe6cB5C730C07a788dAB0aD7ed629d9c418a9c14",
+        erc1155_addr: "0x783cA58315336dD646aCeCF0b55f728099ee73ec",
+        erc721_addr: "0xf4C24d031C336CdcC5CC251E5abbE777235A65f3",
+        minter_addr: "0xa8440b0702923A54bb0FF3B55f458Cfe8142C1A0",
+        paymentTokenAddress: "0x59ab97Ee239e02112652587F9Ef86CB6F762983b", // Euphoria ETH (ETH) Token
       },
       moonbeamParams: {
         nonce: Chain.MOONBEAM,
@@ -940,6 +958,7 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x55B1D1891ABb21A5d245d149B49007b55Bd3746D",
         minter_addr: "0x4ceDb46481d7118E1D292C318E37510E5919bBe6",
       },
+
       secretParams: {
         notifier,
         rpcUrl: MainNetRpcUri.SECRET,

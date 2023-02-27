@@ -21,7 +21,6 @@ jobs:
           node-version: 16.x
       #           cache: yarn
       #           cache-dependency-path: yarn.lock
-      
 
       - name: dep
         run: yarn
@@ -35,18 +34,9 @@ jobs:
       - name: prepare package
         run: mkdir out && mv package.json out && mv dist out && mv README.md out && mv LICENSE out && mv docs out
 
-      - name: Prepare Master Release
+      - name: Prepare Production Release
         uses: s0/git-publish-subdir-action@develop
-        if: ${{ github.ref == 'refs/heads/master' }}
-        env:
-          REPO: self
-          BRANCH: master-dist
-          FOLDER: out
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MESSAGE: "Build: ({sha}) {msg}"
-      - name: Prepare Branch Release
-        uses: s0/git-publish-subdir-action@develop
-        if: ${{ github.ref != 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/production' }}
         env:
           REPO: self
           BRANCH: bleeding-edge

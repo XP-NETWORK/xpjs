@@ -35,6 +35,7 @@ export type TonSigner = {
 export type TonWalletProvider = {
   isTonWallet: boolean;
   send(method: string, params?: any[]): Promise<any>;
+  onSuccess?(): Promise<any>;
   on(eventName: string, handler: (...data: any[]) => any): void;
 };
 
@@ -90,6 +91,7 @@ type TonWallet = {
     method: M,
     params: MethodMap[M][0]
   ): Promise<MethodMap[M][1]>;
+  onSuccess?(): Function;
   handleResponse(res: ResponseUnionType): Promise<string>;
 };
 
@@ -128,19 +130,35 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     Emitter?.addEventListener("cancel tonKeeper", setStop);
 
     await new Promise((r) => {
-      fastResolve = r;
-      setTimeout(r, 30 * 1000);
+      setTimeout(r, 10 * 1000);
     });
+
+    async function getUserTrxs(address: string): Promise<any> {
+      try {
+        await new Promise((r) => {
+          setTimeout(r, 30 * 1000);
+        });
+        const trxs = await ton.provider.getTransactions(address, 20);
+        return trxs;
+      } catch (e) {
+        console.log(e, "new iterration 30 sec");
+        return await getUserTrxs(address);
+      }
+    }
 
     while (!body) {
       console.log("TON:tring to find the trx...");
-      await new Promise((r) => {
-        fastResolve = r;
-        setTimeout(r, 10 * 1000);
-      });
+
       if (stop) return;
       //get last 20 trx of address
-      const trxs = await ton.provider.getTransactions(address, 20);
+      const timeout = setTimeout(() => {
+        throw new Error("TON: timeout when trying to send trx");
+      }, 60 * 1000 * 10);
+      const trxs = await getUserTrxs(address);
+      if (trxs) {
+        clearTimeout(timeout);
+      }
+
       //find body of the trx
       body = trxs.find((trx: any) => {
         const messages = trx[msgType];
@@ -284,7 +302,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
                   payload
                 )}&open=1`
               );
-
+            //!
             default:
               return null;
           }
@@ -292,12 +310,14 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
         async handleResponse(res: boolean) {
           console.log(res);
-          return await waitTonTrx(
+          const result = await waitTonTrx(
             payload,
             value,
             args.config.address!,
             "out_msgs"
           );
+          args.wallet.onSuccess && args.wallet.onSuccess();
+          return result;
         },
       };
 

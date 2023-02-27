@@ -10,6 +10,8 @@ export type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
   readonly collectionIdent: string;
+  readonly tokenId?: any;
+  readonly originChain?: any;
 };
 
 /**
@@ -101,6 +103,8 @@ export interface EstimateTxFees<RawNftF> {
     metadata: NftInfo<RawNftF>,
     mintWith: string
   ): Promise<BigNumber>;
+  estimateContractDep?(toChain: any): Promise<BigNumber>;
+  isNftWhitelisted?(nft: any): Promise<Boolean>;
   estimateValidateUnfreezeNft(
     to: string,
     metadata: NftInfo<RawNftF>,
@@ -192,6 +196,10 @@ export async function isWrappedNft(nft: NftInfo<unknown>) {
 
 export interface IsContractAddress {
   isContractAddress(address: string): Promise<boolean>;
+}
+
+export interface ParamsGetter<T> {
+  getParams(): T;
 }
 
 export interface FeeMargins {

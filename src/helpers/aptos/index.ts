@@ -9,9 +9,16 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  BalanceCheck,
 } from "../chain";
 
-import { AptosAccount, AptosClient, HexString, TokenClient } from "aptos";
+import {
+  AptosAccount,
+  AptosClient,
+  HexString,
+  CoinClient,
+  TokenClient,
+} from "aptos";
 
 import { Chain } from "../../consts";
 import BigNumber from "bignumber.js";
@@ -57,7 +64,10 @@ export type AptosHelper = ChainNonceGet &
   } & GetFeeMargins &
   MintNft<AptosAccount, AptosMintArgs, string> &
   GetProvider<AptosClient> &
-  ClaimNFT<AptosAccount, AptosClaimArgs, string>;
+  ClaimNFT<AptosAccount, AptosClaimArgs, string> &
+  BalanceCheck & {
+    setPetraSigner(signer: any): void;
+  };
 
 export type AptosParams = {
   feeMargin: FeeMargins;
@@ -79,6 +89,7 @@ export async function aptosHelper({
   const client = new AptosClient(rpcUrl);
 
   const bridgeClient = new BridgeClient(client, bridge, network);
+  const coinClient = new CoinClient(client);
 
   return {
     getNonce() {
@@ -86,6 +97,19 @@ export async function aptosHelper({
     },
     getFeeMargin() {
       return feeMargin;
+    },
+    setPetraSigner(signer: any) {
+      //imposter
+      client.generateSignSubmitTransaction = async function (
+        _: AptosAccount,
+        payload: any
+      ) {
+        const trx = await signer.signAndSubmitTransaction(payload);
+        return trx.hash;
+      };
+    },
+    balance: async (address) => {
+      return new BigNumber((await coinClient.checkBalance(address)).toString());
     },
     async validateAddress(adr) {
       try {
@@ -96,6 +120,7 @@ export async function aptosHelper({
       }
     },
     XpNft: xpnft,
+
     async estimateValidateTransferNft(_to, _metadata, _mintWith) {
       return new BigNumber(0);
     },
@@ -130,6 +155,7 @@ export async function aptosHelper({
       return client;
     },
     async mintNft(owner, options) {
+      //AptosAccount.fromAptosAccountObject({""})
       const tc = new TokenClient(client);
       if (options.createCollection) {
         await tc.createCollection(

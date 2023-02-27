@@ -15,6 +15,7 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
+  ParamsGetter,
 } from "./chain";
 import {
   BigNumber as EthBN,
@@ -152,7 +153,8 @@ export type Web3Helper = BaseWeb3Helper &
   } & WhitelistCheck<EthNftInfo> &
   GetFeeMargins &
   IsContractAddress &
-  GetTokenURI;
+  GetTokenURI &
+  ParamsGetter<Web3Params>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -269,7 +271,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       customData: NullableCustomData
     ) => {
       return umt.isApprovedForAll(sender, minterAddr, {
-        gasLimit: "1000000",
+        gasLimit: "85000",
         customData,
       });
     },
@@ -284,7 +286,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         forAddr,
         true,
         {
-          gasLimit: "1000000",
+          gasLimit: "85000",
           customData,
         }
       );
@@ -306,7 +308,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       return (
         (
           await umt.getApproved(tok, {
-            gasLimit: "1000000",
+            gasLimit: "85000",
             customData,
             //@ts-ignore
           })
@@ -320,7 +322,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       txnUp: (tx: PopulatedTransaction) => Promise<void>
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "1000000",
+        gasLimit: "85000",
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
@@ -356,6 +358,7 @@ export async function web3HelperFactory(
           }
         }
       : () => Promise.resolve();
+
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
@@ -477,6 +480,7 @@ export async function web3HelperFactory(
     ...base,
     XpNft: params.erc721_addr,
     XpNft1155: params.erc1155_addr,
+    getParams: () => params,
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
@@ -645,7 +649,7 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toFixed(0)).div(1e5),
+            value: EthBN.from(txFees.toFixed(0)).div(100),
             gasLimit: gasLimit || 300_000,
             gasPrice,
           }
@@ -708,7 +712,7 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value: EthBN.from(txFees.toFixed(0)).div(1e5),
+            value: EthBN.from(txFees.toFixed(0)).div(100),
             gasLimit: gasLimit || 300_00,
             gasPrice,
           }
@@ -743,6 +747,30 @@ export async function web3HelperFactory(
       const gas = await provider.getGasPrice();
 
       return new BigNumber(gas.mul(150_000).toString());
+    },
+    async estimateContractDep(toChain: any): Promise<BigNumber> {
+      try {
+        console.log("NEED TO DEPLOY CONTRACT");
+        const gas = await provider.getGasPrice();
+        const pro = toChain.getProvider();
+        const wl = ["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"];
+        const gk = 123;
+        const gkx = 42;
+        const factory = new ethers.ContractFactory(
+          Minter__factory.abi,
+          Minter__factory.bytecode
+        );
+        const estimateGas = await pro.estimateGas(
+          factory.getDeployTransaction(gk, gkx, wl)
+        );
+        const contractFee = gas.mul(estimateGas);
+        const sum = new BigNumber(contractFee.toString());
+        return sum;
+      } catch (error: any) {
+        console.log(error.message);
+        const gas = await provider.getGasPrice();
+        return new BigNumber(gas.mul(150_000).toString());
+      }
     },
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));

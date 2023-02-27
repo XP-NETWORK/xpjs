@@ -6,7 +6,6 @@ src/**.js
 coverage
 *.log
 tsconfig.tsbuildinfo
-dist
 src/test.ts
 .env*
 test*
