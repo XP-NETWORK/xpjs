@@ -73,6 +73,7 @@ import {
   prepareTokenId,
   _headers,
 } from "./cons";
+import base64url from "base64url";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -891,6 +892,9 @@ export function ChainFactory(
       cToP.set(chainNonce, params);
     },
     async nftList<T>(chain: ChainNonceGet & T, owner: string) {
+      if (chain.getNonce() === Chain.TON) {
+        owner = base64url.encode(owner);
+      }
       let res = await nftlistRest.get<{ data: NftInfo<InferNativeNft<T>>[] }>(
         `/nfts/${chain.getNonce()}/${owner}`
       );
