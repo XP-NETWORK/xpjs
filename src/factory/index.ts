@@ -893,8 +893,10 @@ export function ChainFactory(
     },
     async nftList<T>(chain: ChainNonceGet & T, owner: string) {
       if (chain.getNonce() === Chain.TON) {
+        console.log("decode for ton");
         owner = base64url.encode(owner);
       }
+
       let res = await nftlistRest.get<{ data: NftInfo<InferNativeNft<T>>[] }>(
         `/nfts/${chain.getNonce()}/${owner}`
       );
