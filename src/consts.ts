@@ -79,7 +79,7 @@ export enum MainNetRpcUri {
   ETHEREUM = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
   AVALANCHE = "https://api.avax.network/ext/bc/C/rpc",
   POLYGON = "https://polygon-rpc.com",
-  FANTOM = "https://rpc.ftm.tools/",
+  FANTOM = "https://rpc.fantom.network/",
   TRON = "https://api.trongrid.io/",
   CELO = "https://forno.celo.org",
   HARMONY = "https://rpc.s0.t.hmny.io",
