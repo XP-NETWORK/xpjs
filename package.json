@@ -59,6 +59,7 @@
     "algosdk": "^1.15.0-beta.1",
     "aptos": "^1.6.0",
     "axios": "^0.21.1",
+    "base64url": "^3.0.1",
     "bignumber.js": "=9.0.1",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
