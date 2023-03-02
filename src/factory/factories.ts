@@ -448,6 +448,17 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      nearParams: {
+        networkId: "mainnet",
+        nonce: Chain.NEAR,
+        rpcUrl: MainNetRpcUri.NEAR,
+        bridge: "xpbridge.near",
+        xpnft: "xpnft.near",
+        feeMargin,
+        notifier,
+        walletUrl: "https://wallet.mainnet.near.org",
+        helperUrl: "https://helper.mainnet.near.org",
+      },
       solanaParams: {
         xpnftAddr: "",
         bridgeContractAddr: "kVvEBTB1h9GWEC7GcuDNTEmk6uxbCM11GvSmwvuCAwx",
