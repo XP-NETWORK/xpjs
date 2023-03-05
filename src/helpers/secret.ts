@@ -216,26 +216,35 @@ export async function secretHelperFactory(
           address: owner,
         },
       };
+      if (!codeHash) {
+        codeHash = await queryClient.query.compute.contractCodeHash(
+          contractAddress
+        );
+      }
       const contract = {
         address: contractAddress,
         codeHash: codeHash || "",
       };
 
-      const { token_list } = (await queryClient.query.snip721.GetOwnedTokens({
-        contract,
-        auth,
-        owner,
-      })) as GetOwnedTokensResponse;
+      const { token_list, generic_err } =
+        (await queryClient.query.snip721.GetOwnedTokens({
+          contract,
+          auth,
+          owner,
+        })) as GetOwnedTokensResponse;
+
+      if (generic_err) throw new Error(generic_err.msg);
 
       const response: NftInfo<SecretNftInfo>[] = [];
 
       await Promise.all(
-        token_list?.tokens?.map(async (token) => {
+        token_list.tokens.map(async (token) => {
           const tokenInfo = await queryClient.query.snip721.GetTokenInfo({
             contract,
             auth,
             token_id: token,
           });
+
           response.push({
             collectionIdent: contractAddress,
             uri: tokenInfo.all_nft_info.info?.token_uri || "",
