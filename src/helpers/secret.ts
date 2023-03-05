@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Bech32, SecretNetworkClient, Tx } from "secretjs";
+import { Bech32, SecretNetworkClient } from "secretjs";
 import {
   Extension,
   Snip721MintOptions,
@@ -40,15 +40,19 @@ type GetOwnedTokensResponse = Snip721GetTokensResponse & {
   generic_err?: { msg: string };
 };
 
-export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
-  UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> &
+export type SecretHelper = TransferNftForeign<
+  SecretSigner,
+  SecretNftInfo,
+  any
+> &
+  UnfreezeForeignNft<SecretSigner, SecretNftInfo, any> &
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
   PreTransfer<SecretSigner, SecretNftInfo, string, undefined> &
   BalanceCheck &
   GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
-  MintNft<SecretSigner, SecretMintArgs, Tx> & {
+  MintNft<SecretSigner, SecretMintArgs, any> & {
     nftList(
       owner: string,
 
@@ -60,7 +64,7 @@ export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
       client: SecretNetworkClient,
       contract: string,
       vk: string
-    ): Promise<Tx>;
+    ): Promise<any>;
     isApprovedForMinter(
       sender: SecretSigner,
       nft: NftInfo<SecretNftInfo>
