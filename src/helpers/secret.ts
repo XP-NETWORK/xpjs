@@ -212,55 +212,44 @@ export async function secretHelperFactory(
     async nftList(owner, vk, contractAddress, codeHash) {
       const auth = {
         viewer: {
-          viewing_key: vk,
-          address: owner,
+            viewing_key: vk,
+            address: owner,
         },
-      };
-      if (!codeHash) {
-        codeHash = (
-          await queryClient.query.compute.codeHashByContractAddress({
-            contract_address: contractAddress,
-          })
-        ).code_hash;
-      }
-      const contract = {
+    };
+    const contract = {
         address: contractAddress,
-        codeHash: codeHash || "",
-      };
+        codeHash: codeHash || '',
+    };
 
-      const { token_list, generic_err } =
-        (await queryClient.query.snip721.GetOwnedTokens({
-          contract,
-          auth,
-          owner,
-        })) as GetOwnedTokensResponse;
+    const { token_list } = await queryClient.query.snip721.GetOwnedTokens({
+        contract,
+        auth,
+        owner,
+    }) as GetOwnedTokensResponse;
 
-      if (generic_err) throw new Error(generic_err.msg);
+    const response: NftInfo<SecretNftInfo>[] = [];
 
-      const response: NftInfo<SecretNftInfo>[] = [];
-
-      await Promise.all(
-        token_list.tokens.map(async (token) => {
-          const tokenInfo = await queryClient.query.snip721.GetTokenInfo({
-            contract,
-            auth,
-            token_id: token,
-          });
-
-          response.push({
-            collectionIdent: contractAddress,
-            uri: tokenInfo.all_nft_info.info?.token_uri || "",
-            native: {
-              chainId: p.chainId,
-              contract: contractAddress,
-              contractHash: codeHash || "",
-              tokenId: token,
-              vk,
-              metadata: tokenInfo.all_nft_info.info?.extension,
-            },
-          });
+    await Promise.all(
+        token_list?.tokens?.map(async (token) => {
+            const tokenInfo = await queryClient.query.snip721.GetTokenInfo({
+                contract,
+                auth,
+                token_id: token,
+            });
+            response.push({
+                collectionIdent: contractAddress,
+                uri: tokenInfo.all_nft_info.info?.token_uri || '',
+                native: {
+                    chainId: p.chainId,
+                    contract: contractAddress,
+                    contractHash: codeHash || '',
+                    tokenId: token,
+                    vk,
+                    metadata: tokenInfo.all_nft_info.info?.extension,
+                },
+            });
         })
-      );
+    );
       return response;
     },
     estimateValidateTransferNft: async () => {
