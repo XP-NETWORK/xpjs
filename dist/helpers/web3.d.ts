@@ -49,7 +49,7 @@ import { EvNotifier } from "../notifier";
 /**
  * Information required to perform NFT transfers in this chain
  */
-export declare type EthNftInfo = {
+export type EthNftInfo = {
   chainId: string;
   tokenId: string;
   owner: string;
@@ -65,7 +65,7 @@ export declare type EthNftInfo = {
  * owner: Owner of the newly minted nft
  * uri: uri of the nft
  */
-export declare type MintArgs = {
+export type MintArgs = {
   contract: string;
   uri: string;
 };
@@ -85,11 +85,11 @@ export interface Approve<Sender> {
     gasPrice?: ethers.BigNumber
   ): Promise<string | undefined>;
 }
-declare type NullableCustomData = Record<string, any> | undefined;
+type NullableCustomData = Record<string, any> | undefined;
 /**
  * Base util traits
  */
-export declare type BaseWeb3Helper = BalanceCheck &
+export type BaseWeb3Helper = BalanceCheck &
   /**
    * Mint an nft in the given ERC1155 smart contract
    *
@@ -109,13 +109,13 @@ export declare type BaseWeb3Helper = BalanceCheck &
       options: MintArgs
     ): Promise<ContractTransaction>;
   };
-declare type ExtraArgs = {
+type ExtraArgs = {
   gasPrice: ethers.BigNumber;
 };
 /**
  * Traits implemented by this module
  */
-export declare type Web3Helper = BaseWeb3Helper &
+export type Web3Helper = BaseWeb3Helper &
   TransferNftForeign<Signer, EthNftInfo, TransactionResponse> &
   UnfreezeForeignNft<Signer, EthNftInfo, TransactionResponse> &
   TransferNftForeignBatch<Signer, EthNftInfo, TransactionResponse> &
@@ -166,7 +166,7 @@ export interface Web3Params {
   nonce: ChainNonce;
   feeMargin: FeeMargins;
 }
-declare type NftMethodVal<T, Tx> = {
+type NftMethodVal<T, Tx> = {
   freeze: "freezeErc1155" | "freezeErc721";
   validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
   umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
@@ -186,8 +186,8 @@ declare type NftMethodVal<T, Tx> = {
     gasPrice: ethers.BigNumberish | undefined
   ) => Promise<Tx>;
 };
-declare type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
-declare type NftMethodMap = Record<
+type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
+type NftMethodMap = Record<
   "ERC1155" | "ERC721",
   EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>
 >;

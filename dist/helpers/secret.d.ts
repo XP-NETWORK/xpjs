@@ -1,4 +1,4 @@
-import { SecretNetworkClient, TxResponse } from "secretjs";
+import { SecretNetworkClient, Tx } from "secretjs";
 import { Extension } from "secretjs/dist/extensions/snip721/types";
 import { EvNotifier } from "../notifier";
 import {
@@ -15,7 +15,7 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
 } from "./chain";
-export declare type SecretNftInfo = {
+export type SecretNftInfo = {
   contract: string;
   contractHash: string;
   chainId: string;
@@ -23,17 +23,13 @@ export declare type SecretNftInfo = {
   vk: string;
   metadata: Extension | undefined;
 };
-export declare type SecretMintArgs = {
+export type SecretMintArgs = {
   url: string;
   contract?: SecretContract;
 };
-declare type SecretSigner = SecretNetworkClient;
-export declare type SecretHelper = TransferNftForeign<
-  SecretSigner,
-  SecretNftInfo,
-  TxResponse
-> &
-  UnfreezeForeignNft<SecretSigner, SecretNftInfo, TxResponse> &
+type SecretSigner = SecretNetworkClient;
+export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, Tx> &
+  UnfreezeForeignNft<SecretSigner, SecretNftInfo, Tx> &
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
@@ -42,7 +38,7 @@ export declare type SecretHelper = TransferNftForeign<
   GetFeeMargins & {
     XpNft: string;
   } & GetProvider<SecretNetworkClient> &
-  MintNft<SecretSigner, SecretMintArgs, TxResponse> & {
+  MintNft<SecretSigner, SecretMintArgs, Tx> & {
     nftList(
       owner: string,
       viewingKey: string,
@@ -53,17 +49,17 @@ export declare type SecretHelper = TransferNftForeign<
       client: SecretNetworkClient,
       contract: string,
       vk: string
-    ): Promise<TxResponse>;
+    ): Promise<Tx>;
     isApprovedForMinter(
       sender: SecretSigner,
       nft: NftInfo<SecretNftInfo>
     ): Promise<boolean>;
   };
-export declare type SecretContract = {
+export type SecretContract = {
   contractAddress: string;
   codeHash: string;
 };
-export declare type SecretParams = {
+export type SecretParams = {
   rpcUrl: string;
   chainId: string;
   notifier: EvNotifier;

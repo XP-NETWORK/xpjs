@@ -15,12 +15,12 @@ import {
   BalanceCheck,
   PreTransfer,
 } from "./chain";
-declare type NearTxResult = [FinalExecutionOutcome, any];
-declare type NearPreTransferArgs = {
+type NearTxResult = [FinalExecutionOutcome, any];
+type NearPreTransferArgs = {
   to: string;
   receiver: string;
 };
-export declare type NearParams = {
+export type NearParams = {
   readonly networkId: string;
   readonly nonce: number;
   readonly rpcUrl: string;
@@ -31,11 +31,11 @@ export declare type NearParams = {
   readonly walletUrl: string;
   readonly helperUrl: string;
 };
-export declare type NearNFT = {
+export type NearNFT = {
   tokenId: string;
   contract: string;
 };
-export declare type Metadata = {
+export type Metadata = {
   title?: string;
   description?: string;
   media?: string;
@@ -59,7 +59,7 @@ interface BrowserMethods {
   getContract(signer: Account, _contract: string): Promise<Contract>;
   getUserMinter(keypair: string, address: string): Promise<Near>;
 }
-export declare type NearHelper = ChainNonceGet &
+export type NearHelper = ChainNonceGet &
   BalanceCheck &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &

@@ -4,7 +4,7 @@ import { ChainNonce } from "../type-utils";
 /**
  * NFT Info
  */
-export declare type NftInfo<Raw> = {
+export type NftInfo<Raw> = {
   readonly uri: string;
   readonly native: Raw;
   readonly collectionIdent: string;
@@ -158,7 +158,7 @@ export interface EstimateTxFeesBatch<RawNftF> {
     metadatas: NftInfo<RawNftF>[]
   ): Promise<BigNumber>;
 }
-export declare type WhitelistCheck<RawNft> = {
+export type WhitelistCheck<RawNft> = {
   isNftWhitelisted(nft: NftInfo<RawNft>): Promise<boolean>;
 };
 export interface GetProvider<Provider> {

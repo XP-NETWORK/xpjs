@@ -20,20 +20,20 @@ import {
   UnfreezeForeignNftBatch,
   EstimateTxFeesBatch,
 } from "./chain";
-declare type TezosSigner = WalletProvider | Signer;
-export declare type TezosNftInfo = {
+type TezosSigner = WalletProvider | Signer;
+export type TezosNftInfo = {
   contract: string;
   token_id: string;
   amt: number;
 };
-declare type TezosMintArgs = {
+type TezosMintArgs = {
   identifier: string;
   contract: string;
   uri: string;
   to: string;
   amt: number;
 };
-export declare type TezosHelper = TransferNftForeign<
+export type TezosHelper = TransferNftForeign<
   TezosSigner,
   TezosNftInfo,
   string
@@ -63,7 +63,7 @@ export declare type TezosHelper = TransferNftForeign<
   } & GetFeeMargins &
   WhitelistCheck<TezosNftInfo> &
   GetTokenURI;
-export declare type TezosParams = {
+export type TezosParams = {
   Tezos: TezosToolkit;
   notifier: EvNotifier;
   xpnftAddress: string;
