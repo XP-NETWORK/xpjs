@@ -14,17 +14,17 @@ import {
 } from "./chain";
 import { PreTransfer } from "..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
-export declare type TonSigner = {
+export type TonSigner = {
   wallet?: TonWallet;
   accIdx: number;
 };
-export declare type TonWalletProvider = {
+export type TonWalletProvider = {
   isTonWallet: boolean;
   send(method: string, params?: any[]): Promise<any>;
   onSuccess?(): Promise<any>;
   on(eventName: string, handler: (...data: any[]) => any): void;
 };
-export declare type TonArgs = {
+export type TonArgs = {
   wallet: TonhubConnector & TonWalletProvider & Function;
   config: {
     seed?: string;
@@ -33,10 +33,10 @@ export declare type TonArgs = {
     [x: string]: any;
   };
 };
-export declare type TonNft = {
+export type TonNft = {
   nftItemAddr: string;
 };
-export declare type TonHelper = ChainNonceGet &
+export type TonHelper = ChainNonceGet &
   BalanceCheck &
   PreTransfer<any, any, any, undefined> &
   TransferNftForeign<TonSigner, TonNft, string> &
@@ -50,7 +50,7 @@ export declare type TonHelper = ChainNonceGet &
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
   } & GetFeeMargins;
-export declare type TonParams = {
+export type TonParams = {
   tonweb: TonWeb;
   notifier: EvNotifier;
   bridgeAddr: string;
@@ -58,7 +58,7 @@ export declare type TonParams = {
   xpnftAddr: string;
   feeMargin: FeeMargins;
 };
-declare type MethodMap = {
+type MethodMap = {
   ton_requestAccounts: [undefined, string];
   ton_sendTransaction: [
     {
@@ -70,11 +70,11 @@ declare type MethodMap = {
   ];
   ton_getBalance: [undefined, string];
 };
-declare type ResponseUnionType = boolean &
+type ResponseUnionType = boolean &
   TonhubTransactionResponse & {
     hash: string;
   };
-declare type TonWallet = {
+type TonWallet = {
   send<M extends keyof MethodMap>(
     method: M,
     params: MethodMap[M][0]
