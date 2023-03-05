@@ -92,7 +92,7 @@ export enum MainNetRpcUri {
   GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
-  SECRET = "https://secret-4.api.trivium.network:1317",
+  SECRET = "https://secret-4.api.trivium.network:9091/",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
   NEAR = "https://rpc.mainnet.near.org",
   MOONBEAM = "https://rpc.api.moonbeam.network",
