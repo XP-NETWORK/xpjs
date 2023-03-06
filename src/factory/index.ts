@@ -522,20 +522,31 @@ export function ChainFactory(
         originalChain = nft.native.chainId;
       }
 
-      const axiosResult = await axios
-        .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
-          fromChain: Number(originalChain),
-          chain:
-            fromChain?.getNonce() == originalChain //if first time sending
-              ? Number(toChain.getNonce())
-              : toChain.getNonce() == originalChain //if sending back
-              ? Number(fromChain.getNonce())
-              : Number(toChain.getNonce()), //all the rest
-          sc: originalContract,
-        })
-        .catch(() => false);
+      const [checkWithOutTokenId, verifyList] = await Promise.all([
+        await axios
+          .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
+            fromChain: Number(originalChain),
+            chain:
+              fromChain?.getNonce() == originalChain //if first time sending
+                ? Number(toChain.getNonce())
+                : toChain.getNonce() == originalChain //if sending back
+                ? Number(fromChain.getNonce())
+                : Number(toChain.getNonce()), //all the rest
+            sc: originalContract,
+          })
+          .catch(() => false),
+        await axios
+          .get(
+            `https://sc-verify.xp.network/verify/list?from=${originalContract}&targetChain=${toChain.getNonce()}&fromChain=${fromChain.getNonce()}&tokenId=1`
+          )
+          .then((res) => {
+            return res.data.data.length > 0 && res.data.code == 200;
+          })
+          .catch(() => false),
+      ]);
 
-      if (!axiosResult) {
+      if (!checkWithOutTokenId && !verifyList) {
+        console.log({ checkWithOutTokenId, verifyList });
         //@ts-ignore
         const contractFee = await toChain?.estimateContractDep(toChain);
         calcContractDep = await calcExchangeFees(
@@ -544,6 +555,8 @@ export function ChainFactory(
           contractFee,
           toChain.getFeeMargin()
         );
+      } else {
+        console.log("DO NOT NEED TO DEPLOY CONTRACT");
       }
 
       let calcTransfer = await calcExchangeFees(
@@ -559,6 +572,7 @@ export function ChainFactory(
           .integerValue(BigNumber.ROUND_CEIL);
         console.log("extra conv");
       }
+      console.log({ calcTransfer, calcContractDep });
       return { calcTransfer, calcContractDep };
     } catch (error: any) {
       console.log(error.message);
