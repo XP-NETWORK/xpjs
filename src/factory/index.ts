@@ -22,7 +22,12 @@ import {
 } from "..";
 
 import { UserSigner } from "@elrondnetwork/erdjs/out";
-import { ContractFactory, Wallet } from "@hashgraph/hethers";
+import {
+  ContractFactory,
+  Wallet,
+  Contract as HContract,
+} from "@hashgraph/hethers";
+
 import algosdk from "algosdk";
 import axios from "axios";
 import { ethers, utils } from "ethers";
@@ -1015,15 +1020,24 @@ export function ChainFactory(
         HEDERA_PROXY_BC,
         sender
       );
+
       const hts_contract = htscf.attach(contractAddress);
-      const cf = new ContractFactory(HEDERA_TOKEN_SERVICE_ABI, "0x", sender);
-      const contract = cf.attach("0x0000000000000000000000000000000000000167");
-      (
+
+      const contract = new HContract(
+        "0x0000000000000000000000000000000000000167",
+        HEDERA_TOKEN_SERVICE_ABI,
+        sender
+      );
+      console.log(contract.address);
+
+      //const contract = cf.attach("0x0000000000000000000000000000000000000167");
+
+      /* (
         await contract.associateToken(await sender.getAddress(), htsToken, {
           gasLimit: 1000000,
         })
-      ).wait();
-
+      ).wait();*/
+      console.log("d");
       const res = await hts_contract.functions.claimNft(
         serialNumber,
         htsToken,
@@ -1031,6 +1045,7 @@ export function ChainFactory(
           gasLimit: 1000000,
         }
       );
+      console.log("a");
       return res;
     },
     /**
