@@ -647,7 +647,7 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
   currency: SupportedCurrency.ABEY,
   currencySymbol: SupportedCurrencyName.ABEY,
   decimals: Decimals.ABEY,
-  name: "AbeyChain",
+  name: "ABEY",
   nonce: Chain.ABEYCHAIN,
   chainId: 178,
   type: ChainType.EVM,
