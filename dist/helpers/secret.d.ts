@@ -1,7 +1,7 @@
 import { SecretNetworkClient } from "secretjs";
 import { Extension } from "secretjs/dist/extensions/snip721/types";
 import { EvNotifier } from "../notifier";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WhitelistCheck } from "./chain";
 export type SecretNftInfo = {
     contract: string;
     contractHash: string;
@@ -15,7 +15,7 @@ export type SecretMintArgs = {
     contract?: SecretContract;
 };
 type SecretSigner = SecretNetworkClient;
-export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, any> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, any> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & PreTransfer<SecretSigner, SecretNftInfo, string, undefined> & BalanceCheck & GetFeeMargins & {
+export type SecretHelper = TransferNftForeign<SecretSigner, SecretNftInfo, any> & UnfreezeForeignNft<SecretSigner, SecretNftInfo, any> & ValidateAddress & EstimateTxFees<SecretNftInfo> & ChainNonceGet & WhitelistCheck<SecretNftInfo> & PreTransfer<SecretSigner, SecretNftInfo, string, undefined> & BalanceCheck & GetFeeMargins & {
     XpNft: string;
 } & GetProvider<SecretNetworkClient> & MintNft<SecretSigner, SecretMintArgs, any> & {
     nftList(owner: string, viewingKey: string, contract: string, codeHash?: string): Promise<NftInfo<SecretNftInfo>[]>;
