@@ -79,7 +79,7 @@ export enum MainNetRpcUri {
   ETHEREUM = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
   AVALANCHE = "https://api.avax.network/ext/bc/C/rpc",
   POLYGON = "https://polygon-rpc.com",
-  FANTOM = "https://rpc.ftm.tools/",
+  FANTOM = "https://rpc.fantom.network/",
   TRON = "https://api.trongrid.io/",
   CELO = "https://forno.celo.org",
   HARMONY = "https://rpc.s0.t.hmny.io",
@@ -92,7 +92,7 @@ export enum MainNetRpcUri {
   GODWOKEN = "https://v1.mainnet.godwoken.io/rpc",
   GATECHAIN = "https://evm.gatenode.cc",
   VECHAIN = "https://sync-mainnet.veblocks.net",
-  SECRET = "https://secret-4.api.trivium.network:1317",
+  SECRET = "https://secret-4.api.trivium.network:9091/",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
   NEAR = "https://rpc.mainnet.near.org",
   MOONBEAM = "https://rpc.api.moonbeam.network",
@@ -103,7 +103,7 @@ export enum MainNetRpcUri {
   OKC = "https://exchainrpc.okex.org/",
   ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
-  SOLANA = "https://api.mainnet-beta.solana.com",
+  SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
   // TODO: Algorand
 }
 
@@ -121,7 +121,7 @@ type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
-type MetaMapAssert = { [idx in typeof Chain[keyof typeof Chain]]: unknown };
+type MetaMapAssert = { [idx in (typeof Chain)[keyof typeof Chain]]: unknown };
 
 export type MetaMap = {
   2: ElrondMeta;
@@ -647,7 +647,7 @@ CHAIN_INFO.set(Chain.ABEYCHAIN, {
   currency: SupportedCurrency.ABEY,
   currencySymbol: SupportedCurrencyName.ABEY,
   decimals: Decimals.ABEY,
-  name: "AbeyChain",
+  name: "ABEY",
   nonce: Chain.ABEYCHAIN,
   chainId: 178,
   type: ChainType.EVM,

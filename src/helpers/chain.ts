@@ -198,6 +198,10 @@ export interface IsContractAddress {
   isContractAddress(address: string): Promise<boolean>;
 }
 
+export interface ParamsGetter<T> {
+  getParams(): T;
+}
+
 export interface FeeMargins {
   min: number;
   max: number;
