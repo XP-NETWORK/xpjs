@@ -524,20 +524,30 @@ export function ChainFactory(
         originalChain = nft.native.chainId;
       }
 
-      const axiosResult = await axios
-        .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
-          fromChain: Number(originalChain),
-          chain:
-            fromChain?.getNonce() == originalChain //if first time sending
-              ? Number(toChain.getNonce())
-              : toChain.getNonce() == originalChain //if sending back
-              ? Number(fromChain.getNonce())
-              : Number(toChain.getNonce()), //all the rest
-          sc: originalContract,
-        })
-        .catch(() => false);
+      const [checkWithOutTokenId, verifyList] = await Promise.all([
+        axios
+          .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
+            fromChain: Number(originalChain),
+            chain:
+              fromChain?.getNonce() == originalChain //if first time sending
+                ? Number(toChain.getNonce())
+                : toChain.getNonce() == originalChain //if sending back
+                ? Number(fromChain.getNonce())
+                : Number(toChain.getNonce()), //all the rest
+            sc: originalContract,
+          })
+          .catch(() => false),
+        axios
+          .get(
+            `https://sc-verify.xp.network/verify/list?from=${originalContract}&targetChain=${toChain.getNonce()}&fromChain=${fromChain.getNonce()}&tokenId=1`
+          )
+          .then((res) => {
+            return res.data.data.length > 0 && res.data.code == 200;
+          })
+          .catch(() => false),
+      ]);
 
-      if (!axiosResult && toChain?.estimateContractDep) {
+      if (!checkWithOutTokenId && !verifyList && toChain?.estimateContractDep) {
         //@ts-ignore
         const contractFee = await toChain?.estimateContractDep(toChain);
         calcContractDep = await calcExchangeFees(
