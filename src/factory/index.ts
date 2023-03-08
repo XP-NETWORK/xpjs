@@ -209,7 +209,7 @@ export type ChainFactory = {
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
     receiver: string
-  ): Promise<{ calcContractDep: BigNumber }>;
+  ): Promise<{ calcTransfer: BigNumber; calcContractDep: number | BigNumber }>;
 
   estimateSFTfees<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
@@ -598,69 +598,6 @@ export function ChainFactory(
         console.log("extra conv");
       }
       return { calcTransfer, calcContractDep: 0 };
-    }
-  };
-
-  const estimateWithContractDep = async <
-    SignerF,
-    RawNftF,
-    SignerT,
-    RawNftT,
-    Resp
-  >(
-    fromChain: FullChain<SignerF, RawNftF, Resp>,
-    toChain: FullChain<SignerT, RawNftT, Resp>,
-    nft: NftInfo<any>
-  ) => {
-    let calcContractDep: BigNumber = new BigNumber("0"),
-      originalContract,
-      originalChain;
-    try {
-      const { bool, wrapped } = await isWrappedNft(
-        nft,
-        fromChain.getNonce(),
-        toChain.getNonce()
-      );
-
-      if (bool) {
-        originalContract = wrapped?.contract?.toLowerCase();
-        originalChain = wrapped?.origin;
-      } else {
-        originalContract = nft.native.contract.toLowerCase();
-        originalChain = nft.native.chainId;
-      }
-
-      const axiosResult = await axios
-        .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
-          fromChain: Number(originalChain),
-          chain:
-            fromChain?.getNonce() == originalChain //if first time sending
-              ? Number(toChain.getNonce())
-              : toChain.getNonce() == originalChain //if sending back
-              ? Number(fromChain.getNonce())
-              : Number(toChain.getNonce()), //all the rest
-          sc: originalContract,
-        })
-        .catch(() => false);
-
-      if (!axiosResult && toChain?.estimateContractDep) {
-        //@ts-ignore
-        const contractFee = await toChain?.estimateContractDep(toChain);
-        calcContractDep = await calcExchangeFees(
-          fromChain.getNonce(),
-          toChain.getNonce(),
-          contractFee,
-          toChain.getFeeMargin()
-        );
-      }
-
-      return { calcContractDep };
-    } catch (error: any) {
-      console.log(
-        error.message,
-        console.log("error in estimateWithContractDep")
-      );
-      return { calcContractDep };
     }
   };
 
