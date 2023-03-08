@@ -209,7 +209,10 @@ export type ChainFactory = {
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<RawNftF>,
     receiver: string
-  ): Promise<{ calcTransfer: BigNumber; calcContractDep: number | BigNumber }>;
+  ): Promise<{
+    calcTransfer: number | BigNumber;
+    calcContractDep: number | BigNumber;
+  }>;
 
   estimateSFTfees<SignerF, RawNftF, Resp>(
     fromChain: FullChain<SignerF, RawNftF, Resp>,
