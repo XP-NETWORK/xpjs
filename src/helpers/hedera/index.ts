@@ -16,7 +16,7 @@ import {
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
   ParamsGetter,
-} from "./chain";
+} from "../chain";
 import {
   BigNumber as EthBN,
   ContractTransaction,
@@ -47,9 +47,9 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
-} from "..";
-import { ChainNonce } from "../type-utils";
-import { EvNotifier } from "../notifier";
+} from "../../";
+import { ChainNonce } from "../../type-utils";
+import { EvNotifier } from "../../notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 
