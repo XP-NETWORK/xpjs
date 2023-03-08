@@ -1,5 +1,10 @@
 import BigNumber from "bignumber.js";
-import { Bech32, SecretNetworkClient } from "secretjs";
+import {
+  Bech32,
+  SecretNetworkClient,
+  addressToBytes,
+  toBase64,
+} from "secretjs";
 import {
   Extension,
   Snip721MintOptions,
@@ -19,6 +24,7 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  WhitelistCheck,
 } from "./chain";
 
 export type SecretNftInfo = {
@@ -49,6 +55,7 @@ export type SecretHelper = TransferNftForeign<
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
+  WhitelistCheck<SecretNftInfo> &
   PreTransfer<SecretSigner, SecretNftInfo, string, undefined> &
   BalanceCheck &
   GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
@@ -349,6 +356,20 @@ export async function secretHelperFactory(
       await p.notifier.notifySecret(tx.transactionHash, nft.native.vk);
 
       return tx;
+    },
+    isNftWhitelisted: async (nft) => {
+      if (!nft.native?.contract) return false;
+      const result = await queryClient.query.compute.queryContract({
+        contractAddress: p.bridge.contractAddress,
+        codeHash: p.bridge.codeHash,
+        query: {
+          get_whitelisted: {
+            addr: toBase64(addressToBytes(nft.native.contract)),
+          },
+        },
+      });
+
+      return typeof result === "boolean" ? result : false;
     },
   };
 }
