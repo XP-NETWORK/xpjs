@@ -800,7 +800,7 @@
     long "^4.0.0"
     protobufjs "^6.11.3"
 
-"@hashgraph/sdk@^2.19.0":
+"@hashgraph/sdk@^2.19.0", "@hashgraph/sdk@^2.22.0":
   version "2.22.0"
   resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.22.0.tgz#48486f81ae7f50b6b3d019e0a7b82910b1965c69"
   integrity sha512-7/uDS7n1W3PPz/dBtGzXjMGHr4NMYvc8M/DiL2JROj3ULU6GI/hhslkcztZ2SB6dgcdS88lu8An2gLWjiJrGHQ==
