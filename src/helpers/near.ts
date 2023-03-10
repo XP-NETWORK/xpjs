@@ -17,6 +17,7 @@ import {
   getTransactionLastResult,
 } from "near-api-js/lib/providers";
 import { Chain } from "../consts";
+import { SignatureService } from "../estimator";
 import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
@@ -50,6 +51,7 @@ export type NearParams = {
   readonly notifier: EvNotifier;
   readonly walletUrl: string;
   readonly helperUrl: string;
+  readonly signatureSvc: SignatureService;
 };
 export type NearNFT = {
   tokenId: string;
@@ -108,6 +110,7 @@ export async function nearHelperFactory({
   feeMargin,
   notifier,
   walletUrl,
+  signatureSvc,
   helperUrl,
 }: NearParams): Promise<NearHelper> {
   const near = await connect({
@@ -227,6 +230,14 @@ export async function nearHelperFactory({
           id.native.tokenId
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
+      const signature = await signatureSvc.getSignatureNear(
+        Chain.NEAR,
+        chain_nonce as any,
+        id.native.tokenId,
+        id.collectionIdent,
+        id.native.tokenId,
+        to
+      );
 
       const result = await sender.functionCall({
         contractId: bridge,
@@ -237,6 +248,7 @@ export async function nearHelperFactory({
           amt: new BigNumber(txFees),
           mint_with,
           token_contract: id.native.contract,
+          sig_data: Buffer.from(signature, "hex"),
         },
         methodName: "freeze_nft",
         attachedDeposit: new BN(txFees.toString(10)),
@@ -261,6 +273,15 @@ export async function nearHelperFactory({
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
 
+      const signature = await signatureSvc.getSignatureNear(
+        Chain.NEAR,
+        nonce as any,
+        id.native.tokenId,
+        id.collectionIdent,
+        id.native.tokenId,
+        to
+      );
+
       const result = await sender.functionCall({
         contractId: bridge,
         args: {
@@ -269,6 +290,7 @@ export async function nearHelperFactory({
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,
+          sig_data: Buffer.from(signature, "hex"),
         },
         methodName: "withdraw_nft",
         attachedDeposit: new BN(txFees.toString(10)),
