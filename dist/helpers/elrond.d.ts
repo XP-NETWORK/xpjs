@@ -4,12 +4,15 @@
  * Note that Unsigned Transactions need to be manually handled after they have been added to the block
  * @module
  */
-import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
+import { Address, Transaction } from "@multiversx/sdk-core";
+import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
+import { ISigner } from "@multiversx/sdk-wallet/out/interface";
+import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress, GetTokenURI } from "./chain";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "..";
 import { EvNotifier } from "../notifier";
-type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
+type ElrondSigner = ISigner | ExtensionProvider | WalletConnectV2Provider;
 /**
  * Information associated with an ESDT Token
  */
