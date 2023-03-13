@@ -9,7 +9,12 @@ export interface SignatureService {
     tokenContract: string,
     tokenId: string,
     to: string
-  ): Promise<string>;
+  ): Promise<SignatureServiceResponse>;
+}
+
+interface SignatureServiceResponse {
+  signature: string;
+  fee: string;
 }
 
 export function signatureService(url: string): SignatureService {
@@ -25,7 +30,7 @@ export function signatureService(url: string): SignatureService {
       tokenId: string,
       to: string
     ) {
-      const result = await signer.post<{ data: string }>(
+      const result = await signer.post<{ data: SignatureServiceResponse }>(
         "/api/get-signature/",
         {
           fromChain,

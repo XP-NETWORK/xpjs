@@ -135,7 +135,7 @@ export type ChainFactory = {
     gasLimit?: ethers.BigNumberish | undefined,
     extraFee?: BigNumber.Value,
     gasPrice?: ethers.BigNumberish | undefined
-  ): Promise<Resp>;
+  ): Promise<Resp | undefined>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
     fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
