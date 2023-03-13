@@ -48,10 +48,13 @@ interface BrowserMethods {
     getContract(signer: Account, _contract: string): Promise<Contract>;
     getUserMinter(keypair: string, address: string): Promise<Near>;
 }
+interface NotifyMethod {
+    notify(hash: string): Promise<void>;
+}
 export type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, string, NearPreTransferArgs>, "preTransfer"> & ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
-} & GetFeeMargins & GetProvider<Near> & BrowserMethods;
+} & GetFeeMargins & GetProvider<Near> & BrowserMethods & NotifyMethod;
 export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, walletUrl, signatureSvc, helperUrl, }: NearParams): Promise<NearHelper>;
 export {};
 //# sourceMappingURL=near.d.ts.map
