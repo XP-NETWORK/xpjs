@@ -41,6 +41,7 @@ export function signatureService(url: string): SignatureService {
           tokenContract,
         }
       );
+      console.log("near signature response", result);
       return result.data.data;
     },
   };
