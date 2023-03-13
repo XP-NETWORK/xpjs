@@ -85,6 +85,10 @@ interface BrowserMethods {
   getUserMinter(keypair: string, address: string): Promise<Near>;
 }
 
+interface NotifyMethod {
+  notify(hash: string): Promise<void>;
+}
+
 export type NearHelper = ChainNonceGet &
   BalanceCheck &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
@@ -100,7 +104,8 @@ export type NearHelper = ChainNonceGet &
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
   } & GetFeeMargins &
   GetProvider<Near> &
-  BrowserMethods;
+  BrowserMethods &
+  NotifyMethod;
 
 export async function nearHelperFactory({
   networkId,
@@ -147,7 +152,10 @@ export async function nearHelperFactory({
     return walletCallbackUrl;
   };
 
+  const notifyValidators = async (hash: string) => notifier.notifyNear(hash);
+
   return {
+    notify: notifyValidators,
     async estimateValidateTransferNft(_to, _metadata, _mintWith) {
       return new BigNumber(0); // TODO
     },
@@ -230,14 +238,16 @@ export async function nearHelperFactory({
           id.native.tokenId
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
-      const signature = await signatureSvc.getSignatureNear(
-        Chain.NEAR,
-        chain_nonce as any,
-        id.native.tokenId,
-        id.collectionIdent,
-        id.native.tokenId,
-        to
-      );
+      const signature = await signatureSvc
+        .getSignatureNear(
+          Chain.NEAR,
+          chain_nonce as any,
+          id.native.tokenId,
+          id.collectionIdent,
+          id.native.tokenId,
+          to
+        )
+        .catch(() => undefined);
 
       const result = await sender.functionCall({
         contractId: bridge,
@@ -245,17 +255,17 @@ export async function nearHelperFactory({
           token_id: id.native.tokenId,
           chain_nonce,
           to,
-          amt: new BigNumber(txFees),
+          amt: new BigNumber(txFees) /*.div(2)*/,
           mint_with,
           token_contract: id.native.contract,
-          sig_data: Buffer.from(signature, "hex"),
+          ...(signature ? { sig_data: Buffer.from(signature, "hex") } : {}),
         },
         methodName: "freeze_nft",
-        attachedDeposit: new BN(txFees.toString(10)),
+        attachedDeposit: new BN(txFees.toString(10)) /*.div(new BN(2))*/,
         gas: new BN("46000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
-      await notifier.notifyNear(result.transaction.hash);
+      await notifyValidators(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
     },
     getFeeMargin() {
@@ -297,7 +307,7 @@ export async function nearHelperFactory({
         gas: new BN(65_000_000_000_000),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
-      await notifier.notifyNear(result.transaction.hash);
+      await notifyValidators(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
     },
     async validateAddress(adr) {
