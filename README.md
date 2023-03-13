@@ -1,6 +1,6 @@
 <center>
 
-# XP Network JS API v 4.0.2
+# XP Network JS API
 
 </center>
 
@@ -46,7 +46,7 @@ Make sure [nodejs](https://nodejs.org/en/download/) is installed on your machine
 <br/>
 
 ```bash
-yarn add xp.network @metaversxnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+yarn add xp.network
 ```
 
 OR
