@@ -112,7 +112,7 @@ export function prepareTokenId(nft: NftInfo<any>, from: number) {
         return String(hex ? parseInt(hex, 16) : "");
       }
 
-      if (from === Chain.TON) {
+      if (from === Chain.TON || from === Chain.SECRET) {
         return "1";
       }
     } else {

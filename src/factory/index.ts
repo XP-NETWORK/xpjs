@@ -523,7 +523,7 @@ export function ChainFactory(
       }
 
       const [checkWithOutTokenId, verifyList] = await Promise.all([
-        await axios
+        axios
           .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
             fromChain: Number(originalChain),
             chain:
@@ -535,7 +535,7 @@ export function ChainFactory(
             sc: originalContract,
           })
           .catch(() => false),
-        await axios
+        axios
           .get(
             `https://sc-verify.xp.network/verify/list?from=${originalContract}&targetChain=${toChain.getNonce()}&fromChain=${fromChain.getNonce()}&tokenId=1`
           )
@@ -545,8 +545,7 @@ export function ChainFactory(
           .catch(() => false),
       ]);
 
-      if (!checkWithOutTokenId && !verifyList) {
-        console.log({ checkWithOutTokenId, verifyList });
+      if (!checkWithOutTokenId && !verifyList && toChain?.estimateContractDep) {
         //@ts-ignore
         const contractFee = await toChain?.estimateContractDep(toChain);
         calcContractDep = await calcExchangeFees(

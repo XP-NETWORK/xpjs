@@ -2,6 +2,7 @@
  * Web3 Implementation for cross chain traits
  * @module
  */
+/* tslint:disable:no-unused-variable */
 import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
@@ -24,7 +25,6 @@ import {
   PopulatedTransaction,
   providers,
   Signer,
-  VoidSigner,
   Wallet,
 } from "ethers";
 import { Provider, TransactionResponse } from "@ethersproject/providers";
@@ -43,7 +43,6 @@ import {
   GetTokenURI,
   NftInfo,
   PreTransfer,
-  PreTransferRawTxn,
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
@@ -51,22 +50,14 @@ import {
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../notifier";
 import axios from "axios";
-import { hethers } from "@hashgraph/hethers";
+//import { hethers } from "@hashgraph/hethers";
 import {
-  Client,
-  Hbar,
-  //ContractCallQuery,
-  ContractFunctionParameters,
-  ContractExecuteTransaction,
-  ContractId,
-  ContractCallQuery,
-  Query,
   Signer as HSigner,
-  //FileCreateTransaction,
-  //ContractCreateFlow,
-  TokenCreateTransaction,
-  TokenAssociateTransaction,
-  TokenId,
+  ContractCallQuery,
+  ContractId,
+  ContractFunctionParameters,
+  Hbar,
+  ContractExecuteTransaction,
 } from "@hashgraph/sdk";
 
 /**
@@ -95,29 +86,29 @@ export type MintArgs = {
   walletNonce?: number;
 };
 
-export interface IsApproved<Sender> {
+export interface IsApproved<_> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
-    sender: Sender,
+    sender: HSigner,
     txFee: BigNumber,
     gasPrice?: ethers.BigNumber
   ): Promise<boolean>;
 }
 
-export interface Approve<Sender> {
+export interface Approve<_> {
   approveForMinter(
     address: NftInfo<EthNftInfo>,
-    sender: Sender,
+    sender: HSigner,
     txFee: BigNumber,
     gasPrice?: ethers.BigNumber
   ): Promise<string | undefined>;
 }
 
-hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
+/*hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
   return EthBN.from("1");
-};
+};*/
 
-type NullableCustomData = Record<string, any> | undefined;
+//type NullableCustomData = Record<string, any> | undefined;
 
 /**
  * Base util traits
@@ -162,7 +153,6 @@ export type Web3Helper = BaseWeb3Helper &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
   } & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> &
-  PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
     XpNft: string;
@@ -247,7 +237,7 @@ export interface Web3Params {
   feeMargin: FeeMargins;
 }
 
-type NftMethodVal<T, Tx> = {
+type NftMethodVal<_, Tx> = {
   freeze: "freezeErc1155" | "freezeErc721";
   validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
   umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
@@ -255,17 +245,14 @@ type NftMethodVal<T, Tx> = {
     contract: string,
     signer: HSigner,
     minterAddr: string,
-    tok: string,
-    customData: NullableCustomData
+    tok: string
   ) => Promise<boolean>;
   approve: (
-    umt: T,
+    constract: string,
     forAddr: string,
     tok: string,
-    txnUp: (tx: PopulatedTransaction) => Promise<void>,
-    customData: NullableCustomData,
-    gasPrice: ethers.BigNumberish | undefined
-  ) => Promise<Tx>;
+    signer: HSigner
+  ) => Promise<Tx | null>;
 };
 
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
@@ -280,27 +267,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     freeze: "freezeErc1155",
     validateUnfreeze: "validateUnfreezeErc1155",
     umt: Erc1155Minter__factory,
-    approved: async (
-      contract: string,
-      sender: any,
-      minterAddr: string,
-      _tok: string,
-      customData: NullableCustomData
-    ) => {
+    approved: async (_tok: string) => {
       /*return umt.isApprovedForAll(sender, minterAddr, {
         gasLimit: "85000",
         customData,
       });*/
       return true;
     },
-    approve: async (
-      umt: Erc1155Minter,
-      forAddr: string,
-      _tok: string,
-      txnUp: (tx: PopulatedTransaction) => Promise<void>,
-      customData: NullableCustomData
-    ) => {
-      const tx = await umt.populateTransaction.setApprovalForAll(
+    approve: async () => {
+      /*const tx = await umt.populateTransaction.setApprovalForAll(
         forAddr,
         true,
         {
@@ -309,7 +284,8 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         }
       );
       await txnUp(tx);
-      return await umt.signer.sendTransaction(tx);
+      return await umt.signer.sendTransaction(tx);*/
+      return null;
     },
   },
   ERC721: {
@@ -320,10 +296,10 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       contract: string,
       signer: HSigner,
       minterAddr: string,
-      tok: string,
-      customData: NullableCustomData
+      tok: string
     ) => {
-      const call = await new ContractCallQuery()
+      console.log(ContractCallQuery);
+      const x = await new ContractCallQuery()
         .setContractId(ContractId.fromSolidityAddress(contract))
         .setGas(2000000)
         .setQueryPayment(new Hbar(5))
@@ -332,7 +308,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
           new ContractFunctionParameters().addUint256(Number(tok))
         );
 
-      const txResponse = await call.executeWithSigner(signer);
+      const txResponse = await x.executeWithSigner(signer);
 
       return txResponse.getString(0)?.toLowerCase() == minterAddr.toLowerCase();
     },
@@ -340,26 +316,27 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       contract: string,
       forAddr: string,
       tok: string,
-      txnUp: (tx: PopulatedTransaction) => Promise<void>
+      signer: HSigner
     ) => {
-      const transaction = new ContractExecuteTransaction()
+      const transaction = await new ContractExecuteTransaction()
         .setContractId(ContractId.fromSolidityAddress(contract))
         .setGas(2000000)
         .setPayableAmount(5)
         .setFunction(
           "approve",
           new ContractFunctionParameters()
-            .addAddress("0x0000000000000000000000000000000000370094")
-            .addUint256(2)
+            .addAddress(forAddr)
+            .addUint256(Number(tok))
         )
-        .freezeWith(client);
+        .freezeWithSigner(signer);
 
       //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
-      const txResponse = await transaction.execute(client);
+      const txResponse = await (await transaction).executeWithSigner(signer);
       console.log("x");
-      const receipt = await txResponse.getReceipt(client);
+      const receipt = await txResponse.getReceiptWithSigner(signer);
 
       console.log(receipt, txResponse.transactionId);
+      return null;
     },
   },
 };
@@ -457,46 +434,36 @@ export async function web3HelperFactory(
     signer: HSigner
   ) => {
     return await NFT_METHOD_MAP[id.native.contractType].approved(
-      contractAddress,
+      id.native.contract,
       signer,
       params.erc721_addr,
-      id.native.tokenId,
-      params.nonce === 0x1d ? {} : undefined
+      id.native.tokenId
     );
   };
 
   const approveForMinter = async (
     id: NftInfo<EthNftInfo>,
-    sender: Signer,
-    _txFees: BigNumber,
-    gasPrice: ethers.BigNumberish | undefined
+    sender: HSigner,
+    _txFees: BigNumber
   ) => {
     const isApproved = await isApprovedForMinter(id, sender);
     if (isApproved) {
       return undefined;
     }
-    const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
+    /*  const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
       sender
-    );
+    );*/
 
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
+    const toApprove = params.erc721_addr;
 
-    const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
-      erc as any,
+    await NFT_METHOD_MAP[id.native.contractType].approve(
+      id.native.contract,
       toApprove,
       id.native.tokenId,
-      txnUnderpricedPolyWorkaround,
-      params.nonce === 0x1d ? {} : undefined,
-      gasPrice
+      sender
     );
-    await receipt.wait();
-    return receipt.hash;
+    return "";
   };
 
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
@@ -516,36 +483,13 @@ export async function web3HelperFactory(
       return params.feeMargin;
     },
     isApprovedForMinter,
-    preTransfer: (s, id, fee, args) =>
-      approveForMinter(id, s, fee, args?.gasPrice),
+    preTransfer: (s: any, id, fee) => approveForMinter(id, s, fee),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
       return code !== "0x";
     },
     getNonce: () => params.nonce,
-    async preTransferRawTxn(id, address, _value) {
-      const isApproved = await isApprovedForMinter(
-        id,
-        new VoidSigner(address, provider)
-      );
-
-      if (isApproved) {
-        return undefined;
-      }
-
-      const erc = UserNftMinter__factory.connect(
-        id.native.contract,
-        new VoidSigner(address, provider)
-      );
-
-      const approvetxn = await erc.populateTransaction.approve(
-        minter_addr,
-        id.native.tokenId
-      );
-
-      return approvetxn;
-    },
 
     async extractTxnStatus(txn) {
       const status = (await (await provider.getTransaction(txn)).wait()).status;
@@ -641,7 +585,7 @@ export async function web3HelperFactory(
       return new Wallet(privateKey, provider);
     },
     async transferNftToForeign(
-      sender: Signer,
+      sender: any,
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
@@ -650,7 +594,7 @@ export async function web3HelperFactory(
       gasLimit: ethers.BigNumberish | undefined = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      await approveForMinter(id, sender, txFees);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       // Chain is Hedera
@@ -683,7 +627,7 @@ export async function web3HelperFactory(
 
       const txr: TransactionResponse | unknown = await sender
         .sendTransaction(tx)
-        .catch((e) => {
+        .catch((e: any) => {
           if (params.nonce === 33) {
             return e;
           } else throw e;
@@ -710,7 +654,7 @@ export async function web3HelperFactory(
       return txr as any;
     },
     async unfreezeWrappedNft(
-      sender: Signer,
+      sender: any,
       to: string,
       id: NftInfo<EthNftInfo>,
       txFees: BigNumber,
@@ -718,7 +662,7 @@ export async function web3HelperFactory(
       gasLimit = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      await approveForMinter(id, sender, txFees);
 
       // Chain is Hedera
       if (params.nonce === 0x1d) {

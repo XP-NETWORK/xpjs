@@ -1,5 +1,10 @@
 import BigNumber from "bignumber.js";
-import { Bech32, SecretNetworkClient, TxResponse } from "secretjs";
+import {
+  Bech32,
+  SecretNetworkClient,
+  addressToBytes,
+  toBase64,
+} from "secretjs";
 import {
   Extension,
   Snip721MintOptions,
@@ -19,6 +24,7 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  WhitelistCheck,
 } from "./chain";
 
 export type SecretNftInfo = {
@@ -43,16 +49,17 @@ type GetOwnedTokensResponse = Snip721GetTokensResponse & {
 export type SecretHelper = TransferNftForeign<
   SecretSigner,
   SecretNftInfo,
-  TxResponse
+  any
 > &
-  UnfreezeForeignNft<SecretSigner, SecretNftInfo, TxResponse> &
+  UnfreezeForeignNft<SecretSigner, SecretNftInfo, any> &
   ValidateAddress &
   EstimateTxFees<SecretNftInfo> &
   ChainNonceGet &
+  WhitelistCheck<SecretNftInfo> &
   PreTransfer<SecretSigner, SecretNftInfo, string, undefined> &
   BalanceCheck &
   GetFeeMargins & { XpNft: string } & GetProvider<SecretNetworkClient> &
-  MintNft<SecretSigner, SecretMintArgs, TxResponse> & {
+  MintNft<SecretSigner, SecretMintArgs, any> & {
     nftList(
       owner: string,
 
@@ -64,7 +71,7 @@ export type SecretHelper = TransferNftForeign<
       client: SecretNetworkClient,
       contract: string,
       vk: string
-    ): Promise<TxResponse>;
+    ): Promise<any>;
     isApprovedForMinter(
       sender: SecretSigner,
       nft: NftInfo<SecretNftInfo>
@@ -95,8 +102,8 @@ const UNFREEZE_GASL = new BigNumber(0);
 export async function secretHelperFactory(
   p: SecretParams
 ): Promise<SecretHelper> {
-  const queryClient = new SecretNetworkClient({
-    url: p.rpcUrl,
+  const queryClient = await SecretNetworkClient.create({
+    grpcWebUrl: p.rpcUrl,
     chainId: p.chainId,
   });
 
@@ -142,8 +149,8 @@ export async function secretHelperFactory(
     const res = await sender.tx.compute.executeContract(
       {
         sender: sender.address,
-        contract_address: nft.native.contract,
-        code_hash: nft.native.contractHash,
+        contractAddress: nft.native.contract,
+        codeHash: nft.native.contractHash,
         msg: {
           approve: {
             spender: p.bridge.contractAddress,
@@ -180,8 +187,8 @@ export async function secretHelperFactory(
       const minter = args.contract ? args.contract : p.umt;
       const tx = await signer.tx.compute.executeContract(
         {
-          contract_address: minter.contractAddress,
-          code_hash: minter.codeHash,
+          contractAddress: minter.contractAddress,
+          codeHash: minter.codeHash,
           msg: {
             mint_nft: {
               public_metadata: {
@@ -217,11 +224,9 @@ export async function secretHelperFactory(
         },
       };
       if (!codeHash) {
-        codeHash = (
-          await queryClient.query.compute.codeHashByContractAddress({
-            contract_address: contractAddress,
-          })
-        ).code_hash;
+        codeHash = await queryClient.query.compute.contractCodeHash(
+          contractAddress
+        );
       }
       const contract = {
         address: contractAddress,
@@ -272,7 +277,7 @@ export async function secretHelperFactory(
     async setViewingKey(client, contract, vk) {
       const tx = await client.tx.snip721.setViewingKey(
         {
-          contract_address: contract,
+          contractAddress: contract,
           msg: {
             set_viewing_key: {
               key: vk,
@@ -293,8 +298,8 @@ export async function secretHelperFactory(
       const tx = await wallet.tx.compute.executeContract(
         {
           sender: wallet.address,
-          contract_address: p.bridge.contractAddress,
-          code_hash: p.bridge.codeHash,
+          contractAddress: p.bridge.contractAddress,
+          codeHash: p.bridge.codeHash,
           msg: {
             freeze_nft: {
               contract: nft.native.contract,
@@ -309,7 +314,7 @@ export async function secretHelperFactory(
               minter: mw,
             },
           },
-          sent_funds: [
+          sentFunds: [
             {
               denom: "uscrt",
               amount: fee.toString(10),
@@ -327,8 +332,8 @@ export async function secretHelperFactory(
       const tx = await wallet.tx.compute.executeContract(
         {
           sender: wallet.address,
-          contract_address: p.bridge.contractAddress,
-          code_hash: p.bridge.codeHash,
+          contractAddress: p.bridge.contractAddress,
+          codeHash: p.bridge.codeHash,
           msg: {
             withdraw_nft: {
               burner: nft.native.contract,
@@ -338,7 +343,7 @@ export async function secretHelperFactory(
               chain_nonce: Number(chainNonce),
             },
           },
-          sent_funds: [
+          sentFunds: [
             {
               denom: "uscrt",
               amount: fee.toString(10),
@@ -351,6 +356,20 @@ export async function secretHelperFactory(
       await p.notifier.notifySecret(tx.transactionHash, nft.native.vk);
 
       return tx;
+    },
+    isNftWhitelisted: async (nft) => {
+      if (!nft.native?.contract) return false;
+      const result = await queryClient.query.compute.queryContract({
+        contractAddress: p.bridge.contractAddress,
+        codeHash: p.bridge.codeHash,
+        query: {
+          get_whitelisted: {
+            addr: toBase64(addressToBytes(nft.native.contract)),
+          },
+        },
+      });
+
+      return typeof result === "boolean" ? result : false;
     },
   };
 }
