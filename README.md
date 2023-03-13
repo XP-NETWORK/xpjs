@@ -52,7 +52,7 @@ yarn add xp.network
 OR
 
 ```bash
-npm i --save xp.network @metaversxnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+npm i --save xp.network
 ```
 
 To import the latest version of `xp.network` library:
