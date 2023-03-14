@@ -306,10 +306,10 @@ export async function nearHelperFactory({
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,
-          sig_data: Buffer.from(res.signature, "hex"),
+          sig_data: Buffer.from(res?.signature, "hex"),
         },
         methodName: "withdraw_nft",
-        attachedDeposit: new BN(txFees.toString(10)),
+        attachedDeposit: new BN(res?.fee),
         gas: new BN(65_000_000_000_000),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
