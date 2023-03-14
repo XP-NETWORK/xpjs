@@ -143,10 +143,7 @@ export interface IssueESDTNFT {
  * ESDTRoleNFTBurn: Allow burning NFTs
  * ESDTRoleNFTAddQuanitity: Allowing minting >1 NFTs (SFT)
  */
-export type ESDTRole =
-  | "ESDTRoleNFTCreate"
-  | "ESDTRoleNFTBurn"
-  | "ESDTRoleNFTAddQuantity";
+export type ESDTRole = "ESDTRoleNFTCreate" | "ESDTRoleNFTBurn";
 
 /**
  * Utility for setting ESDT roles
@@ -659,7 +656,10 @@ export async function elrondHelperFactory(
 
       const tx = await signAndSend(sender, txu);
       const res = await transactionResult(tx.getHash());
-      const tickerh: string = res["smartContractResults"][0].data.split("@")[2];
+      const result = res["smartContractResults"].find((e: any) =>
+        e.data.startsWith("@")
+      );
+      const tickerh: string = result.data.split("@")[2];
       return Buffer.from(tickerh, "hex").toString("utf-8");
     },
     async mintNft(owner: ElrondSigner, args: NftIssueArgs): Promise<string> {
