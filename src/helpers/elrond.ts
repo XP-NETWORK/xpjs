@@ -8,21 +8,24 @@ import {
   Account,
   Address,
   AddressValue,
+  Balance,
   BigUIntValue,
   BytesValue,
   ContractFunction,
-  SmartContract,
+  Egld,
+  ExtensionProvider,
+  GasLimit,
+  ISigner,
+  NetworkConfig,
+  ProxyProvider,
   TokenIdentifierValue,
-  TokenPayment,
   Transaction,
   TransactionHash,
-  TransactionWatcher,
+  TransactionPayload,
   U64Value,
-} from "@multiversx/sdk-core";
-import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
-import { ISigner } from "@multiversx/sdk-wallet/out/interface";
-import { ProxyNetworkProvider as ProxyProvider } from "@multiversx/sdk-network-providers";
-import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
+  UserSigner,
+  WalletConnectProvider,
+} from "@elrondnetwork/erdjs";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import {
@@ -53,9 +56,8 @@ import {
 } from "..";
 import { EvNotifier } from "../notifier";
 import { Base64 } from "js-base64";
-import { UserSigner } from "@multiversx/sdk-wallet/out";
 
-type ElrondSigner = ISigner | ExtensionProvider | WalletConnectV2Provider;
+type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
 
 type EasyBalance = string | number | BigNumber;
 
@@ -232,12 +234,9 @@ export async function elrondHelperFactory(
   elrondParams: ElrondParams
 ): Promise<ElrondHelper> {
   const provider = new ProxyProvider(elrondParams.node_uri);
-  const config = await provider.getNetworkConfig();
+  await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(elrondParams.minter_address);
   const swapContract = new Address(elrondParams.esdt_swap_address);
-  const swapCtr = new SmartContract({
-    address: swapContract,
-  });
   const providerRest = axios.create({
     baseURL: elrondParams.node_uri,
   });
@@ -264,6 +263,8 @@ export async function elrondHelperFactory(
 
   const syncAccount = async (signer: ElrondSigner) => {
     const account = new Account(await getAddress(signer));
+    await account.sync(provider);
+
     return account;
   };
 
@@ -271,7 +272,7 @@ export async function elrondHelperFactory(
     const acc = await syncAccount(signer);
     tx.setNonce(acc.nonce);
     let stx: Transaction;
-    if (signer instanceof WalletConnectV2Provider) {
+    if (signer instanceof WalletConnectProvider) {
       const txs = await signer.signTransactions([tx]);
       stx = txs[0];
     } else if (signer instanceof ExtensionProvider) {
@@ -284,7 +285,7 @@ export async function elrondHelperFactory(
       stx = await signer.signTransaction(tx);
     }
     try {
-      provider.sendTransaction(stx);
+      await stx.send(provider);
     } catch (e: any) {
       if (e.message.includes("lowerNonceInTx")) {
         throw ConcurrentSendError();
@@ -336,12 +337,17 @@ export async function elrondHelperFactory(
     const esdts = await listEsdt((await sender.getAddress()).toString());
     const res = esdts[nft.native.nonce];
     if (res === undefined || new BigNumber(res.balance).lt(value)) {
-      const utx = swapCtr.call({
-        chainID: config.ChainID,
+      const utx = new Transaction({
         receiver: swapContract,
-        gasLimit: 300000000,
-        func: new ContractFunction("wrapEgld"),
-        value: TokenPayment.egldFromAmount(value),
+        gasLimit: new GasLimit(300000000),
+        value: new Balance(
+          Egld.getToken(),
+          Egld.getNonce(),
+          new BigNumber(value.toString())
+        ),
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("wrapEgld"))
+          .build(),
       });
 
       const tx = await signAndSend(sender, utx);
@@ -356,27 +362,27 @@ export async function elrondHelperFactory(
     owner: Address,
     { identifier, quantity, name, royalties, hash, attrs, uris }: NftIssueArgs
   ) => {
-    const ow = new SmartContract({ address: owner });
-
-    const args = [
-      new TokenIdentifierValue(identifier),
-      new BigUIntValue(new BigNumber(quantity ?? 1)),
-      new BytesValue(Buffer.from(name, "utf-8")),
-      new U64Value(new BigNumber(royalties ?? 0)),
-      new BytesValue(hash ? Buffer.from(hash, "utf-8") : Buffer.alloc(0)),
-      new BytesValue(attrs ? Buffer.from(attrs, "utf-8") : Buffer.alloc(0)),
-    ];
+    let baseArgs = TransactionPayload.contractCall()
+      .setFunction(new ContractFunction("ESDTNFTCreate"))
+      .addArg(new TokenIdentifierValue(Buffer.from(identifier, "utf-8")))
+      .addArg(new BigUIntValue(new BigNumber(quantity ?? 1)))
+      .addArg(new BytesValue(Buffer.from(name, "utf-8")))
+      .addArg(new U64Value(new BigNumber(royalties ?? 0)))
+      .addArg(
+        new BytesValue(hash ? Buffer.from(hash, "utf-8") : Buffer.alloc(0))
+      )
+      .addArg(
+        new BytesValue(attrs ? Buffer.from(attrs, "utf-8") : Buffer.alloc(0))
+      );
 
     for (const uri of uris) {
-      args.push(new BytesValue(Buffer.from(uri, "utf-8")));
+      baseArgs = baseArgs.addArg(new BytesValue(Buffer.from(uri, "utf-8")));
     }
 
-    return ow.call({
-      func: new ContractFunction("ESDTNFTCreate"),
-      chainID: config.ChainID,
-      gasLimit: 70000000,
-      args,
+    return new Transaction({
       receiver: owner,
+      gasLimit: new GasLimit(70000000), // TODO: Auto derive
+      data: baseArgs.build(),
     });
   };
 
@@ -394,25 +400,28 @@ export async function elrondHelperFactory(
     tx_fees: BigNumber,
     mintWith: string
   ) => {
-    const ow = new SmartContract({ address });
-    return ow.call({
-      func: new ContractFunction("MultiESDTNFTTransfer"),
-      chainID: config.ChainID,
-      gasLimit: 300000000,
-      args: [
-        new AddressValue(mintContract),
-        new BigUIntValue(new BigNumber(2)),
-        new TokenIdentifierValue(tokenIdentReal(tokenIdentifier)),
-        new U64Value(new BigNumber(nonce)),
-        new BigUIntValue(new BigNumber(1)),
-        new TokenIdentifierValue(esdtSwaphex.toString("hex")),
-        new U64Value(new BigNumber(0x0)),
-        new BigUIntValue(tx_fees),
-        new BytesValue(Buffer.from("freezeSendNft", "ascii")),
-        new U64Value(new BigNumber(chain_nonce)),
-        new BytesValue(Buffer.from(to, "ascii")),
-        new BytesValue(Buffer.from(mintWith, "ascii")),
-      ],
+    return new Transaction({
+      receiver: address,
+      gasLimit: new GasLimit(300000000),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+        .addArg(new AddressValue(mintContract))
+        .addArg(new BigUIntValue(new BigNumber(2)))
+        .addArg(
+          new TokenIdentifierValue(
+            Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")
+          )
+        )
+        .addArg(new U64Value(new BigNumber(nonce)))
+        .addArg(new BigUIntValue(new BigNumber(1)))
+        .addArg(new TokenIdentifierValue(esdtSwaphex))
+        .addArg(new U64Value(new BigNumber(0x0)))
+        .addArg(new BigUIntValue(tx_fees))
+        .addArg(new BytesValue(Buffer.from("freezeSendNft", "ascii")))
+        .addArg(new U64Value(new BigNumber(chain_nonce)))
+        .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .addArg(new BytesValue(Buffer.from(mintWith, "ascii")))
+        .build(),
     });
   };
 
@@ -423,24 +432,27 @@ export async function elrondHelperFactory(
     tx_fees: BigNumber,
     chain_nonce: string
   ) => {
-    const ow = new SmartContract({ address });
-    return ow.call({
-      func: new ContractFunction("MultiESDTNFTTransfer"),
-      gasLimit: 300000000,
-      chainID: config.ChainID,
-      args: [
-        new AddressValue(mintContract),
-        new BigUIntValue(new BigNumber(2)),
-        new TokenIdentifierValue(tokenIdentReal(tokenIdentifier)),
-        new U64Value(new BigNumber(nonce)),
-        new BigUIntValue(new BigNumber(1)),
-        new TokenIdentifierValue(esdtSwaphex.toString("hex")),
-        new U64Value(new BigNumber(0x0)),
-        new BigUIntValue(tx_fees),
-        new BytesValue(Buffer.from("withdrawNft", "ascii")),
-        new U64Value(new BigNumber(chain_nonce)),
-        new BytesValue(Buffer.from(to, "ascii")),
-      ],
+    return new Transaction({
+      receiver: address,
+      gasLimit: new GasLimit(300000000),
+      data: TransactionPayload.contractCall()
+        .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+        .addArg(new AddressValue(mintContract))
+        .addArg(new BigUIntValue(new BigNumber(2)))
+        .addArg(
+          new TokenIdentifierValue(
+            Buffer.from(tokenIdentReal(tokenIdentifier), "utf-8")
+          )
+        )
+        .addArg(new U64Value(new BigNumber(nonce)))
+        .addArg(new BigUIntValue(new BigNumber(1)))
+        .addArg(new TokenIdentifierValue(esdtSwaphex))
+        .addArg(new U64Value(new BigNumber(0x0)))
+        .addArg(new BigUIntValue(tx_fees))
+        .addArg(new BytesValue(Buffer.from("withdrawNft", "ascii")))
+        .addArg(new U64Value(new BigNumber(chain_nonce)))
+        .addArg(new BytesValue(Buffer.from(to, "ascii")))
+        .build(),
     });
   };
 
@@ -458,24 +470,44 @@ export async function elrondHelperFactory(
     canWipe: boolean | undefined,
     canTransferNFTCreateRole: boolean | undefined
   ) => {
-    const sc = new SmartContract({ address: ESDT_ISSUE_ADDR });
-    return sc.call({
-      func: new ContractFunction("issueNonFungible"),
-      args: [
-        new TokenIdentifierValue(name),
-        new TokenIdentifierValue(ticker),
-        new BytesValue(Buffer.from("canFreeze", "ascii")),
-        new BytesValue(Buffer.from(canFreeze ? "true" : "false", "ascii")),
-        new BytesValue(Buffer.from("canWipe", "ascii")),
-        new BytesValue(Buffer.from(canWipe ? "true" : "false", "ascii")),
-        new BytesValue(Buffer.from("canChangeOwner", "ascii")),
-        new BytesValue(
-          Buffer.from(canTransferNFTCreateRole ? "true" : "false", "ascii")
-        ),
-      ],
-      chainID: config.ChainID,
-      gasLimit: 60000000,
-      value: TokenPayment.egldFromAmount(ESDT_ISSUE_COST),
+    let baseArgs = TransactionPayload.contractCall()
+      .setFunction(new ContractFunction("issueNonFungible"))
+      .addArg(new TokenIdentifierValue(Buffer.from(name, "utf-8")))
+      .addArg(new TokenIdentifierValue(Buffer.from(ticker, "utf-8")));
+
+    if (canFreeze !== undefined) {
+      baseArgs = baseArgs
+        .addArg(new BytesValue(Buffer.from("canFreeze", "ascii")))
+        .addArg(
+          new BytesValue(Buffer.from(canFreeze ? "true" : "false", "ascii"))
+        );
+    }
+    if (canWipe !== undefined) {
+      baseArgs = baseArgs
+        .addArg(new BytesValue(Buffer.from("canWipe", "ascii")))
+        .addArg(
+          new BytesValue(Buffer.from(canWipe ? "true" : "false", "ascii"))
+        );
+    }
+    if (canTransferNFTCreateRole !== undefined) {
+      baseArgs = baseArgs
+        .addArg(new BytesValue(Buffer.from("canChangeOwner", "ascii")))
+        .addArg(
+          new BytesValue(
+            Buffer.from(canTransferNFTCreateRole ? "true" : "false", "ascii")
+          )
+        );
+    }
+
+    return new Transaction({
+      receiver: ESDT_ISSUE_ADDR,
+      value: new Balance(
+        Egld.getToken(),
+        Egld.getNonce(),
+        new BigNumber(ESDT_ISSUE_COST.toString())
+      ),
+      gasLimit: new GasLimit(60000000),
+      data: baseArgs.build(),
     });
   };
 
@@ -484,25 +516,25 @@ export async function elrondHelperFactory(
     target: Address,
     roles: ESDTRole[]
   ) => {
-    const ow = new SmartContract({ address: ESDT_ISSUE_ADDR });
+    let baseArgs = TransactionPayload.contractCall()
+      .setFunction(new ContractFunction("setSpecialRole"))
+      .addArg(new TokenIdentifierValue(Buffer.from(token)))
+      .addArg(new AddressValue(target));
 
-    const args = [new TokenIdentifierValue(token), new AddressValue(target)];
-
-    for (const r of roles) {
-      new BytesValue(Buffer.from(r, "utf-8"));
+    for (const role of roles) {
+      baseArgs = baseArgs.addArg(new BytesValue(Buffer.from(role, "utf-8")));
     }
-    return ow.call({
-      chainID: config.ChainID,
-      func: new ContractFunction("setSpecialRole"),
-      gasLimit: 70000000,
-      args: args,
+
+    return new Transaction({
+      receiver: ESDT_ISSUE_ADDR,
+      gasLimit: new GasLimit(70000000), // TODO: auto derive
+      data: baseArgs.build(),
     });
   };
 
   async function extractAction(tx: Transaction): Promise<string> {
-    const tw = new TransactionWatcher(provider);
     let err;
-    tw.awaitCompleted(tx).catch((e) => (err = e));
+    await tx.awaitExecuted(provider).catch((e) => (err = e));
     if (err) {
       await new Promise((r) => setTimeout(r, 3000));
       return await extractAction(tx);
@@ -520,7 +552,7 @@ export async function elrondHelperFactory(
   }
 
   async function getAddress(sender: ElrondSigner): Promise<Address> {
-    return new Address(sender.getAddress().toString());
+    return new Address(await sender.getAddress());
   }
 
   return {
@@ -528,7 +560,9 @@ export async function elrondHelperFactory(
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
 
-      return new BigNumber(wallet.balance.toString());
+      await wallet.sync(provider);
+
+      return wallet.balance.valueOf();
     },
     async isContractAddress(address) {
       return Address.fromString(address).isContractAddress();
@@ -537,7 +571,9 @@ export async function elrondHelperFactory(
       return elrondParams.feeMargin;
     },
     async extractTxnStatus(txn) {
-      const status = await provider.getTransactionStatus(txn);
+      const status = await provider.getTransactionStatus(
+        new TransactionHash(txn)
+      );
       if (status.isPending()) {
         return TransactionStatus.PENDING;
       }
@@ -645,11 +681,17 @@ export async function elrondHelperFactory(
       const esdts = await listEsdt(address);
       const res = esdts[id.native.nonce];
       if (res === undefined || new BigNumber(res.balance).lt(value)) {
-        const utx = swapCtr.call({
-          func: new ContractFunction("wrapEgld"),
-          chainID: config.ChainID,
-          gasLimit: 50000000,
-          value: TokenPayment.egldFromAmount(value),
+        const utx = new Transaction({
+          receiver: swapContract,
+          gasLimit: new GasLimit(50000000),
+          value: new Balance(
+            Egld.getToken(),
+            Egld.getNonce(),
+            new BigNumber(value.toString())
+          ),
+          data: TransactionPayload.contractCall()
+            .setFunction(new ContractFunction("wrapEgld"))
+            .build(),
         });
         return utx.toPlainObject();
       }
@@ -668,17 +710,16 @@ export async function elrondHelperFactory(
       return tx;
     },
     async transferESDTOwnership(sender, token, target): Promise<Transaction> {
-      const ow = new SmartContract({
-        address: new Address(
+      const txu = new Transaction({
+        receiver: new Address(
           "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
         ),
-      });
-
-      const txu = ow.call({
-        func: new ContractFunction("transferOwnership"),
-        args: [new TokenIdentifierValue(token), new AddressValue(target)],
-        chainID: config.ChainID,
-        gasLimit: 60000000,
+        gasLimit: new GasLimit(60000000),
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("transferOwnership"))
+          .addArg(new TokenIdentifierValue(Buffer.from(token, "utf-8")))
+          .addArg(new AddressValue(target))
+          .build(),
       });
 
       return await signAndSend(sender, txu);
@@ -696,27 +737,27 @@ export async function elrondHelperFactory(
       return estimateGas(NFT_UNFREEZE_COST); // TODO: properly estimate NFT_UNFREEZE_COST
     },
     async unfreezeWrappedNftBatch(sender, chainNonce, to, nfts, txFees) {
-      const sc = new SmartContract({ address: await getAddress(sender) });
-
-      const txu = sc.call({
-        func: new ContractFunction("MultiESDTNFTTransfer"),
-        chainID: config.ChainID,
-        gasLimit: 40000000 + 5000000 * nfts.length,
-        args: [
-          new AddressValue(mintContract),
-          new BigUIntValue(new BigNumber(nfts.length + 1)),
-          ...nfts.flatMap((nft) => [
-            new TokenIdentifierValue(esdtNftHex.toString("hex")),
-            new U64Value(new BigNumber(nft.native.nonce)),
-            new BigUIntValue(new BigNumber(1)),
-          ]),
-          new TokenIdentifierValue(esdtSwaphex.toString("hex")),
-          new U64Value(new BigNumber(0x0)),
-          new BigUIntValue(txFees),
-          new BytesValue(Buffer.from("withdrawBatchNft", "ascii")),
-          new U64Value(new BigNumber(chainNonce)),
-          new BytesValue(Buffer.from(to, "ascii")),
-        ],
+      const txu = new Transaction({
+        receiver: await getAddress(sender),
+        gasLimit: new GasLimit(40000000 + 5000000 * nfts.length), // TODO: better estimate
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+          .setArgs([
+            new AddressValue(mintContract),
+            new BigUIntValue(new BigNumber(nfts.length + 1)),
+            ...nfts.flatMap((nft) => [
+              new TokenIdentifierValue(esdtNftHex),
+              new U64Value(new BigNumber(nft.native.nonce)),
+              new BigUIntValue(new BigNumber(1)),
+            ]),
+            new TokenIdentifierValue(esdtSwaphex),
+            new U64Value(new BigNumber(0x0)),
+            new BigUIntValue(txFees),
+            new BytesValue(Buffer.from("withdrawBatchNft", "ascii")),
+            new U64Value(new BigNumber(chainNonce)),
+            new BytesValue(Buffer.from(to, "ascii")),
+          ])
+          .build(),
       });
       const tx = await signAndSend(sender, txu);
       await notifyValidator(
@@ -737,29 +778,30 @@ export async function elrondHelperFactory(
       mintWith,
       txFees
     ) {
-      const sc = new SmartContract({ address: await getAddress(sender) });
-      const txu = sc.call({
-        func: new ContractFunction("MultiESDTNFTTransfer"),
-        args: [
-          new AddressValue(mintContract),
-          new BigUIntValue(new BigNumber(nfts.length + 1)),
-          ...nfts.flatMap((nft) => [
-            new TokenIdentifierValue(
-              tokenIdentReal(nft.native.tokenIdentifier)
-            ),
-            new U64Value(new BigNumber(nft.native.nonce)),
-            new BigUIntValue(new BigNumber(1)),
-          ]),
-          new TokenIdentifierValue(esdtSwaphex.toString("hex")),
-          new U64Value(new BigNumber(0x0)),
-          new BigUIntValue(txFees),
-          new BytesValue(Buffer.from("freezeSendBatchNft", "ascii")),
-          new U64Value(new BigNumber(chainNonce)),
-          new BytesValue(Buffer.from(to, "ascii")),
-          new BytesValue(Buffer.from(mintWith, "ascii")),
-        ],
-        chainID: config.ChainID,
-        gasLimit: 50000000 + 5000000 * nfts.length,
+      const txu = new Transaction({
+        receiver: await getAddress(sender),
+        gasLimit: new GasLimit(50000000 + 5000000 * nfts.length), // TODO: better estimate
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("MultiESDTNFTTransfer"))
+          .setArgs([
+            new AddressValue(mintContract),
+            new BigUIntValue(new BigNumber(nfts.length + 1)),
+            ...nfts.flatMap((nft) => [
+              new TokenIdentifierValue(
+                Buffer.from(tokenIdentReal(nft.native.tokenIdentifier), "utf-8")
+              ),
+              new U64Value(new BigNumber(nft.native.nonce)),
+              new BigUIntValue(new BigNumber(1)),
+            ]),
+            new TokenIdentifierValue(esdtSwaphex),
+            new U64Value(new BigNumber(0x0)),
+            new BigUIntValue(txFees),
+            new BytesValue(Buffer.from("freezeSendBatchNft", "ascii")),
+            new U64Value(new BigNumber(chainNonce)),
+            new BytesValue(Buffer.from(to, "ascii")),
+            new BytesValue(Buffer.from(mintWith, "ascii")),
+          ])
+          .build(),
       });
       const tx = await signAndSend(sender, txu);
       await notifyValidator(
@@ -773,27 +815,23 @@ export async function elrondHelperFactory(
       return tx;
     },
     async wegldBalance(addr) {
-      const esdtinfo = await provider.getFungibleTokensOfAccount(
-        new Address(addr)
+      const esdtInfo = await provider.getAddressEsdt(
+        new Address(addr),
+        elrondParams.esdt_swap
       );
-      for (const t of esdtinfo) {
-        if (t.identifier === elrondParams.esdt_swap) {
-          new BigNumber(t.balance);
-        }
-      }
-      throw new Error(`No wEGLD balance`);
+
+      return new BigNumber(esdtInfo.balance);
     },
     async unwrapWegld(sender: ElrondSigner, amount: BigNumber) {
-      const txu = swapCtr.call({
-        func: new ContractFunction("ESDTTransfer"),
-        chainID: config.ChainID,
-        args: [
-          new TokenIdentifierValue(esdtSwaphex.toString("hex")),
-          new U64Value(amount),
-          new BytesValue(Buffer.from("unwrapEgld")),
-        ],
-        gasLimit: 300500000,
+      const txu = new Transaction({
         receiver: swapContract,
+        gasLimit: new GasLimit(300500000),
+        data: TransactionPayload.contractCall()
+          .setFunction(new ContractFunction("ESDTTransfer"))
+          .addArg(new TokenIdentifierValue(esdtSwaphex))
+          .addArg(new U64Value(amount))
+          .addArg(new BytesValue(Buffer.from("unwrapEgld")))
+          .build(),
       });
 
       const tx = await signAndSend(sender, txu);
