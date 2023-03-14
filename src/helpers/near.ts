@@ -238,7 +238,7 @@ export async function nearHelperFactory({
           id.native.tokenId
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
-      const signature = await signatureSvc
+      const res = await signatureSvc
         .getSignatureNear(
           Chain.NEAR,
           chain_nonce as any,
@@ -249,24 +249,30 @@ export async function nearHelperFactory({
         )
         .catch(() => undefined);
 
-      const result = await sender.functionCall({
-        contractId: bridge,
-        args: {
-          token_id: id.native.tokenId,
-          chain_nonce,
-          to,
-          amt: new BigNumber(txFees) /*.div(2)*/,
-          mint_with,
-          token_contract: id.native.contract,
-          ...(signature ? { sig_data: Buffer.from(signature, "hex") } : {}),
-        },
-        methodName: "freeze_nft",
-        attachedDeposit: new BN(txFees.toString(10)) /*.div(new BN(2))*/,
-        gas: new BN("46000000000000"),
-        ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
-      });
-      await notifyValidators(result.transaction.hash);
-      return [result, getTransactionLastResult(result)];
+      if (res) {
+        const result = await sender.functionCall({
+          contractId: bridge,
+          args: {
+            token_id: id.native.tokenId,
+            chain_nonce,
+            to,
+            amt: new BigNumber(txFees) /*.div(2)*/,
+            mint_with,
+            token_contract: id.native.contract,
+            ...(res?.signature
+              ? { sig_data: Buffer.from(res.signature, "hex") }
+              : {}),
+          },
+          methodName: "freeze_nft",
+          attachedDeposit: new BN(res?.fee) /*.div(new BN(2))*/,
+          gas: new BN("46000000000000"),
+          ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
+        });
+        await notifyValidators(result.transaction.hash);
+        return [result, getTransactionLastResult(result)];
+      } else {
+        return undefined;
+      }
     },
     getFeeMargin() {
       return feeMargin;
@@ -283,7 +289,7 @@ export async function nearHelperFactory({
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
 
-      const signature = await signatureSvc.getSignatureNear(
+      const res = await signatureSvc.getSignatureNear(
         Chain.NEAR,
         nonce as any,
         id.native.tokenId,
@@ -300,7 +306,7 @@ export async function nearHelperFactory({
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,
-          sig_data: Buffer.from(signature, "hex"),
+          sig_data: Buffer.from(res.signature, "hex"),
         },
         methodName: "withdraw_nft",
         attachedDeposit: new BN(txFees.toString(10)),

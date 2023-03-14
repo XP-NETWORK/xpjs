@@ -52,7 +52,7 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     mintWith: string,
     gasLimit?: ethers.BigNumberish | undefined,
     gasPrice?: ethers.BigNumberish | undefined
-  ): Promise<Resp>;
+  ): Promise<Resp | undefined>;
 }
 
 /**
