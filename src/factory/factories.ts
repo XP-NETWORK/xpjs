@@ -35,7 +35,7 @@ const middleware_uri = "https://notifier.xp.network";
 const testnet_middleware_uri =
   "https://testnet-notifier.xp.network/notify-test/";
 
-const signature_service_uri = "http://5.9.67.248:3003";
+const signature_service_uri = "https://fee.xp.network";
 const signatureSvc = signatureService(signature_service_uri);
 
 export namespace ChainFactoryConfigs {
