@@ -29,7 +29,7 @@ export interface PreTransfer<Signer, Nft, Ret, ExtraArgs> {
  * @returns Transaction and the Identifier of this action to track the status
  */
 export interface TransferNftForeign<Signer, RawNft, Resp> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string, gasLimit?: ethers.BigNumberish | undefined, gasPrice?: ethers.BigNumberish | undefined): Promise<Resp>;
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string, gasLimit?: ethers.BigNumberish | undefined, gasPrice?: ethers.BigNumberish | undefined): Promise<Resp | undefined>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
