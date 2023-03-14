@@ -12,7 +12,7 @@
     "url": "https://github.com/XP-NETWORK/xpjs"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.hedera.json",
     "format": "prettier . --write",
     "prepare": "husky install"
   },

@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ES6"
+  },
+  "exclude": ["**/*", "!src/helpers/hedera/index.ts"],
+  //"include": ["src/helpers/hedera/index.ts"],
+  "files": ["src/helpers/hedera/index.ts"]
+}
