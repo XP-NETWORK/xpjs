@@ -1,11 +1,8 @@
-export const idlFactory = ({ IDL }: { IDL: any }) => {
+export const idlFactory = ({ IDL }: any) => {
   const ValidateWhitelistDip721 = IDL.Record({
     dip_contract: IDL.Principal,
   });
-  const ValidateCleanLogs = IDL.Record({
-    from_action: IDL.Nat,
-    to_action: IDL.Nat,
-  });
+  const ValidateCleanLogs = IDL.Record({ action_id: IDL.Nat });
   const ValidateTransferNft = IDL.Record({
     to: IDL.Principal,
     mint_with: IDL.Principal,
@@ -28,6 +25,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   });
   const Config = IDL.Record({
     event_cnt: IDL.Nat,
+    fee_public_key: IDL.Vec(IDL.Nat8),
     chain_nonce: IDL.Nat64,
     group_key: IDL.Vec(IDL.Nat8),
     paused: IDL.Bool,
@@ -80,6 +78,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
       [],
       []
     ),
+    encode_transfer_tx: IDL.Func(
+      [IDL.Nat8, IDL.Nat8, IDL.Text, IDL.Nat],
+      [IDL.Vec(IDL.Nat8)],
+      ["query"]
+    ),
     encode_validate_transfer_nft: IDL.Func(
       [IDL.Nat, ValidateTransferNft],
       [IDL.Vec(IDL.Nat8)],
@@ -101,7 +104,15 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
       ["query"]
     ),
     freeze_nft: IDL.Func(
-      [IDL.Nat64, IDL.Principal, IDL.Nat, IDL.Nat64, IDL.Text, IDL.Text],
+      [
+        IDL.Nat64,
+        IDL.Principal,
+        IDL.Nat,
+        IDL.Nat64,
+        IDL.Text,
+        IDL.Text,
+        IDL.Vec(IDL.Nat8),
+      ],
       [IDL.Nat],
       []
     ),
@@ -124,6 +135,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
       ["query"]
     ),
     is_whitelisted: IDL.Func([IDL.Principal], [IDL.Bool], ["query"]),
+    set_fee_group_key: IDL.Func(
+      [IDL.Nat, ValidateSetGroupKey, IDL.Vec(IDL.Nat8)],
+      [],
+      []
+    ),
     set_group_key: IDL.Func(
       [IDL.Nat, ValidateSetGroupKey, IDL.Vec(IDL.Nat8)],
       [],
@@ -156,7 +172,14 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
       []
     ),
     withdraw_nft: IDL.Func(
-      [IDL.Nat64, IDL.Principal, IDL.Nat, IDL.Nat64, IDL.Text],
+      [
+        IDL.Nat64,
+        IDL.Principal,
+        IDL.Nat,
+        IDL.Nat64,
+        IDL.Text,
+        IDL.Vec(IDL.Nat8),
+      ],
       [IDL.Nat],
       []
     ),

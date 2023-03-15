@@ -154,6 +154,7 @@ export namespace ChainFactoryConfigs {
         umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
         notifier,
         feeMargin,
+        signatureSvc,
       },
       moonbeamParams: {
         nonce: Chain.MOONBEAM,
@@ -731,6 +732,7 @@ export namespace ChainFactoryConfigs {
         umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
         notifier,
         feeMargin,
+        signatureSvc,
       },
       vechainParams: {
         notifier,
