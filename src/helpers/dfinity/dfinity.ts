@@ -23,7 +23,9 @@ import { AccountIdentifier, ICP, LedgerCanister } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import BigNumber from "bignumber.js";
 import { Chain } from "../../consts";
+import { SignatureService } from "../../estimator";
 import { EvNotifier } from "../../notifier";
+import { ChainNonce } from "../../type-utils";
 
 import {
   BalanceCheck,
@@ -115,6 +117,7 @@ export type DfinityParams = {
   notifier: EvNotifier;
   feeMargin: FeeMargins;
   umt: Principal;
+  readonly signatureSvc: SignatureService;
 };
 
 export async function dfinityHelper(
@@ -179,6 +182,11 @@ export async function dfinityHelper(
     },
     async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
       args.agent.replaceIdentity(sender);
+      const sig = await args.signatureSvc.getSignatureDfinity(
+        Chain.DFINITY,
+        chain_nonce as ChainNonce,
+        to
+      );
 
       const txFeeBlock = await transferTxFee(txFees);
 
@@ -188,7 +196,8 @@ export async function dfinityHelper(
         BigInt(id.native.tokenId),
         BigInt(chain_nonce),
         to,
-        mintWith
+        mintWith,
+        [...Buffer.from(sig.signature, "hex")]
       );
 
       await args.notifier.notifyDfinity(actionId.toString());
@@ -218,6 +227,12 @@ export async function dfinityHelper(
     async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
       args.agent.replaceIdentity(sender);
 
+      const sig = await args.signatureSvc.getSignatureDfinity(
+        Chain.DFINITY,
+        parseInt(nonce) as ChainNonce,
+        to
+      );
+
       const txFeeBlock = await transferTxFee(txFees);
 
       const actionId = await minter.withdraw_nft(
@@ -225,7 +240,8 @@ export async function dfinityHelper(
         Principal.fromText(id.native.canisterId),
         BigInt(id.native.tokenId),
         BigInt(nonce),
-        to
+        to,
+        [...Buffer.from(sig.signature, "hex")]
       );
 
       await args.notifier.notifyDfinity(actionId.toString());

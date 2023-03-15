@@ -1,4 +1,6 @@
 import type { Principal } from "@dfinity/principal";
+import type { ActorMethod } from "@dfinity/agent";
+
 export type BridgeEvent =
   | { UnfreezeNftBatch: UnfreezeNftBatch }
   | { UnfreezeNft: UnfreezeNft }
@@ -12,6 +14,7 @@ export interface BridgeEventCtx {
 }
 export interface Config {
   event_cnt: bigint;
+  fee_public_key: Array<number>;
   chain_nonce: bigint;
   group_key: Array<number>;
   paused: boolean;
@@ -39,8 +42,7 @@ export interface UnfreezeNftBatch {
   burner: Principal;
 }
 export interface ValidateCleanLogs {
-  from_action: bigint;
-  to_action: bigint;
+  action_id: bigint;
 }
 export interface ValidateSetGroupKey {
   group_key: Array<number>;
@@ -75,98 +77,80 @@ export interface ValidateWithdrawFees {
   to: Principal;
 }
 export interface _SERVICE {
-  add_whitelist: (
-    arg_0: bigint,
-    arg_1: ValidateWhitelistDip721,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  clean_logs: (
-    arg_0: bigint,
-    arg_1: ValidateCleanLogs,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  encode_validate_transfer_nft: (
-    arg_0: bigint,
-    arg_1: ValidateTransferNft
-  ) => Promise<Array<number>>;
-  encode_validate_transfer_nft_batch: (
-    arg_0: bigint,
-    arg_1: ValidateTransferNftBatch
-  ) => Promise<Array<number>>;
-  encode_validate_unfreeze_nft: (
-    arg_0: bigint,
-    arg_1: ValidateUnfreezeNft
-  ) => Promise<Array<number>>;
-  encode_validate_unfreeze_nft_batch: (
-    arg_0: bigint,
-    arg_1: ValidateUnfreezeNftBatch
-  ) => Promise<Array<number>>;
-  freeze_nft: (
-    arg_0: bigint,
-    arg_1: Principal,
-    arg_2: bigint,
-    arg_3: bigint,
-    arg_4: string,
-    arg_5: string
-  ) => Promise<bigint>;
-  freeze_nft_batch: (
-    arg_0: bigint,
-    arg_1: Principal,
-    arg_2: Array<bigint>,
-    arg_3: bigint,
-    arg_4: string,
-    arg_5: string
-  ) => Promise<bigint>;
-  get_config: () => Promise<Config>;
-  get_event: (arg_0: bigint) => Promise<[] | [[BridgeEventCtx, BridgeEvent]]>;
-  is_whitelisted: (arg_0: Principal) => Promise<boolean>;
-  set_group_key: (
-    arg_0: bigint,
-    arg_1: ValidateSetGroupKey,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  set_pause: (
-    arg_0: bigint,
-    arg_1: ValidateSetPause,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  validate_transfer_nft: (
-    arg_0: bigint,
-    arg_1: ValidateTransferNft,
-    arg_2: Array<number>
-  ) => Promise<number>;
-  validate_transfer_nft_batch: (
-    arg_0: bigint,
-    arg_1: ValidateTransferNftBatch,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  validate_unfreeze_nft: (
-    arg_0: bigint,
-    arg_1: ValidateUnfreezeNft,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  validate_unfreeze_nft_batch: (
-    arg_0: bigint,
-    arg_1: ValidateUnfreezeNftBatch,
-    arg_2: Array<number>
-  ) => Promise<undefined>;
-  withdraw_fees: (
-    arg_0: bigint,
-    arg_1: ValidateWithdrawFees,
-    arg_2: Array<number>
-  ) => Promise<bigint>;
-  withdraw_nft: (
-    arg_0: bigint,
-    arg_1: Principal,
-    arg_2: bigint,
-    arg_3: bigint,
-    arg_4: string
-  ) => Promise<bigint>;
-  withdraw_nft_batch: (
-    arg_0: bigint,
-    arg_1: Principal,
-    arg_2: Array<bigint>,
-    arg_3: bigint,
-    arg_4: string
-  ) => Promise<bigint>;
+  add_whitelist: ActorMethod<
+    [bigint, ValidateWhitelistDip721, Array<number>],
+    undefined
+  >;
+  clean_logs: ActorMethod<
+    [bigint, ValidateCleanLogs, Array<number>],
+    undefined
+  >;
+  encode_transfer_tx: ActorMethod<
+    [number, number, string, bigint],
+    Array<number>
+  >;
+  encode_validate_transfer_nft: ActorMethod<
+    [bigint, ValidateTransferNft],
+    Array<number>
+  >;
+  encode_validate_transfer_nft_batch: ActorMethod<
+    [bigint, ValidateTransferNftBatch],
+    Array<number>
+  >;
+  encode_validate_unfreeze_nft: ActorMethod<
+    [bigint, ValidateUnfreezeNft],
+    Array<number>
+  >;
+  encode_validate_unfreeze_nft_batch: ActorMethod<
+    [bigint, ValidateUnfreezeNftBatch],
+    Array<number>
+  >;
+  freeze_nft: ActorMethod<
+    [bigint, Principal, bigint, bigint, string, string, Array<number>],
+    bigint
+  >;
+  freeze_nft_batch: ActorMethod<
+    [bigint, Principal, Array<bigint>, bigint, string, string],
+    bigint
+  >;
+  get_config: ActorMethod<[], Config>;
+  get_event: ActorMethod<[bigint], [] | [[BridgeEventCtx, BridgeEvent]]>;
+  is_whitelisted: ActorMethod<[Principal], boolean>;
+  set_fee_group_key: ActorMethod<
+    [bigint, ValidateSetGroupKey, Array<number>],
+    undefined
+  >;
+  set_group_key: ActorMethod<
+    [bigint, ValidateSetGroupKey, Array<number>],
+    undefined
+  >;
+  set_pause: ActorMethod<[bigint, ValidateSetPause, Array<number>], undefined>;
+  validate_transfer_nft: ActorMethod<
+    [bigint, ValidateTransferNft, Array<number>],
+    number
+  >;
+  validate_transfer_nft_batch: ActorMethod<
+    [bigint, ValidateTransferNftBatch, Array<number>],
+    undefined
+  >;
+  validate_unfreeze_nft: ActorMethod<
+    [bigint, ValidateUnfreezeNft, Array<number>],
+    undefined
+  >;
+  validate_unfreeze_nft_batch: ActorMethod<
+    [bigint, ValidateUnfreezeNftBatch, Array<number>],
+    undefined
+  >;
+  withdraw_fees: ActorMethod<
+    [bigint, ValidateWithdrawFees, Array<number>],
+    bigint
+  >;
+  withdraw_nft: ActorMethod<
+    [bigint, Principal, bigint, bigint, string, Array<number>],
+    bigint
+  >;
+  withdraw_nft_batch: ActorMethod<
+    [bigint, Principal, Array<bigint>, bigint, string],
+    bigint
+  >;
 }
