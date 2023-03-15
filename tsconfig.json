@@ -2,11 +2,11 @@
   "compilerOptions": {
     "incremental": false,
     "target": "ES2021",
-    "outDir": "./dist",
-    //"outDir": "../bridge-interface/node_modules/xp.network/dist",
+    //"outDir": "./dist",
+    "outDir": "../bridge-interface/node_modules/xp.network/dist",
     "rootDir": "src",
     "moduleResolution": "node",
-    "module": "commonjs",
+    "module": "CommonJS",
     "declaration": true,
     "declarationMap": true,
     "inlineSourceMap": true,
@@ -44,7 +44,7 @@
     "types": ["node"],
     "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "exclude": ["node_modules/**", "src/helpers/hedera/index.ts"],
+  "exclude": ["node_modules/**", "./src/helpers/hedera/index.ts"],
   "include": ["src/**/*.ts"],
   "compileOnSave": false,
   "typedocOptions": {
