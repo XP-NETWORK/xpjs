@@ -545,8 +545,10 @@ CHAIN_INFO.set(Chain.SECRET, {
   currencySymbol: SupportedCurrencyName.SCRT,
   decimals: Decimals.SCRT,
   type: ChainType.COSMOS,
-  blockExplorerUrl: "https://atomscan.com/secret-network/transactions/",
-  blockExplorerUrlAddr: "https://atomscan.com/secret-network/accounts/",
+  blockExplorerUrl: "https://secretnodes.com/secret/transactions/",
+  blockExplorerUrlAddr: "https://secretnodes.com/secret/accounts/",
+  tnBlockExplorerUrl: "https://secretnodes.com/pulsar/transactions/",
+  tnBlockExplorerUrlAddr: "https://secretnodes.com/pulsar/accounts/",
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",
