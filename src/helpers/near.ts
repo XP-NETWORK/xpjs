@@ -260,12 +260,12 @@ export async function nearHelperFactory({
             mint_with,
             token_contract: id.native.contract,
             ...(res?.signature
-              ? { sig_data: Buffer.from(res.signature, "hex") }
+              ? { sig_data: [...Buffer.from(res.signature, "hex")] }
               : {}),
           },
           methodName: "freeze_nft",
           attachedDeposit: new BN(res?.fee) /*.div(new BN(2))*/,
-          gas: new BN("46000000000000"),
+          gas: new BN("300000000000000"),
           ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
         });
         await notifyValidators(result.transaction.hash);
@@ -306,11 +306,11 @@ export async function nearHelperFactory({
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,
-          sig_data: Buffer.from(res?.signature, "hex"),
+          sig_data: [...Buffer.from(res?.signature, "hex")],
         },
         methodName: "withdraw_nft",
         attachedDeposit: new BN(res?.fee),
-        gas: new BN(65_000_000_000_000),
+        gas: new BN("300000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
       await notifyValidators(result.transaction.hash);
