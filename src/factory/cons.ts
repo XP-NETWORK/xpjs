@@ -90,6 +90,10 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     throw defaultMintError;
   }
 
+  if (from === Chain.SECRET) {
+    throw defaultMintError;
+  }
+
   if (fromType === ChainType.TRON) {
     throw defaultMintError;
   }
