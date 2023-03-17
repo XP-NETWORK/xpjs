@@ -13,6 +13,7 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
 import { FeeMargins } from "../helpers/chain";
+import { signatureService } from "../estimator";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -32,6 +33,9 @@ import { FeeMargins } from "../helpers/chain";
 
 const middleware_uri = "https://notifier.xp.network";
 const testnet_middleware_uri = "http://localhost:3061";
+
+const signature_service_uri = "https://fee.xp.network";
+const signatureSvc = signatureService(signature_service_uri);
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
@@ -425,6 +429,7 @@ export namespace ChainFactoryConfigs {
         helperUrl: "https://helper.testnet.near.org",
         feeMargin,
         notifier,
+        signatureSvc,
       },
     };
   };
@@ -451,12 +456,14 @@ export namespace ChainFactoryConfigs {
         networkId: "mainnet",
         nonce: Chain.NEAR,
         rpcUrl: MainNetRpcUri.NEAR,
-        bridge: "xpbridge.near",
-        xpnft: "xpnft.near",
+        bridge:
+          "e138f27300334f546bbd792e65dc8753af29d534c5248a3f55e875693bddcf19",
+        xpnft: "damphir.near",
         feeMargin,
         notifier,
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
+        signatureSvc,
       },
       solanaParams: {
         xpnftAddr: "",
@@ -1000,6 +1007,7 @@ export namespace ChainFactoryConfigs {
         notifier,
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
+        signatureSvc,
       },
     };
   };

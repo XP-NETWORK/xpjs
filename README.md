@@ -1,6 +1,6 @@
 <center>
 
-# XP Network JS API v 4.0.2
+# XP Network JS API
 
 </center>
 
@@ -15,16 +15,19 @@ Bridging steps:
 - [x] [3. Getting the signer objects](#3-get-the-signer-objects)
   - [x] [3.1 Backend unsafe signer](#31-example-of-getting-the-signer-object-for-manual-testing-in-the-be)
   - [x] [3.2 EVM compatible browser extension signer](#32-example-of-getting-the-signer-object-in-the-fe-for-web3)
-  - [x] [3.3 Elrond signer](#33-example-of-getting-the-signer-object-in-the-fe-for-elrond)
+  - [x] [3.3 Elrond signer](#33-example-of-getting-the-signer-object-in-the-fe-for-metaversx)
   - [x] [3.4 Tron signer](#34-example-of-getting-the-signer-object-in-the-fe-for-tron)
   - [x] [3.5 Algorand signer](#35-example-of-getting-the-signer-object-in-the-fe-for-algorand)
-- [x] [4. Getting the Chain inner objects](#4-getting-the-inner-objects-from-this-factory-to-be-used-for-transferring-minting-estimation-of-gas-fees)
+  - [x] [3.6 Tezos signer](#36-example-of-getting-the-signer-object-in-the-fe-for-tezos)
+  - [x] [3.7 Secret signer](#37-example-of-secret-network)
+  - [x] [3.8 TON signer](#38-example-signer-object-for-ton)
+- [x] [4. Getting the Chain's inner objects](#4-getting-the-inner-objects-from-this-factory-to-be-used-for-transferring-minting-estimation-of-gas-fees)
 - [x] [5. Listing NFTs](#51-listing-nfts-owned-by-the-sender)
   - [x] [Example of a native NFT object](#52-example-of-console-logged-native-bsc-nft-object)
   - [x] [Example of a wrapped NFT object](#53-example-of-the-console-logged-wrapped-nft-from-bsc-on-velas)
 - [x] [6. Approving](#6-approve-accessing-your-nft-by-the-bridge-smart-contract)
 - [x] [7. Transferring NFTs between chains](#7-transferring-an-nft)
-- [x] [Minting NFTs](#minting-nfts-on-evm-chains-elrond--tron)(optional)
+- [x] [Minting NFTs](#minting-nfts-on-evm-chains-metaversx--tron)(optional)
 - [x] [Estimating the TX fee on the target chain](#estimating-the-transaction-fee-on-the-target-chain) (optional)
 - [ ] ... and much more to come
 
@@ -43,16 +46,16 @@ Make sure [nodejs](https://nodejs.org/en/download/) is installed on your machine
 <br/>
 
 ```bash
-yarn add xp.network @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+yarn add xp.network
 ```
 
 OR
 
 ```bash
-npm i --save xp.network @elrondnetwork/erdjs ethers @taquito/taquito @temple-wallet/dapp
+npm i --save xp.network
 ```
 
-To import the latest version of xp.network library:
+To import the latest version of `xp.network` library:
 
 ```bash
 yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge"
@@ -128,35 +131,38 @@ const signer = new Wallet(
 
 <center>
 
-|   Chain   |   Parameters    | Chain Nonce |
-| :-------: | :-------------: | :---------: |
-|  Elrond   |  elrondParams   |      2      |
-|    BSC    |    bscParams    |      4      |
-| Ethereum  |  ropstenParams  |      5      |
-| Avalanche | avalancheParams |      6      |
-|  Polygon  |  polygonParams  |      7      |
-|  Fantom   |  fantomParams   |      8      |
-|   Tron    |   tronParams    |      9      |
-|  Harmony  |  harmonyParams  |     12      |
-|   xDai    |   xDaiParams    |     14      |
-| Algorand  | algorandParams  |     15      |
-|   Fuse    |   fuseParams    |     16      |
-|   Tezos   |   tezosParams   |     18      |
-|   Velas   |   velasParams   |     19      |
-|  Aurora   |  auroraParams   |     21      |
-| Godwoken  | godwokenParams  |     22      |
-| Gatechain | gatechainParams |     23      |
-|  VeChain  |  vechainParams  |     25      |
-|  Solana   |  solanaParams   |     26      |
-|    TON    |    tonParams    |     27      |
-|  DFinity  |  dfinityParams  |     28      |
-|  Hedera   |  hederaParams   |     29      |
-|   Skale   |   skaleParams   |     30      |
-|   NEAR    |   nearParams    |     31      |
-| Moonbeam  | moonbeamParams  |     32      |
-| Abeychain | abeychainParams |     33      |
-|   Aptos   |   aptosParams   |     34      |
-| Caduceus  | caduceusParams  |     35      |
+|     Chain     |   Parameters    | Chain Nonce |
+| :-----------: | :-------------: | :---------: |
+|    Elrond     | metaversxParams |      2      |
+|      BSC      |    bscParams    |      4      |
+|   Ethereum    |  ropstenParams  |      5      |
+|   Avalanche   | avalancheParams |      6      |
+|    Polygon    |  polygonParams  |      7      |
+|    Fantom     |  fantomParams   |      8      |
+|     Tron      |   tronParams    |      9      |
+|    Harmony    |  harmonyParams  |     12      |
+|     xDai      |   xDaiParams    |     14      |
+|   Algorand    | algorandParams  |     15      |
+|     Fuse      |   fuseParams    |     16      |
+|     Tezos     |   tezosParams   |     18      |
+|     Velas     |   velasParams   |     19      |
+|    Aurora     |  auroraParams   |     21      |
+|   Godwoken    | godwokenParams  |     22      |
+|   Gatechain   | gatechainParams |     23      |
+|    VeChain    |  vechainParams  |     25      |
+|    Solana     |  solanaParams   |     26      |
+|      TON      |    tonParams    |     27      |
+|    DFinity    |  dfinityParams  |     28      |
+|    Hedera     |  hederaParams   |     29      |
+|     Skale     |   skaleParams   |     30      |
+|     NEAR      |   nearParams    |     31      |
+|   Moonbeam    | moonbeamParams  |     32      |
+|   Abeychain   | abeychainParams |     33      |
+|     Aptos     |   aptosParams   |     34      |
+|   Caduceus    | caduceusParams  |     35      |
+|      OKC      |    okcParams    |     36      |
+| Arbitrum Nova | arbitrumParams  |     37      |
+|    Bitgert    |  bitgertParams  |     38      |
 
 </center><br/>
 
@@ -174,12 +180,12 @@ const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
 
 ```typescript
 // ELROND provider (injected from the browser extension):
-import { ExtensionProvider } from "@elrondnetwork/erdjs/out";
-const elrondSigner = ExtensionProvider.getInstance();
+import { ExtensionProvider } from "@metaversxnetwork/erdjs/out";
+const metaversxSigner = ExtensionProvider.getInstance();
 
 // Elrond signer from a PEM key stored in the .env file
-import { UserSigner } from "@elrondnetwork/erdjs/out";
-const elrondSigner = UserSigner.fromPem(process.env.ELROND_PEM!);
+import { UserSigner } from "@metaversxnetwork/erdjs/out";
+const metaversxSigner = UserSigner.fromPem(process.env.ELROND_PEM!);
 ```
 
 <br/>
@@ -221,7 +227,24 @@ import { TempleWallet } from "@temple-wallet/dapp";
 })();
 ```
 
-### 3.7 Example signer object for TON
+### 3.7 Example of Secret Network
+
+```typescript
+import { SecretNetworkClient, Wallet } from "secretjs";
+import { SecretNftInfo } from "xp.network/dist/helpers/secret";
+
+const wallet = new Wallet(process.env.mnemonic!);
+
+// Testnet example
+const client = await SecretNetworkClient.create({
+  chainId: "pulsar-2",
+  grpcWebUrl: TestNetRpcUri.SECRET,
+  wallet: wallet,
+  walletAddress: wallet.address,
+});
+```
+
+### 3.8 Example signer object for TON
 
 ```ts
 import { config } from "dotenv";
@@ -280,13 +303,17 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
   const moonbeam = await factory.inner(Chain.MOONBEAM); // 32
   const abeychain = await factory.inner(Chain.ABEYCHAIN); // 33
   const causeus = await factory.inner(Chain.CADUCEUS); //35
+  const okc = await factory.inner(Chain.OKC); //36
+  const arbitrum = await factory.inner(Chain.ARBITRUM); //37
+  const bitgert = await factory.inner(Chain.BITGERT); //38
 
   // Non-EVM chains:
   // Inner Object ====================================== Chain Nonce
-  const elrond = await factory.inner(Chain.ELROND); // 2
+  const metaversx = await factory.inner(Chain.ELROND); // 2
   const tron = await factory.inner(Chain.TRON); // 9
   const algorand = await factory.inner(Chain.ALGORAND); // 15
   const tezos = await factory.inner(Chain.TEZOS); // 18
+  const secret = await factory.inner(Chain.SECRET); // 24
   const solana = await factory.inner(Chain.SOLANA); // 26
   const ton = await factory.inner(Chain.TON); // 27
   const dfinity = await factory.inner(Chain.DFINITY); // 28
@@ -311,8 +338,8 @@ This operation does not depend on a wallet since reading operations are free and
   );
 
   // Elrond:
-  const elrondNfts = await factory.nftList(
-    elrond, // The chain of interest
+  const metaversxNfts = await factory.nftList(
+    metaversx, // The chain of interest
     "erd1...." // The public key of the NFT owner in Elrond
   );
 
@@ -334,6 +361,12 @@ This operation does not depend on a wallet since reading operations are free and
     "EQB..." // The public key of the NFT owner in Tezos
   );
 
+  // Secret:
+  const secretNfts = await factory.nftList(
+    secret, // Secret chain internal object
+    "secret1..." // The public key of the NFT owner in Secret
+  );
+
   // TON:
   const tonNfts = await factory.nftList(
     ton, // TON chain internal object
@@ -345,18 +378,20 @@ This operation does not depend on a wallet since reading operations are free and
 ```javascript
 // Choosing an NFT to transfer:
 const web3ChosenOne = web3Nfts[0];
-const elrondChosenOne = elrondNfts[0];
+const metaversxChosenOne = metaversxNfts[0];
 const tronChosenOne = tronNfts[0];
 const algoChosenOne = algoNfts[0];
 const tezosChosenOne = tezosNfts[0];
+const secretChosenOne = secretNfts[0];
 const tonChosenOne = tonNfts[0];
 
 // Checking the selected NFT object
 console.log("EVM Selected NFT:       ", web3ChosenOne);
-console.log("Elrond Selected NFT:    ", elrondChosenOne);
+console.log("Elrond Selected NFT:    ", metaversxChosenOne);
 console.log("Tron Selected NFT:      ", tronChosenOne);
 console.log("Algorand Selected NFT:  ", algoChosenOne);
 console.log("Tezos Selected NFT:     ", tezosChosenOne);
+console.log("Secret Selected NFT:     ", secretChosenOne);
 console.log("Ton Selected NFT:       ", tonChosenOne);
 ```
 
@@ -409,14 +444,14 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
   console.log("Is Approved in an EVM:", isApprovedEVM);
 
   // Elrond example
-  const isApprovedElrond = await elrond.approveForMinter(
-    elrondChosenOne,
-    elrondSigner
+  const isApprovedElrond = await metaversx.approveForMinter(
+    metaversxChosenOne,
+    metaversxSigner
   );
   console.log("Is Approved in Elrond:", isApprovedElrond);
 
   // Tron example
-  const isApprovedTron = await elrond.approveForMinter(
+  const isApprovedTron = await metaversx.approveForMinter(
     tronChosenOne,
     tronSigner
   );
@@ -435,6 +470,14 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
     tezosSigner
   );
   console.log("Is Approved in Tezos:", isApprovedTezos);
+
+  // Secret example
+  const secretApprove = await scrt.preTransfer(
+    client,
+    chosenOne,
+    new BigNumber(0)
+  );
+  console.log("Approved for Secret:", secretApprove);
 
   // TON
   // Approval is not required in TON...
@@ -458,19 +501,19 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
   console.log(web3Result);
 
   // Elrond example:
-  const elrondResult = await factory.transferNft(
-    elrond, // The Source Chain.
+  const metaversxResult = await factory.transferNft(
+    metaversx, // The Source Chain.
     tron, // The Destination Chain.
-    elrondChosenOne, // The NFT object you have chosen from the list.
-    elrondSigner, // The Elrond signer object (see p. 3.3 above).
+    metaversxChosenOne, // The NFT object you have chosen from the list.
+    metaversxSigner, // The Elrond signer object (see p. 3.3 above).
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
   );
-  console.log(elrondResult);
+  console.log(metaversxResult);
 
   // Tron example:
   const tronResult = await factory.transferNft(
     tron, // The Source Chain.
-    elrond, // The Destination Chain.
+    metaversx, // The Destination Chain.
     tronChosenOne, // The NFT object you have chosen from the list.
     tronSigner, // The Tron signer object (see p. 3.4 above).
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
@@ -480,7 +523,7 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
   // Algorand example:
   const algorandResult = await factory.transferNft(
     algorand, // The Source Chain.
-    elrond, // The Destination Chain.
+    metaversx, // The Destination Chain.
     algoChosenOne, // The NFT object you have chosen from the list.
     algorandSigner, // The Tron signer object (see p. 3.5 above).
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
@@ -549,8 +592,8 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
 ```javascript
 (async () => {
   // Deploying ESDTs:
-  const response = await elrond.issueESDTNft(
-      elrondSigner,
+  const response = await metaversx.issueESDTNft(
+      metaversxSigner,
       "Target",
       "TGT",
       true, // canFreeze
@@ -559,8 +602,8 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
   );
 
   // Checking whether ESDTs exist for this account
-  const esdts = await elrond.mintableEsdts(
-    elrondSigner.getAddress())
+  const esdts = await metaversx.mintableEsdts(
+    metaversxSigner.getAddress())
     .catch((e) => {
       console.log("Failed to get Mintable ESDTs", e)
       return undefined
@@ -573,8 +616,8 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
     }
 
     // Minting an NFT to an ESDT
-    const response = await elrond.mintNft(
-      elrondSigner,
+    const response = await metaversx.mintNft(
+      metaversxSigner,
       {
         identifier,  // Your ESDT token
         quantity: 1, // How many tokens you want to mint > 0

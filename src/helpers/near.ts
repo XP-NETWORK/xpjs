@@ -17,6 +17,7 @@ import {
   getTransactionLastResult,
 } from "near-api-js/lib/providers";
 import { Chain } from "../consts";
+import { SignatureService } from "../estimator";
 import { EvNotifier } from "../notifier";
 import {
   ChainNonceGet,
@@ -50,6 +51,7 @@ export type NearParams = {
   readonly notifier: EvNotifier;
   readonly walletUrl: string;
   readonly helperUrl: string;
+  readonly signatureSvc: SignatureService;
 };
 export type NearNFT = {
   tokenId: string;
@@ -83,6 +85,10 @@ interface BrowserMethods {
   getUserMinter(keypair: string, address: string): Promise<Near>;
 }
 
+interface NotifyMethod {
+  notify(hash: string): Promise<void>;
+}
+
 export type NearHelper = ChainNonceGet &
   BalanceCheck &
   TransferNftForeign<Account, NearNFT, NearTxResult> &
@@ -98,7 +104,8 @@ export type NearHelper = ChainNonceGet &
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
   } & GetFeeMargins &
   GetProvider<Near> &
-  BrowserMethods;
+  BrowserMethods &
+  NotifyMethod;
 
 export async function nearHelperFactory({
   networkId,
@@ -108,6 +115,7 @@ export async function nearHelperFactory({
   feeMargin,
   notifier,
   walletUrl,
+  signatureSvc,
   helperUrl,
 }: NearParams): Promise<NearHelper> {
   const near = await connect({
@@ -144,7 +152,10 @@ export async function nearHelperFactory({
     return walletCallbackUrl;
   };
 
+  const notifyValidators = async (hash: string) => notifier.notifyNear(hash);
+
   return {
+    notify: notifyValidators,
     async estimateValidateTransferNft(_to, _metadata, _mintWith) {
       return new BigNumber(0); // TODO
     },
@@ -227,24 +238,41 @@ export async function nearHelperFactory({
           id.native.tokenId
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
+      const res = await signatureSvc
+        .getSignatureNear(
+          Chain.NEAR,
+          chain_nonce as any,
+          id.native.tokenId,
+          id.collectionIdent,
+          id.native.tokenId,
+          to
+        )
+        .catch(() => undefined);
 
-      const result = await sender.functionCall({
-        contractId: bridge,
-        args: {
-          token_id: id.native.tokenId,
-          chain_nonce,
-          to,
-          amt: new BigNumber(txFees),
-          mint_with,
-          token_contract: id.native.contract,
-        },
-        methodName: "freeze_nft",
-        attachedDeposit: new BN(txFees.toString(10)),
-        gas: new BN("46000000000000"),
-        ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
-      });
-      await notifier.notifyNear(result.transaction.hash);
-      return [result, getTransactionLastResult(result)];
+      if (res) {
+        const result = await sender.functionCall({
+          contractId: bridge,
+          args: {
+            token_id: id.native.tokenId,
+            chain_nonce,
+            to,
+            amt: new BigNumber(txFees) /*.div(2)*/,
+            mint_with,
+            token_contract: id.native.contract,
+            ...(res?.signature
+              ? { sig_data: [...Buffer.from(res.signature, "hex")] }
+              : {}),
+          },
+          methodName: "freeze_nft",
+          attachedDeposit: new BN(res?.fee) /*.div(new BN(2))*/,
+          gas: new BN("300000000000000"),
+          ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
+        });
+        await notifyValidators(result.transaction.hash);
+        return [result, getTransactionLastResult(result)];
+      } else {
+        return undefined;
+      }
     },
     getFeeMargin() {
       return feeMargin;
@@ -261,6 +289,15 @@ export async function nearHelperFactory({
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
 
+      const res = await signatureSvc.getSignatureNear(
+        Chain.NEAR,
+        nonce as any,
+        id.native.tokenId,
+        id.collectionIdent,
+        id.native.tokenId,
+        to
+      );
+
       const result = await sender.functionCall({
         contractId: bridge,
         args: {
@@ -269,13 +306,14 @@ export async function nearHelperFactory({
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,
+          sig_data: [...Buffer.from(res?.signature, "hex")],
         },
         methodName: "withdraw_nft",
-        attachedDeposit: new BN(txFees.toString(10)),
-        gas: new BN(65_000_000_000_000),
+        attachedDeposit: new BN(res?.fee),
+        gas: new BN("300000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
-      await notifier.notifyNear(result.transaction.hash);
+      await notifyValidators(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
     },
     async validateAddress(adr) {

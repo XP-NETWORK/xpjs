@@ -134,7 +134,7 @@ export type ChainFactory = {
     gasLimit?: ethers.BigNumberish | undefined,
     extraFee?: BigNumber.Value,
     gasPrice?: ethers.BigNumberish | undefined
-  ): Promise<Resp>;
+  ): Promise<Resp | undefined>;
 
   transferBatchNft<SignerF, RawNftF, Resp>(
     fromChain: FullChainBatch<SignerF, RawNftF, Resp>,
@@ -685,6 +685,13 @@ export function ChainFactory(
         typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
         "undefined"
       );
+    }
+    if (fc === Chain.NEAR) {
+      const data = (nft as any).native?.wrapped || (nft as any).wrapped;
+      return {
+        bool: typeof data !== "undefined",
+        wrapped: undefined,
+      };
     }
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
