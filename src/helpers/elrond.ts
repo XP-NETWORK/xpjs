@@ -25,7 +25,10 @@ import {
   U64Value,
   UserSigner,
   WalletConnectProvider,
+  Nonce,
 } from "@elrondnetwork/erdjs";
+import { Transaction as XTRX, Address as XADDR } from "@multiversx/sdk-core";
+
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import {
@@ -269,9 +272,31 @@ export async function elrondHelperFactory(
     const acc = await syncAccount(signer);
     tx.setNonce(acc.nonce);
     let stx: Transaction;
-    if (signer instanceof WalletConnectProvider) {
-      const txs = await signer.signTransactions([tx]);
+
+    if (typeof (signer as any).walletConnectV2Relay !== "undefined") {
+      const wcSigenr = signer as any;
+      const address = (await signer.getAddress()) as string;
+      const res = await (
+        await axios(`https://gateway.multiversx.com/address/${address}/nonce`)
+      ).data;
+      console.log(res, "res");
+
+      const payload = new XTRX({
+        chainID: wcSigenr.chainId,
+        sender: new XADDR(address),
+        data: tx.getData(),
+        gasLimit: tx.getGasLimit(),
+        receiver: tx.getReceiver(),
+        value: tx.getValue(),
+        nonce: new Nonce(res.data.nonce),
+      });
+      const txs = await wcSigenr.signTransactions([payload]);
+
       stx = txs[0];
+
+      await provider.sendTransaction(stx);
+
+      return stx;
     } else if (signer instanceof ExtensionProvider) {
       stx = await signer.signTransaction(tx);
     } else if (signer instanceof UserSigner) {
@@ -333,6 +358,7 @@ export async function elrondHelperFactory(
   ) => {
     const esdts = await listEsdt((await sender.getAddress()).toString());
     const res = esdts[nft.native.nonce];
+
     if (res === undefined || new BigNumber(res.balance).lt(value)) {
       const utx = new Transaction({
         receiver: swapContract,
@@ -340,7 +366,7 @@ export async function elrondHelperFactory(
         value: new Balance(
           Egld.getToken(),
           Egld.getNonce(),
-          new BigNumber(value.toString())
+          new BigNumber(value.toString()).div(3)
         ),
         data: TransactionPayload.contractCall()
           .setFunction(new ContractFunction("wrapEgld"))
