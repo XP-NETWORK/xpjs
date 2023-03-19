@@ -273,13 +273,12 @@ export async function elrondHelperFactory(
     tx.setNonce(acc.nonce);
     let stx: Transaction;
 
-    if (typeof (signer as any).walletConnectV2Relay !== "undefined") {
+    if (typeof (signer as any).walletConnector !== "undefined") {
       const wcSigenr = signer as any;
       const address = (await signer.getAddress()) as string;
       const res = await (
         await axios(`https://gateway.multiversx.com/address/${address}/nonce`)
       ).data;
-      console.log(res, "res");
 
       const payload = new XTRX({
         chainID: wcSigenr.chainId,
@@ -293,9 +292,7 @@ export async function elrondHelperFactory(
       const txs = await wcSigenr.signTransactions([payload]);
 
       stx = txs[0];
-
       await provider.sendTransaction(stx);
-
       return stx;
     } else if (signer instanceof ExtensionProvider) {
       stx = await signer.signTransaction(tx);
@@ -366,7 +363,7 @@ export async function elrondHelperFactory(
         value: new Balance(
           Egld.getToken(),
           Egld.getNonce(),
-          new BigNumber(value.toString()).div(3)
+          new BigNumber(value.toString()) //.div(3)
         ),
         data: TransactionPayload.contractCall()
           .setFunction(new ContractFunction("wrapEgld"))
