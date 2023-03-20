@@ -353,7 +353,7 @@ export namespace ChainFactoryConfigs {
         provider: hethers.getDefaultProvider("testnet") as any,
         feeMargin,
         nonce: Chain.HEDERA,
-        erc721_addr: "0x0000000000000000000000000000000000370094",
+        erc721_addr: "0x0000000000000000000000000000000000372e70",
         erc1155_addr: "0x0000000000000000000000000000000000370092",
         minter_addr: "0x0000000000000000000000000000000000370098",
         erc721Minter: "0x000000000000000000000000000000000037008d",

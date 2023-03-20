@@ -16,7 +16,7 @@ import {
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
   ParamsGetter,
-} from "./chain";
+} from "../chain";
 import {
   BigNumber as EthBN,
   ContractTransaction,
@@ -47,11 +47,14 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
-} from "..";
-import { ChainNonce } from "../type-utils";
-import { EvNotifier } from "../notifier";
+} from "../..";
+import { ChainNonce } from "../../type-utils";
+import { EvNotifier } from "../../notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
+
+type HSDK = typeof import("@hashgraph/sdk");
+let hashSDK: HSDK;
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -76,7 +79,6 @@ export type EthNftInfo = {
 export type MintArgs = {
   contract: string;
   uri: string;
-  walletNonce?: number;
 };
 
 export interface IsApproved<Sender> {
@@ -155,7 +157,9 @@ export type Web3Helper = BaseWeb3Helper &
   GetFeeMargins &
   IsContractAddress &
   GetTokenURI &
-  ParamsGetter<Web3Params>;
+  ParamsGetter<Web3Params> & {
+    injectSDK(sdk: HSDK): void;
+  };
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -189,14 +193,11 @@ export async function baseWeb3HelperFactory(
     },
     async mintNft(
       owner: Signer,
-      { contract, uri, walletNonce }: MintArgs
+      { contract, uri }: MintArgs
     ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
       const txm = await erc721
-        .mint(uri, {
-          gasLimit: 1000000,
-          ...(walletNonce ? { nonce: walletNonce } : {}),
-        })
+        .mint(uri, { gasLimit: 1000000 })
         .catch(async (e) => {
           if (nonce === 33) {
             let tx;
@@ -248,7 +249,8 @@ type NftMethodVal<T, Tx> = {
     tok: string,
     txnUp: (tx: PopulatedTransaction) => Promise<void>,
     customData: NullableCustomData,
-    gasPrice: ethers.BigNumberish | undefined
+    gasPrice: ethers.BigNumberish | undefined,
+    signer: any
   ) => Promise<Tx>;
 };
 
@@ -301,33 +303,65 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     umt: UserNftMinter__factory,
     approved: async (
       umt: UserNftMinter,
-      _: string,
+      signer: any,
       minterAddr: string,
       tok: string,
       customData: NullableCustomData
     ) => {
-      return (
-        (
-          await umt.getApproved(tok, {
-            gasLimit: "850000",
-            customData,
-            //@ts-ignore
-          })
-        ).toLowerCase() == minterAddr.toLowerCase()
-      );
+      customData;
+      return false;
+      const call = new hashSDK.ContractCallQuery()
+        .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
+        .setGas(700_000)
+        .setQueryPayment(new hashSDK.Hbar(5))
+        .setFunction(
+          "getApproved",
+          new hashSDK.ContractFunctionParameters().addUint256(+tok)
+        );
+      console.log(umt.address, +tok);
+
+      const txResponse1 = await call.executeWithSigner(signer);
+      console.log(txResponse1, "dsads");
+      const approved = txResponse1.getAddress(0);
+      console.log(approved, "approved");
+      return approved.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
       umt: UserNftMinter,
       forAddr: string,
       tok: string,
-      txnUp: (tx: PopulatedTransaction) => Promise<void>
+      txnUp: (tx: PopulatedTransaction) => Promise<void>,
+      _: any,
+      __: any,
+      signer: any
     ) => {
-      console.log(umt.address, forAddr);
-      const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "850000",
-      });
-      await txnUp(tx);
-      return await umt.signer.sendTransaction(tx);
+      txnUp;
+      console.log(signer, "signer");
+      const transaction = await new hashSDK.ContractExecuteTransaction()
+        .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
+        .setGas(700_000)
+        //.setPayableAmount(12)
+        //.setMaxTransactionFee(15)
+        .setFunction(
+          "approve",
+          new hashSDK.ContractFunctionParameters()
+            .addAddress(forAddr)
+            .addUint256(+tok)
+        )
+        .executeWithSigner(signer);
+      //.setNodeAccountIds([new hashSDK.AccountId(signer.accountToSign)])
+      //.freezeWithSigner(signer);
+
+      //const txnResponse = await transaction.execute(signer);
+
+      const txRecord = await transaction.getReceiptWithSigner(signer);
+
+      console.log(txRecord);
+
+      return {
+        wait: new Promise((r) => r),
+        hash: transaction.transactionHash,
+      } as any;
     },
   },
 };
@@ -423,6 +457,8 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     signer: Signer
   ) => {
+    //@ts-ignore
+    signer._isSigner = true;
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
       signer
@@ -433,10 +469,9 @@ export async function web3HelperFactory(
         : id.native.uri.includes("herokuapp.com")
         ? params.minter_addr
         : params.erc721_addr;
-
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
-      await signer.getAddress(),
+      signer as any,
       toApprove,
       id.native.tokenId,
       params.nonce === 0x1d ? {} : undefined
@@ -450,11 +485,11 @@ export async function web3HelperFactory(
     gasPrice: ethers.BigNumberish | undefined
   ) => {
     const isApproved = await isApprovedForMinter(id, sender);
-    console.log(isApproved, "isApproved");
-
     if (isApproved) {
       return undefined;
     }
+    //@ts-ignore
+    sender._isSigner = true;
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
       sender
@@ -473,11 +508,10 @@ export async function web3HelperFactory(
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
       params.nonce === 0x1d ? {} : undefined,
-      gasPrice
+      gasPrice,
+      sender
     );
-
     await receipt.wait();
-    console.log(erc.address, toApprove, id.native.tokenId);
     return receipt.hash;
   };
 
@@ -488,6 +522,9 @@ export async function web3HelperFactory(
     XpNft: params.erc721_addr,
     XpNft1155: params.erc1155_addr,
     getParams: () => params,
+    injectSDK(sdk) {
+      hashSDK = sdk;
+    },
     approveForMinter,
     getProvider: () => provider,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
@@ -633,9 +670,7 @@ export async function web3HelperFactory(
       gasPrice
     ): Promise<TransactionResponse> {
       await approveForMinter(id, sender, txFees, gasPrice);
-      console.log("ds");
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
-      console.log("d");
 
       // Chain is Hedera
       if (params.nonce === 0x1d) {
@@ -646,10 +681,6 @@ export async function web3HelperFactory(
         id.native.contract = params.erc721_addr;
       }
 
-      console.log(txFees.toString());
-      console.log(txFees.toFixed(0), "x");
-      console.log(id.native.tokenId);
-
       const tx = await minter
         .connect(sender)
         .populateTransaction[method](
@@ -659,12 +690,11 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value: EthBN.from(txFees.toFixed(0)).div(3),
-            gasLimit: gasLimit || 300_000,
+            value: EthBN.from(txFees.toFixed(0)),
+            gasLimit,
             gasPrice,
           }
         );
-
       await txnUnderpricedPolyWorkaround(tx);
 
       const txr: TransactionResponse | unknown = await sender
@@ -715,10 +745,6 @@ export async function web3HelperFactory(
         id.native.contract = params.erc721_addr;
       }
 
-      console.log(id.native, "id.native");
-
-      console.log(txFees.toFixed(0));
-
       const txn = await minter
         .connect(sender)
         .populateTransaction.withdrawNft(
@@ -728,7 +754,7 @@ export async function web3HelperFactory(
           id.native.contract,
           {
             value: EthBN.from(txFees.toFixed(0)),
-            gasLimit: gasLimit || 850_000,
+            gasLimit,
             gasPrice,
           }
         );

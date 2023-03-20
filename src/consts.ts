@@ -5,7 +5,7 @@ import {
 } from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
-//import { web3HelperFactory as HederaHelper } from "./helpers/hedera";
+//import { web3HelperFactory as HederaHelper } from "./helpers/hedera/helper";
 
 import {
   SupportedCurrency,
@@ -571,7 +571,7 @@ CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/mainnet/transaction/",
   tnBlockExplorerUrl: "https://hashscan.io/#/testnet/transaction/",
   //@ts-ignore
-  constructor: /*web3HelperFactory*/ HederaFactory,
+  constructor: web3HelperFactory, //HederaHelper,
   currency: SupportedCurrency.HBAR,
   currencySymbol: SupportedCurrencyName.HBAR,
   decimals: Decimals.HBAR,
