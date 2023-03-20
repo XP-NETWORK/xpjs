@@ -569,7 +569,7 @@ CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/mainnet/transaction/",
   tnBlockExplorerUrl: "https://hashscan.io/#/testnet/transaction/",
   //@ts-ignore
-  constructor: HederaFactory,
+  constructor: web3HelperFactory, //HederaFactory,
   currency: SupportedCurrency.HBAR,
   currencySymbol: SupportedCurrencyName.HBAR,
   decimals: Decimals.HBAR,
