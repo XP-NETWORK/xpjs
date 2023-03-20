@@ -5,7 +5,7 @@ import {
 } from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
-import { web3HelperFactory as HederaFactory } from "./helpers/hedera";
+//import { web3HelperFactory as HederaHelper } from "./helpers/hedera";
 
 import {
   SupportedCurrency,
@@ -546,8 +546,10 @@ CHAIN_INFO.set(Chain.SECRET, {
   currencySymbol: SupportedCurrencyName.SCRT,
   decimals: Decimals.SCRT,
   type: ChainType.COSMOS,
-  blockExplorerUrl: "https://atomscan.com/secret-network/transactions/",
-  blockExplorerUrlAddr: "https://atomscan.com/secret-network/accounts/",
+  blockExplorerUrl: "https://secretnodes.com/secret/transactions/",
+  blockExplorerUrlAddr: "https://secretnodes.com/secret/accounts/",
+  tnBlockExplorerUrl: "https://secretnodes.com/pulsar/transactions/",
+  tnBlockExplorerUrlAddr: "https://secretnodes.com/pulsar/accounts/",
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",
@@ -569,7 +571,7 @@ CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/#/mainnet/transaction/",
   tnBlockExplorerUrl: "https://hashscan.io/#/testnet/transaction/",
   //@ts-ignore
-  constructor: web3HelperFactory, //HederaFactory,
+  constructor: /*web3HelperFactory*/ HederaFactory,
   currency: SupportedCurrency.HBAR,
   currencySymbol: SupportedCurrencyName.HBAR,
   decimals: Decimals.HBAR,
