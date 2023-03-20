@@ -306,6 +306,9 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       tok: string,
       customData: NullableCustomData
     ) => {
+      console.log(umt.address, "contract");
+      console.log(minterAddr, "minterAddr");
+      console.log(tok, "tok");
       return (
         (
           await umt.getApproved(tok, {
@@ -432,6 +435,7 @@ export async function web3HelperFactory(
         : id.native.uri.includes("herokuapp.com")
         ? params.minter_addr
         : params.erc721_addr;
+    console.log(toApprove, "toApprove", params.nonce, id.native);
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
       await signer.getAddress(),
@@ -448,6 +452,8 @@ export async function web3HelperFactory(
     gasPrice: ethers.BigNumberish | undefined
   ) => {
     const isApproved = await isApprovedForMinter(id, sender);
+    console.log(isApproved, "isApproved");
+    return;
     if (isApproved) {
       return undefined;
     }

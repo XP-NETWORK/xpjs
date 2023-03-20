@@ -50,15 +50,19 @@ import {
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../notifier";
 import axios from "axios";
-//import { hethers } from "@hashgraph/hethers";
+
 import {
   Signer as HSigner,
-  ContractCallQuery,
-  ContractId,
-  ContractFunctionParameters,
-  Hbar,
-  ContractExecuteTransaction,
+  //ContractCallQuery,
+  //ContractId,
+  //ContractFunctionParameters,
+  //Hbar,
+  //ContractExecuteTransaction,
 } from "@hashgraph/sdk";
+//import { sign } from "crypto";
+
+type HSDK = typeof import("@hashgraph/sdk");
+let hashSDK: HSDK;
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -161,7 +165,9 @@ export type Web3Helper = BaseWeb3Helper &
   GetFeeMargins &
   IsContractAddress &
   GetTokenURI &
-  ParamsGetter<Web3Params>;
+  ParamsGetter<Web3Params> & {
+    injectSDK(sdk: HSDK): void;
+  };
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -298,19 +304,30 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       minterAddr: string,
       tok: string
     ) => {
-      console.log(ContractCallQuery);
-      const x = await new ContractCallQuery()
-        .setContractId(ContractId.fromSolidityAddress(contract))
-        .setGas(2000000)
-        .setQueryPayment(new Hbar(5))
+      //console.log(hashSDK.ContractCallQuery, " dsa");
+      // signer.
+      //const cl  = hashSDK.Client.forTestnet();
+      //cl.setDefaultMaxTransactionFee(new hashSDK.Hbar(20));
+      //cl.setOperatorWith()
+      //cl.setOperatorWith(signer.getAccountId(), signer.get)
+
+      //client.setDefaultMaxTransactionFee(new Hbar(20));
+
+      const x = await new hashSDK.ContractCallQuery()
+        .setContractId(hashSDK.ContractId.fromSolidityAddress(contract))
+        //.setMaxQueryPayment(new hashSDK.Hbar(10))
+        .setGas(50_000)
+        //.setQueryPayment(new hashSDK.Hbar(8))
         .setFunction(
           "getApproved",
-          new ContractFunctionParameters().addUint256(Number(tok))
+          new hashSDK.ContractFunctionParameters().addUint256(Number(tok))
         );
 
       const txResponse = await x.executeWithSigner(signer);
 
-      return txResponse.getString(0)?.toLowerCase() == minterAddr.toLowerCase();
+      return (
+        txResponse?.getString(0)?.toLowerCase() == minterAddr.toLowerCase()
+      );
     },
     approve: async (
       contract: string,
@@ -318,13 +335,14 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       tok: string,
       signer: HSigner
     ) => {
-      const transaction = await new ContractExecuteTransaction()
-        .setContractId(ContractId.fromSolidityAddress(contract))
-        .setGas(2000000)
-        .setPayableAmount(5)
+      const transaction = await new hashSDK.ContractExecuteTransaction()
+        .setContractId(hashSDK.ContractId.fromSolidityAddress(contract))
+        .setGas(50_000)
+        //.setMaxTransactionFee(new hashSDK.Hbar(10))
+        .setPayableAmount(new hashSDK.Hbar(5))
         .setFunction(
           "approve",
-          new ContractFunctionParameters()
+          new hashSDK.ContractFunctionParameters()
             .addAddress(forAddr)
             .addUint256(Number(tok))
         )
@@ -332,7 +350,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 
       //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
       const txResponse = await (await transaction).executeWithSigner(signer);
-      console.log("x");
+      console.log(txResponse, "x");
       const receipt = await txResponse.getReceiptWithSigner(signer);
 
       console.log(receipt, txResponse.transactionId);
@@ -472,6 +490,9 @@ export async function web3HelperFactory(
     ...base,
     XpNft: params.erc721_addr,
     XpNft1155: params.erc1155_addr,
+    injectSDK(sdk) {
+      hashSDK = sdk;
+    },
     getParams: () => params,
     approveForMinter,
     getProvider: () => provider,
