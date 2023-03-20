@@ -17,7 +17,7 @@ export namespace AppConfigs {
   };
   export const TestNet: () => AppConfig = () => {
     return {
-      exchangeRateUri: "http://localhost:3068/exchange/",
+      exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
       nftListUri: "http://localhost:3066",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
