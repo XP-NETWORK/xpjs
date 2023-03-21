@@ -459,7 +459,7 @@ export namespace ChainFactoryConfigs {
         rpcUrl: MainNetRpcUri.NEAR,
         bridge:
           "e138f27300334f546bbd792e65dc8753af29d534c5248a3f55e875693bddcf19",
-        xpnft: "damphir5.near",
+        xpnft: "damphir7.near",
         feeMargin,
         notifier,
         walletUrl: "https://wallet.mainnet.near.org",
