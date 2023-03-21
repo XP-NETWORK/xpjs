@@ -304,7 +304,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       return (
         (
           await umt.getApproved(tok, {
-            gasLimit: "85000",
+            gasLimit: "100000",
             customData,
             //@ts-ignore
           })
