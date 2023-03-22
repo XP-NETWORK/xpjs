@@ -33,7 +33,7 @@ export namespace AppConfigs {
   export const Staging: () => AppConfig = () => {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
-      nftListUri: "https://tools.xp.network/index",
+      nftListUri: "http://localhost:3066",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
       txSocketUri: "https://bridge1.xp.network/tx-socket",

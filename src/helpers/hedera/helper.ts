@@ -3,6 +3,7 @@
  * @module
  */
 import BigNumber from "bignumber.js";
+
 import {
   BalanceCheck,
   EstimateTxFeesBatch,
@@ -159,6 +160,14 @@ export type Web3Helper = BaseWeb3Helper &
   GetTokenURI &
   ParamsGetter<Web3Params> & {
     injectSDK(sdk: HSDK): void;
+  } & {
+    listHederaClaimableNFT(
+      proxyContract: string,
+      htsToken: string,
+      signer: any
+    ): Promise<string>;
+  } & {
+    claimNFT(token: string, htsToken: string, signer: any): Promise<boolean>;
   };
 
 /**
@@ -309,7 +318,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       customData: NullableCustomData
     ) => {
       customData;
-      return false;
+
       const call = new hashSDK.ContractCallQuery()
         .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
         .setGas(700_000)
@@ -322,45 +331,40 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 
       const txResponse1 = await call.executeWithSigner(signer);
       console.log(txResponse1, "dsads");
-      const approved = txResponse1.getAddress(0);
+      const approved = txResponse1?.getAddress(0);
       console.log(approved, "approved");
-      return approved.toLowerCase() == minterAddr.toLowerCase();
+      return approved?.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
       umt: UserNftMinter,
       forAddr: string,
       tok: string,
-      txnUp: (tx: PopulatedTransaction) => Promise<void>,
+      ___: (tx: PopulatedTransaction) => Promise<void>,
       _: any,
       __: any,
       signer: any
     ) => {
-      txnUp;
-      console.log(signer, "signer");
+      console.log(umt.address, forAddr, signer);
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
-        .setGas(700_000)
-        //.setPayableAmount(12)
-        //.setMaxTransactionFee(15)
+        .setGas(1_000_000)
+        .setMaxTransactionFee(new hashSDK.Hbar(10))
+        //.setPayableAmount(new hashSDK.Hbar(5))
         .setFunction(
           "approve",
           new hashSDK.ContractFunctionParameters()
             .addAddress(forAddr)
-            .addUint256(+tok)
+            .addUint256(Number(tok))
         )
-        .executeWithSigner(signer);
-      //.setNodeAccountIds([new hashSDK.AccountId(signer.accountToSign)])
-      //.freezeWithSigner(signer);
+        .freezeWithSigner(signer);
 
-      //const txnResponse = await transaction.execute(signer);
-
-      const txRecord = await transaction.getReceiptWithSigner(signer);
-
-      console.log(txRecord);
+      //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
+      const txResponse = await transaction.executeWithSigner(signer);
+      console.log(txResponse, "txResponse");
 
       return {
-        wait: new Promise((r) => r),
-        hash: transaction.transactionHash,
+        wait: () => new Promise((r) => r(true)),
+        hash: txResponse.transactionId,
       } as any;
     },
   },
@@ -453,10 +457,18 @@ export async function web3HelperFactory(
     return action_id;
   }
 
+  const sanifyTrx = (trx: any) => {
+    const validTrx = String(trx).replace("@", "-");
+    const array = validTrx.split("");
+    array[validTrx.lastIndexOf(".")] = "-";
+    return array.join("");
+  };
+
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
     signer: Signer
   ) => {
+    return false;
     //@ts-ignore
     signer._isSigner = true;
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
@@ -469,6 +481,7 @@ export async function web3HelperFactory(
         : id.native.uri.includes("herokuapp.com")
         ? params.minter_addr
         : params.erc721_addr;
+
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
       signer as any,
@@ -511,7 +524,9 @@ export async function web3HelperFactory(
       gasPrice,
       sender
     );
+    console.log(receipt);
     await receipt.wait();
+    console.log("after wait()");
     return receipt.hash;
   };
 
@@ -669,19 +684,43 @@ export async function web3HelperFactory(
       gasLimit: ethers.BigNumberish | undefined = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      console.log(chain_nonce, txFees, mintWith, gasLimit, gasPrice);
+      //await approveForMinter(id, sender, txFees, gasPrice);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
-      // Chain is Hedera
-      if (params.nonce === 0x1d) {
-        id.native.tokenId = ethers.utils.solidityPack(
-          ["uint160", "int96"],
-          [id.collectionIdent, id.native.tokenId]
-        );
-        id.native.contract = params.erc721_addr;
-      }
+      const tokenId = ethers.utils.solidityPack(
+        ["uint160", "int96"],
+        [id.collectionIdent, id.native.tokenId]
+      );
 
-      const tx = await minter
+      const contract = params.erc721_addr;
+
+      const transaction = await new hashSDK.ContractExecuteTransaction()
+        .setContractId(
+          hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
+        )
+        .setGas(2_000_000)
+        .setMaxTransactionFee(new hashSDK.Hbar(10))
+        .setPayableAmount(5)
+        .setFunction(
+          method,
+          new hashSDK.ContractFunctionParameters()
+            .addAddress(contract)
+            //@ts-ignore
+            .addUint256(String(tokenId))
+            .addString(to)
+            //@ts-ignore
+            .addUint64(String(nonce))
+            .addString(to)
+            .addString(mintWith)
+        )
+        .freezeWithSigner(sender as any);
+
+      await transaction.executeWithSigner(sender as any);
+
+      return {} as any;
+
+      /*const tx = await minter
         .connect(sender)
         .populateTransaction[method](
           id.native.contract,
@@ -723,62 +762,49 @@ export async function web3HelperFactory(
       if (params.nonce === 33) {
         return await provider.getTransaction(txHash);
       }
-      return txr as any;
+      return txr as any;*/
     },
     async unfreezeWrappedNft(
-      sender: Signer,
+      sender: any,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber,
+      ____: BigNumber,
       nonce,
-      gasLimit = undefined,
-      gasPrice
+      _ = undefined,
+      __
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      const tokenId = ethers.utils.solidityPack(
+        ["uint160", "int96"],
+        [EthBN.from(id.collectionIdent), id.native.tokenId]
+      );
 
-      // Chain is Hedera
-      if (params.nonce === 0x1d) {
-        id.native.tokenId = ethers.utils.solidityPack(
-          ["uint160", "int96"],
-          [EthBN.from(id.collectionIdent), id.native.tokenId]
-        );
-        id.native.contract = params.erc721_addr;
-      }
+      const contract = params.erc721_addr;
 
-      const txn = await minter
-        .connect(sender)
-        .populateTransaction.withdrawNft(
-          to,
-          nonce,
-          id.native.tokenId,
-          id.native.contract,
-          {
-            value: EthBN.from(txFees.toFixed(0)),
-            gasLimit,
-            gasPrice,
-          }
-        );
+      const transaction = await new hashSDK.ContractExecuteTransaction()
+        .setContractId(
+          hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
+        )
+        .setGas(2_000_000)
+        .setMaxTransactionFee(new hashSDK.Hbar(10))
+        .setPayableAmount(5)
+        .setFunction(
+          "withdrawNft",
+          new hashSDK.ContractFunctionParameters()
+            .addString(to)
+            //@ts-ignore
+            .addUint64(String(nonce))
+            //@ts-ignore
+            .addUint256(String(tokenId))
+            .addAddress(contract)
+        )
+        .freezeWithSigner(sender);
 
-      await txnUnderpricedPolyWorkaround(txn);
-      const res = await sender.sendTransaction(txn);
-      console.log(res, "res");
-      let txHash: string;
-      if (params.nonce === 0x1d) {
-        //@ts-ignore checked hedera
-        txHash = res["transactionId"];
-      } else if (params.nonce === 33) {
-        //@ts-ignore checked abeychain
-        txHash = res["returnedHash"] || res.hash;
-      } else {
-        //@ts-ignore checked normal evm
-        txHash = res.hash;
-      }
-
-      await notifyValidator(txHash);
-      if (params.nonce === 33) {
-        return await provider.getTransaction(txHash);
-      }
-      return res as any;
+      const txResponse = await transaction.executeWithSigner(sender);
+      const hash = sanifyTrx(txResponse.transactionId);
+      await notifyValidator(hash);
+      return {
+        hash,
+      } as any;
     },
     async estimateValidateTransferNft(
       _to: string,
@@ -818,6 +844,45 @@ export async function web3HelperFactory(
     },
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
+    },
+    async listHederaClaimableNFT(proxyContract, htsToken, signer) {
+      const query = new hashSDK.ContractCallQuery()
+        .setContractId(hashSDK.ContractId.fromSolidityAddress(proxyContract))
+        .setGas(700_000)
+        .setMaxQueryPayment(new hashSDK.Hbar(3))
+        .setQueryPayment(new hashSDK.Hbar(3))
+        .setFunction(
+          "getClaimableNfts",
+          new hashSDK.ContractFunctionParameters()
+            .addAddress(signer.address)
+            .addAddress(htsToken)
+        );
+
+      await query.executeWithSigner(signer);
+
+      return "";
+    },
+    async claimNFT(token, htsToken, signer) {
+      const trx = await new hashSDK.ContractExecuteTransaction()
+        .setContractId(
+          hashSDK.ContractId.fromSolidityAddress(params.erc721_addr)
+        )
+        .setGas(900_000)
+        .setMaxTransactionFee(new hashSDK.Hbar(12))
+        //.setPayableAmount(5)
+        .setFunction(
+          "claimNft",
+          new hashSDK.ContractFunctionParameters()
+            //@ts-ignore
+            .addInt64(token)
+            .addAddress(htsToken)
+        )
+        .freezeWithSigner(signer);
+
+      const res = await trx.executeWithSigner(signer);
+      console.log(res, "res");
+
+      return true;
     },
   };
 }
