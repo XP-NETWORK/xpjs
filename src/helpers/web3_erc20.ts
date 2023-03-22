@@ -76,9 +76,13 @@ export type Web3ERC20Params = Web3Params & {
   paymentTokenAddress: string;
 };
 
+export type Web3ERC20Helper = Web3Helper & {
+  getEurEthBalance(address: string): Promise<string>;
+};
+
 export async function web3ERC20HelperFactory(
   params: Web3ERC20Params
-): Promise<Web3Helper> {
+): Promise<Web3ERC20Helper> {
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7
       ? async (utx: PopulatedTransaction) => {
@@ -231,6 +235,9 @@ export async function web3ERC20HelperFactory(
     },
     getFeeMargin() {
       return params.feeMargin;
+    },
+    async getEurEthBalance(address: string) {
+      return address + "boooom";
     },
     isApprovedForMinter,
     preTransfer: (s, id, _fee, args) =>

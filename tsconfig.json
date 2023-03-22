@@ -2,8 +2,8 @@
   "compilerOptions": {
     "incremental": false,
     "target": "ES2021",
-    "outDir": "./dist",
-    //"outDir": "../bridge-interface/node_modules/xp.network/dist",
+    // "outDir": "./dist",
+    "outDir": "../bridge-interface/node_modules/xp.network/dist",
     "rootDir": "src",
     "moduleResolution": "node",
     "module": "commonjs",
