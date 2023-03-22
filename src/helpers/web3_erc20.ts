@@ -19,6 +19,7 @@ import {
   UserNftMinter__factory,
   PaymentToken__factory,
 } from "xpnet-web3-contracts";
+PaymentToken__factory.abi;
 import {
   BaseWeb3Helper,
   EthNftInfo,
