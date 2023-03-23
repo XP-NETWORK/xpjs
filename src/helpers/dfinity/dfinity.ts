@@ -185,7 +185,8 @@ export async function dfinityHelper(
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
         chain_nonce as ChainNonce,
-        to
+        to,
+        1
       );
 
       const txFeeBlock = await transferTxFee(txFees);
@@ -230,7 +231,8 @@ export async function dfinityHelper(
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
         parseInt(nonce) as ChainNonce,
-        to
+        to,
+        1
       );
 
       const txFeeBlock = await transferTxFee(txFees);
