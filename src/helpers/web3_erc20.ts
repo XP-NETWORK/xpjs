@@ -237,7 +237,16 @@ export async function web3ERC20HelperFactory(
       return params.feeMargin;
     },
     async getEurEthBalance(address: string) {
-      return address + "boooom";
+      //paymentTokenAddress
+      const contractAddress = params.paymentTokenAddress;
+      const abi = PaymentToken__factory.abi;
+      const eurEthContract = new ethers.Contract(
+        contractAddress,
+        abi,
+        provider
+      );
+      const balance = await eurEthContract.balanceOf(address);
+      return ethers.utils.formatUnits(balance, 18);
     },
     isApprovedForMinter,
     preTransfer: (s, id, _fee, args) =>
