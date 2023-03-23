@@ -568,8 +568,8 @@ CHAIN_INFO.set(Chain.SOLANA, {
 });
 
 CHAIN_INFO.set(Chain.HEDERA, {
-  blockExplorerUrl: "https://hashscan.io/#/mainnet/transaction/",
-  tnBlockExplorerUrl: "https://hashscan.io/#/testnet/transaction/",
+  blockExplorerUrl: "https://hashscan.io/mainnet/transactionsById/",
+  tnBlockExplorerUrl: "https://hashscan.io/testnet/transactionsById/",
   //@ts-ignore
   constructor:
     typeof window !== "undefined" ? HederaHelperFactory : web3HelperFactory,
@@ -579,8 +579,8 @@ CHAIN_INFO.set(Chain.HEDERA, {
   nonce: Chain.HEDERA,
   name: "Hedera",
   type: ChainType.HEDERA,
-  blockExplorerUrlAddr: "https://hashscan.io/#/mainnet/account/",
-  tnBlockExplorerUrlAddr: "https://hashscan.io/#/testnet/account/",
+  blockExplorerUrlAddr: "https://hashscan.io/mainnet/account/",
+  tnBlockExplorerUrlAddr: "https://hashscan.io/testnet/account/",
 });
 
 CHAIN_INFO.set(Chain.SKALE, {

@@ -168,6 +168,8 @@ export type Web3Helper = BaseWeb3Helper &
     ): Promise<string>;
   } & {
     claimNFT(token: string, htsToken: string, signer: any): Promise<boolean>;
+  } & {
+    assosiateToken(token: string, signer: any): Promise<boolean>;
   };
 
 /**
@@ -862,6 +864,22 @@ export async function web3HelperFactory(
 
       return "";
     },
+    async assosiateToken(token, signer) {
+      const trx = await new hashSDK.TokenAssociateTransaction()
+        .setAccountId(signer.accountToSign)
+        .setTokenIds([hashSDK.TokenId.fromSolidityAddress(token)])
+        .freezeWithSigner(signer);
+
+      const result = await trx.executeWithSigner(signer).catch((err) => {
+        console.log(err, "assoc");
+      });
+
+      if (!result) {
+        throw new Error("Failed to Associate token to an account");
+      }
+
+      return true;
+    },
     async claimNFT(token, htsToken, signer) {
       const trx = await new hashSDK.ContractExecuteTransaction()
         .setContractId(
@@ -869,7 +887,6 @@ export async function web3HelperFactory(
         )
         .setGas(900_000)
         .setMaxTransactionFee(new hashSDK.Hbar(12))
-        //.setPayableAmount(5)
         .setFunction(
           "claimNft",
           new hashSDK.ContractFunctionParameters()
@@ -880,9 +897,7 @@ export async function web3HelperFactory(
         .freezeWithSigner(signer);
 
       const res = await trx.executeWithSigner(signer);
-      console.log(res, "res");
-
-      return true;
+      return Boolean(res.transactionId);
     },
   };
 }
