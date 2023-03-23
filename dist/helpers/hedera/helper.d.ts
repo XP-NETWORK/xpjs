@@ -78,6 +78,8 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
     listHederaClaimableNFT(proxyContract: string, htsToken: string, signer: any): Promise<string>;
 } & {
     claimNFT(token: string, htsToken: string, signer: any): Promise<boolean>;
+} & {
+    assosiateToken(token: string, signer: any): Promise<boolean>;
 };
 /**
  * Create an object implementing minimal utilities for a web3 chain
