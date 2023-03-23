@@ -329,12 +329,9 @@ export const NFT_METHOD_MAP: NftMethodMap = {
           "getApproved",
           new hashSDK.ContractFunctionParameters().addUint256(+tok)
         );
-      console.log(umt.address, +tok);
 
       const txResponse1 = await call.executeWithSigner(signer);
-      console.log(txResponse1, "dsads");
       const approved = txResponse1?.getAddress(0);
-      console.log(approved, "approved");
       return approved?.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
@@ -346,7 +343,6 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       __: any,
       signer: any
     ) => {
-      console.log(umt.address, forAddr, signer);
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
         .setGas(1_000_000)
@@ -362,7 +358,6 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 
       //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
       const txResponse = await transaction.executeWithSigner(signer);
-      console.log(txResponse, "txResponse");
 
       return {
         wait: () => new Promise((r) => r(true)),
@@ -373,7 +368,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 };
 
 export async function web3HelperFactory(
-  params: Web3Params
+  params: Web3Params & { api: string }
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7
@@ -526,9 +521,9 @@ export async function web3HelperFactory(
       gasPrice,
       sender
     );
-    console.log(receipt);
+
     await receipt.wait();
-    console.log("after wait()");
+
     return receipt.hash;
   };
 
@@ -681,13 +676,11 @@ export async function web3HelperFactory(
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
-      txFees: BigNumber,
+      _: BigNumber,
       mintWith: string,
-      gasLimit: ethers.BigNumberish | undefined = undefined,
-      gasPrice
+      __: ethers.BigNumberish | undefined = undefined,
+      ___
     ): Promise<TransactionResponse> {
-      console.log(chain_nonce, txFees, mintWith, gasLimit, gasPrice);
-      //await approveForMinter(id, sender, txFees, gasPrice);
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       const tokenId = ethers.utils.solidityPack(
@@ -702,25 +695,28 @@ export async function web3HelperFactory(
           hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
         )
         .setGas(2_000_000)
-        .setMaxTransactionFee(new hashSDK.Hbar(10))
-        .setPayableAmount(5)
+        .setMaxTransactionFee(new hashSDK.Hbar(12))
+        .setPayableAmount(7)
         .setFunction(
           method,
           new hashSDK.ContractFunctionParameters()
             .addAddress(contract)
             //@ts-ignore
             .addUint256(String(tokenId))
-            .addString(to)
             //@ts-ignore
-            .addUint64(String(nonce))
+            .addUint64(String(chain_nonce))
             .addString(to)
             .addString(mintWith)
         )
         .freezeWithSigner(sender as any);
 
-      await transaction.executeWithSigner(sender as any);
+      const txResponse = await transaction.executeWithSigner(sender as any);
 
-      return {} as any;
+      const hash = sanifyTrx(txResponse.transactionId);
+      await notifyValidator(hash);
+      return {
+        hash,
+      } as any;
 
       /*const tx = await minter
         .connect(sender)
@@ -819,7 +815,6 @@ export async function web3HelperFactory(
     },
     async estimateContractDep(toChain: any): Promise<BigNumber> {
       try {
-        console.log("NEED TO DEPLOY CONTRACT");
         const gas = await provider.getGasPrice();
         const pro = toChain.getProvider();
         const wl = ["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"];
@@ -836,7 +831,6 @@ export async function web3HelperFactory(
         const sum = new BigNumber(contractFee.toString());
         return sum;
       } catch (error: any) {
-        console.log(error.message);
         const gas = await provider.getGasPrice();
         return new BigNumber(gas.mul(150_000).toString());
       }

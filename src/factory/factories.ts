@@ -359,6 +359,8 @@ export namespace ChainFactoryConfigs {
         provider: hethers.getDefaultProvider("testnet") as any,
         feeMargin,
         nonce: Chain.HEDERA,
+        api: "https://testnet.mirrornode.hedera.com/",
+        htcToken: "0x00000000000000000000000000000000003b22a5",
         erc721_addr: "0x00000000000000000000000000000000003b2294",
         erc1155_addr: "0x00000000000000000000000000000000003b2294",
         minter_addr: "0x00000000000000000000000000000000003b229e",
