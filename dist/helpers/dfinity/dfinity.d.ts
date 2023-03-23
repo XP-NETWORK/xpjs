@@ -1,6 +1,7 @@
 import { HttpAgent, Identity, SubmitResponse } from "@dfinity/agent";
 import { AccountIdentifier } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
+import { SignatureService } from "../../estimator";
 import { EvNotifier } from "../../notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 export type DfinitySigner = Identity;
@@ -33,6 +34,7 @@ export type DfinityParams = {
     notifier: EvNotifier;
     feeMargin: FeeMargins;
     umt: Principal;
+    readonly signatureSvc: SignatureService;
 };
 export declare function dfinityHelper(args: DfinityParams): Promise<DfinityHelper>;
 //# sourceMappingURL=dfinity.d.ts.map
