@@ -13,7 +13,8 @@ export interface SignatureService {
   getSignatureDfinity(
     fc: ChainNonce,
     tc: ChainNonce,
-    to: string
+    to: string,
+    num: number
   ): Promise<SignatureServiceResponse>;
 }
 
@@ -49,13 +50,14 @@ export function signatureService(url: string): SignatureService {
       console.log("near signature response", result);
       return result.data.data;
     },
-    async getSignatureDfinity(fc, tc, to) {
+    async getSignatureDfinity(fc, tc, to, num: number) {
       const result = await signer.post<{ data: SignatureServiceResponse }>(
-        "/api/get-signature/dfinity",
+        "/api/get-signature",
         {
           fromChain: fc,
           toChain: tc,
           to,
+          num,
         }
       );
       console.log("dfinity signature response", result);
