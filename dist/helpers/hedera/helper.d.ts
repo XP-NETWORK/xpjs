@@ -115,6 +115,8 @@ type NftMethodVal<T, Tx> = {
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
 type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
 export declare const NFT_METHOD_MAP: NftMethodMap;
-export declare function web3HelperFactory(params: Web3Params): Promise<Web3Helper>;
+export declare function web3HelperFactory(params: Web3Params & {
+    api: string;
+}): Promise<Web3Helper>;
 export {};
 //# sourceMappingURL=helper.d.ts.map
