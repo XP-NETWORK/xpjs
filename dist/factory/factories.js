@@ -160,9 +160,9 @@ var ChainFactoryConfigs;
                 agent: new agent_1.HttpAgent({
                     host: "https://ic0.app",
                 }),
-                bridgeContract: principal_1.Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
-                xpnftId: principal_1.Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
-                umt: principal_1.Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
+                bridgeContract: principal_1.Principal.fromText("53bb2-rqaaa-aaaap-aa3vq-cai"),
+                xpnftId: principal_1.Principal.fromText("5ogqx-qyaaa-aaaap-aa3wa-cai"),
+                umt: principal_1.Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
                 notifier,
                 feeMargin,
                 signatureSvc,
