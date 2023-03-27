@@ -52,15 +52,15 @@ export function signatureService(url: string): SignatureService {
     },
     async getSignatureDfinity(fc, tc, to, num: number) {
       const result = await signer.post<{ data: SignatureServiceResponse }>(
-        "/api/get-signature",
+        "/api/get-signature/",
         {
           fromChain: fc,
           toChain: tc,
           to,
           num,
+          nft: {},
         }
       );
-      console.log("dfinity signature response", result);
       return result.data.data;
     },
   };
