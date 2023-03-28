@@ -7,7 +7,6 @@ import {
   Near,
   keyStores,
   WalletConnection,
-  Contract,
   KeyPair,
   InMemorySigner,
 } from "near-api-js";
@@ -32,6 +31,7 @@ import {
   ValidateAddress,
   BalanceCheck,
   PreTransfer,
+  WhitelistCheck,
 } from "./chain";
 
 type NearTxResult = [FinalExecutionOutcome, any];
@@ -81,7 +81,6 @@ export interface NearMintArgs {
 
 interface BrowserMethods {
   connectWallet(): Promise<WalletConnection>;
-  getContract(signer: Account, _contract: string): Promise<Contract>;
   getUserMinter(keypair: string, address: string): Promise<Near>;
 }
 
@@ -105,7 +104,8 @@ export type NearHelper = ChainNonceGet &
   } & GetFeeMargins &
   GetProvider<Near> &
   BrowserMethods &
-  NotifyMethod;
+  NotifyMethod &
+  WhitelistCheck<NearNFT, Account>;
 
 export async function nearHelperFactory({
   networkId,
@@ -152,7 +152,10 @@ export async function nearHelperFactory({
     return walletCallbackUrl;
   };
 
-  const notifyValidators = async (hash: string) => notifier.notifyNear(hash);
+  const notifyValidators = async (hash: string) => {
+    //await new Promise((r) => setTimeout(r, 15_000));
+    return notifier.notifyNear(hash);
+  };
 
   return {
     notify: notifyValidators,
@@ -268,6 +271,7 @@ export async function nearHelperFactory({
           gas: new BN("300000000000000"),
           ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
         });
+
         await notifyValidators(result.transaction.hash);
         return [result, getTransactionLastResult(result)];
       } else {
@@ -313,6 +317,7 @@ export async function nearHelperFactory({
         gas: new BN("300000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
+
       await notifyValidators(result.transaction.hash);
       return [result, getTransactionLastResult(result)];
     },
@@ -325,7 +330,7 @@ export async function nearHelperFactory({
       }
     },
 
-    async connectWallet() {
+    async connectWallet(url?: string) {
       if (typeof window === "undefined") {
         throw new Error("Browser method only");
       }
@@ -334,18 +339,26 @@ export async function nearHelperFactory({
         nodeUrl: rpcUrl,
         keyStore: new keyStores.BrowserLocalStorageKeyStore(),
         headers: {},
-        walletUrl,
+        walletUrl: url || walletUrl,
         helperUrl,
       });
       const wc = new WalletConnection(nearConnection, "");
+
       return wc;
     },
 
-    async getContract(signer: Account, _contract: string) {
-      return new Contract(signer, _contract, {
-        viewMethods: [],
-        changeMethods: ["nft_mint"],
-      });
+    async isNftWhitelisted(nft: NftInfo<NearNFT>, signer: Account) {
+      const result: boolean = await signer
+        .viewFunction({
+          args: {
+            contract_id: nft.native.contract,
+          },
+          contractId: bridge,
+          methodName: "is_whitelist",
+        })
+        .catch(() => false);
+
+      return result;
     },
 
     async getUserMinter(keypair: string, address: string) {

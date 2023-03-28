@@ -104,7 +104,7 @@ export interface EstimateTxFees<RawNftF> {
     mintWith: string
   ): Promise<BigNumber>;
   estimateContractDep?(toChain: any): Promise<BigNumber>;
-  isNftWhitelisted?(nft: any): Promise<Boolean>;
+  isNftWhitelisted?(nft: any, signer?: any): Promise<Boolean>;
   estimateValidateUnfreezeNft(
     to: string,
     metadata: NftInfo<RawNftF>,
@@ -179,8 +179,8 @@ export interface EstimateTxFeesBatch<RawNftF> {
   ): Promise<BigNumber>;
 }
 
-export type WhitelistCheck<RawNft> = {
-  isNftWhitelisted(nft: NftInfo<RawNft>): Promise<boolean>;
+export type WhitelistCheck<RawNft, Singer = void> = {
+  isNftWhitelisted(nft: NftInfo<RawNft>, signer?: Singer): Promise<boolean>;
 };
 
 export interface GetProvider<Provider> {
