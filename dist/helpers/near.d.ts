@@ -1,8 +1,8 @@
-import { Account, Near, WalletConnection, Contract } from "near-api-js";
+import { Account, Near, WalletConnection } from "near-api-js";
 import { FinalExecutionOutcome } from "near-api-js/lib/providers";
 import { SignatureService } from "../estimator";
 import { EvNotifier } from "../notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, PreTransfer } from "./chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, PreTransfer, WhitelistCheck } from "./chain";
 type NearTxResult = [FinalExecutionOutcome, any];
 type NearPreTransferArgs = {
     to: string;
@@ -45,7 +45,6 @@ export interface NearMintArgs {
 }
 interface BrowserMethods {
     connectWallet(): Promise<WalletConnection>;
-    getContract(signer: Account, _contract: string): Promise<Contract>;
     getUserMinter(keypair: string, address: string): Promise<Near>;
 }
 interface NotifyMethod {
@@ -54,7 +53,7 @@ interface NotifyMethod {
 export type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, string, NearPreTransferArgs>, "preTransfer"> & ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
-} & GetFeeMargins & GetProvider<Near> & BrowserMethods & NotifyMethod;
+} & GetFeeMargins & GetProvider<Near> & BrowserMethods & NotifyMethod & WhitelistCheck<NearNFT, Account>;
 export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, walletUrl, signatureSvc, helperUrl, }: NearParams): Promise<NearHelper>;
 export {};
 //# sourceMappingURL=near.d.ts.map
