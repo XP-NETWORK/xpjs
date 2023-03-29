@@ -146,8 +146,9 @@ export async function nearHelperFactory({
     if (globalThis.window !== undefined) {
       const network =
         location.pathname.match(/^\/(staging|testnet)\/.+/)?.at(1) || "";
-
-      walletCallbackUrl = `${location.protocol}//${location.host}/${network}/connect?${params}`;
+      const query = location.search;
+      const initParams = query ? query + "&" : "?";
+      walletCallbackUrl = `${location.protocol}//${location.host}/${network}/connect${initParams}${params}`;
     }
     return walletCallbackUrl;
   };
