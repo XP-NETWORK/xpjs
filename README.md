@@ -72,9 +72,9 @@ import {
   Chain,
   AppConfigs,
   ChainParams,
-
+} from "xp.network";
 import { config } from 'dotenv';
-config();} from "xp.network";
+config();
 
 (async () => {
   // Instantiate the chain factory for the
