@@ -150,9 +150,12 @@ export async function nearHelperFactory({
         window.location.search.replace("?", "")
       );
       const wid = query.get("wid");
+      const selectedNearWallet = query.get("selectedNearWallet");
       walletCallbackUrl = `${location.protocol}//${
         location.host
-      }/${network}/connect?${wid ? `wid=${wid}` : ""}${params}`;
+      }/${network}/connect?${wid ? `wid=${wid}&` : ""}${
+        selectedNearWallet ? `selectedNearWallet=${selectedNearWallet}&` : ""
+      }${params}`;
     }
     return walletCallbackUrl;
   };
