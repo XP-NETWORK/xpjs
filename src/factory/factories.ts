@@ -1006,8 +1006,10 @@ export namespace ChainFactoryConfigs {
         networkId: "mainnet",
         nonce: Chain.NEAR,
         rpcUrl: MainNetRpcUri.NEAR,
-        bridge: "prod_xp_bridge.near",
-        xpnft: "wrapped_xpnft.near",
+        bridge:
+          "1a5c1f4fea55549b4cb8746f42f0a9d79e5aa7a91d3596f12fdd592db15d803e",
+        xpnft:
+          "ef7649710758ed794071230a59493cb390ca67cd202e9548fbbb0ed9d961b463",
         feeMargin,
         notifier,
         walletUrl: "https://wallet.mainnet.near.org",
