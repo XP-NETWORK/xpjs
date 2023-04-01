@@ -273,6 +273,31 @@ import { mnemonicToKeyPair } from "tonweb-mnemonic";
 })();
 ```
 
+### 3.9 Example signer object for NEAR
+
+```ts
+import { connect, InMemorySigner, KeyPair, keyStores } from "near-api-js";
+import { config } from "dotenv";
+config();
+
+// Retrieving the Private Key from environment
+const { SK } = process.env;
+
+const keyStore = new keyStores.InMemoryKeyStore();
+const keyPair = KeyPair.fromString(`ed25519:${SK}`);
+
+keyStore.setKey(network, account, keyPair);
+
+const signer = new InMemorySigner(keyStore);
+
+const provider = await connect({
+  headers: {},
+  nodeUrl: TestNetRpcUri.NEAR,
+  networkId: network,
+  signer,
+});
+```
+
 <hr/>
 
 For the ways of connecting the wallets in the FE check-out our [bridge repository](https://github.com/xp-network/bridge-interface/blob/components-reorder/src/components/ConnectWallet.jsx)
@@ -372,6 +397,13 @@ This operation does not depend on a wallet since reading operations are free and
     ton, // TON chain internal object
     "tz1..." // The public key of the NFT owner in TON
   );
+
+  // NEAR
+  const nearNFTs = await near.nftList(
+    //@ts-ignore
+    await provider.account("near-account-here"),
+    "contract-address"
+  );
 })();
 ```
 
@@ -384,6 +416,7 @@ const algoChosenOne = algoNfts[0];
 const tezosChosenOne = tezosNfts[0];
 const secretChosenOne = secretNfts[0];
 const tonChosenOne = tonNfts[0];
+const nearChosenOne = nearNFTs[0];
 
 // Checking the selected NFT object
 console.log("EVM Selected NFT:       ", web3ChosenOne);
@@ -393,6 +426,7 @@ console.log("Algorand Selected NFT:  ", algoChosenOne);
 console.log("Tezos Selected NFT:     ", tezosChosenOne);
 console.log("Secret Selected NFT:     ", secretChosenOne);
 console.log("Ton Selected NFT:       ", tonChosenOne);
+console.log("NEAR Selected NFT:       ", nearChosenOne);
 ```
 
 ### 5.2 Example of console logged native BSC NFT object:
@@ -481,6 +515,17 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
 
   // TON
   // Approval is not required in TON...
+
+  // NEAR
+  const nearApproved = near.preTransfer(
+    sender,
+    chosenOne,
+    0 /*_fee, can be 0 here*/,
+    {
+      receiver,
+      to,
+    }
+  );
 })();
 ```
 
@@ -549,6 +594,16 @@ console.log("Ton Selected NFT:       ", tonChosenOne);
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
   );
   console.log(tonResult);
+
+  // NEAR example:
+  const neraResult = await factory.transferNft(
+    near,
+    bsc,
+    nearChosenOne,
+    //@ts-ignore
+    await provider.account("near-account"),
+    "ADDRESS OF THE RECEIVER" // The address whom you are transferring
+  );
 })();
 ```
 
