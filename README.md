@@ -21,6 +21,7 @@ Bridging steps:
   - [x] [3.6 Tezos signer](#36-example-of-getting-the-signer-object-in-the-fe-for-tezos)
   - [x] [3.7 Secret signer](#37-example-of-secret-network)
   - [x] [3.8 TON signer](#38-example-signer-object-for-ton)
+  - [x] [3.9 NEAR Signer](#39-example-signer-object-for-near)
 - [x] [4. Getting the Chain's inner objects](#4-getting-the-inner-objects-from-this-factory-to-be-used-for-transferring-minting-estimation-of-gas-fees)
 - [x] [5. Listing NFTs](#51-listing-nfts-owned-by-the-sender)
   - [x] [Example of a native NFT object](#52-example-of-console-logged-native-bsc-nft-object)
