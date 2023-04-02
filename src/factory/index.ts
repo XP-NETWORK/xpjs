@@ -517,10 +517,10 @@ export function ChainFactory(
       );
 
       if (bool) {
-        originalContract = wrapped?.contract?.toLowerCase();
+        originalContract = wrapped?.contract;
         originalChain = wrapped?.origin;
       } else {
-        originalContract = nft.native.contract.toLowerCase();
+        originalContract = nft.collectionIdent || nft.native.contract;
         originalChain = nft.native.chainId;
       }
 
