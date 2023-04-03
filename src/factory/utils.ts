@@ -1,32 +1,10 @@
-import {
-  BatchExchangeRateRepo,
-  cachedExchangeRateRepo,
-  ExchangeRateRepo,
-  networkBatchExchangeRateRepo,
-  NetworkModel,
-} from "crypto-exchange-rate";
-
 import { NftInfo, FullChain } from "..";
-
 import { CHAIN_INFO, ChainType, Chain } from "../consts";
 
 export const _headers = {
   "Content-Type": "application/json",
   Accept: "*/*",
 };
-
-export function exchangeRateRepo(
-  baseUrl: string
-): ExchangeRateRepo & BatchExchangeRateRepo {
-  const baseService = NetworkModel.batchExchangeRateService(baseUrl);
-
-  return cachedExchangeRateRepo(
-    networkBatchExchangeRateRepo(
-      baseService,
-      NetworkModel.exchangeRateDtoMapper()
-    )
-  );
-}
 
 export function checkBlockedContracts(to: any, contract: string) {
   const chain = CHAIN_INFO.get(to);
