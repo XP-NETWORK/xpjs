@@ -2,7 +2,7 @@ import WalletConnect from "@walletconnect/client";
 import algosdk, { SuggestedParams } from "algosdk";
 import { AlgorandSocketHelper, ChainNonceGet, EstimateTxFees, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import { BalanceCheck, FeeMargins, GetFeeMargins, GetTokenURI } from "./chain";
 type TxResp = {
     txId: string;

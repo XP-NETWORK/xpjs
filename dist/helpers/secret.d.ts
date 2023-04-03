@@ -1,6 +1,6 @@
 import { SecretNetworkClient } from "secretjs";
 import { Extension } from "secretjs/dist/extensions/snip721/types";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WhitelistCheck } from "./chain";
 export type SecretNftInfo = {
     contract: string;

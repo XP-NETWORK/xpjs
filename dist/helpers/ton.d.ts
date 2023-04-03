@@ -1,7 +1,7 @@
 import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "./chain";
 import { PreTransfer } from "..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";

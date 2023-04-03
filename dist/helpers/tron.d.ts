@@ -3,7 +3,7 @@ import { TronWeb } from "tronweb";
 import { EthNftInfo, MintArgs } from "./web3";
 import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck, GetTokenURI } from "..";
 import { ChainNonceGet } from "..";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 type TronSender = string | undefined;
 export type MinterRes = {
     minter: string;

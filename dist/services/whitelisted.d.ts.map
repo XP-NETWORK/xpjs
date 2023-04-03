@@ -1,0 +1,1 @@
+{"version":3,"file":"whitelisted.d.ts","sourceRoot":"","sources":["../../src/services/whitelisted.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,IAAI,CAAC;AAC/B,OAAc,EAAE,aAAa,EAAE,MAAM,OAAO,CAAC;AAE7C,MAAM,MAAM,kBAAkB,GAAG,aAAa,CAAC;AAE/C,eAAO,MAAM,kBAAkB,cAAe,SAAS,kBAItD,CAAC"}

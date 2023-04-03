@@ -1,6 +1,6 @@
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
 import { Signer, TezosToolkit, WalletProvider } from "@taquito/taquito";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import { FeeMargins, GetFeeMargins, WhitelistCheck, GetTokenURI, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch } from "./chain";
 type TezosSigner = WalletProvider | Signer;
 export type TezosNftInfo = {

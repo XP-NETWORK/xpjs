@@ -1,8 +1,8 @@
 import { HttpAgent, Identity, SubmitResponse } from "@dfinity/agent";
 import { AccountIdentifier } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
-import { SignatureService } from "../../estimator";
-import { EvNotifier } from "../../notifier";
+import { SignatureService } from "../../services/estimator";
+import { EvNotifier } from "../../services/notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 export type DfinitySigner = Identity;
 export type DfinityNft = {

@@ -9,7 +9,7 @@ import { Provider, TransactionResponse } from "@ethersproject/providers";
 import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__factory } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, ValidateAddress, WhitelistCheck } from "../../";
 import { ChainNonce } from "../../type-utils";
-import { EvNotifier } from "../../notifier";
+import { EvNotifier } from "../../services/notifier";
 import { Signer as HSigner } from "@hashgraph/sdk";
 type HSDK = typeof import("@hashgraph/sdk");
 /**

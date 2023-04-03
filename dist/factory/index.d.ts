@@ -183,6 +183,7 @@ export interface AppConfig {
     heartbeatUri: string;
     txSocketUri: string;
     nftListUri: string;
+    whitelistedUri: string;
     nftListAuthToken: string;
     tronScanUri: string;
     wrappedNftPrefix: string;

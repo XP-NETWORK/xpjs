@@ -3,7 +3,7 @@ export * from "./helpers/elrond";
 export * from "./helpers/web3";
 export * from "./helpers/tron";
 export * from "./socket";
-export * from "./emitter";
+export * from "./services/emitter";
 export * from "./factory";
 export * from "./consts";
 export * from "./config";

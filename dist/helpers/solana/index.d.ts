@@ -1,6 +1,6 @@
 import { Wallet } from "@project-serum/anchor";
 import { Connection } from "@solana/web3.js";
-import { EvNotifier } from "../../notifier";
+import { EvNotifier } from "../../services/notifier";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, MintNft } from "../chain";
 export type SolanaSigner = Wallet;
 export type SolanaNft = {

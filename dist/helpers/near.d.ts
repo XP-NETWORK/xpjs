@@ -1,7 +1,8 @@
 import { Account, Near, WalletConnection } from "near-api-js";
 import { FinalExecutionOutcome } from "near-api-js/lib/providers";
-import { SignatureService } from "../estimator";
-import { EvNotifier } from "../notifier";
+import { SignatureService } from "../services/estimator";
+import { EvNotifier } from "../services/notifier";
+import { WhitelistedService } from "../services/whitelisted";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, PreTransfer, WhitelistCheck } from "./chain";
 type NearTxResult = [FinalExecutionOutcome, any];
 type NearPreTransferArgs = {
@@ -18,6 +19,7 @@ export type NearParams = {
     readonly notifier: EvNotifier;
     readonly walletUrl: string;
     readonly helperUrl: string;
+    readonly whitelisted: WhitelistedService;
     readonly signatureSvc: SignatureService;
 };
 export type NearNFT = {
@@ -54,6 +56,6 @@ export type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Accou
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
 } & GetFeeMargins & GetProvider<Near> & BrowserMethods & NotifyMethod & WhitelistCheck<NearNFT, Account>;
-export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, walletUrl, signatureSvc, helperUrl, }: NearParams): Promise<NearHelper>;
+export declare function nearHelperFactory({ networkId, bridge, rpcUrl, xpnft, feeMargin, notifier, whitelisted, walletUrl, signatureSvc, helperUrl, }: NearParams): Promise<NearHelper>;
 export {};
 //# sourceMappingURL=near.d.ts.map

@@ -1,6 +1,6 @@
 import { ChainNonceGet, ClaimNFT, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "../chain";
 import { AptosAccount, AptosClient, HexString } from "aptos";
-import { EvNotifier } from "../../notifier";
+import { EvNotifier } from "../../services/notifier";
 export type AptosNFT = {
     collection_creator: string;
     collection_name: string;
