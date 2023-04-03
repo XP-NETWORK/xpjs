@@ -15,6 +15,7 @@ import {
   FinalExecutionOutcome,
   getTransactionLastResult,
 } from "near-api-js/lib/providers";
+import axios from "ton/node_modules/axios";
 import { Chain } from "../consts";
 import { SignatureService } from "../estimator";
 import { EvNotifier } from "../notifier";
@@ -355,8 +356,8 @@ export async function nearHelperFactory({
       return wc;
     },
 
-    async isNftWhitelisted(nft: NftInfo<NearNFT>, signer: Account) {
-      const result: boolean = await signer
+    async isNftWhitelisted(nft: NftInfo<NearNFT>) {
+      /*const result: boolean = await signer
         .viewFunction({
           args: {
             contract_id: nft.native.contract,
@@ -364,9 +365,14 @@ export async function nearHelperFactory({
           contractId: bridge,
           methodName: "is_whitelist",
         })
-        .catch(() => false);
+        .catch(() => false);*/
 
-      return result;
+      const res = (
+        await axios(
+          `https://nft-index.xp.network/near/whitelisted/${nft.native.contract}`
+        )
+      )?.data;
+      return Boolean(res?.isWhitelisted);
     },
 
     async getUserMinter(keypair: string, address: string) {
