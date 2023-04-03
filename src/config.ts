@@ -5,6 +5,7 @@ export namespace AppConfigs {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
       nftListUri: "https://nft-index.xp.network/index/",
+      whitelistedUri: "https://nft-index.xp.network/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
       txSocketUri: "https://transaction-socket.xp.network",
@@ -19,6 +20,7 @@ export namespace AppConfigs {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
       nftListUri: "https://testnet-notifier.xp.network/testnet-indexer/",
+      whitelistedUri: "https://testnet-notifier.xp.network/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
       txSocketUri: "https://testnet-tx-socket.herokuapp.com",
@@ -34,6 +36,7 @@ export namespace AppConfigs {
     return {
       exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
       nftListUri: "https://tools.xp.network/index",
+      whitelistedUri: "https://tools.xp.network/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
       txSocketUri: "https://bridge1.xp.network/tx-socket",

@@ -15,7 +15,7 @@ import {
   ValidateAddress,
 } from "..";
 import MyAlgoConnect from "@randlabs/myalgo-connect";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import { BalanceCheck, FeeMargins, GetFeeMargins, GetTokenURI } from "./chain";
 
 type TxResp = {

@@ -49,7 +49,7 @@ import {
   WhitelistCheck,
 } from "..";
 import { ChainNonce } from "../type-utils";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 /**

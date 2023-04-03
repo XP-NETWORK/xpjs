@@ -27,7 +27,7 @@ import algosdk from "algosdk";
 import axios from "axios";
 import { ethers, utils } from "ethers";
 import { Base64 } from "js-base64";
-import { bridgeHeartbeat } from "../heartbeat";
+import { bridgeHeartbeat } from "../services/heartbeat";
 import {
   AlgorandHelper,
   AlgorandParams,
@@ -349,6 +349,7 @@ export interface AppConfig {
   heartbeatUri: string;
   txSocketUri: string;
   nftListUri: string;
+  whitelistedUri: string;
   nftListAuthToken: string;
   tronScanUri: string;
   wrappedNftPrefix: string;

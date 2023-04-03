@@ -5,7 +5,7 @@ import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { Cell as CellF } from "ton";
 import { Chain } from "../consts";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -21,7 +21,7 @@ import { PreTransfer } from "..";
 
 import { BridgeContract } from "./ton-bridge";
 
-import { Emitter } from "../emitter";
+import { Emitter } from "../services/emitter";
 
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { fromUint8Array } from "js-base64";

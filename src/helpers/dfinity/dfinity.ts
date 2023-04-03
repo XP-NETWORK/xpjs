@@ -23,8 +23,8 @@ import { AccountIdentifier, ICP, LedgerCanister } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import BigNumber from "bignumber.js";
 import { Chain } from "../../consts";
-import { SignatureService } from "../../estimator";
-import { EvNotifier } from "../../notifier";
+import { SignatureService } from "../../services/estimator";
+import { EvNotifier } from "../../services/notifier";
 import { ChainNonce } from "../../type-utils";
 
 import {

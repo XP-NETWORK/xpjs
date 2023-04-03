@@ -36,7 +36,7 @@ import {
   GetTokenURI,
 } from "..";
 import { ChainNonceGet, NftInfo } from "..";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 
 // Uses default private key in provider if sender is undefinedd
 type TronSender = string | undefined;

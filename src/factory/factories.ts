@@ -4,7 +4,7 @@ import TronWeb from "tronweb";
 import { Chain, MainNetRpcUri, TestNetRpcUri } from "../consts";
 import { ethers } from "ethers";
 import { TezosToolkit } from "@taquito/taquito";
-import { evNotifier } from "../notifier";
+import { evNotifier } from "../services/notifier";
 import { Driver, SimpleNet } from "@vechain/connex-driver";
 import * as thor from "web3-providers-connex";
 import { Framework } from "@vechain/connex-framework";
@@ -13,7 +13,9 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
 import { FeeMargins } from "../helpers/chain";
-import { signatureService } from "../estimator";
+import { signatureService } from "../services/estimator";
+import { whitelistedService } from "../services/whitelisted";
+import { AppConfigs } from "..";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -41,6 +43,7 @@ const signatureSvc = signatureService(signature_service_uri);
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
+
     const notifier = evNotifier(testnet_middleware_uri);
 
     // VeChain related:
@@ -432,6 +435,7 @@ export namespace ChainFactoryConfigs {
         walletUrl: "https://wallet.testnet.near.org",
         helperUrl: "https://helper.testnet.near.org",
         feeMargin,
+        whitelisted: whitelistedService(AppConfigs.TestNet()),
         notifier,
         signatureSvc,
       },
@@ -465,6 +469,7 @@ export namespace ChainFactoryConfigs {
         xpnft: "damphir7.near",
         feeMargin,
         notifier,
+        whitelisted: whitelistedService(AppConfigs.Staging()),
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
         signatureSvc,
@@ -1012,6 +1017,7 @@ export namespace ChainFactoryConfigs {
           "ef7649710758ed794071230a59493cb390ca67cd202e9548fbbb0ed9d961b463",
         feeMargin,
         notifier,
+        whitelisted: whitelistedService(AppConfigs.MainNet()),
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
         signatureSvc,
