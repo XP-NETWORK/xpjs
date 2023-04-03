@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ChainNonce } from "../type-utils";
+import { ChainNonce } from "../../type-utils";
 
 export interface SignatureService {
   getSignatureNear(

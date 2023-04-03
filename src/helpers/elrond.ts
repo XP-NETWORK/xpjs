@@ -57,7 +57,7 @@ import {
   PreTransferRawTxn,
   ValidateAddress,
 } from "..";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import { Base64 } from "js-base64";
 
 type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;

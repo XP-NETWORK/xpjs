@@ -27,7 +27,7 @@ import {
 
 import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import {
   FeeMargins,
   GetFeeMargins,

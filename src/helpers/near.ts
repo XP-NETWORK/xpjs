@@ -15,10 +15,11 @@ import {
   FinalExecutionOutcome,
   getTransactionLastResult,
 } from "near-api-js/lib/providers";
-import axios from "ton/node_modules/axios";
+
 import { Chain } from "../consts";
-import { SignatureService } from "../estimator";
-import { EvNotifier } from "../notifier";
+import { SignatureService } from "../services/estimator";
+import { EvNotifier } from "../services/notifier";
+import { WhitelistedService } from "../services/whitelisted";
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -52,6 +53,7 @@ export type NearParams = {
   readonly notifier: EvNotifier;
   readonly walletUrl: string;
   readonly helperUrl: string;
+  readonly whitelisted: WhitelistedService;
   readonly signatureSvc: SignatureService;
 };
 export type NearNFT = {
@@ -115,6 +117,7 @@ export async function nearHelperFactory({
   xpnft,
   feeMargin,
   notifier,
+  whitelisted,
   walletUrl,
   signatureSvc,
   helperUrl,
@@ -368,9 +371,7 @@ export async function nearHelperFactory({
         .catch(() => false);*/
 
       const res = (
-        await axios(
-          `https://nft-index.xp.network/near/whitelisted/${nft.native.contract}`
-        )
+        await whitelisted.get(`/near/whitelisted/${nft.native.contract}`)
       )?.data;
       return Boolean(res?.isWhitelisted);
     },

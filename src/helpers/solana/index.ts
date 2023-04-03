@@ -30,7 +30,7 @@ import {
 
 import BigNumber from "bignumber.js";
 import { Chain } from "../..";
-import { EvNotifier } from "../../notifier";
+import { EvNotifier } from "../../services/notifier";
 import {
   ChainNonceGet,
   EstimateTxFees,

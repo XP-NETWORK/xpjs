@@ -10,7 +10,7 @@ import {
   Snip721MintOptions,
 } from "secretjs/dist/extensions/snip721/types";
 import { Snip721GetTokensResponse } from "secretjs/dist/extensions/snip721/msg/GetTokens";
-import { EvNotifier } from "../notifier";
+import { EvNotifier } from "../services/notifier";
 import {
   BalanceCheck,
   ChainNonceGet,

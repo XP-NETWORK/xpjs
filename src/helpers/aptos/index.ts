@@ -23,7 +23,7 @@ import {
 import { Chain } from "../../consts";
 import BigNumber from "bignumber.js";
 import { BridgeClient } from "./bridge_client";
-import { EvNotifier } from "../../notifier";
+import { EvNotifier } from "../../services/notifier";
 
 export type AptosNFT = {
   collection_creator: string;
