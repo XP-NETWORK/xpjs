@@ -1,7 +1,7 @@
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
-export * from "./cons";
+export * from "./utils";
 export * from "./factories";
 import BigNumber from "bignumber.js";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, NftInfo, TransactionStatus, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
