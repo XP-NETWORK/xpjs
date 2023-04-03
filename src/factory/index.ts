@@ -3,7 +3,7 @@ import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
 
-export * from "./cons";
+export * from "./utils";
 export * from "./factories";
 
 import BigNumber from "bignumber.js";
@@ -28,6 +28,7 @@ import axios from "axios";
 import { ethers, utils } from "ethers";
 import { Base64 } from "js-base64";
 import { bridgeHeartbeat } from "../services/heartbeat";
+import { exchangeRateRepo } from "../services/exchangeRate";
 import {
   AlgorandHelper,
   AlgorandParams,
@@ -68,11 +69,10 @@ import {
 } from "../type-utils";
 import {
   checkBlockedContracts,
-  exchangeRateRepo,
   getDefaultContract,
   prepareTokenId,
   _headers,
-} from "./cons";
+} from "./utils";
 import base64url from "base64url";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
