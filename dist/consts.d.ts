@@ -13,7 +13,7 @@ import { NearHelper, NearParams } from "./helpers/near";
 import { AptosHelper, AptosParams } from "./helpers/aptos";
 import { Web3ERC20Params } from "./helpers/web3_erc20";
 export declare enum TestNetRpcUri {
-    ELROND = "https://devnet-gateway.elrond.com",
+    ELROND = "https://devnet-gateway.multiversx.com",
     HECO = "https://http-testnet.hecochain.com",
     BSC = "https://data-seed-prebsc-2-s3.binance.org:8545/",
     ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
@@ -47,7 +47,7 @@ export declare enum TestNetRpcUri {
     BITGERT = "https://testnet-rpc.brisescan.com"
 }
 export declare enum MainNetRpcUri {
-    ELROND = "https://gateway.elrond.com",
+    ELROND = "https://gateway.multiversx.com",
     HECO = "https://http-mainnet-node.huobichain.com",
     BSC = "https://bsc-dataseed.binance.org/",
     ETHEREUM = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
