@@ -688,16 +688,17 @@ export function ChainFactory(
   async function algoOptInCheck(
     nft: NftInfo<unknown>,
     toChain: FullChain<unknown, unknown, unknown>,
-    receiver: string
+    receiver: string,
+    wrapped: any
   ) {
     if ("meta" in (nft.native as Record<string, any>)) return;
-    const nftDat = await axios.get(nft.uri);
+    //const nftDat = await axios.get(nft.uri);
     if (
-      nftDat.data.wrapped.origin == Chain.ALGORAND.toString() &&
+      wrapped.origin == Chain.ALGORAND.toString() &&
       "isOptIn" in toChain &&
       !(await (toChain as AlgorandHelper).isOptIn(
         receiver,
-        parseInt(nftDat.data.wrapped.assetID)
+        parseInt(wrapped.assetID)
       ))
     ) {
       throw Error("receiver hasn't opted-in to wrapped nft");
@@ -959,11 +960,14 @@ export function ChainFactory(
       // if (!(await toChain.validateAddress(receiver))) {
       //   throw Error("invalid address");
       // }
+      const { bool: unfreeze, wrapped } = await isWrappedNft(
+        nft,
+        fromChain.getNonce(),
+        toChain.getNonce()
+      );
 
-      if (
-        (await isWrappedNft(nft, fromChain.getNonce(), toChain.getNonce())).bool
-      ) {
-        await algoOptInCheck(nft, toChain, receiver);
+      if (unfreeze) {
+        await algoOptInCheck(nft, toChain, receiver, wrapped);
 
         const res = await fromChain.unfreezeWrappedNft(
           sender,
