@@ -38,7 +38,10 @@ const testnet_middleware_uri =
   "https://testnet-notifier.xp.network/notify-test/";
 
 const signature_service_uri = "https://fee-validator.herokuapp.com";
+const signature_service_uri_staging = "https://fee.xp.network";
 const signatureSvc = signatureService(signature_service_uri);
+const signatureSvcStaing = signatureService(signature_service_uri_staging);
+
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
@@ -472,7 +475,7 @@ export namespace ChainFactoryConfigs {
         whitelisted: whitelistedService(AppConfigs.Staging()),
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
-        signatureSvc,
+        signatureSvcStaing,
       },
       solanaParams: {
         xpnftAddr: "",
