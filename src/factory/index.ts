@@ -551,12 +551,14 @@ export function ChainFactory(
       if (!checkWithOutTokenId && !verifyList && toChain?.estimateContractDep) {
         //@ts-ignore
         const contractFee = await toChain?.estimateContractDep(toChain);
-        calcContractDep = await calcExchangeFees(
-          fromChain.getNonce(),
-          toChain.getNonce(),
-          contractFee,
-          toChain.getFeeMargin()
-        );
+        calcContractDep = (
+          await calcExchangeFees(
+            fromChain.getNonce(),
+            toChain.getNonce(),
+            contractFee,
+            toChain.getFeeMargin()
+          )
+        ).multipliedBy(1.2);
       }
 
       return { calcContractDep };
