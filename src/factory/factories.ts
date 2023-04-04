@@ -37,7 +37,7 @@ const middleware_uri = "https://notifier.xp.network";
 const testnet_middleware_uri =
   "https://testnet-notifier.xp.network/notify-test/";
 
-const signature_service_uri = "https://fee.xp.network";
+const signature_service_uri = "https://fee-validator.herokuapp.com";
 const signatureSvc = signatureService(signature_service_uri);
 
 export namespace ChainFactoryConfigs {
