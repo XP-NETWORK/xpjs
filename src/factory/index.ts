@@ -652,7 +652,7 @@ export function ChainFactory(
     }
   }
 
-  async function isWrappedNft(nft: NftInfo<unknown>, fc: number, tc?: number) {
+  async function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number) {
     if (fc === Chain.TEZOS) {
       return {
         bool:
@@ -661,17 +661,18 @@ export function ChainFactory(
         wrapped: undefined,
       };
     }
-    /*if (fc === Chain.NEAR) {
-      const data = (nft as any).native?.wrapped || (nft as any).wrapped;
-      return {
-        bool: typeof data !== "undefined",
-        wrapped: undefined,
-      };
-    }*/
+
     try {
       checkNotOldWrappedNft(nft.collectionIdent);
     } catch (_) {
       return { bool: false, wrapped: undefined };
+    }
+
+    if (/w\/$/.test(nft.uri)) {
+      nft = {
+        ...nft,
+        uri: nft.uri + nft.native.tokenId,
+      };
     }
 
     const wrapped = (await axios.get(nft.uri).catch(() => undefined))?.data
