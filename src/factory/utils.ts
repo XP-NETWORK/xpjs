@@ -61,12 +61,12 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     throw defaultMintError;
   }
 
-  if (
-    (fromType === ChainType.EVM && toType === ChainType.TEZOS) ||
-    (fromType === ChainType.TEZOS && toType === ChainType.EVM)
-  ) {
-    throw defaultMintError;
-  }
+//   if (
+//     (fromType === ChainType.EVM && toType === ChainType.TEZOS) ||
+//     (fromType === ChainType.TEZOS && toType === ChainType.EVM)
+//   ) {
+//     throw defaultMintError;
+//   }
 
   if (from === Chain.SECRET) {
     throw defaultMintError;
