@@ -986,7 +986,13 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x55B1D1891ABb21A5d245d149B49007b55Bd3746D",
         minter_addr: "0x4ceDb46481d7118E1D292C318E37510E5919bBe6",
       },
-
+      solanaParams: {
+        xpnftAddr: "",
+        bridgeContractAddr: "8bJT5J4tFzeBcxhd7i3KhYUVr7oAV4z7ijau2mTCcXD1",
+        endpoint: MainNetRpcUri.SOLANA,
+        notifier,
+        feeMargin,
+      },
       secretParams: {
         notifier,
         rpcUrl: MainNetRpcUri.SECRET,
