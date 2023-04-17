@@ -19,7 +19,7 @@ import {
   Tuple,
   Vec,
 } from "@dfinity/candid/lib/cjs/idl";
-import { AccountIdentifier, ICP, LedgerCanister } from "@dfinity/nns";
+import { AccountIdentifier, LedgerCanister } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import BigNumber from "bignumber.js";
 import { Chain } from "../../consts";
@@ -135,7 +135,7 @@ export async function dfinityHelper(
       to: AccountIdentifier.fromPrincipal({
         principal: args.bridgeContract,
       }),
-      amount: ICP.fromE8s(BigInt(amt.toString())),
+      amount: BigInt(amt.toString()),
     });
   }
   const to32bits = (num: number) => {
@@ -180,7 +180,7 @@ export async function dfinityHelper(
         return false;
       }
     },
-    async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
+    async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
       args.agent.replaceIdentity(sender);
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
@@ -189,7 +189,7 @@ export async function dfinityHelper(
         1
       );
 
-      const txFeeBlock = await transferTxFee(txFees);
+      const txFeeBlock = await transferTxFee(new BigNumber(sig.fee));
 
       const actionId = await minter.freeze_nft(
         txFeeBlock,
@@ -354,7 +354,7 @@ export async function dfinityHelper(
         }),
       });
 
-      const e8s = bal.toE8s().toString();
+      const e8s = bal.toString();
 
       return new BigNumber(e8s);
     },
