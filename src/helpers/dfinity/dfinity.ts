@@ -203,7 +203,7 @@ export async function dfinityHelper(
 
       await args.notifier.notifyDfinity(actionId.toString());
 
-      return "NO TX RESP YET";
+      return actionId.toString();
     },
     async mintNft(owner, options) {
       const canister = Principal.fromText(
@@ -225,7 +225,7 @@ export async function dfinityHelper(
       });
       return mint;
     },
-    async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
+    async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
       args.agent.replaceIdentity(sender);
 
       const sig = await args.signatureSvc.getSignatureDfinity(
@@ -235,7 +235,7 @@ export async function dfinityHelper(
         1
       );
 
-      const txFeeBlock = await transferTxFee(txFees);
+      const txFeeBlock = await transferTxFee(new BigNumber(sig.fee));
 
       const actionId = await minter.withdraw_nft(
         txFeeBlock,
@@ -248,7 +248,7 @@ export async function dfinityHelper(
 
       await args.notifier.notifyDfinity(actionId.toString());
 
-      return "NO TX RESP YET";
+      return actionId.toString();
     },
 
     /// owner = principal of owner
