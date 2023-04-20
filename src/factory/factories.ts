@@ -173,7 +173,7 @@ export namespace ChainFactoryConfigs {
       aptosParams: {
         rpcUrl: TestNetRpcUri.APTOS,
         bridge:
-          "0x2b9c2009290f6a291df678bca9b03aa55f909cbdbbcc215d4868f5bd8e5a7d58",
+          "0x42ef1f5fcf8398a07c57d8320f510e82588bac408d820679918c0f87270e932e",
         xpnft: "XPNFT",
         notifier,
         feeMargin,
@@ -637,7 +637,7 @@ export namespace ChainFactoryConfigs {
       aptosParams: {
         rpcUrl: MainNetRpcUri.APTOS,
         bridge:
-          "0x813d070ca33bf08223e957257c25cb66072fa8960b0af4810c2e78990126ec37",
+          "0x42ef1f5fcf8398a07c57d8320f510e82588bac408d820679918c0f87270e932e",
         xpnft: "XPNFT",
         notifier,
         feeMargin,
