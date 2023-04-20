@@ -772,8 +772,12 @@ export function ChainFactory(
       const unwrapped: NftInfo<any>[] = [];
       await Promise.all(
         nfts.map(async (e) => {
-          // @ts-ignore
-          if (e.native.contractType && e.native.contractType === "ERC721") {
+          if (
+            // @ts-ignore
+            e.native.contractType &&
+            // @ts-ignore
+            e.native.contractType === "ERC721"
+          ) {
             throw new Error(`ERC721 is not supported`);
           }
           if ((await isWrappedNft(e, from.getNonce())).bool) {
@@ -919,9 +923,9 @@ export function ChainFactory(
         owner = base64url.encode(owner);
       }
 
-      let res = await nftlistRest.get<{ data: NftInfo<InferNativeNft<T>>[] }>(
-        `/nfts/${chain.getNonce()}/${owner}`
-      );
+      let res = await nftlistRest.get<{
+        data: NftInfo<InferNativeNft<T>>[];
+      }>(`/nfts/${chain.getNonce()}/${owner}`);
 
       if (res.headers["Retry-After"]) {
         await new Promise((r) => setTimeout(r, 30000));
@@ -944,8 +948,14 @@ export function ChainFactory(
       //@ts-ignore
       if (nft.native.contract) {
         if (![9, 18, 24, 31, 27, 26].includes(fromChain.getNonce())) {
-          //@ts-ignore
-          checkNotOldWrappedNft(utils.getAddress(nft.native.contract));
+          try {
+            checkNotOldWrappedNft(
+              //@ts-ignore
+              utils.getAddress(nft.native.contract)
+            );
+          } catch {
+            console.log("non evm nonce");
+          }
         }
       }
 
