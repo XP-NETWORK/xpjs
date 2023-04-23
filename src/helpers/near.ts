@@ -133,16 +133,27 @@ export async function nearHelperFactory({
     nft: NftInfo<NearNFT>
   ): Promise<boolean> => {
     const { tokenId: token_id, contract } = nft.native;
-    const result: boolean = await account.viewFunction({
+
+    const tokenData = await account.viewFunction({
+      args: {
+        token_id,
+      },
+      contractId: contract,
+      methodName: "nft_token",
+    });
+
+    const approval_id = tokenData.approved_account_ids[bridge];
+    if (!approval_id) return false;
+
+    return await account.viewFunction({
       args: {
         token_id,
         approved_account_id: bridge,
-        approval_id: null,
+        approval_id,
       },
       contractId: contract,
       methodName: "nft_is_approved",
     });
-    return result;
   };
 
   const getWalletCallbackUrl = (params: string) => {
@@ -275,7 +286,9 @@ export async function nearHelperFactory({
             mint_with,
             token_contract: id.native.contract,
             ...(res?.signature
-              ? { sig_data: [...Buffer.from(res.signature, "hex")] }
+              ? {
+                  sig_data: [...Buffer.from(res.signature, "hex")],
+                }
               : {}),
           },
           methodName: "freeze_nft",
