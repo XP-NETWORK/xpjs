@@ -861,10 +861,9 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       algorandParams: {
-        algodApiKey:
-          "e5b7d342b8a742be5e213540669b611bfd67465b754e7353eca8fd19b1efcffd",
-        algodUri: "https://algorand-node.xp.network/",
-        indexerUri: "https://algoindexer.algoexplorerapi.io",
+        algodApiKey: "kZWDAxYR7Y6S6RoyfGIi28SATZ5DfTIs5pF0UMW4",
+        algodUri: "https://mainnet-algorand.api.purestake.io/ps2",
+        indexerUri: "https://mainnet-algorand.api.purestake.io/idx2",
         nonce: Chain.ALGORAND,
         sendNftAppId: 769053604,
         algodPort: 443,

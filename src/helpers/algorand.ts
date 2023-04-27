@@ -163,15 +163,16 @@ const MINT_NFT_COST = new BigNumber(1000);
 
 export function algorandHelper(args: AlgorandParams): AlgorandHelper {
   const appAddr = algosdk.getApplicationAddress(args.sendNftAppId);
+
   const algod = new algosdk.Algodv2(
-    args.algodApiKey,
+    { "X-API-Key": args.algodApiKey },
     args.algodUri,
-    args.algodPort
+    ""
   );
   const indexer = new algosdk.Indexer(
-    args.algodApiKey,
+    { "X-API-Key": args.algodApiKey },
     args.indexerUri,
-    args.algodPort
+    ""
   );
 
   async function waitTxnConfirm(txId: string) {
