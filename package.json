@@ -56,7 +56,7 @@
     "@vechain/connex-driver": "^2.0.8",
     "@vechain/connex-framework": "^2.0.8",
     "@walletconnect/client": "^1.7.0",
-    "algosdk": "^1.15.0-beta.1",
+    "algosdk": "^2.2.0",
     "aptos": "^1.6.0",
     "axios": "^0.21.1",
     "base64url": "^3.0.1",
