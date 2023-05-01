@@ -188,6 +188,10 @@ export async function nearHelperFactory({
     async estimateValidateUnfreezeNft(_to, _metadata, _mintWith) {
       return new BigNumber(0); // TODO
     },
+    estimateContractDep: async () => {
+      return new BigNumber("5000000000000000000000000");
+    },
+    //async estimateContractDe
     getNonce() {
       return Chain.NEAR;
     },

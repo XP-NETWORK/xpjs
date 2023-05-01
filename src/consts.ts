@@ -476,7 +476,7 @@ CHAIN_INFO.set(Chain.AURORA, {
   nonce: Chain.AURORA,
   decimals: Decimals.AURORA,
   constructor: web3HelperFactory,
-  currency: SupportedCurrency.AURORA,
+  currency: SupportedCurrency.ETH,
   currencySymbol: SupportedCurrencyName.AURORA,
   chainId: 1313161554,
   type: ChainType.EVM,
