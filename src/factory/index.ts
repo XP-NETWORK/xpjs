@@ -833,6 +833,13 @@ export function ChainFactory(
       let transfers = Array(parseInt(amt.toString())).fill(nft);
       if (!fee) {
         fee = await estimateFees(from, to, transfers[0], receiver);
+        const deplFees = (await estimateWithContractDep(from, to, transfers[0]))
+          .calcContractDep;
+        if (deplFees.gt(0)) {
+          fee = new BigNumber(fee)
+            .plus(deplFees)
+            .integerValue(BigNumber.ROUND_CEIL);
+        }
       }
       const sftFees = await estimateSFTfees(from, amt, 0.05);
       const x = new BigNumber(fee).plus(sftFees);
@@ -965,6 +972,14 @@ export function ChainFactory(
 
       if (!fee) {
         fee = await estimateFees(fromChain, toChain, nft, receiver, extraFee);
+        const deplFees = (
+          await estimateWithContractDep(fromChain, toChain, nft)
+        ).calcContractDep;
+        if (deplFees.gt(0)) {
+          fee = new BigNumber(fee)
+            .plus(deplFees)
+            .integerValue(BigNumber.ROUND_CEIL);
+        }
         console.log(new BigNumber(fee).toString());
       }
       // if (!(await toChain.validateAddress(receiver))) {
