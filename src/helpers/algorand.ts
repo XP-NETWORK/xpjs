@@ -148,6 +148,7 @@ export type AlgorandParams = {
   indexerUri: string;
   algodPort: number | undefined;
   sendNftAppId: number;
+  sendNftAppAddress: string;
   notifier: EvNotifier;
   feeMargin: FeeMargins;
 };
@@ -356,7 +357,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       return new BigNumber(acc.amount);
     },
     async preTransfer(sender, nft, fee) {
-      if (await isOptIn(sender.address, nft.native.nftId)) {
+      if (await isOptIn(args.sendNftAppAddress, nft.native.nftId)) {
         return undefined;
       }
 
