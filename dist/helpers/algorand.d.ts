@@ -75,6 +75,7 @@ export type AlgorandParams = {
     indexerUri: string;
     algodPort: number | undefined;
     sendNftAppId: number;
+    sendNftAppAddress: string;
     notifier: EvNotifier;
     feeMargin: FeeMargins;
 };
