@@ -297,6 +297,8 @@ export namespace ChainFactoryConfigs {
         algodUri: "https://node.testnet.algoexplorerapi.io",
         nonce: Chain.ALGORAND,
         sendNftAppId: 83148194,
+        sendNftAppAddress:
+          "IWWZVASJCPHOXCGQFOI3CTEVYGWTMUDD2PTMMGS3TLQNKNFUHTU4W56ZDQ",
         algodPort: 443,
         notifier,
         feeMargin,
@@ -509,6 +511,8 @@ export namespace ChainFactoryConfigs {
         indexerUri: "https://mainnet-algorand.api.purestake.io/idx2",
         nonce: Chain.ALGORAND,
         sendNftAppId: 942656248,
+        sendNftAppAddress:
+          "NWFARCYRP7AGZBRLQXAK55YM4F7MIM6NMZ6SAWUBNGM2MGE73WO7UZI7VA",
         algodPort: 443,
         notifier,
         feeMargin,
@@ -866,6 +870,8 @@ export namespace ChainFactoryConfigs {
         indexerUri: "https://mainnet-algorand.api.purestake.io/idx2",
         nonce: Chain.ALGORAND,
         sendNftAppId: 769053604,
+        sendNftAppAddress:
+          "4NADOO3YSROEIB7Z3QF2KWPFVHKQELRNLIBBF357EV3ZKVZVFVCAQBMBIY",
         algodPort: 443,
         notifier,
         feeMargin,
