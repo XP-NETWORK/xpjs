@@ -472,7 +472,7 @@ export namespace ChainFactoryConfigs {
         whitelisted: whitelistedService(AppConfigs.Staging()),
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
-        signatureSvc: signatureService("https://fee.xp.network"),
+        signatureSvc: signatureService("https://tools.xp.network/fee-oracle"),
       },
       solanaParams: {
         xpnftAddr: "",
