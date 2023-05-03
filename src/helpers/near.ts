@@ -280,6 +280,19 @@ export async function nearHelperFactory({
         .catch(() => undefined);
 
       if (res) {
+        const tokenData = await sender.viewFunction({
+          args: {
+            token_id: id.native.tokenId,
+          },
+          contractId: id.native.contract,
+          methodName: "nft_token",
+        });
+
+        let approval_id = tokenData.approved_account_ids[bridge];
+        if (!approval_id) {
+          approval_id = null;
+        }
+
         const result = await sender.functionCall({
           contractId: bridge,
           args: {
@@ -294,6 +307,7 @@ export async function nearHelperFactory({
                   sig_data: [...Buffer.from(res.signature, "hex")],
                 }
               : {}),
+            approval_id,
           },
           methodName: "freeze_nft",
           attachedDeposit: new BN(res?.fee) /*.div(new BN(2))*/,
