@@ -15,13 +15,14 @@ Bridging steps:
 - [x] [3. Getting the signer objects](#3-get-the-signer-objects)
   - [x] [3.1 Backend unsafe signer](#31-example-of-getting-the-signer-object-for-manual-testing-in-the-be)
   - [x] [3.2 EVM compatible browser extension signer](#32-example-of-getting-the-signer-object-in-the-fe-for-web3)
-  - [x] [3.3 Elrond signer](#33-example-of-getting-the-signer-object-in-the-fe-for-metaversx)
+  - [x] [3.3 MetaversX signer](#33-example-of-getting-the-signer-object-in-the-fe-for-metaversx)
   - [x] [3.4 Tron signer](#34-example-of-getting-the-signer-object-in-the-fe-for-tron)
   - [x] [3.5 Algorand signer](#35-example-of-getting-the-signer-object-in-the-fe-for-algorand)
   - [x] [3.6 Tezos signer](#36-example-of-getting-the-signer-object-in-the-fe-for-tezos)
   - [x] [3.7 Secret signer](#37-example-of-secret-network)
   - [x] [3.8 TON signer](#38-example-signer-object-for-ton)
   - [x] [3.9 NEAR Signer](#39-example-signer-object-for-near)
+  - [x] [3.10 Solana signer](#310-example-of-solana-signer-object)
 - [x] [4. Getting the Chain's inner objects](#4-getting-the-inner-objects-from-this-factory-to-be-used-for-transferring-minting-estimation-of-gas-fees)
 - [x] [5. Listing NFTs](#51-listing-nfts-owned-by-the-sender)
   - [x] [Example of a native NFT object](#52-example-of-console-logged-native-bsc-nft-object)
@@ -39,7 +40,7 @@ Bridging steps:
 </center>
 <br/>
 
-Make sure [nodejs](https://nodejs.org/en/download/) is installed on your machine.<br/>
+Make sure [node.js](https://nodejs.org/en/download/) is installed on your machine.<br/>
 <br/>
 
 ### 1. Install the libraries required for the project:
@@ -56,7 +57,7 @@ OR
 npm i --save xp.network
 ```
 
-To import the latest version of `xp.network` library:
+To import the latest version of the `xp.network` library:
 
 ```bash
 yarn add "git+https://github.com/xp-network/xpjs#bleeding-edge"
@@ -105,7 +106,7 @@ config();} from "xp.network";
 
 ### 3.1 Example of getting the signer object (for manual EVM testing in the BE)
 
-Avoid using 3.1 setup in production. Use it for initial or backend testing only.
+Avoid using the $3.n$ setups in production. Use it for initial or backend testing only.
 <br/>
 
 Add your private key to the environment:
@@ -134,7 +135,7 @@ const signer = new Wallet(
 
 |     Chain     |   Parameters    | Chain Nonce |
 | :-----------: | :-------------: | :---------: |
-|    Elrond     | metaversxParams |      2      |
+|   MetaversX   | metaversxParams |      2      |
 |      BSC      |    bscParams    |      4      |
 |   Ethereum    |  ropstenParams  |      5      |
 |   Avalanche   | avalancheParams |      6      |
@@ -177,14 +178,14 @@ const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
 
 <br/>
 
-### 3.3 Example of getting the signer object (in the FE for Elrond):<br/><br/>
+### 3.3 Example of getting the signer object (in the FE for MetaversX):<br/><br/>
 
 ```typescript
-// ELROND provider (injected from the browser extension):
+// MetaversX provider (injected from the browser extension):
 import { ExtensionProvider } from "@metaversxnetwork/erdjs/out";
 const metaversxSigner = ExtensionProvider.getInstance();
 
-// Elrond signer from a PEM key stored in the .env file
+// MetaversX signer from a PEM key stored in the .env file
 import { UserSigner } from "@metaversxnetwork/erdjs/out";
 const metaversxSigner = UserSigner.fromPem(process.env.ELROND_PEM!);
 ```
@@ -299,6 +300,38 @@ const provider = await connect({
 });
 ```
 
+### 3.10 Example of Solana signer object
+
+```ts
+import { config } from "dotenv";
+import { Connection, Keypair } from "@solana/web3.js";
+import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
+config();
+
+// Extracting the variables from .env
+const { URL, SK } = process.env;
+
+// Solana provider
+const provider = new Connection(URL!);
+
+// Convert secret key (SK) to Uint8Array
+const buffer = require("bs58").decode(SK!);
+const keyAsArray = new Uint8Array(
+  buffer.buffer,
+  buffer.byteOffset,
+  buffer.byteLength / Uint8Array.BYTES_PER_ELEMENT
+);
+
+// Solana signer
+const payer = Keypair.fromSecretKey(keyAsArray);
+
+// Metaplex Solana token standard
+const metaplex = Metaplex.make(provider).use(keypairIdentity(payer));
+
+// Client for interacting with NFT contracts
+const nftc = metaplex.nfts();
+```
+
 <hr/>
 
 For the ways of connecting the wallets in the FE check-out our [bridge repository](https://github.com/xp-network/bridge-interface/blob/components-reorder/src/components/ConnectWallet.jsx)
@@ -350,7 +383,7 @@ For the ways of connecting the wallets in the FE check-out our [bridge repositor
 
 <hr/><br/>
 
-### 5.1 Listing NFTs Owned by the sender.<br/><br/>
+### 5.1 Listing NFTs owned by the sender.<br/><br/>
 
 This operation does not depend on a wallet since reading operations are free and, therefore, do not require signing.
 <br/>
@@ -363,10 +396,10 @@ This operation does not depend on a wallet since reading operations are free and
     "0x...." // The public key of the NFT owner in a web3 chain
   );
 
-  // Elrond:
+  // MetaversX:
   const metaversxNfts = await factory.nftList(
     metaversx, // The chain of interest
-    "erd1...." // The public key of the NFT owner in Elrond
+    "erd1...." // The public key of the NFT owner in MetaversX
   );
 
   // Tron:
@@ -421,13 +454,13 @@ const nearChosenOne = nearNFTs[0];
 
 // Checking the selected NFT object
 console.log("EVM Selected NFT:       ", web3ChosenOne);
-console.log("Elrond Selected NFT:    ", metaversxChosenOne);
+console.log("MetaversX Selected NFT: ", metaversxChosenOne);
 console.log("Tron Selected NFT:      ", tronChosenOne);
 console.log("Algorand Selected NFT:  ", algoChosenOne);
 console.log("Tezos Selected NFT:     ", tezosChosenOne);
-console.log("Secret Selected NFT:     ", secretChosenOne);
+console.log("Secret Selected NFT:    ", secretChosenOne);
 console.log("Ton Selected NFT:       ", tonChosenOne);
-console.log("NEAR Selected NFT:       ", nearChosenOne);
+console.log("NEAR Selected NFT:      ", nearChosenOne);
 ```
 
 ### 5.2 Example of console logged native BSC NFT object:
@@ -478,12 +511,12 @@ console.log("NEAR Selected NFT:       ", nearChosenOne);
   const isApprovedEVM = await harmony.approveForMinter(web3ChosenOne, signer);
   console.log("Is Approved in an EVM:", isApprovedEVM);
 
-  // Elrond example
-  const isApprovedElrond = await metaversx.approveForMinter(
+  // MetaversX example
+  const isApprovedMetaversX = await metaversx.approveForMinter(
     metaversxChosenOne,
     metaversxSigner
   );
-  console.log("Is Approved in Elrond:", isApprovedElrond);
+  console.log("Is Approved in MetaversX:", isApprovedMetaversX);
 
   // Tron example
   const isApprovedTron = await metaversx.approveForMinter(
@@ -546,12 +579,12 @@ console.log("NEAR Selected NFT:       ", nearChosenOne);
   );
   console.log(web3Result);
 
-  // Elrond example:
+  // MetaversX example:
   const metaversxResult = await factory.transferNft(
     metaversx, // The Source Chain.
     tron, // The Destination Chain.
     metaversxChosenOne, // The NFT object you have chosen from the list.
-    metaversxSigner, // The Elrond signer object (see p. 3.3 above).
+    metaversxSigner, // The MetaversX signer object (see p. 3.3 above).
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
   );
   console.log(metaversxResult);
@@ -610,7 +643,7 @@ console.log("NEAR Selected NFT:       ", nearChosenOne);
 
 <br/><hr/><br/><center>
 
-## Minting NFTs on EVM chains, Elrond & Tron
+## Minting NFTs on EVM chains, MultiversX & Tron
 
 <br/>
 </center>
@@ -643,7 +676,7 @@ console.log("NEAR Selected NFT:       ", nearChosenOne);
 
 <br/>
 
-2. For Elrond:<br/>
+2. For MetaversX:<br/>
 
 ```javascript
 (async () => {
