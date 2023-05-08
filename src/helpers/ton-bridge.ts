@@ -1,6 +1,8 @@
 import BN from "bn.js";
 import TonWeb, { ContractMethods, ContractOptions } from "tonweb";
+import { Cell as CellF, Slice, parseDictRefs, Address } from "ton";
 import { HttpProvider } from "tonweb/dist/types/providers/http-provider";
+import BigNumber from "bignumber.js";
 
 const Contract = TonWeb.Contract;
 const Cell = TonWeb.boc.Cell;
@@ -19,7 +21,7 @@ interface BridgeMethods extends ContractMethods {
   getPublicKey: () => Promise<BN>;
   isInitialized: () => Promise<BN>;
   getActionId: () => Promise<BN>;
-  getWhitelist: () => Promise<BN>;
+  getWhitelist: () => Promise<string[]>;
 }
 
 interface WithdrawParams {
@@ -36,6 +38,8 @@ interface FreezeParams {
 }
 
 export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
+  whiteListedCollections: string[] = [];
+
   constructor(provider: HttpProvider, options: BridgeOptions) {
     super(provider, options);
 
@@ -116,11 +120,55 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
   };
 
   getWhitelist = async () => {
-    const address = await this.getAddress();
-    const result = await this.provider.call2(
-      address.toString(),
-      "get_whitelist"
-    );
-    return result;
+    if (this.whiteListedCollections.length) return this.whiteListedCollections;
+    const address = (await this.getAddress()).toString();
+
+    const readContract = async (
+      tries: number = 1
+    ): Promise<string | undefined> => {
+      try {
+        const res = await this.provider.call(address, "get_whitelist");
+        return res["stack"][0][1].bytes;
+      } catch (e) {
+        if (tries < 4) {
+          return readContract(tries + 1);
+        }
+        return undefined;
+      }
+    };
+
+    const bytes = await readContract();
+
+    if (!bytes) {
+      throw new Error("Could not load bridge contract state");
+    }
+
+    try {
+      const cell = CellF.fromBoc(Buffer.from(bytes, "base64")).at(0);
+      const slice = Slice.fromCell(cell!);
+      const whitelistedCollectionsMap = parseDictRefs(slice, 256);
+
+      const whitelistedCollections = Array.from(
+        whitelistedCollectionsMap.keys()
+      ).map((collection) =>
+        Address.parseRaw(
+          `0:${new BigNumber(collection).toString(16)}`
+        ).toFriendly()
+      );
+
+      if (!this.whiteListedCollections.length) {
+        this.whiteListedCollections = whitelistedCollections;
+        setTimeout(() => {
+          (this.whiteListedCollections = []), 5_000;
+        });
+      }
+
+      return whitelistedCollections;
+    } catch (e: any) {
+      console.log(e.message, "error when parsing whitelisted collectons");
+      throw new Error(
+        e.message + "::error when parsing whitelisted collectons"
+      );
+    }
   };
 }
