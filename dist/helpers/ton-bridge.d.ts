@@ -14,7 +14,7 @@ interface BridgeMethods extends ContractMethods {
     getPublicKey: () => Promise<BN>;
     isInitialized: () => Promise<BN>;
     getActionId: () => Promise<BN>;
-    getWhitelist: () => Promise<BN>;
+    getWhitelist: () => Promise<string[]>;
 }
 interface WithdrawParams {
     chainNonce: number;
@@ -28,6 +28,7 @@ interface FreezeParams {
     amount?: number | BN;
 }
 export declare class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
+    whiteListedCollections: string[];
     constructor(provider: HttpProvider, options: BridgeOptions);
     serializeUri(uri: string): Uint8Array;
     createWithdrawBody(params: WithdrawParams): Promise<import("tonweb/dist/types/boc/cell").Cell>;
@@ -35,7 +36,7 @@ export declare class BridgeContract extends Contract<BridgeOptions, BridgeMethod
     getPublicKey: () => Promise<any>;
     isInitialized: () => Promise<any>;
     getActionId: () => Promise<any>;
-    getWhitelist: () => Promise<any>;
+    getWhitelist: () => Promise<string[]>;
 }
 export {};
 //# sourceMappingURL=ton-bridge.d.ts.map
