@@ -15,6 +15,7 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
   BalanceCheck,
+  WhitelistCheck,
 } from "./chain";
 
 import { PreTransfer } from "..";
@@ -64,7 +65,8 @@ export type TonHelper = ChainNonceGet &
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
-  } & GetFeeMargins;
+  } & GetFeeMargins &
+  WhitelistCheck<TonNft>;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -439,6 +441,14 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         wallet: wWallet,
         accIdx: 0,
       };
+    },
+    async isNftWhitelisted(nft) {
+      const collectionAddress = nft.native?.collectionAddress;
+      if (!collectionAddress) return false;
+
+      const whitelistedCollections = await bridge.getWhitelist();
+
+      return whitelistedCollections.includes(collectionAddress) ? true : false;
     },
   };
 }
