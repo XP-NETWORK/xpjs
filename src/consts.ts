@@ -5,7 +5,7 @@ import {
 } from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
-import { web3HelperFactory as HederaHelperFactory } from "./helpers/hedera/helper";
+import { web3HelperFactory as HederaHelperFactory } from "./helpers/hedera/browserAdapted";
 
 import {
   SupportedCurrency,

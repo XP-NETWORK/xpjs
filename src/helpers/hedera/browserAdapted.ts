@@ -54,6 +54,8 @@ import { EvNotifier } from "../../services/notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 
+import { HEDERA_PROXY_ABI } from "./hts_abi";
+
 type HSDK = typeof import("@hashgraph/sdk");
 let hashSDK: HSDK;
 
@@ -779,19 +781,30 @@ export async function web3HelperFactory(
       htsToken = params.htcToken,
       signer
     ) {
-      const query = new hashSDK.ContractCallQuery()
-        .setContractId(hashSDK.ContractId.fromSolidityAddress(proxyContract))
-        .setGas(300_000)
-        .setFunction(
-          "getClaimableNfts",
-          new hashSDK.ContractFunctionParameters()
-            .addAddress(signer.address)
-            .addAddress(htsToken)
-        );
+      const constract = new ethers.Contract(
+        proxyContract,
+        HEDERA_PROXY_ABI,
+        params.evmProvider
+      );
+      return await constract.getClaimableNfts(signer.address, htsToken, {
+        gasLimit: 1000000,
+      });
 
-      await query.executeWithSigner(signer);
+      /*const query = new hashSDK.ContractCallQuery()
+                .setContractId(
+                    hashSDK.ContractId.fromSolidityAddress(proxyContract)
+                )
+                .setGas(300_000)
+                .setFunction(
+                    "getClaimableNfts",
+                    new hashSDK.ContractFunctionParameters()
+                        .addAddress(signer.address)
+                        .addAddress(htsToken)
+                );
 
-      return "";
+            await query.executeWithSigner(signer);
+
+            return "";*/
     },
     async assosiateToken(token = params.htcToken, signer) {
       const trx = await new hashSDK.TokenAssociateTransaction()
