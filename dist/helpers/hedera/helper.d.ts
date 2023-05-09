@@ -75,11 +75,11 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
 } & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params> & {
     injectSDK(sdk: HSDK): void;
 } & {
-    listHederaClaimableNFT(proxyContract: string, htsToken: string, signer: any): Promise<string>;
+    listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<string>;
 } & {
-    claimNFT(token: string, htsToken: string, signer: any): Promise<boolean>;
+    claimNFT(proxyContract: string | undefined, htsToken: string | undefined, tokenId: string, signer: any): Promise<boolean>;
 } & {
-    assosiateToken(token: string, signer: any): Promise<boolean>;
+    assosiateToken(htsToken: string | undefined, signer: any): Promise<boolean>;
 };
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -116,7 +116,8 @@ type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
 type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
 export declare const NFT_METHOD_MAP: NftMethodMap;
 export declare function web3HelperFactory(params: Web3Params & {
-    api: string;
+    htcToken: string;
+    evmProvider: ethers.providers.JsonRpcProvider;
 }): Promise<Web3Helper>;
 export {};
 //# sourceMappingURL=helper.d.ts.map
