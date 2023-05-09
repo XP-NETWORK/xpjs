@@ -162,14 +162,19 @@ export type Web3Helper = BaseWeb3Helper &
     injectSDK(sdk: HSDK): void;
   } & {
     listHederaClaimableNFT(
-      proxyContract: string,
-      htsToken: string,
+      proxyContract: string | undefined,
+      htsToken: string | undefined,
       signer: any
     ): Promise<string>;
   } & {
-    claimNFT(token: string, htsToken: string, signer: any): Promise<boolean>;
+    claimNFT(
+      proxyContract: string | undefined,
+      htsToken: string | undefined,
+      tokenId: string,
+      signer: any
+    ): Promise<boolean>;
   } & {
-    assosiateToken(token: string, signer: any): Promise<boolean>;
+    assosiateToken(htsToken: string | undefined, signer: any): Promise<boolean>;
   };
 
 /**
@@ -314,25 +319,15 @@ export const NFT_METHOD_MAP: NftMethodMap = {
     umt: UserNftMinter__factory,
     approved: async (
       umt: UserNftMinter,
-      signer: any,
+      _: any,
       minterAddr: string,
       tok: string,
-      customData: NullableCustomData
+      __: NullableCustomData
     ) => {
-      customData;
-
-      const call = new hashSDK.ContractCallQuery()
-        .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
-        .setGas(700_000)
-        .setQueryPayment(new hashSDK.Hbar(5))
-        .setFunction(
-          "getApproved",
-          new hashSDK.ContractFunctionParameters().addUint256(+tok)
-        );
-
-      const txResponse1 = await call.executeWithSigner(signer);
-      const approved = txResponse1?.getAddress(0);
-      return approved?.toLowerCase() == minterAddr.toLowerCase();
+      const res = await umt.getApproved(tok, {
+        gasLimit: "85000",
+      });
+      return res?.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
       umt: UserNftMinter,
@@ -368,7 +363,10 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 };
 
 export async function web3HelperFactory(
-  params: Web3Params & { api: string }
+  params: Web3Params & {
+    htcToken: string;
+    evmProvider: ethers.providers.JsonRpcProvider;
+  }
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7
@@ -461,30 +459,17 @@ export async function web3HelperFactory(
     return array.join("");
   };
 
-  const isApprovedForMinter = async (
-    id: NftInfo<EthNftInfo>,
-    signer: Signer
-  ) => {
-    return false;
-    //@ts-ignore
-    signer._isSigner = true;
-    const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
-      id.native.contract,
-      signer
-    );
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
+  const isApprovedForMinter = async (id: NftInfo<EthNftInfo>, _: Signer) => {
+    const contract = NFT_METHOD_MAP[id.native.contractType];
 
-    return await NFT_METHOD_MAP[id.native.contractType].approved(
+    const erc = contract.umt.connect(id.native.contract, params.evmProvider);
+
+    return await contract.approved(
       erc as any,
-      signer as any,
-      toApprove,
+      "",
+      params.erc721_addr,
       id.native.tokenId,
-      params.nonce === 0x1d ? {} : undefined
+      {}
     );
   };
 
@@ -505,19 +490,12 @@ export async function web3HelperFactory(
       sender
     );
 
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
-
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
-      toApprove,
+      params.erc721_addr,
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
-      params.nonce === 0x1d ? {} : undefined,
+      {},
       gasPrice,
       sender
     );
@@ -676,7 +654,7 @@ export async function web3HelperFactory(
       chain_nonce: number,
       to: string,
       id: NftInfo<EthNftInfo>,
-      _: BigNumber,
+      fees: BigNumber,
       mintWith: string,
       __: ethers.BigNumberish | undefined = undefined,
       ___
@@ -694,9 +672,8 @@ export async function web3HelperFactory(
         .setContractId(
           hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
         )
-        .setGas(2_000_000)
-        .setMaxTransactionFee(new hashSDK.Hbar(12))
-        .setPayableAmount(7)
+        .setGas(1_200_000)
+        .setPayableAmount(fees.shiftedBy(-8).toNumber())
         .setFunction(
           method,
           new hashSDK.ContractFunctionParameters()
@@ -717,56 +694,12 @@ export async function web3HelperFactory(
       return {
         hash,
       } as any;
-
-      /*const tx = await minter
-        .connect(sender)
-        .populateTransaction[method](
-          id.native.contract,
-          id.native.tokenId,
-          chain_nonce,
-          to,
-          mintWith,
-          {
-            value: EthBN.from(txFees.toFixed(0)),
-            gasLimit,
-            gasPrice,
-          }
-        );
-      await txnUnderpricedPolyWorkaround(tx);
-
-      const txr: TransactionResponse | unknown = await sender
-        .sendTransaction(tx)
-        .catch((e) => {
-          if (params.nonce === 33) {
-            return e;
-          } else throw e;
-        });
-      let txHash: string;
-      if (params.nonce === 0x1d) {
-        //@ts-ignore checked hedera
-        txHash = txr["transactionId"];
-      } else if (params.nonce === 33) {
-        //@ts-ignore checked abeychain
-        txHash = txr["returnedHash"] || txr.hash;
-      } else {
-        //@ts-ignore checked normal evm
-        txHash = txr.hash;
-      }
-
-      await notifyValidator(
-        //@ts-ignore
-        txHash
-      );
-      if (params.nonce === 33) {
-        return await provider.getTransaction(txHash);
-      }
-      return txr as any;*/
     },
     async unfreezeWrappedNft(
       sender: any,
       to: string,
       id: NftInfo<EthNftInfo>,
-      ____: BigNumber,
+      fees: BigNumber,
       nonce,
       _ = undefined,
       __
@@ -782,9 +715,9 @@ export async function web3HelperFactory(
         .setContractId(
           hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
         )
-        .setGas(2_000_000)
-        .setMaxTransactionFee(new hashSDK.Hbar(10))
-        .setPayableAmount(5)
+
+        .setGas(1_200_000)
+        .setPayableAmount(fees.shiftedBy(-8).toNumber())
         .setFunction(
           "withdrawNft",
           new hashSDK.ContractFunctionParameters()
@@ -841,12 +774,14 @@ export async function web3HelperFactory(
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
     },
-    async listHederaClaimableNFT(proxyContract, htsToken, signer) {
+    async listHederaClaimableNFT(
+      proxyContract = params.erc721_addr,
+      htsToken = params.htcToken,
+      signer
+    ) {
       const query = new hashSDK.ContractCallQuery()
         .setContractId(hashSDK.ContractId.fromSolidityAddress(proxyContract))
-        .setGas(700_000)
-        .setMaxQueryPayment(new hashSDK.Hbar(3))
-        .setQueryPayment(new hashSDK.Hbar(3))
+        .setGas(300_000)
         .setFunction(
           "getClaimableNfts",
           new hashSDK.ContractFunctionParameters()
@@ -858,7 +793,7 @@ export async function web3HelperFactory(
 
       return "";
     },
-    async assosiateToken(token, signer) {
+    async assosiateToken(token = params.htcToken, signer) {
       const trx = await new hashSDK.TokenAssociateTransaction()
         .setAccountId(signer.accountToSign)
         .setTokenIds([hashSDK.TokenId.fromSolidityAddress(token)])
@@ -874,18 +809,21 @@ export async function web3HelperFactory(
 
       return true;
     },
-    async claimNFT(token, htsToken, signer) {
+    async claimNFT(
+      proxyContract = params.erc721_addr,
+      htsToken = params.htcToken,
+      tokenId,
+      signer
+    ) {
       const trx = await new hashSDK.ContractExecuteTransaction()
-        .setContractId(
-          hashSDK.ContractId.fromSolidityAddress(params.erc721_addr)
-        )
-        .setGas(900_000)
+        .setContractId(hashSDK.ContractId.fromSolidityAddress(proxyContract))
+        .setGas(500_000)
         .setMaxTransactionFee(new hashSDK.Hbar(12))
         .setFunction(
           "claimNft",
           new hashSDK.ContractFunctionParameters()
             //@ts-ignore
-            .addInt64(token)
+            .addInt64(tokenId)
             .addAddress(htsToken)
         )
         .freezeWithSigner(signer);
