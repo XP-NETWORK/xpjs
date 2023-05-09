@@ -520,6 +520,9 @@ export function ChainFactory(
       if (bool) {
         originalContract = wrapped?.contract;
         originalChain = wrapped?.origin;
+        if (toChain.getNonce() == Number(originalChain)) {
+          return { calcContractDep };
+        }
       } else {
         originalContract = nft.collectionIdent || nft.native.contract;
         originalChain = nft.native.chainId;
@@ -530,9 +533,9 @@ export function ChainFactory(
           .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
             fromChain: Number(originalChain),
             chain:
-              fromChain?.getNonce() == originalChain //if first time sending
+              fromChain?.getNonce() == Number(originalChain) //if first time sending
                 ? Number(toChain.getNonce())
-                : toChain.getNonce() == originalChain //if sending back
+                : toChain.getNonce() == Number(originalChain) //if sending back
                 ? Number(fromChain.getNonce())
                 : Number(toChain.getNonce()), //all the rest
             sc: originalContract,

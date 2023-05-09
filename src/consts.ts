@@ -95,6 +95,7 @@ export enum MainNetRpcUri {
   VECHAIN = "https://sync-mainnet.veblocks.net",
   SECRET = "https://secret-4.api.trivium.network:9091/",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+  HEDERA = "https://mainnet.hashio.io/api",
   NEAR = "https://rpc.mainnet.near.org",
   MOONBEAM = "https://rpc.api.moonbeam.network",
   ABEYCHAIN = "https://rpc.abeychain.com",
