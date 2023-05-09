@@ -120,4 +120,4 @@ export declare function web3HelperFactory(params: Web3Params & {
     evmProvider: ethers.providers.JsonRpcProvider;
 }): Promise<Web3Helper>;
 export {};
-//# sourceMappingURL=helper.d.ts.map
+//# sourceMappingURL=browserAdapted.d.ts.map
