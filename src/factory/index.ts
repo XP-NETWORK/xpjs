@@ -549,12 +549,12 @@ export function ChainFactory(
         from == Number(originalChain) //if first time sending
           ? to
           : to == Number(originalChain) //if sending back
-          ? Number(from)
+          ? from
           : to; //all the rest
 
       const [checkWithOutTokenId, verifyList] = await Promise.all([
         scVerifyRest.checkWithOutTokenId(
-          +originalChain,
+          Number(originalChain),
           _chain,
           originalContract
         ),
@@ -937,9 +937,11 @@ export function ChainFactory(
       extraFee,
       gasPrice
     ) => {
+      const fromNonce = fromChain.getNonce();
+      const toNonce = toChain.getNonce();
       //@ts-ignore
       if (nft.native.contract) {
-        if (![9, 18, 24, 31, 27, 26].includes(fromChain.getNonce())) {
+        if (![9, 18, 24, 31, 27, 26].includes(fromNonce)) {
           try {
             checkNotOldWrappedNft(
               //@ts-ignore
@@ -952,7 +954,7 @@ export function ChainFactory(
       }
 
       if (appConfig.network === "mainnet") {
-        await requireBridge([fromChain.getNonce(), toChain.getNonce()]);
+        await requireBridge([fromNonce, toNonce]);
       }
 
       if (!fee) {
@@ -965,15 +967,14 @@ export function ChainFactory(
             .plus(deplFees)
             .integerValue(BigNumber.ROUND_CEIL);
         }
-        console.log(new BigNumber(fee).toString());
       }
       // if (!(await toChain.validateAddress(receiver))) {
       //   throw Error("invalid address");
       // }
       const { bool: unfreeze, wrapped } = await isWrappedNft(
         nft,
-        fromChain.getNonce(),
-        toChain.getNonce()
+        fromNonce,
+        toNonce
       );
 
       if (unfreeze) {
@@ -984,7 +985,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          toChain.getNonce().toString(),
+          String(toNonce),
           gasLimit,
           gasPrice
         );
@@ -998,9 +999,9 @@ export function ChainFactory(
           (await checkMintWith(
             nft.collectionIdent,
             mintWith,
-            toChain.getNonce(),
-            fromChain.getNonce(),
-            prepareTokenId(nft, fromChain.getNonce())
+            toNonce,
+            fromNonce,
+            prepareTokenId(nft, fromNonce)
           ))
             ? mintWith
             : getDefaultContract(nft, fromChain, toChain);
@@ -1013,7 +1014,7 @@ export function ChainFactory(
 
         const res = await fromChain.transferNftToForeign(
           sender,
-          toChain.getNonce(),
+          toNonce,
           receiver,
           nft,
           new BigNumber(fee),
