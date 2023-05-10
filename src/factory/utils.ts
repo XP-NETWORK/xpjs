@@ -6,6 +6,18 @@ export const _headers = {
   Accept: "*/*",
 };
 
+export const oldXpWraps = new Set([
+  "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
+  "0xc69ECD37122A9b5FD7e62bC229d478BB83063C9d",
+  "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
+  "0xa1B8947Ff4C1fD992561F629cfE67aEb90DfcBd5",
+  "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
+  "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
+  "0xE773Be36b35e7B58a9b23007057b5e2D4f6686a1",
+  "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
+  "0xb4A252B3b24AF2cA83fcfdd6c7Fac04Ff9d45A7D",
+]);
+
 export function checkBlockedContracts(to: any, contract: string) {
   const chain = CHAIN_INFO.get(to);
   if (chain?.rejectUnfreeze && chain?.rejectUnfreeze.includes(contract)) {
@@ -61,12 +73,12 @@ export function getDefaultContract<SignerT, RawNftF, Resp, RawNftT>(
     throw defaultMintError;
   }
 
-//   if (
-//     (fromType === ChainType.EVM && toType === ChainType.TEZOS) ||
-//     (fromType === ChainType.TEZOS && toType === ChainType.EVM)
-//   ) {
-//     throw defaultMintError;
-//   }
+  //   if (
+  //     (fromType === ChainType.EVM && toType === ChainType.TEZOS) ||
+  //     (fromType === ChainType.TEZOS && toType === ChainType.EVM)
+  //   ) {
+  //     throw defaultMintError;
+  //   }
 
   if (from === Chain.SECRET) {
     throw defaultMintError;

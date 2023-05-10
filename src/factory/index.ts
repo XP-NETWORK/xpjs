@@ -1,4 +1,4 @@
-import { Chain, CHAIN_INFO } from "../consts";
+import { Chain, CHAIN_INFO, ChainType } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/web3";
@@ -29,6 +29,7 @@ import { ethers, utils } from "ethers";
 import { Base64 } from "js-base64";
 import { bridgeHeartbeat } from "../services/heartbeat";
 import { exchangeRateRepo } from "../services/exchangeRate";
+import { scVerify } from "../services/scVerify";
 import {
   AlgorandHelper,
   AlgorandParams,
@@ -71,7 +72,7 @@ import {
   checkBlockedContracts,
   getDefaultContract,
   prepareTokenId,
-  _headers,
+  oldXpWraps,
 } from "./utils";
 import base64url from "base64url";
 
@@ -423,6 +424,8 @@ export function ChainFactory(
     },
   });
 
+  const scVerifyRest = scVerify(appConfig.scVerifyUri);
+
   const inner = async <T extends ChainNonce>(
     chain: T
   ): Promise<InferChainH<T>> => {
@@ -507,60 +510,62 @@ export function ChainFactory(
     toChain: FullChain<SignerT, RawNftT, Resp>,
     nft: NftInfo<any>
   ) => {
-    let calcContractDep: BigNumber = new BigNumber("0"),
-      originalContract,
-      originalChain;
+    const from = fromChain.getNonce();
+    const to = toChain.getNonce();
+    const noDeploy = new Error(`${from} is undeployable`);
+
+    let calcContractDep: BigNumber = new BigNumber("0");
+    let originalContract: string;
+    let originalChain: string;
+
     try {
-      const { bool, wrapped } = await isWrappedNft(
-        nft,
-        fromChain.getNonce(),
-        toChain.getNonce()
-      );
+      const { bool, wrapped } = await isWrappedNft(nft, from, to);
 
       if (bool) {
         originalContract = wrapped?.contract;
         originalChain = wrapped?.origin;
-        if (toChain.getNonce() == Number(originalChain)) {
-          return { calcContractDep };
-        }
+
+        if (to == Number(originalChain)) throw noDeploy;
       } else {
         originalContract = nft.collectionIdent || nft.native.contract;
         originalChain = nft.native.chainId;
       }
 
+      const fromType = CHAIN_INFO.get(
+        Number(originalChain) as ChainNonce
+      )?.type;
+
+      const deployable = [
+        ChainType.EVM,
+        ChainType.SOLANA,
+        ChainType.NEAR,
+        ChainType.APTOS,
+        ChainType.TON,
+      ].find((type) => type === fromType);
+
+      if (!deployable) throw noDeploy;
+
+      const _chain =
+        from == Number(originalChain) //if first time sending
+          ? to
+          : to == Number(originalChain) //if sending back
+          ? Number(from)
+          : to; //all the rest
+
       const [checkWithOutTokenId, verifyList] = await Promise.all([
-        axios
-          .post(`https://sc-verify.xp.network/default/checkWithOutTokenId`, {
-            fromChain: Number(originalChain),
-            chain:
-              fromChain?.getNonce() == Number(originalChain) //if first time sending
-                ? Number(toChain.getNonce())
-                : toChain.getNonce() == Number(originalChain) //if sending back
-                ? Number(fromChain.getNonce())
-                : Number(toChain.getNonce()), //all the rest
-            sc: originalContract,
-          })
-          .catch(() => false),
-        axios
-          .get(
-            `https://sc-verify.xp.network/verify/list?from=${originalContract}&targetChain=${toChain.getNonce()}&fromChain=${fromChain.getNonce()}&tokenId=1`
-          )
-          .then((res) => {
-            return res.data.data.length > 0 && res.data.code == 200;
-          })
-          .catch(() => false),
+        scVerifyRest.checkWithOutTokenId(
+          +originalChain,
+          _chain,
+          originalContract
+        ),
+        scVerifyRest.list(originalContract, to, from),
       ]);
 
       if (!checkWithOutTokenId && !verifyList && toChain?.estimateContractDep) {
         //@ts-ignore
         const contractFee = await toChain?.estimateContractDep(toChain);
         calcContractDep = (
-          await calcExchangeFees(
-            fromChain.getNonce(),
-            toChain.getNonce(),
-            contractFee,
-            toChain.getFeeMargin()
-          )
+          await calcExchangeFees(from, to, contractFee, toChain.getFeeMargin())
         ).multipliedBy(1.2);
       }
 
@@ -639,18 +644,6 @@ export function ChainFactory(
     }
   }
 
-  const oldXpWraps = new Set([
-    "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
-    "0xc69ECD37122A9b5FD7e62bC229d478BB83063C9d",
-    "0xe12B16FFBf7D79eb72016102F3e3Ae6fe03fCA56",
-    "0xa1B8947Ff4C1fD992561F629cfE67aEb90DfcBd5",
-    "0x09F4e56187541f2bC660B0810cA509D2f8c65c96",
-    "0x8B2957DbDC69E158aFceB9822A2ff9F2dd5BcD65",
-    "0xE773Be36b35e7B58a9b23007057b5e2D4f6686a1",
-    "0xFC2b3dB912fcD8891483eD79BA31b8E5707676C9",
-    "0xb4A252B3b24AF2cA83fcfdd6c7Fac04Ff9d45A7D",
-  ]);
-
   function checkNotOldWrappedNft(contract: string) {
     if (oldXpWraps.has(contract)) {
       throw new Error(`${contract} is an old wrapped NFT`);
@@ -714,22 +707,13 @@ export function ChainFactory(
     fc: number,
     tokenId?: string
   ): Promise<string | undefined> {
-    const res = await axios
-      .post<{ data: string }>(
-        `${appConfig.scVerifyUri}/default/`,
-        {
-          sc: from,
-          chain: tc,
-          fromChain: fc,
-          tokenId: tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined,
-        },
-        {
-          headers: _headers,
-        }
-      )
-      .catch(() => {
-        return undefined;
-      });
+    const res = await scVerifyRest.default(
+      from,
+      tc,
+      fc,
+      tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
+    );
+
     return res?.data.data;
   }
 
@@ -740,15 +724,13 @@ export function ChainFactory(
     fromChain: number,
     tokenId?: string
   ): Promise<boolean> {
-    const res = await axios
-      .post<{ data: "allowed" | "not allowed" }>(
-        `${appConfig.scVerifyUri}/verify`,
-        { from, to, targetChain, fromChain, tokenId },
-        {
-          headers: _headers,
-        }
-      )
-      .catch(() => undefined);
+    const res = await scVerifyRest.verify(
+      from,
+      to,
+      targetChain,
+      fromChain,
+      tokenId
+    );
 
     return res?.data.data == "allowed";
   }
