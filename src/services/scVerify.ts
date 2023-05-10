@@ -33,7 +33,7 @@ export function scVerify(url: string): ScVerifyService {
       return (
         await request
           .post("/default/checkWithOutTokenId", {
-            from,
+            fromChain: from,
             chain,
             sc,
           })
