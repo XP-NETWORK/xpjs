@@ -2,12 +2,40 @@ import axios from "axios";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 
+type CreateCollectionContractResponse = {
+  contractAddress: string;
+  collectionAddress: string;
+  chainNonce: number;
+  status: "SUCCESS" | "FAILED";
+};
+
 export function evNotifier(url: string) {
   const api = axios.create({
     baseURL: url,
   });
 
   return {
+    async createCollectionContract(
+      collectionAddress: string,
+      chainNonce: number
+    ) {
+      const res = (
+        await api
+          .post<CreateCollectionContractResponse>(
+            "/create-collection-contract",
+            {
+              chainNonce,
+              collectionAddress,
+            }
+          )
+          .catch(() => ({ data: undefined }))
+      ).data;
+
+      if (res?.status === "SUCCESS") {
+        return res.contractAddress;
+      }
+      throw new Error("Failed to create collection");
+    },
     async notifyWeb3(
       fromChain: number,
       fromHash: string,

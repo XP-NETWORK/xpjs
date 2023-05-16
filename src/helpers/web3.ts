@@ -33,8 +33,12 @@ import {
   Erc1155Minter__factory,
   Minter__factory,
   UserNftMinter,
+  Minter,
   UserNftMinter__factory,
-} from "xpnet-web3-contracts";
+  UserNFTStore,
+  UserNFTStore__factory,
+} from "../../../XP.network-HECO-Migration";
+
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -52,6 +56,7 @@ import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../services/notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
+
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -81,8 +86,7 @@ export interface IsApproved<Sender> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber,
-    gasPrice?: ethers.BigNumber
+    toApprove: string
   ): Promise<boolean>;
 }
 
@@ -91,7 +95,8 @@ export interface Approve<Sender> {
     address: NftInfo<EthNftInfo>,
     sender: Sender,
     txFee: BigNumber,
-    gasPrice?: ethers.BigNumber
+    gasPrice?: ethers.BigNumber,
+    toApprove?: string
   ): Promise<string | undefined>;
 }
 
@@ -155,11 +160,29 @@ export type Web3Helper = BaseWeb3Helper &
   GetTokenURI &
   ParamsGetter<Web3Params>;
 
+enum BridgeTypes {
+  Minter,
+  UserStorage,
+}
+
+type MinterBridge = {
+  address: string;
+  contract: Minter;
+};
+
+type UserStorageBridge = {
+  getForContract(contract: string): Promise<{
+    address: string;
+    contract: UserNFTStore;
+  }>;
+};
+
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
  * @param provider An ethers.js provider object
  */
+
 export async function baseWeb3HelperFactory(
   provider: Provider,
   nonce: number
@@ -357,7 +380,32 @@ export async function web3HelperFactory(
 
   const w3 = params.provider;
   const { minter_addr, provider } = params;
-  const minter = Minter__factory.connect(minter_addr, provider);
+
+  function Bridge<T>(type: BridgeTypes): T {
+    const res = {
+      [BridgeTypes.Minter]: {
+        address: minter_addr,
+        contract: Minter__factory.connect(minter_addr, provider),
+      },
+      [BridgeTypes.UserStorage]: {
+        getForContract: async (contract: string) => {
+          const address = await params.notifier.createCollectionContract(
+            contract,
+            params.nonce
+          );
+
+          return {
+            address,
+            contract: UserNFTStore__factory.connect(address, provider),
+          };
+        },
+      },
+    };
+    //@ts-ignore
+    return res[type];
+  }
+
+  const minter = Bridge<MinterBridge>(BridgeTypes.Minter).contract;
 
   async function notifyValidator(
     fromHash: string,
@@ -403,6 +451,7 @@ export async function web3HelperFactory(
 
   async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
+    const minter = Bridge<MinterBridge>(BridgeTypes.Minter).contract;
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
       throw Error("Couldn't extract action_id");
@@ -415,18 +464,14 @@ export async function web3HelperFactory(
 
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
-    signer: Signer
+    signer: Signer,
+    toApprove: string
   ) => {
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
       signer
     );
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
+
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
       await signer.getAddress(),
@@ -440,9 +485,20 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     sender: Signer,
     _txFees: BigNumber,
-    gasPrice: ethers.BigNumberish | undefined
+    gasPrice: ethers.BigNumberish | undefined,
+    toApprove?: string
   ) => {
-    const isApproved = await isApprovedForMinter(id, sender);
+    if (!toApprove) {
+      toApprove =
+        params.nonce !== 0x1d
+          ? minter_addr
+          : id.native.uri.includes("herokuapp.com")
+          ? params.minter_addr
+          : params.erc721_addr;
+    }
+
+    const isApproved = await isApprovedForMinter(id, sender, toApprove);
+
     if (isApproved) {
       return undefined;
     }
@@ -450,13 +506,6 @@ export async function web3HelperFactory(
       id.native.contract,
       sender
     );
-
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
 
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
@@ -498,7 +547,8 @@ export async function web3HelperFactory(
     async preTransferRawTxn(id, address, _value) {
       const isApproved = await isApprovedForMinter(
         id,
-        new VoidSigner(address, provider)
+        new VoidSigner(address, provider),
+        minter_addr
       );
 
       if (isApproved) {
@@ -555,16 +605,6 @@ export async function web3HelperFactory(
       await txnUnderpricedPolyWorkaround(tx);
       const res = await signer.sendTransaction(tx);
 
-      // await notifyValidator(
-      //   res.hash,
-      //   await extractAction(res),
-      //   "Unfreeze",
-      //   chainNonce.toString(),
-      //   txFees.toString(),
-      //   await signer.getAddress(),
-      //   to,
-      //   res.data
-      // );
       await notifyValidator(res.hash);
 
       return res;
@@ -577,6 +617,12 @@ export async function web3HelperFactory(
       mintWith,
       txFees
     ) {
+      const { contract: minter, address } = await Bridge<UserStorageBridge>(
+        BridgeTypes.UserStorage
+      ).getForContract(nfts[0].native.contract);
+
+      await approveForMinter(nfts[0], signer, txFees, undefined, address);
+
       const tx = await minter
         .connect(signer)
         .populateTransaction.freezeErc1155Batch(
@@ -621,7 +667,12 @@ export async function web3HelperFactory(
       gasLimit: ethers.BigNumberish | undefined = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      const { contract: minter, address } = await Bridge<UserStorageBridge>(
+        BridgeTypes.UserStorage
+      ).getForContract(id.native.contract);
+
+      await approveForMinter(id, sender, txFees, gasPrice, address);
+
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       // Chain is Hedera
