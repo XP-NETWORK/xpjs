@@ -164,7 +164,7 @@ export async function web3ERC20HelperFactory(
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
     signer: Signer,
-    _txFees: BigNumber
+    _: string
   ) => {
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
@@ -185,7 +185,7 @@ export async function web3ERC20HelperFactory(
     txFees: BigNumber,
     gasPrice: ethers.BigNumberish | undefined
   ) => {
-    const isApproved = await isApprovedForMinter(id, sender, txFees);
+    const isApproved = await isApprovedForMinter(id, sender, minter_addr);
     if (isApproved) {
       return undefined;
     }
@@ -245,7 +245,7 @@ export async function web3ERC20HelperFactory(
       const isApproved = await isApprovedForMinter(
         id,
         new VoidSigner(address, provider),
-        _value!
+        minter_addr
       );
 
       if (isApproved) {
