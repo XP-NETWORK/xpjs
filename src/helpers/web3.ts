@@ -37,7 +37,7 @@ import {
   UserNftMinter__factory,
   UserNFTStore,
   UserNFTStore__factory,
-} from "../../../XP.network-HECO-Migration";
+} from "xpnet-web3-contracts";
 
 import {
   ChainNonceGet,
@@ -451,7 +451,6 @@ export async function web3HelperFactory(
 
   async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
-    const minter = Bridge<MinterBridge>(BridgeTypes.Minter).contract;
     const log = receipt.logs.find((log) => log.address === minter.address);
     if (log === undefined) {
       throw Error("Couldn't extract action_id");
@@ -488,6 +487,7 @@ export async function web3HelperFactory(
     gasPrice: ethers.BigNumberish | undefined,
     toApprove?: string
   ) => {
+    console.log(toApprove, "toApprove");
     if (!toApprove) {
       toApprove =
         params.nonce !== 0x1d
