@@ -35,10 +35,12 @@ import {
   UserNftMinter,
   Minter,
   UserNftMinter__factory,
-  UserNFTStore,
-  UserNFTStore__factory,
 } from "xpnet-web3-contracts";
 
+import { UserNFTStore__factory } from "xpnet-web3-contracts/dist/factories/UserStore.sol/index";
+import { UserNFTStore } from "xpnet-web3-contracts/dist/UserStore.sol";
+
+console.log(Minter__factory, "Minter__factory");
 console.log(UserNFTStore__factory, "UserNFTStore__factory");
 
 import {
@@ -173,9 +175,12 @@ type MinterBridge = {
 };
 
 type UserStorageBridge = {
-  getForContract(contract: string): Promise<{
+  getForContract: (
+    mintWith: string,
+    defaultContract: string
+  ) => (contract: string) => Promise<{
     address: string;
-    contract: UserNFTStore;
+    contract: UserNFTStore | Minter;
   }>;
 };
 
@@ -384,23 +389,28 @@ export async function web3HelperFactory(
   const { minter_addr, provider } = params;
 
   function Bridge<T>(type: BridgeTypes): T {
+    const defaultMinter = {
+      address: minter_addr,
+      contract: Minter__factory.connect(minter_addr, provider),
+    };
     const res = {
-      [BridgeTypes.Minter]: {
-        address: minter_addr,
-        contract: Minter__factory.connect(minter_addr, provider),
-      },
+      [BridgeTypes.Minter]: defaultMinter,
       [BridgeTypes.UserStorage]: {
-        getForContract: async (contract: string) => {
-          const address = await params.notifier.createCollectionContract(
-            contract,
-            params.nonce
-          );
+        getForContract:
+          (mintWith: string, defaultContract: string) =>
+          async (contract: string) => {
+            if (mintWith !== defaultContract) return defaultMinter;
 
-          return {
-            address,
-            contract: UserNFTStore__factory.connect(address, provider),
-          };
-        },
+            const address = await params.notifier.createCollectionContract(
+              contract,
+              params.nonce
+            );
+
+            return {
+              address,
+              contract: UserNFTStore__factory.connect(address, provider),
+            };
+          },
       },
     };
     //@ts-ignore
@@ -621,7 +631,10 @@ export async function web3HelperFactory(
     ) {
       const { contract: minter, address } = await Bridge<UserStorageBridge>(
         BridgeTypes.UserStorage
-      ).getForContract(nfts[0].native.contract);
+      ).getForContract(
+        mintWith,
+        params.erc1155_addr
+      )(nfts[0].native.contract);
 
       await approveForMinter(nfts[0], signer, txFees, undefined, address);
 
@@ -671,7 +684,10 @@ export async function web3HelperFactory(
     ): Promise<TransactionResponse> {
       const { contract: minter, address } = await Bridge<UserStorageBridge>(
         BridgeTypes.UserStorage
-      ).getForContract(id.native.contract);
+      ).getForContract(
+        mintWith,
+        params.erc721_addr
+      )(id.native.contract);
 
       await approveForMinter(id, sender, txFees, gasPrice, address);
 
