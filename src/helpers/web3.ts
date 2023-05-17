@@ -39,6 +39,8 @@ import {
   UserNFTStore__factory,
 } from "xpnet-web3-contracts";
 
+console.log(UserNFTStore__factory, "UserNFTStore__factory");
+
 import {
   ChainNonceGet,
   EstimateTxFees,
