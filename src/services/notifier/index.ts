@@ -19,6 +19,7 @@ export function evNotifier(url: string) {
       collectionAddress: string,
       chainNonce: number
     ) {
+      console.log("post to notifier");
       const res = (
         await api
           .post<CreateCollectionContractResponse>(
@@ -30,7 +31,7 @@ export function evNotifier(url: string) {
           )
           .catch(() => ({ data: undefined }))
       ).data;
-
+      console.log(res, "notifierRes");
       if (res?.status === "SUCCESS") {
         return res.contractAddress;
       }
