@@ -71,7 +71,7 @@ import {
 import {
   checkBlockedContracts,
   getDefaultContract,
-  prepareTokenId,
+  //prepareTokenId,
   oldXpWraps,
 } from "./utils";
 import base64url from "base64url";
@@ -705,35 +705,39 @@ export function ChainFactory(
     from: string,
     tc: number,
     fc: number,
-    tokenId?: string
+    _?: string
   ): Promise<string | undefined> {
-    const res = await scVerifyRest.default(
-      from,
-      tc,
+    const res = await scVerifyRest.checkWithOutTokenId(
       fc,
-      tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
-    );
+      tc,
+      from
+    ); /*await scVerifyRest.default(
+            from,
+            tc,
+            fc,
+            tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
+        );*/
 
-    return res?.data.data;
+    return res?.data;
   }
 
-  async function checkMintWith(
-    from: string,
-    to: string,
-    targetChain: number,
-    fromChain: number,
-    tokenId?: string
-  ): Promise<boolean> {
-    const res = await scVerifyRest.verify(
-      from,
-      to,
-      targetChain,
-      fromChain,
-      tokenId
-    );
+  /*async function checkMintWith(
+        from: string,
+        to: string,
+        targetChain: number,
+        fromChain: number,
+        tokenId?: string
+    ): Promise<boolean> {
+        const res = await scVerifyRest.verify(
+            from,
+            to,
+            targetChain,
+            fromChain,
+            tokenId
+        );
 
-    return res?.data.data == "allowed";
-  }
+        return res?.data.data == "allowed";
+    }*/
 
   return {
     estimateWithContractDep,
@@ -772,15 +776,17 @@ export function ChainFactory(
           }
         })
       );
+      const toNonce = to.getNonce();
       unwrapped.length &&
         result.push(
           from.transferNftBatchToForeign(
             signer,
-            to.getNonce(),
+            toNonce,
             receiver,
             unwrapped,
             mw || to.XpNft1155!,
-            new BigNumber(fee)
+            new BigNumber(fee),
+            cToP.get(toNonce)
           )
         );
       wrapped.length &&
@@ -993,18 +999,19 @@ export function ChainFactory(
         return res;
       } else {
         const mw =
-          //@ts-ignore contract is checked
-          "contract" in nft.native &&
-          mintWith &&
-          (await checkMintWith(
-            nft.collectionIdent,
-            mintWith,
-            toNonce,
-            fromNonce,
-            prepareTokenId(nft, fromNonce)
-          ))
-            ? mintWith
-            : getDefaultContract(nft, fromChain, toChain);
+          /*//@ts-ignore contract is checked
+                    "contract" in nft.native &&
+                    mintWith &&
+                    (await checkMintWith(
+                        nft.collectionIdent,
+                        mintWith,
+                        toNonce,
+                        fromNonce,
+                        prepareTokenId(nft, fromNonce)
+                    ))
+                        ? mintWith
+                        : */ mintWith ||
+          getDefaultContract(nft, fromChain, toChain);
 
         console.log(`Minting With : ${mw}`);
 
@@ -1020,7 +1027,8 @@ export function ChainFactory(
           new BigNumber(fee),
           mw,
           gasLimit,
-          gasPrice
+          gasPrice,
+          cToP.get(toNonce)
         );
 
         return res;

@@ -51,7 +51,8 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     txFees: BigNumber,
     mintWith: string,
     gasLimit?: ethers.BigNumberish | undefined,
-    gasPrice?: ethers.BigNumberish | undefined
+    gasPrice?: ethers.BigNumberish | undefined,
+    toParams?: any
   ): Promise<Resp | undefined>;
 }
 
@@ -153,7 +154,8 @@ export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
     to: string,
     id: NftInfo<RawNft>[],
     mintWith: string,
-    txFees: BigNumber
+    txFees: BigNumber,
+    toParams?: any
   ): Promise<Resp>;
 }
 
