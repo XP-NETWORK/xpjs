@@ -54,7 +54,7 @@ import { EvNotifier } from "../../services/notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 
-import { HEDERA_PROXY_ABI } from "./hts_abi";
+import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
 
 type HSDK = typeof import("@hashgraph/sdk");
 let hashSDK: HSDK;
@@ -367,6 +367,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
 export async function web3HelperFactory(
   params: Web3Params & {
     htcToken: string;
+    Xpnfthtsclaims: string;
     evmProvider: ethers.providers.JsonRpcProvider;
   }
 ): Promise<Web3Helper> {
@@ -777,13 +778,13 @@ export async function web3HelperFactory(
       return minter.nftWhitelist(nft.native.contract);
     },
     async listHederaClaimableNFT(
-      proxyContract = params.erc721_addr,
+      proxyContract = params.Xpnfthtsclaims,
       htsToken = params.htcToken,
       signer
     ) {
       const constract = new ethers.Contract(
         proxyContract,
-        HEDERA_PROXY_ABI,
+        HEDERA_PROXY_CLAIMS_ABI,
         params.evmProvider
       );
       return await constract.getClaimableNfts(signer.address, htsToken, {
