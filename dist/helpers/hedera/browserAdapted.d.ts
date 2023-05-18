@@ -117,6 +117,7 @@ type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> 
 export declare const NFT_METHOD_MAP: NftMethodMap;
 export declare function web3HelperFactory(params: Web3Params & {
     htcToken: string;
+    Xpnfthtsclaims: string;
     evmProvider: ethers.providers.JsonRpcProvider;
 }): Promise<Web3Helper>;
 export {};
