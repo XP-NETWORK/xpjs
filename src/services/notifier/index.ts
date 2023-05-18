@@ -2,7 +2,7 @@ import axios from "axios";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 
-type CreateCollectionContractResponse = {
+type CollectionContractResponse = {
   contractAddress: string;
   collectionAddress: string;
   chainNonce: number;
@@ -15,23 +15,36 @@ export function evNotifier(url: string) {
   });
 
   return {
-    async createCollectionContract(
-      collectionAddress: string,
-      chainNonce: number
-    ) {
-      console.log("post to notifier");
+    async getCollectionContract(collectionAddress: string, chainNonce: number) {
       const res = (
         await api
-          .post<CreateCollectionContractResponse>(
-            "/create-collection-contract",
-            {
-              chainNonce,
-              collectionAddress,
-            }
+          .get<CollectionContractResponse>(
+            `/collection-contract/${collectionAddress}/${chainNonce}`
           )
           .catch(() => ({ data: undefined }))
       ).data;
-      console.log(res, "notifierRes");
+
+      if (res?.status === "SUCCESS") {
+        return res.contractAddress;
+      }
+
+      return false;
+    },
+    async createCollectionContract(
+      collectionAddress: string,
+      chainNonce: number,
+      type: string
+    ) {
+      const res = (
+        await api
+          .post<CollectionContractResponse>("/collection-contract", {
+            chainNonce,
+            collectionAddress,
+            type,
+          })
+          .catch(() => ({ data: undefined }))
+      ).data;
+
       if (res?.status === "SUCCESS") {
         return res.contractAddress;
       }

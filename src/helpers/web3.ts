@@ -60,6 +60,7 @@ import { ChainNonce } from "../type-utils";
 import { EvNotifier } from "../services/notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
+import { ScVerifyService } from "../services/scVerify";
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -175,10 +176,10 @@ type MinterBridge = {
 };
 
 type UserStorageBridge = {
-  getForContract: (
-    mintWith: string,
-    defaultContract: string
-  ) => (contract: string) => Promise<{
+  getMinterForCollection: (isMapped: boolean) => (
+    collection: string,
+    type: string
+  ) => Promise<{
     address: string;
     contract: UserNFTStore | Minter;
   }>;
@@ -254,6 +255,7 @@ export interface Web3Params {
   erc1155Minter: string;
   nonce: ChainNonce;
   feeMargin: FeeMargins;
+  scVerifyRest: ScVerifyService;
 }
 
 type NftMethodVal<T, Tx> = {
@@ -396,14 +398,26 @@ export async function web3HelperFactory(
     const res = {
       [BridgeTypes.Minter]: defaultMinter,
       [BridgeTypes.UserStorage]: {
-        getForContract:
-          (mintWith: string, defaultContract: string) =>
-          async (contract: string) => {
-            if (mintWith !== defaultContract) return defaultMinter;
+        getMinterForCollection:
+          (isMapped: boolean) => async (collection: string, type: string) => {
+            if (isMapped) {
+              const address = await params.notifier.getCollectionContract(
+                collection,
+                params.nonce
+              );
+              if (address) {
+                return {
+                  address,
+                  contract: UserNFTStore__factory.connect(address, provider),
+                };
+              }
+              return defaultMinter;
+            }
 
             const address = await params.notifier.createCollectionContract(
-              contract,
-              params.nonce
+              collection,
+              params.nonce,
+              type
             );
 
             return {
@@ -627,14 +641,15 @@ export async function web3HelperFactory(
       to,
       nfts,
       mintWith,
-      txFees
+      txFees,
+      toParams: Web3Params
     ) {
       const { contract: minter, address } = await Bridge<UserStorageBridge>(
         BridgeTypes.UserStorage
-      ).getForContract(
-        mintWith,
-        params.erc1155_addr
-      )(nfts[0].native.contract);
+      ).getMinterForCollection(mintWith !== toParams.erc1155_addr)(
+        nfts[0].native.contract,
+        nfts[0].native.contractType
+      );
 
       await approveForMinter(nfts[0], signer, txFees, undefined, address);
 
@@ -680,14 +695,15 @@ export async function web3HelperFactory(
       txFees: BigNumber,
       mintWith: string,
       gasLimit: ethers.BigNumberish | undefined = undefined,
-      gasPrice
+      gasPrice,
+      toParams: Web3Params
     ): Promise<TransactionResponse> {
       const { contract: minter, address } = await Bridge<UserStorageBridge>(
         BridgeTypes.UserStorage
-      ).getForContract(
-        mintWith,
-        params.erc721_addr
-      )(id.native.contract);
+      ).getMinterForCollection(mintWith !== toParams.erc721_addr)(
+        id.native.contract,
+        id.native.contractType
+      );
 
       await approveForMinter(id, sender, txFees, gasPrice, address);
 
