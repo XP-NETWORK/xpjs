@@ -1,7 +1,7 @@
 import { Chain, CHAIN_INFO, ChainType } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
-import { Web3Params } from "../helpers/web3";
+import { Web3Params } from "../helpers/evm/web3";
 
 export * from "./utils";
 export * from "./factories";
@@ -57,8 +57,8 @@ import { NearParams } from "../helpers/near";
 import { SecretParams } from "../helpers/secret";
 import { SolanaParams } from "../helpers/solana";
 import { TezosParams } from "../helpers/tezos";
-import { TonParams } from "../helpers/ton";
-import { Web3ERC20Params } from "../helpers/web3_erc20";
+import { TonParams } from "../helpers/ton/ton";
+import { Web3ERC20Params } from "../helpers/evm/web3_erc20";
 import {
   ChainNonce,
   HelperMap,

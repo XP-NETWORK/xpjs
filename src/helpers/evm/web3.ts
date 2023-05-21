@@ -16,7 +16,7 @@ import {
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
   ParamsGetter,
-} from "./chain";
+} from "../chain";
 import {
   BigNumber as EthBN,
   ContractTransaction,
@@ -55,12 +55,12 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
-} from "..";
-import { ChainNonce } from "../type-utils";
-import { EvNotifier } from "../services/notifier";
-import axios from "axios";
+} from "../..";
+import { ChainNonce } from "../../type-utils";
+import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
-import { ScVerifyService } from "../services/scVerify";
+import { ScVerifyService } from "../../services/scVerify";
+import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -110,6 +110,26 @@ hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
 };
 
 type NullableCustomData = Record<string, any> | undefined;
+
+enum BridgeTypes {
+  Minter,
+  UserStorage,
+}
+
+type MinterBridge = {
+  address: string;
+  contract: Minter;
+};
+
+type UserStorageBridge = {
+  getMinterForCollection: (isMapped: boolean) => (
+    collection: string,
+    type: string
+  ) => Promise<{
+    address: string;
+    contract: UserNFTStore | Minter;
+  }>;
+};
 
 /**
  * Base util traits
@@ -164,26 +184,6 @@ export type Web3Helper = BaseWeb3Helper &
   IsContractAddress &
   GetTokenURI &
   ParamsGetter<Web3Params>;
-
-enum BridgeTypes {
-  Minter,
-  UserStorage,
-}
-
-type MinterBridge = {
-  address: string;
-  contract: Minter;
-};
-
-type UserStorageBridge = {
-  getMinterForCollection: (isMapped: boolean) => (
-    collection: string,
-    type: string
-  ) => Promise<{
-    address: string;
-    contract: UserNFTStore | Minter;
-  }>;
-};
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -362,34 +362,9 @@ export async function web3HelperFactory(
   params: Web3Params
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
-    params.nonce == 7
-      ? async (utx: PopulatedTransaction) => {
-          const res = await axios
-            .get(
-              "https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=pendingpooltxgweidata"
-            )
-            .catch(async () => {
-              return await axios.get(
-                "https://gasstation-mainnet.matic.network/v2"
-              );
-            });
-          const { result, fast } = res.data;
-          const trackerGas = result?.rapidgaspricegwei || fast?.maxFee;
-
-          if (trackerGas) {
-            const sixtyGwei = ethers.utils.parseUnits(
-              Math.ceil(trackerGas).toString(),
-              "gwei"
-            );
-            utx.maxFeePerGas = sixtyGwei;
-            utx.maxPriorityFeePerGas = sixtyGwei;
-          }
-        }
-      : () => Promise.resolve();
-
+    params.nonce == 7 ? UnderpricedWorkaround : () => Promise.resolve();
   const w3 = params.provider;
   const { minter_addr, provider } = params;
-
   function Bridge<T>(type: BridgeTypes): T {
     const defaultMinter = {
       address: minter_addr,
@@ -430,9 +405,7 @@ export async function web3HelperFactory(
     //@ts-ignore
     return res[type];
   }
-
   const minter = Bridge<MinterBridge>(BridgeTypes.Minter).contract;
-
   async function notifyValidator(
     fromHash: string,
     actionId?: string,
@@ -459,7 +432,6 @@ export async function web3HelperFactory(
       contract
     );
   }
-
   //@ts-ignore
   async function getTransaction(hash: string) {
     let trx;
@@ -474,7 +446,6 @@ export async function web3HelperFactory(
 
     return trx as TransactionResponse;
   }
-
   async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
@@ -486,7 +457,6 @@ export async function web3HelperFactory(
     const action_id: string = evdat.args[0].toString();
     return action_id;
   }
-
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
     signer: Signer,
@@ -505,7 +475,6 @@ export async function web3HelperFactory(
       params.nonce === 0x1d ? {} : undefined
     );
   };
-
   const approveForMinter = async (
     id: NftInfo<EthNftInfo>,
     sender: Signer,
@@ -513,7 +482,6 @@ export async function web3HelperFactory(
     gasPrice: ethers.BigNumberish | undefined,
     toApprove?: string
   ) => {
-    console.log(toApprove, "toApprove");
     if (!toApprove) {
       toApprove =
         params.nonce !== 0x1d
@@ -544,7 +512,6 @@ export async function web3HelperFactory(
     await receipt.wait();
     return receipt.hash;
   };
-
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
 
   return {

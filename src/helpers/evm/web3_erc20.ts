@@ -7,7 +7,6 @@ import {
   BigNumber as EthBN,
   ContractTransaction,
   ethers,
-  PopulatedTransaction,
   Signer,
   VoidSigner,
   Wallet,
@@ -28,8 +27,8 @@ import {
   TransactionStatus,
   Web3Helper,
   Web3Params,
-} from "..";
-import axios from "axios";
+} from "../..";
+import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -80,30 +79,7 @@ export async function web3ERC20HelperFactory(
   params: Web3ERC20Params
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
-    params.nonce == 7
-      ? async (utx: PopulatedTransaction) => {
-          const res = await axios
-            .get(
-              "https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=pendingpooltxgweidata"
-            )
-            .catch(async () => {
-              return await axios.get(
-                "https://gasstation-mainnet.matic.network/v2"
-              );
-            });
-          const { result, fast } = res.data;
-          const trackerGas = result?.rapidgaspricegwei || fast?.maxFee;
-
-          if (trackerGas) {
-            const sixtyGwei = ethers.utils.parseUnits(
-              Math.ceil(trackerGas).toString(),
-              "gwei"
-            );
-            utx.maxFeePerGas = sixtyGwei;
-            utx.maxPriorityFeePerGas = sixtyGwei;
-          }
-        }
-      : () => Promise.resolve();
+    params.nonce == 7 ? UnderpricedWorkaround : () => Promise.resolve();
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   const minter = MinterERC20__factory.connect(minter_addr, provider);
