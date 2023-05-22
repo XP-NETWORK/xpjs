@@ -28,13 +28,15 @@ export function evNotifier(url: string) {
         return res.contractAddress;
       }
 
-      return false;
+      return "";
     },
     async createCollectionContract(
       collectionAddress: string,
       chainNonce: number,
       type: string
     ) {
+      const error = new Error("Failed to Create Collection");
+      error.name = "FAIL";
       const res = (
         await api
           .post<CollectionContractResponse>("/collection-contract", {
@@ -46,9 +48,22 @@ export function evNotifier(url: string) {
       ).data;
 
       if (res?.status === "SUCCESS") {
-        return res.contractAddress;
+        let contractAddress = "";
+        const errorTimeout = setTimeout(() => {
+          throw error;
+        }, 120_000);
+        while (!contractAddress) {
+          await new Promise((r) => setTimeout(r, 20_000));
+          contractAddress = await this.getCollectionContract(
+            collectionAddress,
+            chainNonce
+          );
+        }
+        clearTimeout(errorTimeout);
+        return contractAddress;
       }
-      throw new Error("Failed to create collection");
+
+      throw error;
     },
     async notifyWeb3(
       fromChain: number,
