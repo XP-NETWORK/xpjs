@@ -48,7 +48,7 @@ export function evNotifier(url: string) {
       ).data;
 
       if (res?.status === "SUCCESS") {
-        let contractAddress = "";
+        let contractAddress = res?.contractAddress || "";
         const errorTimeout = setTimeout(() => {
           throw error;
         }, 120_000);
