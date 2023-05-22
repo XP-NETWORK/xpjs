@@ -59,7 +59,6 @@ import {
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
-import { ScVerifyService } from "../../services/scVerify";
 import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
 
 /**
@@ -255,7 +254,6 @@ export interface Web3Params {
   erc1155Minter: string;
   nonce: ChainNonce;
   feeMargin: FeeMargins;
-  scVerifyRest: ScVerifyService;
 }
 
 type NftMethodVal<T, Tx> = {
@@ -375,30 +373,34 @@ export async function web3HelperFactory(
       [BridgeTypes.UserStorage]: {
         getMinterForCollection:
           (isMapped: boolean) => async (collection: string, type: string) => {
-            if (isMapped) {
-              const address = await params.notifier.getCollectionContract(
-                collection,
-                params.nonce
-              );
-              if (address) {
-                return {
-                  address,
-                  contract: UserNFTStore__factory.connect(address, provider),
-                };
+            try {
+              if (isMapped) {
+                const address = await params.notifier.getCollectionContract(
+                  collection,
+                  params.nonce
+                );
+                if (address) {
+                  return {
+                    address,
+                    contract: UserNFTStore__factory.connect(address, provider),
+                  };
+                }
+                return defaultMinter;
               }
+
+              const address = await params.notifier.createCollectionContract(
+                collection,
+                params.nonce,
+                type
+              );
+
+              return {
+                address,
+                contract: UserNFTStore__factory.connect(address, provider),
+              };
+            } catch (e) {
               return defaultMinter;
             }
-
-            const address = await params.notifier.createCollectionContract(
-              collection,
-              params.nonce,
-              type
-            );
-
-            return {
-              address,
-              contract: UserNFTStore__factory.connect(address, provider),
-            };
           },
       },
     };
