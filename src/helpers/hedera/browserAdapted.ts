@@ -400,6 +400,7 @@ export async function web3HelperFactory(
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
+  const hashioMinter = Minter__factory.connect(minter_addr, params.evmProvider);
 
   async function notifyValidator(
     fromHash: string,
@@ -775,19 +776,21 @@ export async function web3HelperFactory(
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
     isNftWhitelisted(nft) {
-      return minter.nftWhitelist(nft.native.contract);
+      return hashioMinter.nftWhitelist(nft.native.contract, {
+        gasLimit: 1000000,
+      });
     },
     async listHederaClaimableNFT(
       proxyContract = params.Xpnfthtsclaims,
       htsToken = params.htcToken,
       signer
     ) {
-      const constract = new ethers.Contract(
+      const contract = new ethers.Contract(
         proxyContract,
         HEDERA_PROXY_CLAIMS_ABI,
         params.evmProvider
       );
-      return await constract.getClaimableNfts(signer.address, htsToken, {
+      return await contract.getClaimableNfts(signer.address, htsToken, {
         gasLimit: 1000000,
       });
 
