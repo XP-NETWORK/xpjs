@@ -16,7 +16,6 @@ import { FeeMargins } from "../helpers/chain";
 import { signatureService } from "../services/estimator";
 import { whitelistedService } from "../services/whitelisted";
 import { AppConfigs } from "..";
-import { scVerify } from "../services/scVerify";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -46,7 +45,6 @@ export namespace ChainFactoryConfigs {
     const feeMargin = { min: 1, max: 5 };
 
     const notifier = evNotifier(testnet_middleware_uri);
-    const scVerifyRest = scVerify(AppConfigs.TestNet().scVerifyUri);
 
     // VeChain related:
     const net = new SimpleNet(TestNetRpcUri.VECHAIN);
@@ -92,7 +90,7 @@ export namespace ChainFactoryConfigs {
       },
       vechainParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         nonce: Chain.VECHAIN,
         provider,
@@ -120,7 +118,7 @@ export namespace ChainFactoryConfigs {
       },
       caduceusParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.CADUCEUS),
         erc1155_addr: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
@@ -132,7 +130,7 @@ export namespace ChainFactoryConfigs {
       },
       avalancheParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AVALANCHE),
         minter_addr: "0xDdF1f6B8Ae8cd26dBE7C4C3ed9ac8E6D8B3a4FdC",
         erc721_addr: "0xE1D8Df2e06797F22e7ce25c95A7ddccb926f8A1E",
@@ -144,7 +142,7 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.POLYGON),
         minter_addr: "0x224f78681099D66ceEdf4E52ee62E5a98CCB4b9e",
         erc721_addr: "0xb678b13E41a47e46A4046a4D8315b32E0F34389c",
@@ -168,7 +166,7 @@ export namespace ChainFactoryConfigs {
       moonbeamParams: {
         nonce: Chain.MOONBEAM,
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.MOONBEAM),
         erc721Minter: "0x1F71E80E1E785dbDB34c69909C11b71bAd8D9802",
@@ -190,7 +188,7 @@ export namespace ChainFactoryConfigs {
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ABEYCHAIN),
         erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
@@ -201,7 +199,7 @@ export namespace ChainFactoryConfigs {
       },
       fantomParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FANTOM),
         minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
         erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
@@ -213,7 +211,7 @@ export namespace ChainFactoryConfigs {
       },
       bscParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BSC),
         minter_addr: "0x3Dd26fFf61D2a79f5fB77100d6daDBF073F334E6",
         erc721_addr: "0x783eF7485DCF27a3Cf59F5A0A406eEe3f9b2AaeB",
@@ -225,7 +223,7 @@ export namespace ChainFactoryConfigs {
       },
       celoParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.CELO),
         minter_addr: "0x9a287810bA8F0564DaDd9F2Ea9B7B2459497416B",
         erc721_addr: "0x3F51015C76D7A64514E9B86D500bBFD44F95bdE9",
@@ -237,7 +235,7 @@ export namespace ChainFactoryConfigs {
       },
       harmonyParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HARMONY),
         minter_addr: "0x198Cae9EE853e7b44E99c0b35Bddb451F83485d5",
         erc721_addr: "0x1280c5c11bF0aAaaEAeBc998893B42e08B26fD5A",
@@ -249,7 +247,7 @@ export namespace ChainFactoryConfigs {
       },
       ropstenParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ROPSTEN),
         erc1155_addr: "0x46Df0d0Dd629d61BDFA567dE61912FDeD883A60d",
         erc721_addr: "0x33DC209D33AddF60cf90Dd4B10f9a198A1A93f63",
@@ -268,7 +266,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -280,7 +278,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.ARBITRUM,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ARBITRUM),
       },
       bitgertParams: {
@@ -292,7 +290,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.BITGERT,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BITGERT),
       },
       xDaiParams: {
@@ -304,7 +302,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
         erc1155_addr: "0x1C6d7aa611B30C9C1e5f52068E145b77b0e661b2",
         nonce: Chain.XDAI,
-        scVerifyRest,
+
         feeMargin,
       },
       algorandParams: {
@@ -322,7 +320,7 @@ export namespace ChainFactoryConfigs {
       },
       auroraParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.AURORA),
         erc721_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
         minter_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
@@ -341,7 +339,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "string",
         erc721Minter: "string",
         notifier,
-        scVerifyRest,
+
         feeMargin,
       },
       tezosParams: {
@@ -358,7 +356,7 @@ export namespace ChainFactoryConfigs {
       },
       velasParams: {
         notifier,
-        scVerifyRest,
+
         erc721_addr: "0xE657b66d683bF4295325c5E66F6bb0fb6D1F7551",
         erc1155_addr: "0x5D822bA2a0994434392A0f947C83310328CFB0DE",
         minter_addr: "0x5051679FEDf0D7F01Dc23e72674d0ED58de9be6a",
@@ -370,7 +368,7 @@ export namespace ChainFactoryConfigs {
       },
       iotexParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.IOTEX),
         minter_addr: "0xE657b66d683bF4295325c5E66F6bb0fb6D1F7551",
         erc721_addr: "0x5D822bA2a0994434392A0f947C83310328CFB0DE",
@@ -382,12 +380,11 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-        scVerifyRest,
+
         provider: hethers.getDefaultProvider("testnet") as any,
         evmProvider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
-        Xpnfthtsclaims: "",
         htcToken: "0x00000000000000000000000000000000003b22a5",
         erc721_addr: "0x00000000000000000000000000000000003b2294",
         erc1155_addr: "0x00000000000000000000000000000000003b2294",
@@ -398,7 +395,7 @@ export namespace ChainFactoryConfigs {
       skaleParams: {
         nonce: Chain.SKALE,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.SKALE),
         feeMargin,
         erc1155_addr: "0x57d2Ad1a14C77627D5f82B7A0F244Cfe391e59C5",
@@ -410,7 +407,7 @@ export namespace ChainFactoryConfigs {
       },
       godwokenParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.GODWOKEN),
         minter_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
         erc721_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
@@ -422,7 +419,7 @@ export namespace ChainFactoryConfigs {
       },
       gateChainParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.GATECHAIN),
         minter_addr: "0x2B24de7BFf5d2ab01b1C53682Ee5987c9BCf1BAc",
         erc721_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
@@ -473,7 +470,6 @@ export namespace ChainFactoryConfigs {
   export const Staging: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin: FeeMargins = { min: 1, max: 5 };
     const notifier = evNotifier("https://bridge1.xp.network/notifier");
-    const scVerifyRest = scVerify(AppConfigs.Staging().scVerifyUri);
 
     return {
       tonParams: {
@@ -488,7 +484,6 @@ export namespace ChainFactoryConfigs {
         ),
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
-        scVerifyRest,
       },
       nearParams: {
         networkId: "mainnet",
@@ -513,22 +508,21 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-        scVerifyRest,
+
         provider: hethers.getDefaultProvider() as any,
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
-        Xpnfthtsclaims: "0x000000000000000000000000000000000026eb9e",
-        htcToken: "0x000000000000000000000000000000000026EfFC",
-        erc721_addr: "0x000000000000000000000000000000000026eb6d",
-        erc1155_addr: "0x000000000000000000000000000000000026eb6d",
+        htcToken: "0x0000000000000000000000000000000000230872",
+        erc721_addr: "0x000000000000000000000000000000000023084a",
+        erc1155_addr: "0x000000000000000000000000000000000023084a",
         minter_addr: "0x00000000000000000000000000000000002308b6",
         erc721Minter: "",
         erc1155Minter: "",
       },
       caduceusParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CADUCEUS),
         erc1155_addr: "0x820c0b504fe85b43E3c43D2EA24cb764ad78d52e",
@@ -540,7 +534,7 @@ export namespace ChainFactoryConfigs {
       },
       avalancheParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
         erc721Minter: "0xb3cE27eDadFE006f9f47C5ed5b62E63DFd9Cf3bD",
         erc1155Minter: "0x23d399368EF31ca950E4Fd2063F2e4A5ACC0f9c2",
@@ -564,7 +558,7 @@ export namespace ChainFactoryConfigs {
       },
       fantomParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
         erc721Minter: "",
         erc1155Minter: "",
@@ -588,7 +582,7 @@ export namespace ChainFactoryConfigs {
       },
       harmonyParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HARMONY),
         minter_addr: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
         erc721_addr: "0x23d399368EF31ca950E4Fd2063F2e4A5ACC0f9c2",
@@ -600,7 +594,7 @@ export namespace ChainFactoryConfigs {
       },
       velasParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
         erc721Minter: "0x4d739e4953CE42f71604cbE142FD293841F9ed1c",
         erc1155Minter: "0xeEc7955F2F7AA4E36B582D8f022c9417ecB75a44",
@@ -612,7 +606,7 @@ export namespace ChainFactoryConfigs {
       },
       bscParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BSC),
         erc721Minter: "0x83feaeA88b1377970E7cD11492d084B63e09C87E",
         erc1155_addr: "0x1B20ceec70e9635f5B56928de16A9dBc8EB8e3b6",
@@ -644,7 +638,7 @@ export namespace ChainFactoryConfigs {
       },
       abeyChainParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ABEYCHAIN),
         erc1155_addr: "0x8776073043eef8929F4a9cBa8Aacc6B59A21BA52",
@@ -656,7 +650,7 @@ export namespace ChainFactoryConfigs {
       },
       moonbeamParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.MOONBEAM),
         erc1155_addr: "0x554560C6800f123B4A713F80A5AC9F21486F5De8",
@@ -668,7 +662,7 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
         erc721Minter: "0x32732607F67f9FC2007AF84e54B2ea9042327ed3",
         erc1155Minter: "0x62E26979F555Ec475981D8D1A7e269f747643f22",
@@ -689,7 +683,6 @@ export namespace ChainFactoryConfigs {
         erc721_addr: "0x46Df0d0Dd629d61BDFA567dE61912FDeD883A60d",
         minter_addr: "0x33DC209D33AddF60cf90Dd4B10f9a198A1A93f63",
         paymentTokenAddress: "0x59ab97Ee239e02112652587F9Ef86CB6F762983b", // Euphoria ETH (ETH) Token
-        scVerifyRest,
       },
       aptosParams: {
         rpcUrl: MainNetRpcUri.APTOS,
@@ -707,7 +700,6 @@ export namespace ChainFactoryConfigs {
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(middleware_uri);
-    const scVerifyRest = scVerify(AppConfigs.MainNet().scVerifyUri);
 
     // VeChain related:
     const net = new SimpleNet(MainNetRpcUri.VECHAIN);
@@ -746,7 +738,7 @@ export namespace ChainFactoryConfigs {
       },
       caduceusParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CADUCEUS),
         erc1155_addr: "0xF8AE68714fF6704883281603a22b56f47eB23511",
@@ -765,7 +757,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -777,7 +769,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.ARBITRUM,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ARBITRUM),
       },
       bitgertParams: {
@@ -789,7 +781,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.BITGERT,
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BITGERT),
       },
       dfinityParams: {
@@ -805,7 +797,7 @@ export namespace ChainFactoryConfigs {
       },
       vechainParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         nonce: Chain.VECHAIN,
         provider,
@@ -837,7 +829,7 @@ export namespace ChainFactoryConfigs {
       },
       avalancheParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
         erc721Minter: "0x9b2bACF4E69c81EF4EF42da84872aAC39ce7EC62",
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
@@ -849,7 +841,7 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
         erc721Minter: "0x7E8493F59274651Cc0919feCf12E6A77153cdA72",
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
@@ -861,7 +853,7 @@ export namespace ChainFactoryConfigs {
       },
       fantomParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
         erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
         erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
@@ -873,7 +865,7 @@ export namespace ChainFactoryConfigs {
       },
       bscParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BSC),
         erc721Minter: "0xa66dA346C08dD77bfB7EE5E68C45010B6F2538ff",
         erc1155_addr: "0x3F888c0Ee72943a3Fb1c169684A9d1e8DEB9f537",
@@ -885,7 +877,7 @@ export namespace ChainFactoryConfigs {
       },
       celoParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CELO),
         minter_addr: "string",
         erc721_addr: "string",
@@ -897,7 +889,7 @@ export namespace ChainFactoryConfigs {
       },
       harmonyParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HARMONY),
         minter_addr: "0x1358844f14feEf4D99Bc218C9577d1c7e0Cb2E89",
         erc721_addr: "0xDcAA2b071c1851D8Da43f85a34a5A57d4Fa93A1A",
@@ -909,7 +901,7 @@ export namespace ChainFactoryConfigs {
       },
       ropstenParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ETHEREUM),
         minter_addr: "0x1cC24128C04093d832D4b50609e182ed183E1688",
         erc721_addr: "0x32E8854DC2a5Fd7049DCF10ef2cb5f01300c7B47",
@@ -921,7 +913,7 @@ export namespace ChainFactoryConfigs {
       },
       xDaiParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.XDAI),
         erc721Minter: "0x82A7d50A0030935808dAF6e5f0f06645866fb7Bb",
         erc1155Minter: "0xFEeD85607C1fbc2f30EAc13281480ED6265e121E",
@@ -945,7 +937,7 @@ export namespace ChainFactoryConfigs {
       },
       fuseParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FUSE),
         erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
         erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
@@ -972,7 +964,7 @@ export namespace ChainFactoryConfigs {
       },
       velasParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
         erc721Minter: "0x3F888c0Ee72943a3Fb1c169684A9d1e8DEB9f537",
         erc1155Minter: "0x0cC5F00e673B0bcd1F780602CeC6553aec1A57F0",
@@ -984,7 +976,7 @@ export namespace ChainFactoryConfigs {
       },
       iotexParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.IOTEX),
         minter_addr: "0x4bA4ADdc803B04b71412439712cB1911103380D6",
         erc721_addr: "0x6eD7dfDf9678eCb2051c46A1A5E38B4f310b18c5",
@@ -1003,12 +995,12 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.AURORA,
         notifier,
-        scVerifyRest,
+
         feeMargin,
       },
       godwokenParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.GODWOKEN),
         minter_addr: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
         erc721_addr: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
@@ -1020,7 +1012,7 @@ export namespace ChainFactoryConfigs {
       },
       gateChainParams: {
         notifier,
-        scVerifyRest,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.GATECHAIN),
         minter_addr: "0xFc7f7fD2DBdAF6D8F3ee3f222b3a6a9f89729f05",
         erc721_addr: "0xD6939f722B977afd7DD934A31bc94d08d4ea4336",
@@ -1032,7 +1024,7 @@ export namespace ChainFactoryConfigs {
       },
       skaleParams: {
         notifier,
-        scVerifyRest,
+
         feeMargin,
         nonce: Chain.SKALE,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.SKALE),
@@ -1046,7 +1038,7 @@ export namespace ChainFactoryConfigs {
       moonbeamParams: {
         nonce: Chain.MOONBEAM,
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.MOONBEAM),
         erc721Minter: "",
@@ -1058,7 +1050,7 @@ export namespace ChainFactoryConfigs {
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,
         notifier,
-        scVerifyRest,
+
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ABEYCHAIN),
         erc721Minter: "0xBb5e9896cEe600DaC470775B6f235Db105E861BD",
