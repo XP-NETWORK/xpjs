@@ -185,6 +185,10 @@ export type WhitelistCheck<RawNft, Singer = void> = {
   isNftWhitelisted(nft: NftInfo<RawNft>, signer?: Singer): Promise<boolean>;
 };
 
+export type GetApprovable<RawNft> = {
+  getApprovable(nft: NftInfo<RawNft>): Promise<string>;
+};
+
 export interface GetProvider<Provider> {
   getProvider(): Provider;
 }

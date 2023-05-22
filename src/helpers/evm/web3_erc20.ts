@@ -443,5 +443,8 @@ export async function web3ERC20HelperFactory(
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
     },
+    async getApprovable() {
+      return params.minter_addr;
+    },
   };
 }

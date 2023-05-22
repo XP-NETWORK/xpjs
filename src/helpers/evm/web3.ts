@@ -11,6 +11,7 @@ import {
   GetProvider,
   IsContractAddress,
   MintNft,
+  GetApprovable,
   TransferNftForeign,
   TransferNftForeignBatch,
   UnfreezeForeignNft,
@@ -179,6 +180,7 @@ export type Web3Helper = BaseWeb3Helper &
     XpNft: string;
     XpNft1155: string;
   } & WhitelistCheck<EthNftInfo> &
+  GetApprovable<EthNftInfo> &
   GetFeeMargins &
   IsContractAddress &
   GetTokenURI &
@@ -825,6 +827,12 @@ export async function web3HelperFactory(
     },
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
+    },
+    async getApprovable(nft) {
+      return await params.notifier.getCollectionContract(
+        nft.native.contract,
+        params.nonce
+      );
     },
   };
 }
