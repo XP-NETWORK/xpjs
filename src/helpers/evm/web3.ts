@@ -398,7 +398,8 @@ export async function web3HelperFactory(
                 address,
                 contract: UserNFTStore__factory.connect(address, provider),
               };
-            } catch (e) {
+            } catch (e: any) {
+              if (e.name === "FAIL") throw e;
               return defaultMinter;
             }
           },
