@@ -800,6 +800,7 @@ export namespace ChainFactoryConfigs {
 
         feeMargin,
         nonce: Chain.VECHAIN,
+
         provider,
         minter_addr: "0xE860cef926E5e76E0E88fdc762417a582F849C27",
         erc721_addr: "0xf0E778BD5C4c2F219A2A5699e3AfD2D82D50E271",
