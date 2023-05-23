@@ -566,7 +566,7 @@ export function ChainFactory(
         const contractFee = await toChain?.estimateContractDep(toChain);
         calcContractDep = (
           await calcExchangeFees(from, to, contractFee, toChain.getFeeMargin())
-        ).multipliedBy(1.2);
+        ).multipliedBy(1.1);
       }
 
       return { calcContractDep };
