@@ -49,10 +49,13 @@ export function evNotifier(url: string) {
 
       if (res?.status === "SUCCESS") {
         let contractAddress = res?.contractAddress || "";
+
+        let timedOut = false;
         const errorTimeout = setTimeout(() => {
-          throw error;
-        }, 120_000);
-        while (!contractAddress) {
+          timedOut = true;
+        }, 150_000);
+
+        while (!contractAddress && !timedOut) {
           await new Promise((r) => setTimeout(r, 20_000));
           contractAddress = await this.getCollectionContract(
             collectionAddress,
@@ -60,6 +63,8 @@ export function evNotifier(url: string) {
           );
         }
         clearTimeout(errorTimeout);
+        if (timedOut && !contractAddress) throw error;
+
         return contractAddress;
       }
 
