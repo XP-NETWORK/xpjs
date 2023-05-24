@@ -216,6 +216,8 @@ export async function web3ERC20HelperFactory(
       const code = await provider.getCode(address);
       return code !== "0x";
     },
+    estimateContractDeploy: async () => new BigNumber(0),
+    estimateUserStoreDeploy: async () => new BigNumber(0),
     getNonce: () => params.nonce,
     async preTransferRawTxn(id, address, _value) {
       const isApproved = await isApprovedForMinter(
@@ -442,9 +444,6 @@ export async function web3ERC20HelperFactory(
     },
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
-    },
-    async getApprovable() {
-      return params.minter_addr;
     },
   };
 }
