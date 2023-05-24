@@ -117,17 +117,17 @@ export interface EstimateTxFees<RawNftF> {
   ): Promise<BigNumber>;
 }
 
-export interface PayToMinter {
-  payForDeployUserStore?(
-    signer: ethers.Signer,
-    amount: string,
-    address: string
-  ): Promise<ethers.providers.TransactionReceipt>;
-}
-
-export interface DeployUserStore {
+export interface UserStore {
   checkUserStore?(nft: NftInfo<any>): Promise<string>;
-  deployUserStore?(nft: NftInfo<any>): Promise<string>;
+  getUserStore?(
+    signer: ethers.Signer,
+    nft: NftInfo<any>,
+    fees?: number,
+    isMapped?: boolean
+  ): Promise<{
+    address: string;
+    contract: any;
+  }>;
 }
 
 export function ConcurrentSendError(): Error {

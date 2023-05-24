@@ -7,7 +7,7 @@ import {
   BalanceCheck,
   EstimateTxFeesBatch,
   EstimateDeployFees,
-  DeployUserStore,
+  UserStore,
   FeeMargins,
   GetFeeMargins,
   GetProvider,
@@ -57,7 +57,6 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
-  PayToMinter,
 } from "../..";
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
@@ -125,8 +124,10 @@ type MinterBridge = {
 
 type UserStorageBridge = {
   getMinterForCollection: (isMapped: boolean) => (
+    signer: Signer,
     collection: string,
-    type: string
+    type: string,
+    fees?: number
   ) => Promise<{
     address: string;
     contract: UserNFTStore | Minter;
@@ -187,8 +188,7 @@ export type Web3Helper = BaseWeb3Helper &
   IsContractAddress &
   GetTokenURI &
   ParamsGetter<Web3Params> &
-  PayToMinter &
-  DeployUserStore;
+  UserStore;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -378,7 +378,13 @@ export async function web3HelperFactory(
       [BridgeTypes.Minter]: defaultMinter,
       [BridgeTypes.UserStorage]: {
         getMinterForCollection:
-          (isMapped: boolean) => async (collection: string, type: string) => {
+          (isMapped: boolean) =>
+          async (
+            signer: Signer,
+            collection: string,
+            type: string,
+            fees?: number
+          ) => {
             try {
               if (isMapped) {
                 const address = await params.notifier.getCollectionContract(
@@ -394,6 +400,21 @@ export async function web3HelperFactory(
                 return defaultMinter;
               }
 
+              if (!fees) {
+                console.log("calc deploy fees");
+                fees = (await estimateUserStoreDeploy())
+                  .div(1e18)
+                  .integerValue()
+                  .toNumber();
+              }
+
+              const tx = await payForDeployUserStore(signer, String(fees));
+
+              if (tx.status !== 1)
+                throw new Error(
+                  "Faied to pay for deployment. Please come back later"
+                );
+
               const address = await params.notifier.createCollectionContract(
                 collection,
                 params.nonce,
@@ -405,8 +426,8 @@ export async function web3HelperFactory(
                 contract: UserNFTStore__factory.connect(address, provider),
               };
             } catch (e: any) {
-              if (e.name === "FAIL") throw e;
-              return defaultMinter;
+              throw e;
+              //return defaultMinter;
             }
           },
       },
@@ -542,15 +563,41 @@ export async function web3HelperFactory(
   };
 
   const getUserStore = async (
+    signer: Signer,
     nft: NftInfo<EthNftInfo>,
+    fees?: number,
     isMapped: boolean = false
   ) => {
     return await Bridge<UserStorageBridge>(
       BridgeTypes.UserStorage
     ).getMinterForCollection(isMapped)(
+      signer,
       nft.native.contract,
-      nft.native.contractType
+      nft.native.contractType,
+      fees
     );
+  };
+
+  const estimateUserStoreDeploy = async () => {
+    const fees = new BigNumber(0);
+    const gasPrice = await provider.getGasPrice();
+    const contract = new ethers.ContractFactory(
+      UserNFTStore__factory.abi,
+      UserNFTStore__factory.bytecode
+    );
+    const gas = await provider.estimateGas(
+      contract.getDeployTransaction(
+        123,
+        42,
+        "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"
+      )
+    );
+
+    const contractFee = gas.mul(gasPrice);
+    return fees
+      .plus(new BigNumber(contractFee.toString()))
+      .multipliedBy(1.1)
+      .integerValue();
   };
 
   return {
@@ -560,17 +607,13 @@ export async function web3HelperFactory(
     getParams: () => params,
     approveForMinter,
     getProvider: () => provider,
-    payForDeployUserStore,
     async checkUserStore(nft: NftInfo<EthNftInfo>) {
       return params.notifier.getCollectionContract(
         nft.native.contract,
         params.nonce
       );
     },
-    async deployUserStore(nft) {
-      const { address } = await getUserStore(nft);
-      return address;
-    },
+    getUserStore,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
       const gas = await provider.getGasPrice();
       return new BigNumber(gas.mul(150_000).toString());
@@ -662,7 +705,9 @@ export async function web3HelperFactory(
       toParams: Web3Params
     ) {
       const { contract: minter, address } = await getUserStore(
+        signer,
         nfts[0],
+        undefined,
         mintWith !== toParams.erc1155_addr
       );
 
@@ -714,7 +759,9 @@ export async function web3HelperFactory(
       toParams: Web3Params
     ): Promise<TransactionResponse> {
       const { contract: minter, address } = await getUserStore(
+        sender,
         id,
+        undefined,
         mintWith !== toParams.erc721_addr
       );
 
@@ -839,27 +886,7 @@ export async function web3HelperFactory(
 
       return new BigNumber(gas.mul(150_000).toString());
     },
-    async estimateUserStoreDeploy() {
-      const fees = new BigNumber(0);
-      const gasPrice = await provider.getGasPrice();
-      const contract = new ethers.ContractFactory(
-        UserNFTStore__factory.abi,
-        UserNFTStore__factory.bytecode
-      );
-      const gas = await provider.estimateGas(
-        contract.getDeployTransaction(
-          123,
-          42,
-          "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"
-        )
-      );
-
-      const contractFee = gas.mul(gasPrice);
-      return fees
-        .plus(new BigNumber(contractFee.toString()))
-        .multipliedBy(1.1)
-        .integerValue();
-    },
+    estimateUserStoreDeploy,
     async estimateContractDeploy(toChain: any): Promise<BigNumber> {
       try {
         const gas = await provider.getGasPrice();
