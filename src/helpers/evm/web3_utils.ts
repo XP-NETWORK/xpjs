@@ -23,3 +23,8 @@ export const txnUnderpricedPolyWorkaround = async (
     utx.maxPriorityFeePerGas = sixtyGwei;
   }
 };
+
+export const getWrapped = async (uri: string) => {
+  return (await axios.get(uri).catch(() => ({ data: undefined }))).data
+    ?.wrapped;
+};

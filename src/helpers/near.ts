@@ -34,6 +34,7 @@ import {
   BalanceCheck,
   PreTransfer,
   WhitelistCheck,
+  EstimateDeployFees,
 } from "./chain";
 
 type NearTxResult = [FinalExecutionOutcome, any];
@@ -97,6 +98,7 @@ export type NearHelper = ChainNonceGet &
   UnfreezeForeignNft<Account, NearNFT, NearTxResult> &
   MintNft<Account, NearMintArgs, NearTxResult> &
   EstimateTxFees<NearNFT> &
+  EstimateDeployFees &
   Pick<
     PreTransfer<Account, NearNFT, string, NearPreTransferArgs>,
     "preTransfer"
@@ -188,7 +190,7 @@ export async function nearHelperFactory({
     async estimateValidateUnfreezeNft(_to, _metadata, _mintWith) {
       return new BigNumber(0); // TODO
     },
-    estimateContractDep: async () => {
+    estimateContractDeploy: async () => {
       return new BigNumber("5000000000000000000000000");
     },
     //async estimateContractDe

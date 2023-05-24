@@ -19,6 +19,7 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  EstimateDeployFees,
 } from "..";
 
 import { UserSigner } from "@elrondnetwork/erdjs/out";
@@ -83,6 +84,7 @@ export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
 > &
   UnfreezeForeignNft<Signer, RawNft, Resp> &
   EstimateTxFees<RawNft> &
+  EstimateDeployFees &
   ChainNonceGet &
   ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins;
 
@@ -561,9 +563,13 @@ export function ChainFactory(
         scVerifyRest.list(originalContract, to, from),
       ]);
 
-      if (!checkWithOutTokenId && !verifyList && toChain?.estimateContractDep) {
+      if (
+        !checkWithOutTokenId &&
+        !verifyList &&
+        toChain?.estimateContractDeploy
+      ) {
         //@ts-ignore
-        const contractFee = await toChain?.estimateContractDep(toChain);
+        const contractFee = await toChain?.estimateContractDeploy(toChain);
         calcContractDep = (
           await calcExchangeFees(from, to, contractFee, toChain.getFeeMargin())
         ).multipliedBy(1.1);

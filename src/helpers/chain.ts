@@ -98,19 +98,36 @@ export interface ValidateAddress {
   validateAddress(adr: string): Promise<boolean>;
 }
 
+export interface EstimateDeployFees {
+  estimateUserStoreDeploy?(): Promise<BigNumber>;
+  estimateContractDeploy?(toChain: any): Promise<BigNumber>;
+}
+
 export interface EstimateTxFees<RawNftF> {
   estimateValidateTransferNft(
     to: string,
     metadata: NftInfo<RawNftF>,
     mintWith: string
   ): Promise<BigNumber>;
-  estimateContractDep?(toChain: any): Promise<BigNumber>;
   isNftWhitelisted?(nft: any, signer?: any): Promise<Boolean>;
   estimateValidateUnfreezeNft(
     to: string,
     metadata: NftInfo<RawNftF>,
     mintWith: string
   ): Promise<BigNumber>;
+}
+
+export interface PayToMinter {
+  payForDeployUserStore?(
+    signer: ethers.Signer,
+    amount: string,
+    address: string
+  ): Promise<ethers.providers.TransactionReceipt>;
+}
+
+export interface DeployUserStore {
+  checkUserStore?(nft: NftInfo<any>): Promise<string>;
+  deployUserStore?(nft: NftInfo<any>): Promise<string>;
 }
 
 export function ConcurrentSendError(): Error {
@@ -183,10 +200,6 @@ export interface EstimateTxFeesBatch<RawNftF> {
 
 export type WhitelistCheck<RawNft, Singer = void> = {
   isNftWhitelisted(nft: NftInfo<RawNft>, signer?: Singer): Promise<boolean>;
-};
-
-export type GetApprovable<RawNft> = {
-  getApprovable(nft: NftInfo<RawNft>): Promise<string>;
 };
 
 export interface GetProvider<Provider> {
