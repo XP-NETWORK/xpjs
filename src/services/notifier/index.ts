@@ -35,7 +35,9 @@ export function evNotifier(url: string) {
       chainNonce: number,
       type: string
     ) {
-      const error = new Error("Failed to Create Collection");
+      const error = new Error(
+        "Failed to deploy contract. Please come back later"
+      );
       error.name = "FAIL";
       const res = (
         await api
