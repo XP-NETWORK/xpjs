@@ -62,6 +62,7 @@ import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
 import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
+import { Err } from "@elrondnetwork/erdjs/out";
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -386,19 +387,23 @@ export async function web3HelperFactory(
             fees?: number
           ) => {
             try {
-              if (isMapped) {
-                const address = await params.notifier.getCollectionContract(
-                  collection,
-                  params.nonce
+              if (!type || !collection)
+                throw new Error(
+                  `That NFT has wrong format:${type}:${collection}`
                 );
-                if (address) {
-                  return {
-                    address,
-                    contract: UserNFTStore__factory.connect(address, provider),
-                  };
-                }
-                return defaultMinter;
-              }
+
+              const contract = await params.notifier.getCollectionContract(
+                collection,
+                params.nonce
+              );
+
+              if (contract)
+                return {
+                  address: contract,
+                  contract: UserNFTStore__factory.connect(contract, provider),
+                };
+
+              if (isMapped) return defaultMinter;
 
               if (!fees) {
                 console.log("calc deploy fees");
