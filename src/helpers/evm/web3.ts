@@ -62,7 +62,6 @@ import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
 import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
-import { Err } from "@elrondnetwork/erdjs/out";
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -573,6 +572,8 @@ export async function web3HelperFactory(
     fees?: number,
     isMapped: boolean = false
   ) => {
+    if (!nft.uri)
+      throw new Error("NFTs with no uri cannot be transferd by the Bridge");
     return await Bridge<UserStorageBridge>(
       BridgeTypes.UserStorage
     ).getMinterForCollection(isMapped)(
