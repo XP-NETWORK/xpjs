@@ -260,6 +260,7 @@ export interface Web3Params {
   erc1155Minter: string;
   nonce: ChainNonce;
   feeMargin: FeeMargins;
+  noWhitelist?: boolean;
 }
 
 type NftMethodVal<T, Tx> = {
@@ -371,7 +372,7 @@ export async function web3HelperFactory(
   const { minter_addr, provider } = params;
   function Bridge<T>(type: BridgeTypes): T {
     const defaultMinter = {
-      address: minter_addr,
+      address: "",
       contract: Minter__factory.connect(minter_addr, provider),
     };
     const res = {
@@ -385,6 +386,8 @@ export async function web3HelperFactory(
             type: string,
             fees?: number
           ) => {
+            if (!params.noWhitelist) return defaultMinter;
+
             try {
               if (!type || !collection)
                 throw new Error(
