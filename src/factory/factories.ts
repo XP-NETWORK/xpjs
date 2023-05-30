@@ -543,6 +543,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
         nonce: Chain.AVALANCHE,
         feeMargin,
+        noWhitelist: true,
       },
       algorandParams: {
         algodApiKey: "kZWDAxYR7Y6S6RoyfGIi28SATZ5DfTIs5pF0UMW4",
@@ -615,6 +616,7 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x7Eac6825A851d79ae24301eA497AD8db2a0F4976",
         nonce: Chain.BSC,
         feeMargin,
+        noWhitelist: true,
       },
       secretParams: {
         bridge: {
@@ -662,7 +664,6 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
         erc721Minter: "0x32732607F67f9FC2007AF84e54B2ea9042327ed3",
         erc1155Minter: "0x62E26979F555Ec475981D8D1A7e269f747643f22",
@@ -671,6 +672,7 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0xF712f9De44425d8845A1d597a247Fe88F4A23b6f",
         nonce: Chain.POLYGON,
         feeMargin,
+        noWhitelist: true,
       },
       skaleParams: {
         notifier,
