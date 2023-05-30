@@ -56,7 +56,7 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
   async createWithdrawBody(params: WithdrawParams) {
     const cell = new Cell();
     cell.bits.writeUint(0x5fcc3d14, 32); // transfer op
-    cell.bits.writeUint(0, 64);
+    cell.bits.writeUint(10, 64);
     cell.bits.writeAddress(new TonWeb.Address(this.options.burner)); // target address
     cell.bits.writeAddress(await this.getAddress()); // bridge as response address
     cell.bits.writeBit(false); // null custom_payload
@@ -76,12 +76,12 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
   async createFreezeBody(params: FreezeParams) {
     const cell = new Cell();
     cell.bits.writeUint(0x5fcc3d14, 32); // transfer op
-    cell.bits.writeUint(0, 64); // query id
+    cell.bits.writeUint(20, 64);
     cell.bits.writeAddress(await this.getAddress()); // target address
-    cell.bits.writeAddress(undefined); // undefined as response address
+    cell.bits.writeAddress(await this.getAddress()); // undefined as response address
     cell.bits.writeBit(false); // null custom_payload
     cell.bits.writeCoins(params.amount || new BN(0));
-    cell.bits.writeBit(true); // forward_payload in this slice, not separate cell
+    cell.bits.writeBit(false); // forward_payload in this slice, not separate cell
 
     const payload = new Cell();
     payload.bits.writeUint(params.chainNonce, 8);
