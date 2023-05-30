@@ -34,12 +34,12 @@
     "yarn-audit-fix": "^9.3.7"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.15.5",
-    "@dfinity/candid": "^0.15.5",
-    "@dfinity/identity-secp256k1": "^0.15.5",
-    "@dfinity/nns": "^0.14.0",
-    "@dfinity/principal": "^0.15.5",
-    "@dfinity/utils": "^0.0.12",
+    "@dfinity/agent": "^0.15.6",
+    "@dfinity/candid": "^0.15.6",
+    "@dfinity/identity-secp256k1": "^0.15.6",
+    "@dfinity/nns": "^0.16.0",
+    "@dfinity/principal": "^0.15.6",
+    "@dfinity/utils": "^0.0.15",
     "@elrondnetwork/erdjs": "9.0.3",
     "@ethersproject/providers": "^5.7.0",
     "@hashgraph/hethers": "^1.2.6",
