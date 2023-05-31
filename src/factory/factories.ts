@@ -832,7 +832,7 @@ export namespace ChainFactoryConfigs {
       },
       avalancheParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
         erc721Minter: "0x9b2bACF4E69c81EF4EF42da84872aAC39ce7EC62",
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
@@ -844,7 +844,7 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
         erc721Minter: "0x7E8493F59274651Cc0919feCf12E6A77153cdA72",
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
@@ -868,7 +868,7 @@ export namespace ChainFactoryConfigs {
       },
       bscParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BSC),
         erc721Minter: "0xa66dA346C08dD77bfB7EE5E68C45010B6F2538ff",
         erc1155_addr: "0x3F888c0Ee72943a3Fb1c169684A9d1e8DEB9f537",
