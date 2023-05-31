@@ -29,6 +29,8 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  WhitelistCheck,
+  ParamsGetter,
 } from "../chain";
 import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
@@ -126,7 +128,8 @@ export type DfinityHelper = ChainNonceGet &
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
   } & {
     getAccountIdentifier(principal: string): string;
-  };
+  } & WhitelistCheck<DfinityNft> &
+  ParamsGetter<DfinityParams>;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -155,6 +158,7 @@ export async function dfinityHelper(
         to: args.bridgeContract.toText(),
         amount: amt.integerValue().toNumber(),
       });
+      console.log(res, "res");
       return BigInt(res.height);
     }
 
@@ -196,6 +200,7 @@ export async function dfinityHelper(
 
   return {
     XpNft: args.xpnftId.toString(),
+    getParams: () => args,
     getNonce: () => Chain.DFINITY,
     estimateValidateTransferNft: async () => new BigNumber(0), // TODO
     estimateValidateUnfreezeNft: async () => new BigNumber(0), // TODO
@@ -210,7 +215,7 @@ export async function dfinityHelper(
     async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
       if (isBrowser) {
         //@ts-ignore
-        args.agent = sender;
+        args.agent = sender.agent;
       } else {
         args.agent.replaceIdentity(sender);
       }
@@ -248,7 +253,7 @@ export async function dfinityHelper(
 
       if (isBrowser) {
         //@ts-ignore
-        args.agent = owner;
+        args.agent = owner.agent;
       }
 
       const principal = isBrowser
@@ -274,7 +279,7 @@ export async function dfinityHelper(
     async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
       if (isBrowser) {
         //@ts-ignore
-        args.agent = sender;
+        args.agent = sender.agent;
       } else {
         args.agent.replaceIdentity(sender);
       }
@@ -290,6 +295,8 @@ export async function dfinityHelper(
         new BigNumber(sig.fee),
         isBrowser ? sender : undefined
       );
+
+      console.log(txFeeBlock, "txFeeBlock");
 
       const actionId = await minter.withdraw_nft(
         txFeeBlock,
@@ -356,7 +363,7 @@ export async function dfinityHelper(
     async preTransfer(sender, nft) {
       if (isBrowser) {
         //@ts-ignore
-        args.agent = sender;
+        args.agent = sender.agent;
       } else {
         args.agent.replaceIdentity(sender);
       }
@@ -425,28 +432,25 @@ export async function dfinityHelper(
       });
       return x.toHex();
     },
+
+    async isNftWhitelisted(nft) {
+      return await minter.is_whitelisted(
+        Principal.fromText(nft.native.canisterId)
+      );
+    },
   };
 }
 
 /***
  * 
  * 
-{height: 6184161}
-dfinity.ts:246 6184161n 'txFeeBlock'
-
- Uncaught (in promise) Error: Call was rejected:
-  Request ID: 2b46b5f1b89494270d4866c280c75404b63736f381fbeb66aeb0bab483228c54
+Error: Call was rejected:
+  Request ID: 0ab1503fb5d82bfa487bbbf0f8ced49c2e886a30e7952bfc7612518657fdb84e
   Reject code: 5
   Reject text: Canister e3io4-qaaaa-aaaak-qasua-cai trapped explicitly: Panicked at 'called `Result::unwrap()` on an `Err` value: InvalidFee', src/minter/src/lib.rs:490:10
 
 call_on_cleanup also failed:
 
-Canister e3io4-qaaaa-aaaak-qasua-cai trapped explicitly: Panicked at 'called `Result::unwrap()` on an `Err` value: FailedToQueryFee("Failed to Query for fee. Code: NoError. Reason: cleanup")', src/minter/src/lib.rs:490:10
-
-    at pollForResponse (index.ts:68:1)
-    at async caller (actor.ts:372:1)
-    at async Object.transferNftToForeign (dfinity.ts:248:1)
-    at async onClickHandler (IcpWallet.jsx:126:1)
-pollForResponse @ index.ts:68
+Canister e3io4-qaaaa-aaaak-qasua-cai trapped explicitly: Panicked at 'called `Result::unwrap()` on an `Err` value: FailedToQueryFee("Failed to Query for fee. Code: NoError. Reason: cleanup")'
 
  */

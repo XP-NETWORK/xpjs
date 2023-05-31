@@ -471,6 +471,10 @@ export namespace ChainFactoryConfigs {
     const feeMargin: FeeMargins = { min: 1, max: 5 };
     const notifier = evNotifier("https://bridge1.xp.network/notifier");
 
+    const signatureSvc = signatureService(
+      "https://tools.xp.network/fee-oracle"
+    );
+
     return {
       tonParams: {
         bridgeAddr: "kQBGFgZOXaF7LPRxWrjd9l6Iws6KGhWiMs3BKzAZGyeMq2AS",
@@ -698,9 +702,9 @@ export namespace ChainFactoryConfigs {
         agent: new HttpAgent({
           host: "https://ic0.app",
         }),
-        bridgeContract: Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
-        xpnftId: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
-        umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
+        bridgeContract: Principal.fromText("53bb2-rqaaa-aaaap-aa3vq-cai"),
+        xpnftId: Principal.fromText("5ogqx-qyaaa-aaaap-aa3wa-cai"),
+        umt: Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
         notifier,
         feeMargin,
         signatureSvc,
@@ -799,9 +803,9 @@ export namespace ChainFactoryConfigs {
         agent: new HttpAgent({
           host: "https://ic0.app",
         }),
-        bridgeContract: Principal.fromText("e3io4-qaaaa-aaaak-qasua-cai"),
-        xpnftId: Principal.fromText("e4jii-5yaaa-aaaak-qasuq-cai"),
-        umt: Principal.fromText("evkdu-lqaaa-aaaak-qasva-cai"),
+        bridgeContract: Principal.fromText("53bb2-rqaaa-aaaap-aa3vq-cai"),
+        xpnftId: Principal.fromText("5ogqx-qyaaa-aaaap-aa3wa-cai"),
+        umt: Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
         notifier,
         feeMargin,
         signatureSvc,
