@@ -58,7 +58,7 @@ export function evNotifier(url: string) {
         }, 150_000);
 
         while (!contractAddress && !timedOut) {
-          await new Promise((r) => setTimeout(r, 20_000));
+          await new Promise((r) => setTimeout(r, 2_300));
           contractAddress = await this.getCollectionContract(
             collectionAddress,
             chainNonce
