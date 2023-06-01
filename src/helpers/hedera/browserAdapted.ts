@@ -48,6 +48,7 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
+  EstimateDeployFees,
 } from "../..";
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
@@ -144,6 +145,7 @@ export type Web3Helper = BaseWeb3Helper &
   UnfreezeForeignNftBatch<Signer, EthNftInfo, TransactionResponse> &
   EstimateTxFees<EthNftInfo> &
   EstimateTxFeesBatch<EthNftInfo> &
+  EstimateDeployFees &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
@@ -750,7 +752,7 @@ export async function web3HelperFactory(
 
       return new BigNumber(gas.mul(150_000).toString());
     },
-    async estimateContractDep(toChain: any): Promise<BigNumber> {
+    async estimateContractDeploy(toChain: any): Promise<BigNumber> {
       try {
         const gas = await provider.getGasPrice();
         const pro = toChain.getProvider();

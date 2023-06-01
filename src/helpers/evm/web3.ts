@@ -6,6 +6,8 @@ import BigNumber from "bignumber.js";
 import {
   BalanceCheck,
   EstimateTxFeesBatch,
+  EstimateDeployFees,
+  UserStore,
   FeeMargins,
   GetFeeMargins,
   GetProvider,
@@ -16,7 +18,7 @@ import {
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
   ParamsGetter,
-} from "./chain";
+} from "../chain";
 import {
   BigNumber as EthBN,
   ContractTransaction,
@@ -33,8 +35,16 @@ import {
   Erc1155Minter__factory,
   Minter__factory,
   UserNftMinter,
+  Minter,
   UserNftMinter__factory,
 } from "xpnet-web3-contracts";
+
+import { UserNFTStore__factory } from "xpnet-web3-contracts/dist/factories/UserStore.sol/index";
+import { UserNFTStore } from "xpnet-web3-contracts/dist/UserStore.sol";
+
+console.log(Minter__factory, "Minter__factory");
+console.log(UserNFTStore__factory, "UserNFTStore__factory");
+
 import {
   ChainNonceGet,
   EstimateTxFees,
@@ -47,11 +57,12 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
-} from "..";
-import { ChainNonce } from "../type-utils";
-import { EvNotifier } from "../services/notifier";
-import axios from "axios";
+} from "../..";
+import { ChainNonce } from "../../type-utils";
+import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
+import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
+
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -81,8 +92,7 @@ export interface IsApproved<Sender> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber,
-    gasPrice?: ethers.BigNumber
+    toApprove: string
   ): Promise<boolean>;
 }
 
@@ -91,7 +101,8 @@ export interface Approve<Sender> {
     address: NftInfo<EthNftInfo>,
     sender: Sender,
     txFee: BigNumber,
-    gasPrice?: ethers.BigNumber
+    gasPrice?: ethers.BigNumber,
+    toApprove?: string
   ): Promise<string | undefined>;
 }
 
@@ -100,6 +111,28 @@ hethers.providers.BaseProvider.prototype.getGasPrice = async () => {
 };
 
 type NullableCustomData = Record<string, any> | undefined;
+
+enum BridgeTypes {
+  Minter,
+  UserStorage,
+}
+
+type MinterBridge = {
+  address: string;
+  contract: Minter;
+};
+
+type UserStorageBridge = {
+  getMinterForCollection: (isMapped: boolean) => (
+    signer: Signer,
+    collection: string,
+    type: string,
+    fees?: number
+  ) => Promise<{
+    address: string;
+    contract: UserNFTStore | Minter;
+  }>;
+};
 
 /**
  * Base util traits
@@ -137,6 +170,7 @@ export type Web3Helper = BaseWeb3Helper &
   UnfreezeForeignNftBatch<Signer, EthNftInfo, TransactionResponse> &
   EstimateTxFees<EthNftInfo> &
   EstimateTxFeesBatch<EthNftInfo> &
+  EstimateDeployFees &
   ChainNonceGet &
   IsApproved<Signer> &
   Approve<Signer> &
@@ -153,13 +187,15 @@ export type Web3Helper = BaseWeb3Helper &
   GetFeeMargins &
   IsContractAddress &
   GetTokenURI &
-  ParamsGetter<Web3Params>;
+  ParamsGetter<Web3Params> &
+  UserStore;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
  * @param provider An ethers.js provider object
  */
+
 export async function baseWeb3HelperFactory(
   provider: Provider,
   nonce: number
@@ -224,6 +260,7 @@ export interface Web3Params {
   erc1155Minter: string;
   nonce: ChainNonce;
   feeMargin: FeeMargins;
+  noWhitelist?: boolean;
 }
 
 type NftMethodVal<T, Tx> = {
@@ -330,35 +367,82 @@ export async function web3HelperFactory(
   params: Web3Params
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
-    params.nonce == 7
-      ? async (utx: PopulatedTransaction) => {
-          const res = await axios
-            .get(
-              "https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=pendingpooltxgweidata"
-            )
-            .catch(async () => {
-              return await axios.get(
-                "https://gasstation-mainnet.matic.network/v2"
-              );
-            });
-          const { result, fast } = res.data;
-          const trackerGas = result?.rapidgaspricegwei || fast?.maxFee;
-
-          if (trackerGas) {
-            const sixtyGwei = ethers.utils.parseUnits(
-              Math.ceil(trackerGas).toString(),
-              "gwei"
-            );
-            utx.maxFeePerGas = sixtyGwei;
-            utx.maxPriorityFeePerGas = sixtyGwei;
-          }
-        }
-      : () => Promise.resolve();
-
+    params.nonce == 7 ? UnderpricedWorkaround : () => Promise.resolve();
   const w3 = params.provider;
   const { minter_addr, provider } = params;
-  const minter = Minter__factory.connect(minter_addr, provider);
+  function Bridge<T>(type: BridgeTypes): T {
+    const defaultMinter = {
+      address: "",
+      contract: Minter__factory.connect(minter_addr, provider),
+    };
+    const res = {
+      [BridgeTypes.Minter]: defaultMinter,
+      [BridgeTypes.UserStorage]: {
+        getMinterForCollection:
+          (isMapped: boolean) =>
+          async (
+            signer: Signer,
+            collection: string,
+            type: string,
+            fees?: number
+          ) => {
+            if (!params.noWhitelist) return defaultMinter;
 
+            try {
+              if (!type || !collection)
+                throw new Error(
+                  `That NFT has wrong format:${type}:${collection}`
+                );
+
+              const contract = await params.notifier.getCollectionContract(
+                collection,
+                params.nonce
+              );
+
+              if (contract)
+                return {
+                  address: contract,
+                  contract: UserNFTStore__factory.connect(contract, provider),
+                };
+
+              if (isMapped) return defaultMinter;
+
+              if (!fees) {
+                console.log("calc deploy fees");
+                fees = (await estimateUserStoreDeploy())
+                  .div(1e18)
+                  .integerValue()
+                  .toNumber();
+              }
+
+              const tx = await payForDeployUserStore(signer, String(fees));
+
+              if (tx.status !== 1)
+                throw new Error(
+                  "Faied to pay for deployment. Please come back later"
+                );
+
+              const address = await params.notifier.createCollectionContract(
+                collection,
+                params.nonce,
+                type
+              );
+
+              return {
+                address,
+                contract: UserNFTStore__factory.connect(address, provider),
+              };
+            } catch (e: any) {
+              throw e;
+              //return defaultMinter;
+            }
+          },
+      },
+    };
+    //@ts-ignore
+    return res[type];
+  }
+  const minter = Bridge<MinterBridge>(BridgeTypes.Minter).contract;
   async function notifyValidator(
     fromHash: string,
     actionId?: string,
@@ -385,7 +469,6 @@ export async function web3HelperFactory(
       contract
     );
   }
-
   //@ts-ignore
   async function getTransaction(hash: string) {
     let trx;
@@ -400,7 +483,6 @@ export async function web3HelperFactory(
 
     return trx as TransactionResponse;
   }
-
   async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
@@ -412,21 +494,16 @@ export async function web3HelperFactory(
     const action_id: string = evdat.args[0].toString();
     return action_id;
   }
-
   const isApprovedForMinter = async (
     id: NftInfo<EthNftInfo>,
-    signer: Signer
+    signer: Signer,
+    toApprove: string
   ) => {
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
       signer
     );
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
+
     return await NFT_METHOD_MAP[id.native.contractType].approved(
       erc as any,
       await signer.getAddress(),
@@ -435,14 +512,24 @@ export async function web3HelperFactory(
       params.nonce === 0x1d ? {} : undefined
     );
   };
-
   const approveForMinter = async (
     id: NftInfo<EthNftInfo>,
     sender: Signer,
     _txFees: BigNumber,
-    gasPrice: ethers.BigNumberish | undefined
+    gasPrice: ethers.BigNumberish | undefined,
+    toApprove?: string
   ) => {
-    const isApproved = await isApprovedForMinter(id, sender);
+    if (!toApprove) {
+      toApprove =
+        params.nonce !== 0x1d
+          ? minter_addr
+          : id.native.uri.includes("herokuapp.com")
+          ? params.minter_addr
+          : params.erc721_addr;
+    }
+
+    const isApproved = await isApprovedForMinter(id, sender, toApprove);
+
     if (isApproved) {
       return undefined;
     }
@@ -450,13 +537,6 @@ export async function web3HelperFactory(
       id.native.contract,
       sender
     );
-
-    const toApprove =
-      params.nonce !== 0x1d
-        ? minter_addr
-        : id.native.uri.includes("herokuapp.com")
-        ? params.minter_addr
-        : params.erc721_addr;
 
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
@@ -469,8 +549,65 @@ export async function web3HelperFactory(
     await receipt.wait();
     return receipt.hash;
   };
-
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
+
+  const payForDeployUserStore = async (
+    signer: Signer,
+    amount: string,
+    address: string = "0x837B2eB764860B442C971F98f505E7c5f419edd7"
+  ) => {
+    const from = await signer.getAddress();
+    const tx = await signer.sendTransaction({
+      from,
+      to: address,
+      value: ethers.utils.parseEther(amount),
+      nonce: await provider.getTransactionCount(from, "latest"),
+      gasLimit: ethers.utils.hexlify(100000),
+      gasPrice: await provider.getGasPrice(),
+    });
+
+    return await tx.wait();
+  };
+
+  const getUserStore = async (
+    signer: Signer,
+    nft: NftInfo<EthNftInfo>,
+    fees?: number,
+    isMapped: boolean = false
+  ) => {
+    if (!nft.uri)
+      throw new Error("NFTs with no uri cannot be transferd by the Bridge");
+    return await Bridge<UserStorageBridge>(
+      BridgeTypes.UserStorage
+    ).getMinterForCollection(isMapped)(
+      signer,
+      nft.native.contract,
+      nft.native.contractType,
+      fees
+    );
+  };
+
+  const estimateUserStoreDeploy = async () => {
+    const fees = new BigNumber(0);
+    const gasPrice = await provider.getGasPrice();
+    const contract = new ethers.ContractFactory(
+      UserNFTStore__factory.abi,
+      UserNFTStore__factory.bytecode
+    );
+    const gas = await provider.estimateGas(
+      contract.getDeployTransaction(
+        123,
+        42,
+        "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"
+      )
+    );
+
+    const contractFee = gas.mul(gasPrice);
+    return fees
+      .plus(new BigNumber(contractFee.toString()))
+      .multipliedBy(1.1)
+      .integerValue();
+  };
 
   return {
     ...base,
@@ -479,6 +616,13 @@ export async function web3HelperFactory(
     getParams: () => params,
     approveForMinter,
     getProvider: () => provider,
+    async checkUserStore(nft: NftInfo<EthNftInfo>) {
+      return params.notifier.getCollectionContract(
+        nft.native.contract,
+        params.nonce
+      );
+    },
+    getUserStore,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
       const gas = await provider.getGasPrice();
       return new BigNumber(gas.mul(150_000).toString());
@@ -498,7 +642,8 @@ export async function web3HelperFactory(
     async preTransferRawTxn(id, address, _value) {
       const isApproved = await isApprovedForMinter(
         id,
-        new VoidSigner(address, provider)
+        new VoidSigner(address, provider),
+        minter_addr
       );
 
       if (isApproved) {
@@ -555,16 +700,6 @@ export async function web3HelperFactory(
       await txnUnderpricedPolyWorkaround(tx);
       const res = await signer.sendTransaction(tx);
 
-      // await notifyValidator(
-      //   res.hash,
-      //   await extractAction(res),
-      //   "Unfreeze",
-      //   chainNonce.toString(),
-      //   txFees.toString(),
-      //   await signer.getAddress(),
-      //   to,
-      //   res.data
-      // );
       await notifyValidator(res.hash);
 
       return res;
@@ -575,8 +710,18 @@ export async function web3HelperFactory(
       to,
       nfts,
       mintWith,
-      txFees
+      txFees,
+      toParams: Web3Params
     ) {
+      const { contract: minter, address } = await getUserStore(
+        signer,
+        nfts[0],
+        undefined,
+        mintWith !== toParams.erc1155_addr
+      );
+
+      await approveForMinter(nfts[0], signer, txFees, undefined, address);
+
       const tx = await minter
         .connect(signer)
         .populateTransaction.freezeErc1155Batch(
@@ -619,9 +764,18 @@ export async function web3HelperFactory(
       txFees: BigNumber,
       mintWith: string,
       gasLimit: ethers.BigNumberish | undefined = undefined,
-      gasPrice
+      gasPrice,
+      toParams: Web3Params
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      const { contract: minter, address } = await getUserStore(
+        sender,
+        id,
+        undefined,
+        mintWith !== toParams.erc721_addr
+      );
+
+      await approveForMinter(id, sender, txFees, gasPrice, address);
+
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
       // Chain is Hedera
@@ -741,9 +895,9 @@ export async function web3HelperFactory(
 
       return new BigNumber(gas.mul(150_000).toString());
     },
-    async estimateContractDep(toChain: any): Promise<BigNumber> {
+    estimateUserStoreDeploy,
+    async estimateContractDeploy(toChain: any): Promise<BigNumber> {
       try {
-        console.log("NEED TO DEPLOY CONTRACT");
         const gas = await provider.getGasPrice();
         const pro = toChain.getProvider();
         const wl = ["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"];
@@ -765,6 +919,7 @@ export async function web3HelperFactory(
         return new BigNumber(gas.mul(150_000).toString());
       }
     },
+
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
