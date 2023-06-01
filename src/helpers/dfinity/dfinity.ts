@@ -108,6 +108,8 @@ export type DfinityHelper = ChainNonceGet &
   GetFeeMargins &
   MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
+  } & {
+    getAccountIdentifier(principal: string): string;
   };
 
 export type DfinityParams = {
@@ -306,7 +308,6 @@ export async function dfinityHelper(
         nft.collectionIdent,
         Number(nft.native.tokenId)
       );
-
       const nftContract = Principal.fromText(nft.native.canisterId);
       const approvedQuery = await args.agent.query(nftContract, {
         methodName: "getAllowances",
@@ -357,6 +358,12 @@ export async function dfinityHelper(
       const e8s = bal.toString();
 
       return new BigNumber(e8s);
+    },
+    getAccountIdentifier(principal: string) {
+      const x = AccountIdentifier.fromPrincipal({
+        principal: Principal.fromText(principal),
+      });
+      return x.toHex();
     },
   };
 }

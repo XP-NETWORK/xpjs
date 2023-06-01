@@ -2,12 +2,76 @@ import axios from "axios";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 
+type CollectionContractResponse = {
+  contractAddress: string;
+  collectionAddress: string;
+  chainNonce: number;
+  status: "SUCCESS" | "FAILED";
+};
+
 export function evNotifier(url: string) {
   const api = axios.create({
     baseURL: url,
   });
 
   return {
+    async getCollectionContract(collectionAddress: string, chainNonce: number) {
+      const res = (
+        await api
+          .get<CollectionContractResponse>(
+            `/collection-contract/${collectionAddress}/${chainNonce}`
+          )
+          .catch(() => ({ data: undefined }))
+      ).data;
+
+      if (res?.status === "SUCCESS") {
+        return res.contractAddress;
+      }
+
+      return "";
+    },
+    async createCollectionContract(
+      collectionAddress: string,
+      chainNonce: number,
+      type: string
+    ) {
+      const error = new Error(
+        "Failed to deploy contract. Please come back later"
+      );
+      error.name = "FAIL";
+      const res = (
+        await api
+          .post<CollectionContractResponse>("/collection-contract", {
+            chainNonce,
+            collectionAddress,
+            type,
+          })
+          .catch(() => ({ data: undefined }))
+      ).data;
+
+      if (res?.status === "SUCCESS") {
+        let contractAddress = res?.contractAddress || "";
+
+        let timedOut = false;
+        const errorTimeout = setTimeout(() => {
+          timedOut = true;
+        }, 150_000);
+
+        while (!contractAddress && !timedOut) {
+          await new Promise((r) => setTimeout(r, 2_300));
+          contractAddress = await this.getCollectionContract(
+            collectionAddress,
+            chainNonce
+          );
+        }
+        clearTimeout(errorTimeout);
+        if (timedOut && !contractAddress) throw error;
+
+        return contractAddress;
+      }
+
+      throw error;
+    },
     async notifyWeb3(
       fromChain: number,
       fromHash: string,

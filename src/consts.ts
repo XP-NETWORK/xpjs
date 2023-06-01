@@ -4,7 +4,7 @@ import {
   ElrondHelper,
 } from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
-import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/web3";
+import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/evm/web3";
 import { web3HelperFactory as HederaHelperFactory } from "./helpers/hedera/browserAdapted";
 
 import {
@@ -25,7 +25,7 @@ import {
   SecretParams,
 } from "./helpers/secret";
 import { solanaHelper, SolanaHelper, SolanaParams } from "./helpers/solana";
-import { tonHelper, TonHelper, TonParams } from "./helpers/ton";
+import { tonHelper, TonHelper, TonParams } from "./helpers/ton/ton";
 import {
   dfinityHelper,
   DfinityHelper,
@@ -33,13 +33,16 @@ import {
 } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams, nearHelperFactory } from "./helpers/near";
 import { aptosHelper, AptosHelper, AptosParams } from "./helpers/aptos";
-import { web3ERC20HelperFactory, Web3ERC20Params } from "./helpers/web3_erc20";
+import {
+  web3ERC20HelperFactory,
+  Web3ERC20Params,
+} from "./helpers/evm/web3_erc20";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
   ELROND = "https://devnet-gateway.multiversx.com",
   HECO = "https://http-testnet.hecochain.com",
-  BSC = "https://data-seed-prebsc-2-s3.binance.org:8545/",
+  BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
   ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://matic-mumbai.chainstacklabs.com",
