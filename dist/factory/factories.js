@@ -675,8 +675,8 @@ var ChainFactoryConfigs;
         const provider = thor.ethers.modifyProvider(new ethers_1.ethers.providers.Web3Provider(new thor.ConnexProvider({ connex: new connex_framework_1.Framework(driver) })));
         return {
             tonParams: {
-                bridgeAddr: "kQAV8Z_aSl_e3PUMwXAb-mdE9l5Bsf83vn40NKc2LtsiFlGm",
-                burnerAddr: "kQDsF-yKhKqg4ygCynLfYRaw_QJeSoK2BeRpamO-nXeuuSiT",
+                bridgeAddr: "kQBpucKquLw9uwGfLe_KHt65YWnchjoY2VPSsKDTI7JqrcLm",
+                burnerAddr: "kQBR45AvvaO9a-rGfVkR0INx3JwoR-HngYA3tfctlGM1_Ml7",
                 notifier,
                 tonweb: new tonweb_1.default(new tonweb_1.default.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
                     apiKey: "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
