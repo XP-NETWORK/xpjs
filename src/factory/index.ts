@@ -1,7 +1,7 @@
 import { Chain, CHAIN_INFO, ChainType } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
-import { Web3Params } from "../helpers/web3";
+import { Web3Params } from "../helpers/evm/web3";
 
 export * from "./utils";
 export * from "./factories";
@@ -19,6 +19,7 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
+  EstimateDeployFees,
 } from "..";
 
 import { UserSigner } from "@elrondnetwork/erdjs/out";
@@ -57,8 +58,8 @@ import { NearParams } from "../helpers/near";
 import { SecretParams } from "../helpers/secret";
 import { SolanaParams } from "../helpers/solana";
 import { TezosParams } from "../helpers/tezos";
-import { TonParams } from "../helpers/ton";
-import { Web3ERC20Params } from "../helpers/web3_erc20";
+import { TonParams } from "../helpers/ton/ton";
+import { Web3ERC20Params } from "../helpers/evm/web3_erc20";
 import {
   ChainNonce,
   HelperMap,
@@ -71,7 +72,7 @@ import {
 import {
   checkBlockedContracts,
   getDefaultContract,
-  prepareTokenId,
+  //prepareTokenId,
   oldXpWraps,
 } from "./utils";
 import base64url from "base64url";
@@ -83,6 +84,7 @@ export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
 > &
   UnfreezeForeignNft<Signer, RawNft, Resp> &
   EstimateTxFees<RawNft> &
+  EstimateDeployFees &
   ChainNonceGet &
   ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins;
 
@@ -561,12 +563,16 @@ export function ChainFactory(
         scVerifyRest.list(originalContract, to, from),
       ]);
 
-      if (!checkWithOutTokenId && !verifyList && toChain?.estimateContractDep) {
+      if (
+        !checkWithOutTokenId &&
+        !verifyList &&
+        toChain?.estimateContractDeploy
+      ) {
         //@ts-ignore
-        const contractFee = await toChain?.estimateContractDep(toChain);
+        const contractFee = await toChain?.estimateContractDeploy(toChain);
         calcContractDep = (
           await calcExchangeFees(from, to, contractFee, toChain.getFeeMargin())
-        ).multipliedBy(1.2);
+        ).multipliedBy(1.1);
       }
 
       return { calcContractDep };
@@ -705,35 +711,39 @@ export function ChainFactory(
     from: string,
     tc: number,
     fc: number,
-    tokenId?: string
+    _?: string
   ): Promise<string | undefined> {
-    const res = await scVerifyRest.default(
-      from,
-      tc,
+    const res = await scVerifyRest.checkWithOutTokenId(
       fc,
-      tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
-    );
+      tc,
+      from
+    ); /*await scVerifyRest.default(
+            from,
+            tc,
+            fc,
+            tokenId && !isNaN(Number(tokenId)) ? tokenId : undefined
+        );*/
 
-    return res?.data.data;
+    return res?.data;
   }
 
-  async function checkMintWith(
-    from: string,
-    to: string,
-    targetChain: number,
-    fromChain: number,
-    tokenId?: string
-  ): Promise<boolean> {
-    const res = await scVerifyRest.verify(
-      from,
-      to,
-      targetChain,
-      fromChain,
-      tokenId
-    );
+  /*async function checkMintWith(
+        from: string,
+        to: string,
+        targetChain: number,
+        fromChain: number,
+        tokenId?: string
+    ): Promise<boolean> {
+        const res = await scVerifyRest.verify(
+            from,
+            to,
+            targetChain,
+            fromChain,
+            tokenId
+        );
 
-    return res?.data.data == "allowed";
-  }
+        return res?.data.data == "allowed";
+    }*/
 
   return {
     estimateWithContractDep,
@@ -772,15 +782,17 @@ export function ChainFactory(
           }
         })
       );
+      const toNonce = to.getNonce();
       unwrapped.length &&
         result.push(
           from.transferNftBatchToForeign(
             signer,
-            to.getNonce(),
+            toNonce,
             receiver,
             unwrapped,
             mw || to.XpNft1155!,
-            new BigNumber(fee)
+            new BigNumber(fee),
+            cToP.get(toNonce)
           )
         );
       wrapped.length &&
@@ -993,18 +1005,19 @@ export function ChainFactory(
         return res;
       } else {
         const mw =
-          //@ts-ignore contract is checked
-          "contract" in nft.native &&
-          mintWith &&
-          (await checkMintWith(
-            nft.collectionIdent,
-            mintWith,
-            toNonce,
-            fromNonce,
-            prepareTokenId(nft, fromNonce)
-          ))
-            ? mintWith
-            : getDefaultContract(nft, fromChain, toChain);
+          /*//@ts-ignore contract is checked
+                    "contract" in nft.native &&
+                    mintWith &&
+                    (await checkMintWith(
+                        nft.collectionIdent,
+                        mintWith,
+                        toNonce,
+                        fromNonce,
+                        prepareTokenId(nft, fromNonce)
+                    ))
+                        ? mintWith
+                        : */ mintWith ||
+          getDefaultContract(nft, fromChain, toChain);
 
         console.log(`Minting With : ${mw}`);
 
@@ -1020,7 +1033,8 @@ export function ChainFactory(
           new BigNumber(fee),
           mw,
           gasLimit,
-          gasPrice
+          gasPrice,
+          cToP.get(toNonce)
         );
 
         return res;

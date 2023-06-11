@@ -13,7 +13,7 @@ import {
 import { TronWeb } from "tronweb";
 // @ts-expect-error no types cope
 import TronStation from "tronstation";
-import { EthNftInfo, MintArgs } from "./web3";
+import { EthNftInfo, MintArgs } from "./evm/web3";
 import { BigNumber as EthBN } from "ethers";
 
 import {
