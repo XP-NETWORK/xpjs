@@ -372,7 +372,6 @@ export async function dfinityHelper(
         nft.collectionIdent,
         Number(nft.native.tokenId)
       );
-
       const nftContract = Principal.fromText(nft.native.canisterId);
 
       const approvedQuery = await args.agent.query(nftContract, {

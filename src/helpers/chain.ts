@@ -51,7 +51,8 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     txFees: BigNumber,
     mintWith: string,
     gasLimit?: ethers.BigNumberish | undefined,
-    gasPrice?: ethers.BigNumberish | undefined
+    gasPrice?: ethers.BigNumberish | undefined,
+    toParams?: any
   ): Promise<Resp | undefined>;
 }
 
@@ -97,19 +98,36 @@ export interface ValidateAddress {
   validateAddress(adr: string): Promise<boolean>;
 }
 
+export interface EstimateDeployFees {
+  estimateUserStoreDeploy?(): Promise<BigNumber>;
+  estimateContractDeploy?(toChain: any): Promise<BigNumber>;
+}
+
 export interface EstimateTxFees<RawNftF> {
   estimateValidateTransferNft(
     to: string,
     metadata: NftInfo<RawNftF>,
     mintWith: string
   ): Promise<BigNumber>;
-  estimateContractDep?(toChain: any): Promise<BigNumber>;
   isNftWhitelisted?(nft: any, signer?: any): Promise<Boolean>;
   estimateValidateUnfreezeNft(
     to: string,
     metadata: NftInfo<RawNftF>,
     mintWith: string
   ): Promise<BigNumber>;
+}
+
+export interface UserStore {
+  checkUserStore?(nft: NftInfo<any>): Promise<string>;
+  getUserStore?(
+    signer: ethers.Signer,
+    nft: NftInfo<any>,
+    fees?: number,
+    isMapped?: boolean
+  ): Promise<{
+    address: string;
+    contract: any;
+  }>;
 }
 
 export function ConcurrentSendError(): Error {
@@ -153,7 +171,8 @@ export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
     to: string,
     id: NftInfo<RawNft>[],
     mintWith: string,
-    txFees: BigNumber
+    txFees: BigNumber,
+    toParams?: any
   ): Promise<Resp>;
 }
 

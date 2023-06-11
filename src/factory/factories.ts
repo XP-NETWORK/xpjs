@@ -477,8 +477,8 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        bridgeAddr: "kQBGFgZOXaF7LPRxWrjd9l6Iws6KGhWiMs3BKzAZGyeMq2AS",
-        burnerAddr: "kQAee5m2tk_-ipbrq40Geey7_yZmjZwAYZFjuKy9CbWvVykL",
+        bridgeAddr: "kQAhrkiW7pA5eE_7vtz7_AQhHznfqR0VFyTGs4mgyaVLPgfG",
+        burnerAddr: "kQBo5aNuDXghpZ2u9yMdfaR9oVQEuRddNLCoNg8YgI_k2MOE",
         notifier,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
@@ -517,9 +517,10 @@ export namespace ChainFactoryConfigs {
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
-        htcToken: "0x0000000000000000000000000000000000230872",
-        erc721_addr: "0x000000000000000000000000000000000023084a",
-        erc1155_addr: "0x000000000000000000000000000000000023084a",
+        Xpnfthtsclaims: "0x000000000000000000000000000000000026eb9e",
+        htcToken: "0x000000000000000000000000000000000026EfFC",
+        erc721_addr: "0x000000000000000000000000000000000026eb6d",
+        erc1155_addr: "0x000000000000000000000000000000000026eb6d",
         minter_addr: "0x00000000000000000000000000000000002308b6",
         erc721Minter: "",
         erc1155Minter: "",
@@ -547,6 +548,7 @@ export namespace ChainFactoryConfigs {
         erc1155_addr: "0x77037e4f8aCb09f9bdedB9311bB6d9e74ed44371",
         nonce: Chain.AVALANCHE,
         feeMargin,
+        noWhitelist: true,
       },
       algorandParams: {
         algodApiKey: "kZWDAxYR7Y6S6RoyfGIi28SATZ5DfTIs5pF0UMW4",
@@ -562,7 +564,7 @@ export namespace ChainFactoryConfigs {
       },
       fantomParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
         erc721Minter: "",
         erc1155Minter: "",
@@ -619,6 +621,7 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x7Eac6825A851d79ae24301eA497AD8db2a0F4976",
         nonce: Chain.BSC,
         feeMargin,
+        noWhitelist: true,
       },
       secretParams: {
         bridge: {
@@ -654,7 +657,7 @@ export namespace ChainFactoryConfigs {
       },
       moonbeamParams: {
         notifier,
-
+        noWhitelist: true,
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.MOONBEAM),
         erc1155_addr: "0x554560C6800f123B4A713F80A5AC9F21486F5De8",
@@ -675,6 +678,7 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0xF712f9De44425d8845A1d597a247Fe88F4A23b6f",
         nonce: Chain.POLYGON,
         feeMargin,
+        noWhitelist: true,
       },
       skaleParams: {
         notifier,
@@ -845,7 +849,7 @@ export namespace ChainFactoryConfigs {
       },
       avalancheParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),
         erc721Minter: "0x9b2bACF4E69c81EF4EF42da84872aAC39ce7EC62",
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
@@ -857,7 +861,7 @@ export namespace ChainFactoryConfigs {
       },
       polygonParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.POLYGON),
         erc721Minter: "0x7E8493F59274651Cc0919feCf12E6A77153cdA72",
         erc1155Minter: "0x73E8deFC951D228828da35Ff8152f25c1e5226fa",
@@ -881,7 +885,7 @@ export namespace ChainFactoryConfigs {
       },
       bscParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BSC),
         erc721Minter: "0xa66dA346C08dD77bfB7EE5E68C45010B6F2538ff",
         erc1155_addr: "0x3F888c0Ee72943a3Fb1c169684A9d1e8DEB9f537",
