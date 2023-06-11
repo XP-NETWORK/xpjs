@@ -1,10 +1,10 @@
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
-import { Web3Params } from "../helpers/web3";
+import { Web3Params } from "../helpers/evm/web3";
 export * from "./utils";
 export * from "./factories";
 import BigNumber from "bignumber.js";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, NftInfo, TransactionStatus, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, MintNft, NftInfo, TransactionStatus, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, EstimateDeployFees } from "..";
 import { Wallet } from "@hashgraph/hethers";
 import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
@@ -15,10 +15,10 @@ import { NearParams } from "../helpers/near";
 import { SecretParams } from "../helpers/secret";
 import { SolanaParams } from "../helpers/solana";
 import { TezosParams } from "../helpers/tezos";
-import { TonParams } from "../helpers/ton";
-import { Web3ERC20Params } from "../helpers/web3_erc20";
+import { TonParams } from "../helpers/ton/ton";
+import { Web3ERC20Params } from "../helpers/evm/web3_erc20";
 import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
-export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & ChainNonceGet & ValidateAddress & {
+export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & EstimateDeployFees & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
 } & GetFeeMargins;

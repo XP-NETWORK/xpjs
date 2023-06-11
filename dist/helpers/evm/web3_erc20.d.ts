@@ -1,5 +1,5 @@
 import { Provider } from "@ethersproject/providers";
-import { BaseWeb3Helper, Web3Helper, Web3Params } from "..";
+import { BaseWeb3Helper, Web3Helper, Web3Params } from "../..";
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *

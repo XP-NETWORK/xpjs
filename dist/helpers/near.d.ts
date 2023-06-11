@@ -3,7 +3,7 @@ import { FinalExecutionOutcome } from "near-api-js/lib/providers";
 import { SignatureService } from "../services/estimator";
 import { EvNotifier } from "../services/notifier";
 import { WhitelistedService } from "../services/whitelisted";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, PreTransfer, WhitelistCheck } from "./chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, NftInfo, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, PreTransfer, WhitelistCheck, EstimateDeployFees } from "./chain";
 type NearTxResult = [FinalExecutionOutcome, any];
 type NearPreTransferArgs = {
     to: string;
@@ -52,7 +52,7 @@ interface BrowserMethods {
 interface NotifyMethod {
     notify(hash: string): Promise<void>;
 }
-export type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & Pick<PreTransfer<Account, NearNFT, string, NearPreTransferArgs>, "preTransfer"> & ValidateAddress & {
+export type NearHelper = ChainNonceGet & BalanceCheck & TransferNftForeign<Account, NearNFT, NearTxResult> & UnfreezeForeignNft<Account, NearNFT, NearTxResult> & MintNft<Account, NearMintArgs, NearTxResult> & EstimateTxFees<NearNFT> & EstimateDeployFees & Pick<PreTransfer<Account, NearNFT, string, NearPreTransferArgs>, "preTransfer"> & ValidateAddress & {
     XpNft: string;
     nftList(owner: Account, contract: string): Promise<NftInfo<NearNFT>[]>;
 } & GetFeeMargins & GetProvider<Near> & BrowserMethods & NotifyMethod & WhitelistCheck<NearNFT, Account>;

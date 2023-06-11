@@ -1,6 +1,6 @@
 import { BalanceCheck, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, TransferNftForeign, UnfreezeForeignNft } from "./chain";
 import { TronWeb } from "tronweb";
-import { EthNftInfo, MintArgs } from "./web3";
+import { EthNftInfo, MintArgs } from "./evm/web3";
 import { Approve, ExtractAction, ExtractTxnStatus, IsApproved, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck, GetTokenURI } from "..";
 import { ChainNonceGet } from "..";
 import { EvNotifier } from "../services/notifier";

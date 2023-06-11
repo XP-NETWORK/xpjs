@@ -1,21 +1,21 @@
 import { ElrondParams, ElrondHelper } from "./helpers/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
-import { Web3Params, Web3Helper } from "./helpers/web3";
+import { Web3Params, Web3Helper } from "./helpers/evm/web3";
 import { SupportedCurrency, SupportedCurrencyName } from "crypto-exchange-rate/dist/model/domain";
 import { AlgorandParams, AlgorandHelper } from "./helpers/algorand";
 import { TezosHelper, TezosParams } from "./helpers/tezos";
 import { ChainNonce, InferChainH, InferChainParam } from "./type-utils";
 import { SecretHelper, SecretParams } from "./helpers/secret";
 import { SolanaHelper, SolanaParams } from "./helpers/solana";
-import { TonHelper, TonParams } from "./helpers/ton";
+import { TonHelper, TonParams } from "./helpers/ton/ton";
 import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams } from "./helpers/near";
 import { AptosHelper, AptosParams } from "./helpers/aptos";
-import { Web3ERC20Params } from "./helpers/web3_erc20";
+import { Web3ERC20Params } from "./helpers/evm/web3_erc20";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.multiversx.com",
     HECO = "https://http-testnet.hecochain.com",
-    BSC = "https://data-seed-prebsc-2-s3.binance.org:8545/",
+    BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
     ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
     POLYGON = "https://matic-mumbai.chainstacklabs.com",

@@ -29,7 +29,7 @@ export interface PreTransfer<Signer, Nft, Ret, ExtraArgs> {
  * @returns Transaction and the Identifier of this action to track the status
  */
 export interface TransferNftForeign<Signer, RawNft, Resp> {
-    transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string, gasLimit?: ethers.BigNumberish | undefined, gasPrice?: ethers.BigNumberish | undefined): Promise<Resp | undefined>;
+    transferNftToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string, gasLimit?: ethers.BigNumberish | undefined, gasPrice?: ethers.BigNumberish | undefined, toParams?: any): Promise<Resp | undefined>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
@@ -61,11 +61,21 @@ export interface MintNft<Signer, Args, Identifier> {
 export interface ValidateAddress {
     validateAddress(adr: string): Promise<boolean>;
 }
+export interface EstimateDeployFees {
+    estimateUserStoreDeploy?(): Promise<BigNumber>;
+    estimateContractDeploy?(toChain: any): Promise<BigNumber>;
+}
 export interface EstimateTxFees<RawNftF> {
     estimateValidateTransferNft(to: string, metadata: NftInfo<RawNftF>, mintWith: string): Promise<BigNumber>;
-    estimateContractDep?(toChain: any): Promise<BigNumber>;
     isNftWhitelisted?(nft: any, signer?: any): Promise<Boolean>;
     estimateValidateUnfreezeNft(to: string, metadata: NftInfo<RawNftF>, mintWith: string): Promise<BigNumber>;
+}
+export interface UserStore {
+    checkUserStore?(nft: NftInfo<any>): Promise<string>;
+    getUserStore?(signer: ethers.Signer, nft: NftInfo<any>, fees?: number, isMapped?: boolean): Promise<{
+        address: string;
+        contract: any;
+    }>;
 }
 export declare function ConcurrentSendError(): Error;
 export interface PreTransferRawTxn<NativeNft, Ret> {
@@ -90,7 +100,7 @@ export interface GetTokenURI {
     getTokenURI(contract: string, tokenId: string): Promise<string>;
 }
 export interface TransferNftForeignBatch<Signer, RawNft, Resp> {
-    transferNftBatchToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>[], mintWith: string, txFees: BigNumber): Promise<Resp>;
+    transferNftBatchToForeign(sender: Signer, chain_nonce: number, to: string, id: NftInfo<RawNft>[], mintWith: string, txFees: BigNumber, toParams?: any): Promise<Resp>;
 }
 export interface UnfreezeForeignNftBatch<Signer, RawNft, Resp> {
     unfreezeWrappedNftBatch(sender: Signer, chainNonce: number, to: string, nfts: NftInfo<RawNft>[], txFees: BigNumber): Promise<Resp>;

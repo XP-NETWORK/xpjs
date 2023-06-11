@@ -1,5 +1,7 @@
 export type EvNotifier = ReturnType<typeof evNotifier>;
 export declare function evNotifier(url: string): {
+    getCollectionContract(collectionAddress: string, chainNonce: number): Promise<string>;
+    createCollectionContract(collectionAddress: string, chainNonce: number, type: string): Promise<string>;
     notifyWeb3(fromChain: number, fromHash: string, actionId?: string, type?: string, toChain?: number, txFees?: string, senderAddress?: string, targetAddress?: string, nftUri?: string, tokenId?: string, contract?: string): Promise<void>;
     notifyTron(txHash: string): Promise<void>;
     notifyElrond(txHash: string, sender: string, uris: string[], action_id: string | undefined): Promise<void>;

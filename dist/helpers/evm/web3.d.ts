@@ -3,13 +3,13 @@
  * @module
  */
 import BigNumber from "bignumber.js";
-import { BalanceCheck, EstimateTxFeesBatch, FeeMargins, GetFeeMargins, GetProvider, IsContractAddress, MintNft, TransferNftForeign, TransferNftForeignBatch, UnfreezeForeignNft, UnfreezeForeignNftBatch, ParamsGetter } from "./chain";
+import { BalanceCheck, EstimateTxFeesBatch, EstimateDeployFees, UserStore, FeeMargins, GetFeeMargins, GetProvider, IsContractAddress, MintNft, TransferNftForeign, TransferNftForeignBatch, UnfreezeForeignNft, UnfreezeForeignNftBatch, ParamsGetter } from "../chain";
 import { ContractTransaction, ethers, PopulatedTransaction, providers, Signer, Wallet } from "ethers";
 import { Provider, TransactionResponse } from "@ethersproject/providers";
 import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__factory } from "xpnet-web3-contracts";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "..";
-import { ChainNonce } from "../type-utils";
-import { EvNotifier } from "../services/notifier";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "../..";
+import { ChainNonce } from "../../type-utils";
+import { EvNotifier } from "../../services/notifier";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -34,10 +34,10 @@ export type MintArgs = {
     uri: string;
 };
 export interface IsApproved<Sender> {
-    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber): Promise<boolean>;
+    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, toApprove: string): Promise<boolean>;
 }
 export interface Approve<Sender> {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber): Promise<string | undefined>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber, toApprove?: string): Promise<string | undefined>;
 }
 type NullableCustomData = Record<string, any> | undefined;
 /**
@@ -66,12 +66,12 @@ type ExtraArgs = {
 /**
  * Traits implemented by this module
  */
-export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo, TransactionResponse> & UnfreezeForeignNft<Signer, EthNftInfo, TransactionResponse> & TransferNftForeignBatch<Signer, EthNftInfo, TransactionResponse> & UnfreezeForeignNftBatch<Signer, EthNftInfo, TransactionResponse> & EstimateTxFees<EthNftInfo> & EstimateTxFeesBatch<EthNftInfo> & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
+export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo, TransactionResponse> & UnfreezeForeignNft<Signer, EthNftInfo, TransactionResponse> & TransferNftForeignBatch<Signer, EthNftInfo, TransactionResponse> & UnfreezeForeignNftBatch<Signer, EthNftInfo, TransactionResponse> & EstimateTxFees<EthNftInfo> & EstimateTxFeesBatch<EthNftInfo> & EstimateDeployFees & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
 } & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
     XpNft1155: string;
-} & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params>;
+} & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params> & UserStore;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
@@ -95,6 +95,7 @@ export interface Web3Params {
     erc1155Minter: string;
     nonce: ChainNonce;
     feeMargin: FeeMargins;
+    noWhitelist?: boolean;
 }
 type NftMethodVal<T, Tx> = {
     freeze: "freezeErc1155" | "freezeErc721";
