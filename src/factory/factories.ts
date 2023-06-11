@@ -757,7 +757,6 @@ export namespace ChainFactoryConfigs {
       },
       caduceusParams: {
         notifier,
-
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.CADUCEUS),
         erc1155_addr: "0xF8AE68714fF6704883281603a22b56f47eB23511",
@@ -873,7 +872,7 @@ export namespace ChainFactoryConfigs {
       },
       fantomParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FANTOM),
         erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
         erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
@@ -1058,7 +1057,7 @@ export namespace ChainFactoryConfigs {
       moonbeamParams: {
         nonce: Chain.MOONBEAM,
         notifier,
-
+        noWhitelist: true,
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.MOONBEAM),
         erc721Minter: "",
