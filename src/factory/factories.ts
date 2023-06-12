@@ -600,7 +600,7 @@ export namespace ChainFactoryConfigs {
       },
       velasParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
         erc721Minter: "0x4d739e4953CE42f71604cbE142FD293841F9ed1c",
         erc1155Minter: "0xeEc7955F2F7AA4E36B582D8f022c9417ecB75a44",
@@ -983,7 +983,7 @@ export namespace ChainFactoryConfigs {
       },
       velasParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.VELAS),
         erc721Minter: "0x3F888c0Ee72943a3Fb1c169684A9d1e8DEB9f537",
         erc1155Minter: "0x0cC5F00e673B0bcd1F780602CeC6553aec1A57F0",
@@ -995,7 +995,7 @@ export namespace ChainFactoryConfigs {
       },
       iotexParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.IOTEX),
         minter_addr: "0x4bA4ADdc803B04b71412439712cB1911103380D6",
         erc721_addr: "0x6eD7dfDf9678eCb2051c46A1A5E38B4f310b18c5",
