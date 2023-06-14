@@ -74,6 +74,7 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
     XpNft1155: string;
 } & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params> & {
     injectSDK(sdk: HSDK): void;
+    toSolidityAddress(address: string): string;
 } & {
     listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<string>;
 } & {
