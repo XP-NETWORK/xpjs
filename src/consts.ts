@@ -608,7 +608,6 @@ CHAIN_INFO.set(Chain.SKALE, {
 });
 
 CHAIN_INFO.set(Chain.DFINITY, {
-  blockExplorerUrl: "", // TODO
   constructor: dfinityHelper,
   currency: SupportedCurrency.ICP,
   currencySymbol: SupportedCurrencyName.ICP,
@@ -616,6 +615,10 @@ CHAIN_INFO.set(Chain.DFINITY, {
   name: "DFINITY",
   nonce: Chain.DFINITY,
   type: ChainType.DFINITY,
+  blockExplorerUrl: "https://dashboard.internetcomputer.org/account/",
+  blockExplorerUrlAddr: "https://dashboard.internetcomputer.org/account/",
+  tnBlockExplorerUrl: "https://dashboard.internetcomputer.org/account/",
+  tnBlockExplorerUrlAddr: "https://dashboard.internetcomputer.org/account/",
 });
 
 CHAIN_INFO.set(Chain.NEAR, {

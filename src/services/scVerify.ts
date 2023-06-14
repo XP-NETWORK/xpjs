@@ -44,7 +44,7 @@ export function scVerify(url: string): ScVerifyService {
     async list(from: string, targetChain: number, fromChain: number) {
       const res = await request
         .get(
-          `/list?from=${from}&targetChain=${targetChain}&fromChain=${fromChain}&tokenId=1`
+          `/verify/list?from=${from}&targetChain=${targetChain}&fromChain=${fromChain}&tokenId=1`
         )
         .catch(() => ({ data: false }));
 

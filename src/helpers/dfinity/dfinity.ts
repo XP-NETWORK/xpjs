@@ -129,7 +129,10 @@ export type DfinityHelper = ChainNonceGet &
   } & {
     getAccountIdentifier(principal: string): string;
   } & WhitelistCheck<DfinityNft> &
-  ParamsGetter<DfinityParams>;
+  ParamsGetter<DfinityParams> & {
+    withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
+    encode_withdraw_fees(to: string, actionId: string): Promise<Buffer>;
+  };
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -145,15 +148,40 @@ export async function dfinityHelper(
   args: DfinityParams
 ): Promise<DfinityHelper> {
   //@ts-ignore
-  const ledger = LedgerCanister.create({ agent: args.agent });
-
-  const minter: ActorSubclass<_SERVICE> = Actor.createActor(idlFactory, {
+  let ledger = LedgerCanister.create({ agent: args.agent });
+  let minter: ActorSubclass<_SERVICE> = Actor.createActor(idlFactory, {
     agent: args.agent,
     canisterId: args.bridgeContract,
   });
 
+  const encode_withdraw_fees = async (to: string, actionId: string) => {
+    /*const numbers = await minter.encode_withdraw_fees(BigInt(actionId), {
+            to: Principal.fromText(to),
+        });*/
+
+    const x = encode(
+      [IDL.Nat, IDL.Record({ to: IDL.Principal })],
+      [
+        BigInt(actionId),
+        {
+          to: Principal.fromText(to),
+        },
+      ]
+    );
+    return Buffer.from(x);
+  };
+
+  const withdraw_fees = async (to: string, actionId: string, sig: Buffer) => {
+    await minter.withdraw_fees(
+      BigInt(actionId),
+      { to: Principal.fromText(to) },
+      Array.from(sig)
+    );
+    return true;
+  };
+
   async function transferTxFee(amt: BigNumber, sender?: any): Promise<bigint> {
-    if (sender) {
+    if (sender.requestTransfer) {
       const res = await sender.requestTransfer({
         to: args.bridgeContract.toText(),
         amount: amt.integerValue().toNumber(),
@@ -198,6 +226,16 @@ export async function dfinityHelper(
   //   return decode([Nat], resp)[0].toString() as string;
   // }
 
+  const adaptPlug = (agent: HttpAgent) => {
+    minter = Actor.createActor(idlFactory, {
+      agent,
+      canisterId: args.bridgeContract,
+    });
+    /* ledger = LedgerCanister.create({
+            agent,
+        });*/
+  };
+
   return {
     XpNft: args.xpnftId.toString(),
     getParams: () => args,
@@ -213,12 +251,10 @@ export async function dfinityHelper(
       }
     },
     async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
-      if (isBrowser) {
-        //@ts-ignore
-        args.agent = sender.agent;
-      } else {
-        args.agent.replaceIdentity(sender);
-      }
+      isBrowser
+        ? //@ts-ignore
+          adaptPlug(sender.agent)
+        : args.agent.replaceIdentity(sender);
 
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
@@ -227,10 +263,7 @@ export async function dfinityHelper(
         1
       );
 
-      const txFeeBlock = await transferTxFee(
-        new BigNumber(sig.fee),
-        isBrowser ? sender : undefined
-      );
+      const txFeeBlock = await transferTxFee(new BigNumber(sig.fee), sender);
 
       const actionId = await minter.freeze_nft(
         txFeeBlock,
@@ -250,12 +283,10 @@ export async function dfinityHelper(
       const canister = Principal.fromText(
         options.canisterId ? options.canisterId : args.umt.toText()
       );
-
       if (isBrowser) {
         //@ts-ignore
         args.agent = owner.agent;
       }
-
       const principal = isBrowser
         ? await args.agent.getPrincipal()
         : owner.getPrincipal();
@@ -277,12 +308,10 @@ export async function dfinityHelper(
       return mint;
     },
     async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
-      if (isBrowser) {
-        //@ts-ignore
-        args.agent = sender.agent;
-      } else {
-        args.agent.replaceIdentity(sender);
-      }
+      isBrowser
+        ? //@ts-ignore
+          adaptPlug(sender.agent)
+        : args.agent.replaceIdentity(sender);
 
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
@@ -291,12 +320,7 @@ export async function dfinityHelper(
         1
       );
 
-      const txFeeBlock = await transferTxFee(
-        new BigNumber(sig.fee),
-        isBrowser ? sender : undefined
-      );
-
-      console.log(txFeeBlock, "txFeeBlock");
+      const txFeeBlock = await transferTxFee(new BigNumber(sig.fee), sender);
 
       const actionId = await minter.withdraw_nft(
         txFeeBlock,
@@ -313,7 +337,7 @@ export async function dfinityHelper(
     },
 
     /// owner = principal of owner
-    async nftList(owner, contract) {
+    async nftList(owner, contract = args.xpnftId.toText()) {
       let aid = AccountIdentifier.fromPrincipal({
         principal: Principal.fromText(owner),
       });
@@ -437,19 +461,7 @@ export async function dfinityHelper(
         Principal.fromText(nft.native.canisterId)
       );
     },
+    withdraw_fees,
+    encode_withdraw_fees,
   };
 }
-
-/***
- * 
- * 
-Error: Call was rejected:
-  Request ID: 0ab1503fb5d82bfa487bbbf0f8ced49c2e886a30e7952bfc7612518657fdb84e
-  Reject code: 5
-  Reject text: Canister e3io4-qaaaa-aaaak-qasua-cai trapped explicitly: Panicked at 'called `Result::unwrap()` on an `Err` value: InvalidFee', src/minter/src/lib.rs:490:10
-
-call_on_cleanup also failed:
-
-Canister e3io4-qaaaa-aaaak-qasua-cai trapped explicitly: Panicked at 'called `Result::unwrap()` on an `Err` value: FailedToQueryFee("Failed to Query for fee. Code: NoError. Reason: cleanup")'
-
- */
