@@ -681,6 +681,7 @@ export async function web3HelperFactory(
         )
         .setGas(1_200_000)
         .setPayableAmount(fees.shiftedBy(-8).integerValue().toString())
+
         .setFunction(
           method,
           new hashSDK.ContractFunctionParameters()
@@ -852,7 +853,7 @@ export async function web3HelperFactory(
       return Boolean(res.transactionId);
     },
     toSolidityAddress(address) {
-      return hashSDK.AccountId.fromString(address).toSolidityAddress();
+      return hethers.utils.getAddressFromAccount(address);
     },
   };
 }
