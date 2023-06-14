@@ -31,7 +31,7 @@ export type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, Df
     getAccountIdentifier(principal: string): string;
 } & WhitelistCheck<DfinityNft> & ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
-    encode_withdraw_fees(to: string, actionId: string): Promise<Buffer>;
+    encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
 };
 export type DfinityParams = {
     agent: HttpAgent;
