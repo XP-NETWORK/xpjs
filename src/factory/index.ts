@@ -545,9 +545,12 @@ export function ChainFactory(
         ChainType.NEAR,
         ChainType.APTOS,
         ChainType.TON,
-      ].find((type) => type === fromType && type === toType);
+      ];
 
-      if (!deployable) throw noDeploy;
+      const deployableFrom = deployable.find((type) => type === fromType);
+      const deployableTo = deployable.find((type) => type === toType);
+
+      if (!deployableFrom || !deployableTo) throw noDeploy;
 
       const _chain =
         from == Number(originalChain) //if first time sending
