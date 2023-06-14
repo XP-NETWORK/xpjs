@@ -164,6 +164,7 @@ export type Web3Helper = BaseWeb3Helper &
   GetTokenURI &
   ParamsGetter<Web3Params> & {
     injectSDK(sdk: HSDK): void;
+    toSolidityAddress(address: string): string;
   } & {
     listHederaClaimableNFT(
       proxyContract: string | undefined,
@@ -849,6 +850,9 @@ export async function web3HelperFactory(
 
       const res = await trx.executeWithSigner(signer);
       return Boolean(res.transactionId);
+    },
+    toSolidityAddress(address) {
+      return hashSDK.AccountId.fromString(address).toSolidityAddress();
     },
   };
 }
