@@ -514,7 +514,7 @@ export function ChainFactory(
   ) => {
     const from = fromChain.getNonce();
     const to = toChain.getNonce();
-    const noDeploy = new Error(`${from} is undeployable`);
+    const noDeploy = new Error(`${from} or ${to} is undeployable`);
 
     let calcContractDep: BigNumber = new BigNumber("0");
     let originalContract: string;
@@ -537,13 +537,15 @@ export function ChainFactory(
         Number(originalChain) as ChainNonce
       )?.type;
 
+      const toType = CHAIN_INFO.get(to)?.type;
+
       const deployable = [
         ChainType.EVM,
         ChainType.SOLANA,
         ChainType.NEAR,
         ChainType.APTOS,
         ChainType.TON,
-      ].find((type) => type === fromType);
+      ].find((type) => type === fromType && type === toType);
 
       if (!deployable) throw noDeploy;
 

@@ -34,6 +34,7 @@ import {
 } from "../chain";
 import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
+import * as utils from "@dfinity/utils";
 
 export type DfinitySigner = Identity;
 
@@ -131,7 +132,7 @@ export type DfinityHelper = ChainNonceGet &
   } & WhitelistCheck<DfinityNft> &
   ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
-    encode_withdraw_fees(to: string, actionId: string): Promise<Buffer>;
+    encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
   };
 
 export type DfinityParams = {
@@ -159,8 +160,10 @@ export async function dfinityHelper(
             to: Principal.fromText(to),
         });*/
 
+    const ValidateWithdrawFees = IDL.Record({ to: IDL.Principal });
+
     const x = encode(
-      [IDL.Nat, IDL.Record({ to: IDL.Principal })],
+      [IDL.Nat, ValidateWithdrawFees],
       [
         BigInt(actionId),
         {
@@ -168,7 +171,8 @@ export async function dfinityHelper(
         },
       ]
     );
-    return Buffer.from(x);
+
+    return utils.arrayBufferToUint8Array(x);
   };
 
   const withdraw_fees = async (to: string, actionId: string, sig: Buffer) => {
