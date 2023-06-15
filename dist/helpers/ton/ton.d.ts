@@ -2,7 +2,7 @@ import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { EvNotifier } from "../../services/notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, WhitelistCheck } from "../chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck } from "../chain";
 import { PreTransfer } from "../..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 export type TonSigner = {
@@ -34,7 +34,7 @@ export type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
-} & GetFeeMargins & WhitelistCheck<TonNft>;
+} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees;
 export type TonParams = {
     tonweb: TonWeb;
     notifier: EvNotifier;
@@ -42,6 +42,7 @@ export type TonParams = {
     burnerAddr: string;
     xpnftAddr: string;
     feeMargin: FeeMargins;
+    extraFees: string;
 };
 type MethodMap = {
     ton_requestAccounts: [undefined, string];

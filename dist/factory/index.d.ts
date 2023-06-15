@@ -9,7 +9,7 @@ import { Wallet } from "@hashgraph/hethers";
 import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { AptosParams } from "../helpers/aptos";
-import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck } from "../helpers/chain";
+import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck, GetExtraFees } from "../helpers/chain";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { SecretParams } from "../helpers/secret";
@@ -21,7 +21,7 @@ import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner }
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & EstimateDeployFees & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
-} & GetFeeMargins;
+} & GetFeeMargins & GetExtraFees;
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> & TransferNftForeignBatch<Signer, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, RawNft, Resp> & EstimateTxFeesBatch<RawNft>;
 /**
  * A type representing a chain factory.
