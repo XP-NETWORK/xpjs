@@ -1118,6 +1118,21 @@ export namespace ChainFactoryConfigs {
         helperUrl: "https://helper.mainnet.near.org",
         signatureSvc,
       },
+      hederaParams: {
+        notifier,
+
+        provider: hethers.getDefaultProvider() as any,
+        evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
+        feeMargin,
+        nonce: Chain.HEDERA,
+        Xpnfthtsclaims: "0x00000000000000000000000000000000002daff5",
+        htcToken: "0x000000000000000000000000000000000026EfFC",
+        erc721_addr: "0x00000000000000000000000000000000002daff0",
+        erc1155_addr: "0x00000000000000000000000000000000002daff0",
+        minter_addr: "0x00000000000000000000000000000000002da8a2",
+        erc721Minter: "",
+        erc1155Minter: "",
+      },
     };
   };
 }
