@@ -47,6 +47,7 @@ import {
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
   WhitelistCheck,
+  GetExtraFees,
 } from "../helpers/chain";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import {
@@ -86,7 +87,8 @@ export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   EstimateTxFees<RawNft> &
   EstimateDeployFees &
   ChainNonceGet &
-  ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins;
+  ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins &
+  GetExtraFees;
 
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   TransferNftForeignBatch<Signer, RawNft, Resp> &
@@ -495,10 +497,9 @@ export function ChainFactory(
 
     if (extraFee) {
       conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
-      console.log("extra conv");
     }
 
-    return conv;
+    return fromChain.getExtraFees ? fromChain.getExtraFees().plus(conv) : conv;
   };
 
   const estimateWithContractDep = async <
@@ -703,6 +704,7 @@ export function ChainFactory(
     if (
       wrapped.origin == Chain.ALGORAND.toString() &&
       "isOptIn" in toChain &&
+      //@ts-ignore
       !(await (toChain as AlgorandHelper).isOptIn(
         receiver,
         parseInt(wrapped.assetID)

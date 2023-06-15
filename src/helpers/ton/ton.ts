@@ -15,6 +15,7 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
   BalanceCheck,
+  GetExtraFees,
   WhitelistCheck,
 } from "../chain";
 
@@ -66,7 +67,8 @@ export type TonHelper = ChainNonceGet &
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
   } & GetFeeMargins &
-  WhitelistCheck<TonNft>;
+  WhitelistCheck<TonNft> &
+  GetExtraFees;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -75,6 +77,7 @@ export type TonParams = {
   burnerAddr: string;
   xpnftAddr: string;
   feeMargin: FeeMargins;
+  extraFees: string;
 };
 
 type MethodMap = {
@@ -208,6 +211,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     preTransfer: () => Promise.resolve(true),
     preUnfreeze: () => Promise.resolve(true),
     getNonce: () => Chain.TON,
+    getExtraFees: () => {
+      return new BigNumber(TonWeb.utils.toNano(args.extraFees).toString(10));
+    },
     XpNft: args.xpnftAddr,
     async balance(address: string) {
       return new BigNumber(await ton.getBalance(address));
