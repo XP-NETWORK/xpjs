@@ -79,7 +79,7 @@ export namespace ChainFactoryConfigs {
         burnerAddr: "kQCbH9gGgqJzXuusUVajW_40brrl2fxTYqMkk6HUhJnIgOQA",
         xpnftAddr: "EQDji0YH-SNT-qi6o5dQQBLeWL0Xmm46fnqj34EYhOL34WDc",
         feeMargin,
-        extraFees: "0.5",
+        extraFees: "1",
         notifier,
       },
       solanaParams: {
@@ -478,7 +478,7 @@ export namespace ChainFactoryConfigs {
 
     return {
       tonParams: {
-        extraFees: "0.5",
+        extraFees: "1",
         bridgeAddr: "kQAhrkiW7pA5eE_7vtz7_AQhHznfqR0VFyTGs4mgyaVLPgfG",
         burnerAddr: "kQBo5aNuDXghpZ2u9yMdfaR9oVQEuRddNLCoNg8YgI_k2MOE",
         notifier,
@@ -740,7 +740,7 @@ export namespace ChainFactoryConfigs {
           })
         ),
         xpnftAddr: "EQABqbZubs5e3QQF3lxVZMvdaxlaIdNQWq8W1rn8rvVvWHys",
-        extraFees: "0.5",
+        extraFees: "1",
         feeMargin: { min: 1.5, max: 5 },
       },
       elrondParams: {
