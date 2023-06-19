@@ -930,6 +930,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0xF547002799955812378137FA30C21039E69deF05",
         nonce: Chain.ETHEREUM,
         feeMargin,
+        noWhitelist: true,
       },
       xDaiParams: {
         notifier,

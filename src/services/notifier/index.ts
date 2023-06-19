@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Chain } from "../..";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 
@@ -35,17 +36,21 @@ export function evNotifier(url: string) {
       chainNonce: number,
       type: string
     ) {
+      const ethereum = chainNonce === Chain.ETHEREUM;
       const error = new Error(
         "Failed to deploy contract. Please come back later"
       );
       error.name = "FAIL";
       const res = (
         await api
-          .post<CollectionContractResponse>("/collection-contract", {
-            chainNonce,
-            collectionAddress,
-            type,
-          })
+          .post<CollectionContractResponse>(
+            `/${ethereum ? "eth-" : ""}collection-contract`,
+            {
+              chainNonce,
+              collectionAddress,
+              type,
+            }
+          )
           .catch(() => ({ data: undefined }))
       ).data;
 
