@@ -42,10 +42,13 @@ import {
 import { UserNFTStore__factory } from "xpnet-web3-contracts/dist/factories/UserStore.sol/index";
 import { UserNFTStore } from "xpnet-web3-contracts/dist/UserStore.sol";
 
-console.log(Minter__factory, "Minter__factory");
-console.log(UserNFTStore__factory, "UserNFTStore__factory");
+import { UserNFTStore__factory as UserNFTStore721__factory } from "xpnet-web3-contracts/dist/factories/UserNFTStore721.sol/index";
+//import { UserNFTStore as b } from "xpnet-web3-contracts/dist/UserNFTStore721.sol";
+
+console.log(UserNFTStore721__factory, "Minter__factory");
 
 import {
+  Chain,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
@@ -557,9 +560,10 @@ export async function web3HelperFactory(
     address: string = "0x837B2eB764860B442C971F98f505E7c5f419edd7"
   ) => {
     const from = await signer.getAddress();
+    const ethereum = params.nonce === Chain.ETHEREUM;
     const tx = await signer.sendTransaction({
       from,
-      to: address,
+      to: ethereum ? "0xd84268df6915bFDdd1b639556101992EF0c97C9D" : address,
       value: ethers.utils.parseEther(amount),
       nonce: await provider.getTransactionCount(from, "latest"),
       gasLimit: ethers.utils.hexlify(100000),
@@ -591,8 +595,8 @@ export async function web3HelperFactory(
     const fees = new BigNumber(0);
     const gasPrice = await provider.getGasPrice();
     const contract = new ethers.ContractFactory(
-      UserNFTStore__factory.abi,
-      UserNFTStore__factory.bytecode
+      UserNFTStore721__factory.abi,
+      UserNFTStore721__factory.bytecode
     );
     const gas = await provider.estimateGas(
       contract.getDeployTransaction(
