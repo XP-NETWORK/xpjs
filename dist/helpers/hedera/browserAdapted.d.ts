@@ -64,11 +64,6 @@ export type BaseWeb3Helper = BalanceCheck &
 type ExtraArgs = {
     gasPrice: ethers.BigNumber;
 };
-type tokenListResponce = {
-    contract: string;
-    htsToken: string;
-    tokens: string[];
-};
 /**
  * Traits implemented by this module
  */
@@ -81,7 +76,7 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
     injectSDK(sdk: HSDK): void;
     toSolidityAddress(address: string): string;
 } & {
-    listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<tokenListResponce[]>;
+    listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<string>;
 } & {
     claimNFT(proxyContract: string | undefined, htsToken: string | undefined, tokenId: string, signer: any): Promise<boolean>;
 } & {
