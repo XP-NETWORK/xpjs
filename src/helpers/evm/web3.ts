@@ -48,7 +48,6 @@ import { UserNFTStore__factory as UserNFTStore721__factory } from "xpnet-web3-co
 console.log(UserNFTStore721__factory, "Minter__factory");
 
 import {
-  Chain,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
