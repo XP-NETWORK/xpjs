@@ -134,6 +134,11 @@ export type BaseWeb3Helper = BalanceCheck &
   };
 
 type ExtraArgs = { gasPrice: ethers.BigNumber };
+type tokenListResponce = {
+  contract: string;
+  htsToken: string;
+  tokens: string[];
+};
 
 /**
  * Traits implemented by this module
@@ -170,7 +175,7 @@ export type Web3Helper = BaseWeb3Helper &
       proxyContract: string | undefined,
       htsToken: string | undefined,
       signer: any
-    ): Promise<string>;
+    ): Promise<tokenListResponce[]>;
   } & {
     claimNFT(
       proxyContract: string | undefined,
@@ -512,6 +517,10 @@ export async function web3HelperFactory(
     return receipt.hash;
   };
 
+  const toSolidityAddress = (address: string) => {
+    return hethers.utils.getAddressFromAccount(address);
+  };
+
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
 
   return {
@@ -785,16 +794,63 @@ export async function web3HelperFactory(
       });
     },
     async listHederaClaimableNFT(
-      proxyContract = params.Xpnfthtsclaims,
-      htsToken = params.htcToken,
+      _ = params.Xpnfthtsclaims,
+      __ = params.htcToken,
       signer
     ) {
-      const contract = new ethers.Contract(
+      const address = signer.address;
+
+      const res = (
+        await axios(
+          `https://mainnet-public.mirrornode.hedera.com/api/v1/accounts/${address}`
+        )
+      ).data;
+
+      const unclaimedTokens = res.balance.tokens
+        .filter((token: any) => token.balance === 0)
+        .map((token: any) => token.token_id);
+
+      const toClaim: tokenListResponce[] = [];
+
+      for (const uncaimed of unclaimedTokens) {
+        const tokenInfo = (
+          await axios(
+            `https://mainnet-public.mirrornode.hedera.com/api/v1/tokens/${uncaimed}`
+          )
+        ).data;
+
+        const contract = toSolidityAddress(tokenInfo.treasury_account_id);
+        const htsToken = toSolidityAddress(uncaimed);
+
+        const _contract = new ethers.Contract(
+          contract,
+          HEDERA_PROXY_CLAIMS_ABI,
+          params.evmProvider
+        );
+
+        const claimables: string[] = await _contract
+          .getClaimableNfts(address, htsToken, {
+            gasLimit: 1000000,
+          })
+          .catch(() => []);
+
+        if (claimables.length) {
+          toClaim.push({
+            contract,
+            htsToken,
+            tokens: claimables,
+          });
+        }
+      }
+
+      return toClaim;
+
+      /*const contract = new ethers.Contract(
         proxyContract,
         HEDERA_PROXY_CLAIMS_ABI,
         params.evmProvider
       );
-      return await contract.getClaimableNfts(signer.address, htsToken, {
+      return await contract.getClaimableNfts(address, htsToken, {
         gasLimit: 1000000,
       });
 
@@ -852,8 +908,6 @@ export async function web3HelperFactory(
       const res = await trx.executeWithSigner(signer);
       return Boolean(res.transactionId);
     },
-    toSolidityAddress(address) {
-      return hethers.utils.getAddressFromAccount(address);
-    },
+    toSolidityAddress,
   };
 }
