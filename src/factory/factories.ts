@@ -248,7 +248,7 @@ export namespace ChainFactoryConfigs {
       },
       ropstenParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ROPSTEN),
         erc1155_addr: "0x46Df0d0Dd629d61BDFA567dE61912FDeD883A60d",
         erc721_addr: "0x33DC209D33AddF60cf90Dd4B10f9a198A1A93f63",

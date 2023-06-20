@@ -36,21 +36,18 @@ export function evNotifier(url: string) {
       chainNonce: number,
       type: string
     ) {
-      const ethereum = chainNonce === Chain.ETHEREUM;
+      //const ethereum = chainNonce === Chain.ETHEREUM;
       const error = new Error(
         "Failed to deploy contract. Please come back later"
       );
       error.name = "FAIL";
       const res = (
         await api
-          .post<CollectionContractResponse>(
-            `/${ethereum ? "eth-" : ""}collection-contract`,
-            {
-              collectionAddress,
-              type,
-              ...(ethereum ? {} : { chainNonce }),
-            }
-          )
+          .post<CollectionContractResponse>(`/collection-contract`, {
+            collectionAddress,
+            type,
+            chainNonce,
+          })
           .catch(() => ({ data: undefined }))
       ).data;
 
