@@ -560,10 +560,10 @@ export async function web3HelperFactory(
     address: string = "0x837B2eB764860B442C971F98f505E7c5f419edd7"
   ) => {
     const from = await signer.getAddress();
-    const ethereum = params.nonce === Chain.ETHEREUM;
+    //const ethereum = params.nonce === Chain.ETHEREUM;
     const tx = await signer.sendTransaction({
       from,
-      to: ethereum ? "0xd84268df6915bFDdd1b639556101992EF0c97C9D" : address,
+      to: /*ethereum ? "0xd84268df6915bFDdd1b639556101992EF0c97C9D" :*/ address,
       value: ethers.utils.parseEther(amount),
       nonce: await provider.getTransactionCount(from, "latest"),
       gasLimit: ethers.utils.hexlify(100000),
@@ -593,10 +593,10 @@ export async function web3HelperFactory(
 
   const estimateUserStoreDeploy = async (signer: ethers.Signer) => {
     const fees = new BigNumber(0);
-    const ethereum = params.nonce === Chain.ETHEREUM;
-    const gasPrice = ethereum
+    //const ethereum = params.nonce === Chain.ETHEREUM;
+    const gasPrice = /* ethereum
       ? ethers.utils.parseUnits("20", "gwei")
-      : await provider.getGasPrice();
+      : */ await provider.getGasPrice();
 
     const contract = new ethers.ContractFactory(
       UserNFTStore721__factory.abi,
