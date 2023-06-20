@@ -46,9 +46,9 @@ export function evNotifier(url: string) {
           .post<CollectionContractResponse>(
             `/${ethereum ? "eth-" : ""}collection-contract`,
             {
-              chainNonce,
               collectionAddress,
               type,
+              ...(ethereum ? {} : { chainNonce }),
             }
           )
           .catch(() => ({ data: undefined }))

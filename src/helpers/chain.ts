@@ -99,7 +99,7 @@ export interface ValidateAddress {
 }
 
 export interface EstimateDeployFees {
-  estimateUserStoreDeploy?(): Promise<BigNumber>;
+  estimateUserStoreDeploy?(signer: ethers.Signer): Promise<BigNumber>;
   estimateContractDeploy?(toChain: any): Promise<BigNumber>;
 }
 

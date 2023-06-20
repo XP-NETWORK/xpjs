@@ -412,7 +412,7 @@ export async function web3HelperFactory(
 
               if (!fees) {
                 console.log("calc deploy fees");
-                fees = (await estimateUserStoreDeploy())
+                fees = (await estimateUserStoreDeploy(signer))
                   .div(1e18)
                   .integerValue()
                   .toNumber();
@@ -591,25 +591,43 @@ export async function web3HelperFactory(
     );
   };
 
-  const estimateUserStoreDeploy = async () => {
+  const estimateUserStoreDeploy = async (signer: ethers.Signer) => {
     const fees = new BigNumber(0);
-    const gasPrice = await provider.getGasPrice();
+    const gasPrice = ethers.utils.parseUnits(
+      "20",
+      "gwei"
+    ); /* await provider.getGasPrice();*/
+    const feeData = await provider.getFeeData();
+
+    console.log(feeData, "feeData");
+
     const contract = new ethers.ContractFactory(
       UserNFTStore721__factory.abi,
-      UserNFTStore721__factory.bytecode
+      UserNFTStore721__factory.bytecode,
+      signer
     );
+
     const gas = await provider.estimateGas(
       contract.getDeployTransaction(
         123,
         42,
-        "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"
+        "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE",
+        Buffer.from(
+          "0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE".slice(2),
+          "hex"
+        ).toString("hex")
       )
     );
 
+    if (!feeData.gasPrice) {
+      feeData.gasPrice = await provider.getGasPrice();
+    }
+
     const contractFee = gas.mul(gasPrice);
+
     return fees
       .plus(new BigNumber(contractFee.toString()))
-      .multipliedBy(1.1)
+      .multipliedBy(1.5)
       .integerValue();
   };
 

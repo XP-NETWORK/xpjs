@@ -280,6 +280,7 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.ARBITRUM,
         notifier,
 
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ARBITRUM),
       },
       bitgertParams: {
@@ -800,7 +801,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.ARBITRUM,
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ARBITRUM),
       },
       bitgertParams: {
@@ -1138,7 +1139,9 @@ export namespace ChainFactoryConfigs {
         notifier,
 
         provider: hethers.getDefaultProvider() as any,
-        evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
+        evmProvider: new ethers.providers.JsonRpcProvider(
+          `https://pool.arkhia.io/hedera/mainnet/json-rpc/v1/w72114343aft2784d1a1e431PW051814`
+        ),
         feeMargin,
         nonce: Chain.HEDERA,
         Xpnfthtsclaims: "0x00000000000000000000000000000000002db2d8",
