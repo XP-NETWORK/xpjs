@@ -593,13 +593,10 @@ export async function web3HelperFactory(
 
   const estimateUserStoreDeploy = async (signer: ethers.Signer) => {
     const fees = new BigNumber(0);
-    const gasPrice = ethers.utils.parseUnits(
-      "20",
-      "gwei"
-    ); /* await provider.getGasPrice();*/
-    const feeData = await provider.getFeeData();
-
-    console.log(feeData, "feeData");
+    const ethereum = params.nonce === Chain.ETHEREUM;
+    const gasPrice = ethereum
+      ? ethers.utils.parseUnits("20", "gwei")
+      : await provider.getGasPrice();
 
     const contract = new ethers.ContractFactory(
       UserNFTStore721__factory.abi,
@@ -618,10 +615,6 @@ export async function web3HelperFactory(
         ).toString("hex")
       )
     );
-
-    if (!feeData.gasPrice) {
-      feeData.gasPrice = await provider.getGasPrice();
-    }
 
     const contractFee = gas.mul(gasPrice);
 
