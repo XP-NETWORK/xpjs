@@ -62,7 +62,7 @@ export interface ValidateAddress {
     validateAddress(adr: string): Promise<boolean>;
 }
 export interface EstimateDeployFees {
-    estimateUserStoreDeploy?(): Promise<BigNumber>;
+    estimateUserStoreDeploy?(signer: ethers.Signer): Promise<BigNumber>;
     estimateContractDeploy?(toChain: any): Promise<BigNumber>;
 }
 export interface EstimateTxFees<RawNftF> {
