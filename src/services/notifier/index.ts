@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Chain } from "../..";
 
 export type EvNotifier = ReturnType<typeof evNotifier>;
 
