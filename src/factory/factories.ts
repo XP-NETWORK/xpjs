@@ -491,6 +491,18 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      arbitrumParams: {
+        erc721Minter: "0x66A47ff1b6d3072942582dACe797BEe8C9F28273",
+        erc1155Minter: "0xBF180ceEcDA4b5449AF8618a1DE2B82211eDC82c",
+        erc1155_addr: "0x0d0Dc4013a078BF36FD1E632032a9d8eFcD3D2dc",
+        erc721_addr: "0x7deC0896CFaFB47D6d8416d07C6bFba06c86B938",
+        minter_addr: "0x79a3C39EF62F5052Af6C8b7874fB0FD809e4e998",
+        feeMargin,
+        nonce: Chain.ARBITRUM,
+        notifier,
+        noWhitelist: true,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ARBITRUM),
+      },
       nearParams: {
         networkId: "mainnet",
         nonce: Chain.NEAR,
