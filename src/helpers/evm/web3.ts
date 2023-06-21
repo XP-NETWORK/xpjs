@@ -619,7 +619,7 @@ export async function web3HelperFactory(
 
     return fees
       .plus(new BigNumber(contractFee.toString()))
-      .multipliedBy(1.5)
+      .multipliedBy(1.1)
       .integerValue();
   };
 
