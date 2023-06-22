@@ -10,6 +10,7 @@ import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__fa
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck, EstimateDeployFees } from "../..";
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
+import { HederaService } from "../../services/hederaApi";
 type HSDK = typeof import("@hashgraph/sdk");
 /**
  * Information required to perform NFT transfers in this chain
@@ -64,6 +65,11 @@ export type BaseWeb3Helper = BalanceCheck &
 type ExtraArgs = {
     gasPrice: ethers.BigNumber;
 };
+type tokenListResponce = {
+    contract: string;
+    htsToken: string;
+    tokens: string[];
+};
 /**
  * Traits implemented by this module
  */
@@ -76,7 +82,7 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
     injectSDK(sdk: HSDK): void;
     toSolidityAddress(address: string): string;
 } & {
-    listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<string>;
+    listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<tokenListResponce[]>;
 } & {
     claimNFT(proxyContract: string | undefined, htsToken: string | undefined, tokenId: string, signer: any): Promise<boolean>;
 } & {
@@ -120,6 +126,7 @@ export declare function web3HelperFactory(params: Web3Params & {
     htcToken: string;
     Xpnfthtsclaims: string;
     evmProvider: ethers.providers.JsonRpcProvider;
+    hederaApi: HederaService;
 }): Promise<Web3Helper>;
 export {};
 //# sourceMappingURL=browserAdapted.d.ts.map
