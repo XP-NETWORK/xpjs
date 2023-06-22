@@ -56,6 +56,7 @@ import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 
 import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
+import { HederaService } from "../../services/hederaApi";
 
 type HSDK = typeof import("@hashgraph/sdk");
 let hashSDK: HSDK;
@@ -134,6 +135,11 @@ export type BaseWeb3Helper = BalanceCheck &
   };
 
 type ExtraArgs = { gasPrice: ethers.BigNumber };
+type tokenListResponce = {
+  contract: string;
+  htsToken: string;
+  tokens: string[];
+};
 
 /**
  * Traits implemented by this module
@@ -170,7 +176,7 @@ export type Web3Helper = BaseWeb3Helper &
       proxyContract: string | undefined,
       htsToken: string | undefined,
       signer: any
-    ): Promise<string>;
+    ): Promise<tokenListResponce[]>;
   } & {
     claimNFT(
       proxyContract: string | undefined,
@@ -372,6 +378,7 @@ export async function web3HelperFactory(
     htcToken: string;
     Xpnfthtsclaims: string;
     evmProvider: ethers.providers.JsonRpcProvider;
+    hederaApi: HederaService;
   }
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
@@ -510,6 +517,10 @@ export async function web3HelperFactory(
     await receipt.wait();
 
     return receipt.hash;
+  };
+
+  const toSolidityAddress = (address: string) => {
+    return hethers.utils.getAddressFromAccount(address);
   };
 
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
@@ -785,16 +796,74 @@ export async function web3HelperFactory(
       });
     },
     async listHederaClaimableNFT(
-      proxyContract = params.Xpnfthtsclaims,
-      htsToken = params.htcToken,
+      _ = params.Xpnfthtsclaims,
+      __ = params.htcToken,
       signer
     ) {
-      const contract = new ethers.Contract(
+      const claimList: tokenListResponce[] = [];
+      const address = signer.address;
+
+      const htsTokens = (await params.hederaApi.getTokens(address))
+        .filter((token) => token.balance === 0)
+        .map((token) => token.token_id);
+
+      for (const htsToken of htsTokens) {
+        const tokenInfo = await params.hederaApi.getokenInfo(htsToken);
+
+        const treasuryAccount = toSolidityAddress(
+          tokenInfo.treasury_account_id
+        );
+
+        const isContract = await params.hederaApi.isContract(treasuryAccount);
+        console.log(isContract, treasuryAccount);
+        if (isContract) {
+          const nftContract = new ethers.Contract(
+            treasuryAccount,
+            ["function claimContract() public view returns (address)"],
+            params.evmProvider
+          );
+
+          const nftClaimsContract = await nftContract.functions
+            .claimContract()
+            .catch((e) => {
+              console.log(e, "e");
+              return [];
+            });
+          console.log(nftClaimsContract, "nftClaimsContract");
+          if (nftClaimsContract.length) {
+            const _nftClaimsContract = new ethers.Contract(
+              nftClaimsContract[0],
+              HEDERA_PROXY_CLAIMS_ABI,
+              params.evmProvider
+            );
+
+            const toClaim = await _nftClaimsContract.getClaimableNfts(
+              address,
+              toSolidityAddress(htsToken),
+              {
+                gasLimit: 1000000,
+              }
+            );
+
+            console.log(toClaim, "toClaim");
+
+            claimList.push({
+              contract: treasuryAccount,
+              htsToken: toSolidityAddress(htsToken),
+              tokens: toClaim,
+            });
+          }
+        }
+      }
+
+      return claimList;
+
+      /*const contract = new ethers.Contract(
         proxyContract,
         HEDERA_PROXY_CLAIMS_ABI,
         params.evmProvider
       );
-      return await contract.getClaimableNfts(signer.address, htsToken, {
+      return await contract.getClaimableNfts(address, htsToken, {
         gasLimit: 1000000,
       });
 
@@ -852,8 +921,6 @@ export async function web3HelperFactory(
       const res = await trx.executeWithSigner(signer);
       return Boolean(res.transactionId);
     },
-    toSolidityAddress(address) {
-      return hethers.utils.getAddressFromAccount(address);
-    },
+    toSolidityAddress,
   };
 }

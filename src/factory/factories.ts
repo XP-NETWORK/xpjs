@@ -16,6 +16,7 @@ import { FeeMargins } from "../helpers/chain";
 import { signatureService } from "../services/estimator";
 import { whitelistedService } from "../services/whitelisted";
 import { AppConfigs } from "..";
+import { hederaService } from "../services/hederaApi";
 
 /*const EVM_VALIDATORS = [
   "0xffa74a26bf87a32992bb4be080467bb4a8019e00",
@@ -731,6 +732,9 @@ export namespace ChainFactoryConfigs {
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(middleware_uri);
+    const hederaApi = hederaService(
+      "https://mainnet-public.mirrornode.hedera.com/api/v1"
+    );
 
     // VeChain related:
     const net = new SimpleNet(MainNetRpcUri.VECHAIN);
@@ -1137,9 +1141,9 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-
         provider: hethers.getDefaultProvider() as any,
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
+        hederaApi,
         feeMargin,
         nonce: Chain.HEDERA,
         Xpnfthtsclaims: "0x00000000000000000000000000000000002db2d8",
