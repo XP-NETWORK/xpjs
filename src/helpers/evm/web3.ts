@@ -45,8 +45,6 @@ import { UserNFTStore } from "xpnet-web3-contracts/dist/UserStore.sol";
 import { UserNFTStore__factory as UserNFTStore721__factory } from "xpnet-web3-contracts/dist/factories/UserNFTStore721.sol/index";
 //import { UserNFTStore as b } from "xpnet-web3-contracts/dist/UserNFTStore721.sol";
 
-console.log(UserNFTStore721__factory, "Minter__factory");
-
 import {
   ChainNonceGet,
   EstimateTxFees,
