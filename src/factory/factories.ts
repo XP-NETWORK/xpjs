@@ -736,9 +736,6 @@ export namespace ChainFactoryConfigs {
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
     const notifier = evNotifier(middleware_uri);
-    const hederaApi = hederaService(
-      "https://mainnet-public.mirrornode.hedera.com/api/v1"
-    );
 
     // VeChain related:
     const net = new SimpleNet(MainNetRpcUri.VECHAIN);
