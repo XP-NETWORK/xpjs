@@ -383,7 +383,9 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-
+        hederaApi: hederaService(
+          "https://testnet.mirrornode.hedera.com/api/v1"
+        ),
         provider: hethers.getDefaultProvider("testnet") as any,
         evmProvider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HEDERA),
         feeMargin,
@@ -528,7 +530,9 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-
+        hederaApi: hederaService(
+          "https://mainnet-public.mirrornode.hedera.com/api/v1"
+        ),
         provider: hethers.getDefaultProvider() as any,
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         feeMargin,
@@ -1033,7 +1037,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x0000000000000000000000000000000000000000",
         nonce: Chain.AURORA,
         notifier,
-
+        noWhitelist: true,
         feeMargin,
       },
       godwokenParams: {
@@ -1143,7 +1147,9 @@ export namespace ChainFactoryConfigs {
         notifier,
         provider: hethers.getDefaultProvider() as any,
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
-        hederaApi,
+        hederaApi: hederaService(
+          "https://mainnet-public.mirrornode.hedera.com/api/v1"
+        ),
         feeMargin,
         nonce: Chain.HEDERA,
         Xpnfthtsclaims: "0x00000000000000000000000000000000002db2d8",
