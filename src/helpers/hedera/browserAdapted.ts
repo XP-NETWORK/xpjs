@@ -58,6 +58,8 @@ import { hethers } from "@hashgraph/hethers";
 import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
 import { HederaService } from "../../services/hederaApi";
 
+import { tryTimes } from "../evm/web3_utils";
+
 type HSDK = typeof import("@hashgraph/sdk");
 let hashSDK: HSDK;
 
@@ -334,7 +336,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       tok: string,
       __: NullableCustomData
     ) => {
-      const res = await umt.getApproved(tok, {
+      const res = await tryTimes(3)(umt.getApproved, tok, {
         gasLimit: 1000000,
       });
       return res?.toLowerCase() == minterAddr.toLowerCase();
