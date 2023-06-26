@@ -36,7 +36,7 @@ export type MintArgs = {
     uri: string;
 };
 export interface IsApproved<Sender> {
-    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber): Promise<boolean>;
+    isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, toApprove?: string): Promise<boolean>;
 }
 export interface Approve<Sender> {
     approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber): Promise<string | undefined>;
