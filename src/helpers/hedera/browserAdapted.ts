@@ -90,8 +90,7 @@ export interface IsApproved<Sender> {
   isApprovedForMinter(
     address: NftInfo<EthNftInfo>,
     sender: Sender,
-    txFee: BigNumber,
-    gasPrice?: ethers.BigNumber
+    toApprove?: string
   ): Promise<boolean>;
 }
 
@@ -301,7 +300,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       customData: NullableCustomData
     ) => {
       return umt.isApprovedForAll(sender, minterAddr, {
-        gasLimit: "85000",
+        gasLimit: 1000000,
         customData,
       });
     },
@@ -316,7 +315,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         forAddr,
         true,
         {
-          gasLimit: "85000",
+          gasLimit: 1000000,
           customData,
         }
       );
@@ -336,7 +335,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       __: NullableCustomData
     ) => {
       const res = await umt.getApproved(tok, {
-        gasLimit: "85000",
+        gasLimit: 1000000,
       });
       return res?.toLowerCase() == minterAddr.toLowerCase();
     },
@@ -473,7 +472,11 @@ export async function web3HelperFactory(
     return array.join("");
   };
 
-  const isApprovedForMinter = async (id: NftInfo<EthNftInfo>, _: Signer) => {
+  const isApprovedForMinter = async (
+    id: NftInfo<EthNftInfo>,
+    _: Signer,
+    toApprove: string
+  ) => {
     const contract = NFT_METHOD_MAP[id.native.contractType];
 
     const erc = contract.umt.connect(id.native.contract, params.evmProvider);
@@ -481,7 +484,7 @@ export async function web3HelperFactory(
     return await contract.approved(
       erc as any,
       "",
-      params.erc721_addr,
+      toApprove,
       id.native.tokenId,
       {}
     );
@@ -491,9 +494,20 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     sender: Signer,
     _txFees: BigNumber,
-    gasPrice: ethers.BigNumberish | undefined
+    gasPrice: ethers.BigNumberish | undefined,
+    isWrappedNft?: boolean
   ) => {
-    const isApproved = await isApprovedForMinter(id, sender);
+    const toApprove = isWrappedNft
+      ? toSolidityAddress(
+          (
+            await params.hederaApi.getokenInfo(
+              toHederaAccountId(id.native.contract)
+            )
+          ).treasury_account_id
+        )
+      : params.erc721_addr;
+
+    const isApproved = await isApprovedForMinter(id, sender, toApprove);
     if (isApproved) {
       return undefined;
     }
@@ -506,7 +520,7 @@ export async function web3HelperFactory(
 
     const receipt = await NFT_METHOD_MAP[id.native.contractType].approve(
       erc as any,
-      params.erc721_addr,
+      toApprove,
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
       {},
@@ -522,6 +536,9 @@ export async function web3HelperFactory(
   const toSolidityAddress = (address: string) => {
     return hethers.utils.getAddressFromAccount(address);
   };
+
+  const toHederaAccountId = (address: string) =>
+    hashSDK.AccountId.fromSolidityAddress(address).toString();
 
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
 
@@ -554,7 +571,8 @@ export async function web3HelperFactory(
     async preTransferRawTxn(id, address, _value) {
       const isApproved = await isApprovedForMinter(
         id,
-        new VoidSigner(address, provider)
+        new VoidSigner(address, provider),
+        ""
       );
 
       if (isApproved) {
@@ -692,7 +710,6 @@ export async function web3HelperFactory(
         )
         .setGas(1_200_000)
         .setPayableAmount(fees.shiftedBy(-8).integerValue().toString())
-
         .setFunction(
           method,
           new hashSDK.ContractFunctionParameters()
@@ -725,10 +742,16 @@ export async function web3HelperFactory(
     ): Promise<TransactionResponse> {
       const tokenId = ethers.utils.solidityPack(
         ["uint160", "int96"],
-        [EthBN.from(id.collectionIdent), id.native.tokenId]
+        [id.collectionIdent, id.native.tokenId]
       );
 
-      const contract = params.erc721_addr;
+      const contract = toSolidityAddress(
+        (
+          await params.hederaApi.getokenInfo(
+            toHederaAccountId(id.native.contract)
+          )
+        ).treasury_account_id
+      );
 
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(
@@ -800,63 +823,76 @@ export async function web3HelperFactory(
       __ = params.htcToken,
       signer
     ) {
-      const claimList: tokenListResponce[] = [];
       const address = signer.address;
 
       const htsTokens = (await params.hederaApi.getTokens(address))
         .filter((token) => token.balance === 0)
         .map((token) => token.token_id);
 
-      for (const htsToken of htsTokens) {
-        const tokenInfo = await params.hederaApi.getokenInfo(htsToken);
+      const fetchToken = async (htsToken: string) =>
+        new Promise(async (resolve) => {
+          try {
+            const tokenInfo = await params.hederaApi.getokenInfo(htsToken);
 
-        const treasuryAccount = toSolidityAddress(
-          tokenInfo.treasury_account_id
-        );
-
-        const isContract = await params.hederaApi.isContract(treasuryAccount);
-        console.log(isContract, treasuryAccount);
-        if (isContract) {
-          const nftContract = new ethers.Contract(
-            treasuryAccount,
-            ["function claimContract() public view returns (address)"],
-            params.evmProvider
-          );
-
-          const nftClaimsContract = await nftContract.functions
-            .claimContract()
-            .catch((e) => {
-              console.log(e, "e");
-              return [];
-            });
-          console.log(nftClaimsContract, "nftClaimsContract");
-          if (nftClaimsContract.length) {
-            const _nftClaimsContract = new ethers.Contract(
-              nftClaimsContract[0],
-              HEDERA_PROXY_CLAIMS_ABI,
-              params.evmProvider
+            const treasuryAccount = toSolidityAddress(
+              tokenInfo.treasury_account_id
             );
 
-            const toClaim = await _nftClaimsContract.getClaimableNfts(
-              address,
-              toSolidityAddress(htsToken),
-              {
-                gasLimit: 1000000,
+            const isContract = await params.hederaApi.isContract(
+              treasuryAccount
+            );
+            console.log(isContract, treasuryAccount);
+            if (isContract) {
+              const nftContract = new ethers.Contract(
+                treasuryAccount,
+                ["function claimContract() public view returns (address)"],
+                params.evmProvider
+              );
+
+              const nftClaimsContract = await nftContract.functions
+                .claimContract({ gasLimit: 1200000 })
+                .catch((e) => {
+                  console.log(e, "e");
+                  return [];
+                });
+              console.log(nftClaimsContract, "nftClaimsContract");
+              if (nftClaimsContract.length) {
+                const _nftClaimsContract = new ethers.Contract(
+                  nftClaimsContract[0],
+                  HEDERA_PROXY_CLAIMS_ABI,
+                  params.evmProvider
+                );
+
+                const toClaim = await _nftClaimsContract.getClaimableNfts(
+                  address,
+                  toSolidityAddress(htsToken),
+                  {
+                    gasLimit: 1200000,
+                  }
+                );
+
+                console.log(toClaim, "toClaim");
+
+                resolve({
+                  contract: treasuryAccount,
+                  htsToken: toSolidityAddress(htsToken),
+                  tokens: toClaim,
+                });
+                return;
               }
-            );
+            }
 
-            console.log(toClaim, "toClaim");
-
-            claimList.push({
-              contract: treasuryAccount,
-              htsToken: toSolidityAddress(htsToken),
-              tokens: toClaim,
-            });
+            resolve(null);
+          } catch {
+            resolve(null);
           }
-        }
-      }
+        });
 
-      return claimList;
+      const results = (await Promise.all(
+        htsTokens.map(fetchToken)
+      )) as tokenListResponce[];
+
+      return results.filter((i) => i);
 
       /*const contract = new ethers.Contract(
         proxyContract,
