@@ -3391,7 +3391,7 @@ casper-js-sdk@=2.12.1:
     tweetnacl-util "^0.15.0"
     typedjson "^1.6.0-rc2"
 
-casper-js-sdk@^2.11.0, casper-js-sdk@^2.13.2:
+casper-js-sdk@^2.11.0:
   version "2.13.2"
   resolved "https://registry.yarnpkg.com/casper-js-sdk/-/casper-js-sdk-2.13.2.tgz#6a46ed17d01154068d413b285681fdc5bd0e2be6"
   integrity sha512-42tkYnz3JBCdpM0AfXiTJjEKc4pWbVMU044BNvBi+9cE3G57p6Ica1VgnftMAwK4uY+6EAhiVo2VW+UZghwF4w==
@@ -9090,9 +9090,9 @@ xmlhttprequest@1.8.0:
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   integrity sha512-58Im/U0mlVBLM38NdZjHyhuMtCqa61469k2YP/AaPbvCoV9aQGUpbJBj1QRm2ytRiVQBD/fsw7L2bJGDVQswBA==
 
-"xpbridge-client@git+https://github.com/XP-NETWORK/xp-casper-bridge-client#main":
+"xpbridge-client@git+https://github.com/XP-NETWORK/xp-casper-bridge-client#bleeding-edge":
   version "1.2.0"
-  resolved "git+https://github.com/XP-NETWORK/xp-casper-bridge-client#8fdd916ad51de68552d213b871555ff6e520efec"
+  resolved "git+https://github.com/XP-NETWORK/xp-casper-bridge-client#58e2d57739a386d35c49106492b7c7de40fff210"
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@make-software/ces-js-parser" "=1.1.0"
