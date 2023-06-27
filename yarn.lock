@@ -3744,9 +3744,9 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==
 
-"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#a2915673342ee33aedd1cb4a12b304c36f55fa15":
+"crypto-exchange-rate@git+https://github.com/xp-network/exchange-rate#50f1f0eb25316868996be72d98fbf8050edd3b6a":
   version "1.0.0"
-  resolved "git+https://github.com/xp-network/exchange-rate#a2915673342ee33aedd1cb4a12b304c36f55fa15"
+  resolved "git+https://github.com/xp-network/exchange-rate#50f1f0eb25316868996be72d98fbf8050edd3b6a"
   dependencies:
     axios "^0.21.1"
 
