@@ -761,8 +761,8 @@ CHAIN_INFO.set(Chain.BITGERT, {
 CHAIN_INFO.set(Chain.CASPER, {
   blockExplorerUrl: "https://testnet.cspr.live/address/",
   constructor: casperHelper,
-  currency: SupportedCurrency.SOL,
-  currencySymbol: SupportedCurrencyName.SOL,
+  currency: SupportedCurrency.CSPR,
+  currencySymbol: SupportedCurrencyName.CSPR,
   decimals: Decimals.SOL,
   name: "Casper",
   nonce: Chain.CASPER,
