@@ -15,6 +15,7 @@ import {
   GetExtraFees,
   GetFeeMargins,
   GetProvider,
+  MintNft,
   NftInfo,
   PreTransfer,
   TransferNftForeign,
@@ -42,6 +43,14 @@ export interface CasperNFT {
   contract: string;
 }
 
+export interface CasperMintNft {
+  contract: string;
+  name: string;
+  description: string;
+  image: string;
+  collectionName: string;
+}
+
 export type CasperHelper = ChainNonceGet &
   BalanceCheck &
   Pick<
@@ -57,7 +66,8 @@ export type CasperHelper = ChainNonceGet &
     ): Promise<boolean>;
   } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> &
   UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> &
-  EstimateTxFees<CasperNFT> & { XpNft: string } & GetExtraFees;
+  EstimateTxFees<CasperNFT> & { XpNft: string } & GetExtraFees &
+  MintNft<CasperLabsHelper, CasperMintNft, string>;
 
 function getTokenIdentifier(nft: NftInfo<CasperNFT>): string {
   if (nft.native.tokenId || nft.native.tokenHash) {
@@ -86,6 +96,27 @@ export async function casperHelper({
       } catch (e) {
         return false;
       }
+    },
+    async mintNft(owner, options) {
+      cep78Client.setContractHash(options.contract);
+      return cep78Client
+        .mint(
+          {
+            meta: {
+              name: options.name,
+              description: options.description,
+              image: options.image,
+            },
+            owner: CLPublicKey.fromHex(await owner.getActivePublicKey()),
+            collectionName: options.collectionName,
+          },
+          {
+            useSessionCode: true,
+          },
+          "15000000000",
+          CLPublicKey.fromHex(await owner.getActivePublicKey())
+        )
+        .send(rpc);
     },
 
     async isApprovedForMinter(_sender, nft) {
