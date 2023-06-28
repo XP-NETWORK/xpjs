@@ -723,9 +723,9 @@ export namespace ChainFactoryConfigs {
         agent: new HttpAgent({
           host: "https://ic0.app",
         }),
-        bridgeContract: Principal.fromText("53bb2-rqaaa-aaaap-aa3vq-cai"),
-        xpnftId: Principal.fromText("5ogqx-qyaaa-aaaap-aa3wa-cai"),
-        umt: Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
+        bridgeContract: Principal.fromText("coptt-jaaaa-aaaap-qbjbq-cai"),
+        xpnftId: Principal.fromText("cvkpw-tyaaa-aaaap-qbjda-cai"),
+        umt: Principal.fromText("c4jek-fqaaa-aaaap-qbjcq-cai"),
         notifier,
         feeMargin,
         signatureSvc,
