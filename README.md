@@ -23,6 +23,7 @@ Bridging steps:
   - [x] [3.8 TON signer](#38-example-signer-object-for-ton)
   - [x] [3.9 NEAR Signer](#39-example-signer-object-for-near)
   - [x] [3.10 Solana signer](#310-example-of-solana-signer-object)
+  - [x] [3.11 Hedera Signer](#311-example-of-hedera-signer-object)
 - [x] [4. Getting the Chain's inner objects](#4-getting-the-inner-objects-from-this-factory-to-be-used-for-transferring-minting-estimation-of-gas-fees)
 - [x] [5. Listing NFTs](#51-listing-nfts-owned-by-the-sender)
   - [x] [Example of a native NFT object](#52-example-of-console-logged-native-bsc-nft-object)
@@ -30,7 +31,7 @@ Bridging steps:
 - [x] [6. Approving](#6-approve-accessing-your-nft-by-the-bridge-smart-contract)
 - [x] [7. Transferring NFTs between chains](#7-transferring-an-nft)
 - [x] [Minting NFTs](#minting-nfts-on-evm-chains-metaversx--tron)(optional)
-- [x] [Estimating the TX fee on the target chain](#estimating-the-transaction-fee-on-the-target-chain) (optional)
+- [x] [Estimating the TX fee on the target chain](#estimating-the-transaction-fee-on-the-target--destination-chains) (optional)
 - [ ] ... and much more to come
 
 <hr/><br/><center>
@@ -130,43 +131,6 @@ const signer = new Wallet(
         CONFIG.polygonParams?.provider
     );
 ```
-
-<center>
-
-|     Chain     |   Parameters    | Chain Nonce |
-| :-----------: | :-------------: | :---------: |
-|   MetaversX   | metaversxParams |      2      |
-|      BSC      |    bscParams    |      4      |
-|   Ethereum    |  ropstenParams  |      5      |
-|   Avalanche   | avalancheParams |      6      |
-|    Polygon    |  polygonParams  |      7      |
-|    Fantom     |  fantomParams   |      8      |
-|     Tron      |   tronParams    |      9      |
-|    Harmony    |  harmonyParams  |     12      |
-|     xDai      |   xDaiParams    |     14      |
-|   Algorand    | algorandParams  |     15      |
-|     Fuse      |   fuseParams    |     16      |
-|     Tezos     |   tezosParams   |     18      |
-|     Velas     |   velasParams   |     19      |
-|    Aurora     |  auroraParams   |     21      |
-|   Godwoken    | godwokenParams  |     22      |
-|   Gatechain   | gatechainParams |     23      |
-|    VeChain    |  vechainParams  |     25      |
-|    Solana     |  solanaParams   |     26      |
-|      TON      |    tonParams    |     27      |
-|    DFinity    |  dfinityParams  |     28      |
-|    Hedera     |  hederaParams   |     29      |
-|     Skale     |   skaleParams   |     30      |
-|     NEAR      |   nearParams    |     31      |
-|   Moonbeam    | moonbeamParams  |     32      |
-|   Abeychain   | abeychainParams |     33      |
-|     Aptos     |   aptosParams   |     34      |
-|   Caduceus    | caduceusParams  |     35      |
-|      OKC      |    okcParams    |     36      |
-| Arbitrum Nova | arbitrumParams  |     37      |
-|    Bitgert    |  bitgertParams  |     38      |
-
-</center><br/>
 
 ### 3.2 Example of getting the signer object (in the FE for web3):<br/><br/>
 
@@ -332,11 +296,68 @@ const metaplex = Metaplex.make(provider).use(keypairIdentity(payer));
 const nftc = metaplex.nfts();
 ```
 
+### 3.11 Example of Hedera signer object
+
+```ts
+import { hethers, Wallet } from "@hashgraph/hethers";
+import { config } from "dotenv"; config();
+
+const testnetProvider = hethers.getDefaultProvider("testnet");
+const mainnetProvider = hethers.getDefaultProvider("mainnet");
+
+const hederaSigner = new Wallet(
+    {
+      privateKey:
+      process.env.SK!,
+      account: process.env.PK!,
+      isED25519Type: true,
+    } as any,
+    mainnetProvider,
+  );
+```
+
 <hr/>
 
 For the ways of connecting the wallets in the FE check-out our [bridge repository](https://github.com/xp-network/bridge-interface/blob/components-reorder/src/components/ConnectWallet.jsx)
 
 <hr/>
+
+<center>
+
+|     Chain     |   Parameters    | Chain Nonce |
+| :-----------: | :-------------: | :---------: |
+|   MetaversX   | metaversxParams |      2      |
+|      BSC      |    bscParams    |      4      |
+|   Ethereum    |  ropstenParams  |      5      |
+|   Avalanche   | avalancheParams |      6      |
+|    Polygon    |  polygonParams  |      7      |
+|    Fantom     |  fantomParams   |      8      |
+|     Tron      |   tronParams    |      9      |
+|    Harmony    |  harmonyParams  |     12      |
+|     xDai      |   xDaiParams    |     14      |
+|   Algorand    | algorandParams  |     15      |
+|     Fuse      |   fuseParams    |     16      |
+|     Tezos     |   tezosParams   |     18      |
+|     Velas     |   velasParams   |     19      |
+|    Aurora     |  auroraParams   |     21      |
+|   Godwoken    | godwokenParams  |     22      |
+|   Gatechain   | gatechainParams |     23      |
+|    VeChain    |  vechainParams  |     25      |
+|    Solana     |  solanaParams   |     26      |
+|      TON      |    tonParams    |     27      |
+|    DFinity    |  dfinityParams  |     28      |
+|    Hedera     |  hederaParams   |     29      |
+|     Skale     |   skaleParams   |     30      |
+|     NEAR      |   nearParams    |     31      |
+|   Moonbeam    | moonbeamParams  |     32      |
+|   Abeychain   | abeychainParams |     33      |
+|     Aptos     |   aptosParams   |     34      |
+|   Caduceus    | caduceusParams  |     35      |
+|      OKC      |    okcParams    |     36      |
+| Arbitrum Nova | arbitrumParams  |     37      |
+|    Bitgert    |  bitgertParams  |     38      |
+
+</center><br/>
 
 ### 4. Getting the inner objects from this factory to be used for transferring, minting, and estimation of gas fees.<br/><br/>
 
@@ -438,6 +459,12 @@ This operation does not depend on a wallet since reading operations are free and
     await provider.account("near-account-here"),
     "contract-address"
   );
+
+  // Hedera:
+  const hederaNFTs = await factory.nftList(
+    hedera,
+    "0.0.xxxxxxx" // Hedera / EVM address
+  )
 })();
 ```
 
@@ -451,6 +478,7 @@ const tezosChosenOne = tezosNfts[0];
 const secretChosenOne = secretNfts[0];
 const tonChosenOne = tonNfts[0];
 const nearChosenOne = nearNFTs[0];
+const hederaChosenOne = hederaNFTs[0];
 
 // Checking the selected NFT object
 console.log("EVM Selected NFT:       ", web3ChosenOne);
@@ -461,6 +489,7 @@ console.log("Tezos Selected NFT:     ", tezosChosenOne);
 console.log("Secret Selected NFT:    ", secretChosenOne);
 console.log("Ton Selected NFT:       ", tonChosenOne);
 console.log("NEAR Selected NFT:      ", nearChosenOne);
+console.log("Hedera Selected NFT:    ", hederaChosenOne);
 ```
 
 ### 5.2 Example of console logged native BSC NFT object:
@@ -638,6 +667,15 @@ console.log("NEAR Selected NFT:      ", nearChosenOne);
     await provider.account("near-account"),
     "ADDRESS OF THE RECEIVER" // The address whom you are transferring
   );
+
+  // Hedera example
+  const hederaResult = await factory.transferNft(
+    hedera,
+    moonbeam,
+    hederaChosenOne,
+    hederaSigner,
+    "ADDRESS OF THE RECEIVER" // The address whom you are transferring the NFT to.
+  );
 })();
 ```
 
@@ -741,7 +779,7 @@ P.S. The library is a work in progress. More features will be added soon.
 
  <hr/><br/>
 
-## Estimating the transaction fee on the target chain
+## Estimating the transaction fee on the target & destination chains
 
 ```typescript
 (async () => {
