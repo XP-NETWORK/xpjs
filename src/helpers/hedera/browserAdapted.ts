@@ -59,6 +59,7 @@ import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
 import { HederaService } from "../../services/hederaApi";
 
 import { tryTimes } from "../evm/web3_utils";
+import { isWrappedNft as getWrapped } from "../../factory/utils";
 
 type HSDK = typeof import("@hashgraph/sdk");
 let hashSDK: HSDK;
@@ -499,6 +500,9 @@ export async function web3HelperFactory(
     gasPrice: ethers.BigNumberish | undefined,
     isWrappedNft?: boolean
   ) => {
+    if (isWrappedNft === undefined)
+      isWrappedNft = (await getWrapped(id, +id.native.chainId)).bool;
+
     const toApprove = isWrappedNft
       ? toSolidityAddress(
           (
@@ -895,31 +899,6 @@ export async function web3HelperFactory(
       )) as tokenListResponce[];
 
       return results.filter((i) => i);
-
-      /*const contract = new ethers.Contract(
-        proxyContract,
-        HEDERA_PROXY_CLAIMS_ABI,
-        params.evmProvider
-      );
-      return await contract.getClaimableNfts(address, htsToken, {
-        gasLimit: 1000000,
-      });
-
-      /*const query = new hashSDK.ContractCallQuery()
-                .setContractId(
-                    hashSDK.ContractId.fromSolidityAddress(proxyContract)
-                )
-                .setGas(300_000)
-                .setFunction(
-                    "getClaimableNfts",
-                    new hashSDK.ContractFunctionParameters()
-                        .addAddress(signer.address)
-                        .addAddress(htsToken)
-                );
-
-            await query.executeWithSigner(signer);
-
-            return "";*/
     },
     async assosiateToken(token = params.htcToken, signer) {
       const trx = await new hashSDK.TokenAssociateTransaction()
