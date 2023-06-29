@@ -116,7 +116,7 @@ type NftMethodVal<T, Tx> = {
     freeze: "freezeErc1155" | "freezeErc721";
     validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
     umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
-    approved: (umt: T, sender: string, minterAddr: string, tok: string, customData: NullableCustomData) => Promise<boolean>;
+    approved: (umt: T, sender: string, minterAddr: string, tok: string, hederaApi: HederaService) => Promise<boolean>;
     approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData, gasPrice: ethers.BigNumberish | undefined, signer: any) => Promise<Tx>;
 };
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
