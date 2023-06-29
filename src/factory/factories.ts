@@ -38,8 +38,10 @@ const middleware_uri = "https://notifier.xp.network";
 const testnet_middleware_uri =
   "https://testnet-notifier.xp.network/notify-test/";
 
-const signature_service_uri = "https://tools.xp.network/fee-oracle"; //"https://fee-validator.herokuapp.com";
-const signatureSvc = signatureService(signature_service_uri);
+const signature_service_uri_staging = "https://tools.xp.network/fee-oracle";
+const signature_service_uri_prod = "https://fee-validator.herokuapp.com";
+const signatureSvc_prod = signatureService(signature_service_uri_prod);
+const signatureSvc_staging = signatureService(signature_service_uri_staging);
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
@@ -163,7 +165,7 @@ export namespace ChainFactoryConfigs {
         umt: Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
         notifier,
         feeMargin,
-        signatureSvc,
+        signatureSvc: signatureSvc_prod,
       },
       moonbeamParams: {
         nonce: Chain.MOONBEAM,
@@ -467,7 +469,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         whitelisted: whitelistedService(AppConfigs.TestNet()),
         notifier,
-        signatureSvc,
+        signatureSvc: signatureSvc_prod,
       },
     };
   };
@@ -475,10 +477,6 @@ export namespace ChainFactoryConfigs {
   export const Staging: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin: FeeMargins = { min: 1, max: 5 };
     const notifier = evNotifier("https://bridge1.xp.network/notifier");
-
-    const signatureSvc = signatureService(
-      "https://tools.xp.network/fee-oracle"
-    );
 
     return {
       tonParams: {
@@ -519,7 +517,7 @@ export namespace ChainFactoryConfigs {
         whitelisted: whitelistedService(AppConfigs.Staging()),
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
-        signatureSvc: signatureService("https://tools.xp.network/fee-oracle"),
+        signatureSvc: signatureSvc_staging,
       },
       solanaParams: {
         xpnftAddr: "",
@@ -728,7 +726,7 @@ export namespace ChainFactoryConfigs {
         umt: Principal.fromText("c4jek-fqaaa-aaaap-qbjcq-cai"),
         notifier,
         feeMargin,
-        signatureSvc,
+        signatureSvc: signatureSvc_staging,
       },
     };
   };
@@ -830,7 +828,7 @@ export namespace ChainFactoryConfigs {
         umt: Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
         notifier,
         feeMargin,
-        signatureSvc,
+        signatureSvc: signatureSvc_prod,
       },
       vechainParams: {
         notifier,
@@ -1138,7 +1136,7 @@ export namespace ChainFactoryConfigs {
         whitelisted: whitelistedService(AppConfigs.MainNet()),
         walletUrl: "https://wallet.mainnet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
-        signatureSvc,
+        signatureSvc: signatureSvc_prod,
       },
       hederaParams: {
         notifier,
