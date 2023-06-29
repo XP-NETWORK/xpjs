@@ -1,6 +1,6 @@
 {
   "name": "xp.network",
-  "version": "4.3.1",
+  "version": "4.3.3",
   "author": "xp-network <dima@xp.network>",
   "description": "XP.Network Multi-Chain NFT Bridge JavaScript API",
   "main": "dist/index.js",
