@@ -58,7 +58,7 @@ import { hethers } from "@hashgraph/hethers";
 import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
 import { HederaService } from "../../services/hederaApi";
 
-import { tryTimes } from "../evm/web3_utils";
+//import { tryTimes } from "../evm/web3_utils";
 import { isWrappedNft as getWrapped } from "../../factory/utils";
 
 type HSDK = typeof import("@hashgraph/sdk");
@@ -270,7 +270,7 @@ type NftMethodVal<T, Tx> = {
     sender: string,
     minterAddr: string,
     tok: string,
-    customData: NullableCustomData
+    hederaApi: HederaService
   ) => Promise<boolean>;
   approve: (
     umt: T,
@@ -335,12 +335,18 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       _: any,
       minterAddr: string,
       tok: string,
-      __: NullableCustomData
+      hederaApi: HederaService
     ) => {
-      const res = await tryTimes(3)(umt.getApproved, tok, {
-        gasLimit: 1000000,
-      });
-      return res?.toLowerCase() == minterAddr.toLowerCase();
+      const data = umt.interface.encodeFunctionData("getApproved", [tok]);
+
+      const result = await hederaApi.readContract(umt.address, data);
+
+      const approvedContract = umt.interface.decodeFunctionResult(
+        "getApproved",
+        result
+      );
+
+      return approvedContract.at(0)?.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
       umt: UserNftMinter,
@@ -412,6 +418,7 @@ export async function web3HelperFactory(
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
+
   const hashioMinter = Minter__factory.connect(minter_addr, params.evmProvider);
 
   async function notifyValidator(
@@ -489,7 +496,7 @@ export async function web3HelperFactory(
       "",
       toApprove,
       id.native.tokenId,
-      {}
+      params.hederaApi
     );
   };
 
@@ -819,10 +826,20 @@ export async function web3HelperFactory(
     validateAddress(adr) {
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
-    isNftWhitelisted(nft) {
-      return hashioMinter.nftWhitelist(nft.native.contract, {
-        gasLimit: 1000000,
-      });
+    async isNftWhitelisted(nft) {
+      const data = hashioMinter.interface.encodeFunctionData("nftWhitelist", [
+        nft.native.contract,
+      ]);
+
+      const result = await params.hederaApi.readContract(
+        hashioMinter.address,
+        data
+      );
+
+      return (
+        result ===
+        "0x0000000000000000000000000000000000000000000000000000000000000001"
+      );
     },
     async listHederaClaimableNFT(
       _ = params.Xpnfthtsclaims,
@@ -855,34 +872,45 @@ export async function web3HelperFactory(
                 params.evmProvider
               );
 
-              const nftClaimsContract = await nftContract.functions
-                .claimContract({ gasLimit: 1200000 })
-                .catch((e) => {
-                  console.log(e, "e");
-                  return [];
-                });
+              const result = await params.hederaApi.readContract(
+                treasuryAccount,
+                nftContract.interface.encodeFunctionData("claimContract", [])
+              );
+
+              const nftClaimsContract =
+                nftContract.interface.decodeFunctionResult(
+                  "claimContract",
+                  result
+                );
+
               console.log(nftClaimsContract, "nftClaimsContract");
-              if (nftClaimsContract.length) {
+              if (nftClaimsContract) {
                 const _nftClaimsContract = new ethers.Contract(
                   nftClaimsContract[0],
                   HEDERA_PROXY_CLAIMS_ABI,
                   params.evmProvider
                 );
 
-                const toClaim = await _nftClaimsContract.getClaimableNfts(
-                  address,
-                  toSolidityAddress(htsToken),
-                  {
-                    gasLimit: 1200000,
-                  }
+                const result = await params.hederaApi.readContract(
+                  nftClaimsContract[0],
+                  _nftClaimsContract.interface.encodeFunctionData(
+                    "getClaimableNfts",
+                    [address, toSolidityAddress(htsToken)]
+                  )
                 );
+
+                const toClaim =
+                  _nftClaimsContract.interface.decodeFunctionResult(
+                    "getClaimableNfts",
+                    result
+                  );
 
                 console.log(toClaim, "toClaim");
 
                 resolve({
                   contract: treasuryAccount,
                   htsToken: toSolidityAddress(htsToken),
-                  tokens: toClaim,
+                  tokens: toClaim.at(0),
                 });
                 return;
               }

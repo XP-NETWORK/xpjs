@@ -1,4 +1,3 @@
-import axios from "axios";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { ChainNonce } from "../type-utils";
@@ -207,13 +206,6 @@ export type WhitelistCheck<RawNft, Singer = void> = {
 
 export interface GetProvider<Provider> {
   getProvider(): Provider;
-}
-
-export async function isWrappedNft(nft: NftInfo<unknown>) {
-  return (
-    typeof (await axios.get(nft.uri).catch(() => undefined))?.data.wrapped !==
-    "undefined"
-  );
 }
 
 export interface IsContractAddress {
