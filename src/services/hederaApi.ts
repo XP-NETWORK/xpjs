@@ -4,6 +4,7 @@ export interface HederaService {
   getTokens(addresss: string): Promise<{ token_id: string; balance: number }[]>;
   getokenInfo(tokenId: string): Promise<{ treasury_account_id: string }>;
   isContract(address: string): Promise<boolean>;
+  readContract(to: string, data: any): Promise<any>;
 }
 
 export function hederaService(url: string): HederaService {
@@ -26,6 +27,14 @@ export function hederaService(url: string): HederaService {
     async isContract(address) {
       const res = await request.get(`/contracts/${address}`).catch(() => false);
       return Boolean(res);
+    },
+
+    async readContract(to: string, data: any) {
+      const res = await request.post(`/contracts/call`, {
+        data,
+        to,
+      });
+      return res.data.result;
     },
   };
 }
