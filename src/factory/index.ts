@@ -71,10 +71,9 @@ import {
   ParamMap,
 } from "../type-utils";
 import {
-  checkBlockedContracts,
   getDefaultContract,
-  //prepareTokenId,
-  oldXpWraps,
+  checkNotOldWrappedNft,
+  isWrappedNft,
 } from "./utils";
 import base64url from "base64url";
 
@@ -654,43 +653,6 @@ export function ChainFactory(
     if (!alive) {
       throw Error(`chain ${deadChain} is dead! its unsafe to use the bridge`);
     }
-  }
-
-  function checkNotOldWrappedNft(contract: string) {
-    if (oldXpWraps.has(contract)) {
-      throw new Error(`${contract} is an old wrapped NFT`);
-    }
-  }
-
-  async function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number) {
-    if (fc === Chain.TEZOS) {
-      return {
-        bool:
-          typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
-          "undefined",
-        wrapped: undefined,
-      };
-    }
-
-    try {
-      checkNotOldWrappedNft(nft.collectionIdent);
-    } catch (_) {
-      return { bool: false, wrapped: undefined };
-    }
-
-    if (/w\/$/.test(nft.uri)) {
-      nft = {
-        ...nft,
-        uri: nft.uri + nft.native.tokenId,
-      };
-    }
-
-    const wrapped = (await axios.get(nft.uri).catch(() => undefined))?.data
-      .wrapped;
-    const contract = wrapped?.contract || wrapped?.source_mint_ident;
-    tc && contract && checkBlockedContracts(tc, contract);
-
-    return { bool: typeof wrapped !== "undefined", wrapped };
   }
 
   async function algoOptInCheck(

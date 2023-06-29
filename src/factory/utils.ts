@@ -1,5 +1,6 @@
 import { NftInfo, FullChain } from "..";
 import { CHAIN_INFO, ChainType, Chain } from "../consts";
+import axios from "axios";
 
 export const _headers = {
   "Content-Type": "application/json",
@@ -114,4 +115,41 @@ export function prepareTokenId(nft: NftInfo<any>, from: number) {
     }
   }
   return undefined;
+}
+
+export function checkNotOldWrappedNft(contract: string) {
+  if (oldXpWraps.has(contract)) {
+    throw new Error(`${contract} is an old wrapped NFT`);
+  }
+}
+
+export async function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number) {
+  if (fc === Chain.TEZOS) {
+    return {
+      bool:
+        typeof (nft.native as any).meta?.token?.metadata?.wrapped !==
+        "undefined",
+      wrapped: undefined,
+    };
+  }
+
+  try {
+    checkNotOldWrappedNft(nft.collectionIdent);
+  } catch (_) {
+    return { bool: false, wrapped: undefined };
+  }
+
+  if (/w\/$/.test(nft.uri)) {
+    nft = {
+      ...nft,
+      uri: nft.uri + nft.native.tokenId,
+    };
+  }
+
+  const wrapped = (await axios.get(nft.uri).catch(() => undefined))?.data
+    .wrapped;
+  const contract = wrapped?.contract || wrapped?.source_mint_ident;
+  tc && contract && checkBlockedContracts(tc, contract);
+
+  return { bool: typeof wrapped !== "undefined", wrapped };
 }
