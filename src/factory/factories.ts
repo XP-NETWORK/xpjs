@@ -307,7 +307,7 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x7cB14C4aB12741B5ab185C6eAFb5Eb7b5282A032",
         erc1155_addr: "0x1C6d7aa611B30C9C1e5f52068E145b77b0e661b2",
         nonce: Chain.XDAI,
-        //noWhitelist: true,
+        noWhitelist: true,
         feeMargin,
       },
       algorandParams: {
@@ -950,7 +950,7 @@ export namespace ChainFactoryConfigs {
       },
       xDaiParams: {
         notifier,
-        //noWhitelist: true,
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.XDAI),
         erc721Minter: "0x82A7d50A0030935808dAF6e5f0f06645866fb7Bb",
         erc1155Minter: "0xFEeD85607C1fbc2f30EAc13281480ED6265e121E",
