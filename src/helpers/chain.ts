@@ -208,6 +208,10 @@ export interface GetProvider<Provider> {
   getProvider(): Provider;
 }
 
+export interface IsApprovedForMinter<Signer, RawNft> {
+  isApprovedForMinter(signer: Signer, nft: NftInfo<RawNft>): Promise<boolean>;
+}
+
 export interface IsContractAddress {
   isContractAddress(address: string): Promise<boolean>;
 }

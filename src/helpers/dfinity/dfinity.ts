@@ -1,10 +1,4 @@
-import {
-  Actor,
-  ActorSubclass,
-  HttpAgent,
-  Identity,
-  SubmitResponse,
-} from "@dfinity/agent";
+import { Actor, ActorSubclass, HttpAgent, Identity } from "@dfinity/agent";
 
 import IDLTYPE from "@dfinity/candid";
 import LIBTYPE from "@dfinity/candid/lib/cjs/idl";
@@ -31,10 +25,12 @@ import {
   ValidateAddress,
   WhitelistCheck,
   ParamsGetter,
+  IsApprovedForMinter,
 } from "../chain";
 import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
 import * as utils from "@dfinity/utils";
+import { XPNFTSERVICE, xpnftIdl } from "./xpnft.idl";
 
 export type DfinitySigner = Identity;
 
@@ -56,19 +52,7 @@ const { IDL } = (
     : require("@dfinity/candid")
 ) as typeof IDLTYPE;
 
-const {
-  decode,
-  encode,
-  Nat,
-  Nat32,
-  Nat8,
-  Opt,
-  PrincipalClass,
-  Record,
-  Text,
-  Tuple,
-  Vec,
-} = (
+const { decode, encode, Nat32, Text } = (
   isBrowser
     ? require("@dfinity/candid/lib/esm/idl")
     : require("@dfinity/candid/lib/cjs/idl")
@@ -108,13 +92,6 @@ const MintRequest = IDL.Record({
   metadata: IDL.Opt(IDL.Vec(IDL.Nat8)),
 });
 
-const ApproveRequest = Record({
-  token: Text,
-  subaccount: Opt(Vec(Nat8)),
-  allowance: Nat,
-  spender: new PrincipalClass(),
-});
-
 export type DfinityHelper = ChainNonceGet &
   TransferNftForeign<DfinitySigner, DfinityNft, string> &
   UnfreezeForeignNft<DfinitySigner, DfinityNft, string> &
@@ -125,7 +102,7 @@ export type DfinityHelper = ChainNonceGet &
   > &
   BalanceCheck &
   GetFeeMargins &
-  MintNft<DfinitySigner, DfinityMintArgs, SubmitResponse> & {
+  MintNft<DfinitySigner, DfinityMintArgs, number> & {
     nftList(owner: string, contract: string): Promise<NftInfo<DfinityNft>[]>;
   } & {
     getAccountIdentifier(principal: string): string;
@@ -133,7 +110,7 @@ export type DfinityHelper = ChainNonceGet &
   ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
-  };
+  } & IsApprovedForMinter<DfinitySigner, DfinityNft>;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -230,6 +207,37 @@ export async function dfinityHelper(
   //   return decode([Nat], resp)[0].toString() as string;
   // }
 
+  async function isApprovedForMinter(
+    sender: DfinitySigner,
+    nft: NftInfo<DfinityNft>
+  ) {
+    isBrowser
+      ? //@ts-ignore
+        adaptPlug(sender.agent)
+      : args.agent.replaceIdentity(sender);
+
+    // const tid = tokenIdentifier(
+    //   nft.collectionIdent,
+    //   Number(nft.native.tokenId)
+    // );
+    // const nftContract = Principal.fromText(nft.native.canisterId);
+    const nftCan = Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
+      agent: args.agent,
+      canisterId: nft.native.canisterId,
+    });
+    const allowances = await nftCan.getAllowances();
+
+    for (const [idx, principal] of allowances) {
+      if (
+        idx.toString() === nft.native.tokenId &&
+        principal.toString() === args.bridgeContract.toString()
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const adaptPlug = (agent: HttpAgent) => {
     minter = Actor.createActor(idlFactory, {
       agent,
@@ -259,6 +267,10 @@ export async function dfinityHelper(
         ? //@ts-ignore
           adaptPlug(sender.agent)
         : args.agent.replaceIdentity(sender);
+
+      if (!(await isApprovedForMinter(sender, id))) {
+        throw new Error(`Nft not approved for minter`);
+      }
 
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
@@ -295,19 +307,16 @@ export async function dfinityHelper(
         ? await args.agent.getPrincipal()
         : owner.getPrincipal();
 
-      let mint = await args.agent.call(canister, {
-        methodName: "mintNFT",
-        arg: encode(
-          [MintRequest],
-          [
-            {
-              metadata: [[...Buffer.from(options.uri)]],
-              to: {
-                principal,
-              },
-            } as MintRequest,
-          ]
-        ),
+      const nftCan = Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
+        agent: args.agent,
+        canisterId: canister,
+      });
+
+      let mint = await nftCan.mintNFT({
+        metadata: [[...Buffer.from(options.uri)]],
+        to: {
+          principal,
+        },
       });
       return mint;
     },
@@ -317,6 +326,9 @@ export async function dfinityHelper(
           adaptPlug(sender.agent)
         : args.agent.replaceIdentity(sender);
 
+      if (!(await isApprovedForMinter(sender, id))) {
+        throw new Error(`Nft not approved for minter`);
+      }
       const sig = await args.signatureSvc.getSignatureDfinity(
         Chain.DFINITY,
         parseInt(nonce) as ChainNonce,
@@ -339,7 +351,7 @@ export async function dfinityHelper(
 
       return actionId.toString();
     },
-
+    isApprovedForMinter,
     /// owner = principal of owner
     async nftList(owner, contract = args.xpnftId.toText()) {
       let aid = AccountIdentifier.fromPrincipal({
@@ -389,55 +401,30 @@ export async function dfinityHelper(
       return tokens;
     },
     async preTransfer(sender, nft) {
-      if (isBrowser) {
-        //@ts-ignore
-        args.agent = sender.agent;
-      } else {
-        args.agent.replaceIdentity(sender);
+      isBrowser
+        ? //@ts-ignore
+          adaptPlug(sender.agent)
+        : args.agent.replaceIdentity(sender);
+
+      if (await isApprovedForMinter(sender, nft)) {
+        return undefined;
       }
 
       const tid = tokenIdentifier(
         nft.collectionIdent,
         Number(nft.native.tokenId)
       );
-      const nftContract = Principal.fromText(nft.native.canisterId);
-
-      const approvedQuery = await args.agent.query(nftContract, {
-        methodName: "getAllowances",
-        arg: encode([Text], [tid]),
+      const actor = Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
+        canisterId: nft.collectionIdent,
+        agent: args.agent,
       });
-
-      if ("reply" in approvedQuery) {
-        let decoded: Array<[number, Principal]> = decode(
-          [Vec(Tuple(Nat32, new PrincipalClass()))],
-          approvedQuery.reply.arg
-        )[0] as any;
-
-        for (const item of decoded) {
-          if (item[0] === Number(nft.native.tokenId)) {
-            if (item[1].toText() === args.bridgeContract.toText()) {
-              return undefined;
-            }
-          }
-        }
-      }
-
-      const approveCall = await args.agent.call(nftContract, {
-        methodName: "approve",
-        arg: encode(
-          [ApproveRequest],
-          [
-            {
-              token: tid,
-              allowance: BigInt(1),
-              spender: args.bridgeContract,
-              subaccount: [],
-            },
-          ]
-        ),
+      await actor.approve({
+        allowance: 1n,
+        spender: args.bridgeContract,
+        subaccount: [],
+        token: tid,
       });
-
-      return Buffer.from(approveCall.requestId).toString("hex");
+      return "no hash";
     },
     getFeeMargin() {
       return args.feeMargin;
