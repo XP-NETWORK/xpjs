@@ -27,6 +27,7 @@ import { CasperLabsHelper } from "casper-js-sdk/dist/@types/casperlabsSigner";
 import { AsymmetricKey } from "casper-js-sdk/dist/lib/Keys";
 import { EvNotifier } from "../services/notifier";
 import { XpBridgeClient } from "xpbridge-client";
+import { Chain } from "../consts";
 
 export interface CasperParams {
   rpc: string;
@@ -192,7 +193,7 @@ export async function casperHelper({
       return await client.putDeploy(dep);
     },
     getNonce() {
-      return 38;
+      return Chain.CASPER;
     },
     async balance(address) {
       return new BigNumber(
