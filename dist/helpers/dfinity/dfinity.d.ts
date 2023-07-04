@@ -4,7 +4,7 @@ import { AccountIdentifier } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import { SignatureService } from "../../services/estimator";
 import { EvNotifier } from "../../services/notifier";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WhitelistCheck, ParamsGetter, IsApprovedForMinter } from "../chain";
+import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WhitelistCheck, ParamsGetter, IsApprovedForMinter, GetExtraFees } from "../chain";
 export type DfinitySigner = Identity;
 export type DfinityNft = {
     canisterId: string;
@@ -32,7 +32,7 @@ export type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, Df
 } & WhitelistCheck<DfinityNft> & ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
-} & IsApprovedForMinter<DfinitySigner, DfinityNft>;
+} & IsApprovedForMinter<DfinitySigner, DfinityNft> & GetExtraFees;
 export type DfinityParams = {
     agent: HttpAgent;
     bridgeContract: Principal;
