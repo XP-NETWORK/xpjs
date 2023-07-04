@@ -65,7 +65,7 @@
     "buffer": "^6.0.3",
     "casper-cep78-js-client": "^1.4.0",
     "casper-js-sdk": "=2.12.1",
-    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#50f1f0eb25316868996be72d98fbf8050edd3b6a",
+    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#master-dist",
     "ethers": "^5.5.4",
     "js-base64": "^3.6.1",
     "near-api-js": "1.0.0",
