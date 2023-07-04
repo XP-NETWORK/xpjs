@@ -192,7 +192,7 @@ export namespace ChainFactoryConfigs {
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,
         notifier,
-
+        noWhitelist: true,
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ABEYCHAIN),
         erc721Minter: "0x34933A5958378e7141AA2305Cdb5cDf514896035",
@@ -270,7 +270,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -414,7 +414,7 @@ export namespace ChainFactoryConfigs {
       },
       godwokenParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.GODWOKEN),
         minter_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
         erc721_addr: "0x8CEe805FE5FA49e81266fcbC27F37D85062c1707",
@@ -661,7 +661,7 @@ export namespace ChainFactoryConfigs {
       },
       abeyChainParams: {
         notifier,
-
+        noWhitelist: true,
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ABEYCHAIN),
         erc1155_addr: "0x8776073043eef8929F4a9cBa8Aacc6B59A21BA52",
@@ -792,7 +792,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -1037,7 +1037,7 @@ export namespace ChainFactoryConfigs {
       },
       godwokenParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.GODWOKEN),
         minter_addr: "0xeBCDdF17898bFFE81BCb3182833ba44f4dB25525",
         erc721_addr: "0x9cdda01E00A5A425143F952ee894ff99B5F7999F",
@@ -1087,7 +1087,7 @@ export namespace ChainFactoryConfigs {
       abeyChainParams: {
         nonce: Chain.ABEYCHAIN,
         notifier,
-
+        noWhitelist: true,
         feeMargin,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ABEYCHAIN),
         erc721Minter: "0xBb5e9896cEe600DaC470775B6f235Db105E861BD",
