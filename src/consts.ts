@@ -37,6 +37,7 @@ import {
   web3ERC20HelperFactory,
   Web3ERC20Params,
 } from "./helpers/evm/web3_erc20";
+import { CasperHelper, CasperParams, casperHelper } from "./helpers/casper";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -72,6 +73,7 @@ export enum TestNetRpcUri {
   OKC = "https://exchaintestrpc.okex.org",
   ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
   BITGERT = "https://testnet-rpc.brisescan.com",
+  CASPER = "https://rpc.testnet.casperlabs.io/rpc",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -124,6 +126,7 @@ type DfinityMeta = [DfinityHelper, DfinityParams];
 type NearMeta = [NearHelper, NearParams];
 type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
+type CasperMeta = [CasperHelper, CasperParams];
 
 // Static Assert to Ensure all values of Chain are in MetaMap
 type MetaMapAssert = { [idx in (typeof Chain)[keyof typeof Chain]]: unknown };
@@ -165,6 +168,7 @@ export type MetaMap = {
   0x24: Web3Meta;
   0x25: Web3Meta;
   0x26: Web3Meta;
+  0x27: CasperMeta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -203,7 +207,8 @@ export namespace Chain {
   export const CADUCEUS = 0x23; // 35
   export const OKC = 0x24; // 36
   export const ARBITRUM = 0x25; //37
-  export const BITGERT = 0x26; //37
+  export const BITGERT = 0x26; //38
+  export const CASPER = 0x27; //39
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -241,6 +246,7 @@ export enum ChainType {
   NEAR = "NEAR",
   HEDERA = "HEDERA",
   APTOS = "APTOS",
+  CASPER = "CASPER",
 }
 
 export const CHAIN_INFO: ChainInfo = new Map();
@@ -750,4 +756,15 @@ CHAIN_INFO.set(Chain.BITGERT, {
   tnBlockExplorerUrl: "https://testnet-explorer.brisescan.com/tx/",
   tnBlockExplorerUrlAddr: "https://testnet-explorer.brisescan.com/address/",
   tnChainId: 64668,
+});
+
+CHAIN_INFO.set(Chain.CASPER, {
+  blockExplorerUrl: "https://testnet.cspr.live/address/",
+  constructor: casperHelper,
+  currency: SupportedCurrency.CSPR,
+  currencySymbol: SupportedCurrencyName.CSPR,
+  decimals: Decimals.SOL,
+  name: "Casper",
+  nonce: Chain.CASPER,
+  type: ChainType.CASPER,
 });

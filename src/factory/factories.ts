@@ -71,6 +71,16 @@ export namespace ChainFactoryConfigs {
         nonce: 2,
         feeMargin,
       },
+      casperParams: {
+        network: "casper-test",
+        rpc: TestNetRpcUri.CASPER,
+        bridge:
+          "hash-df3387efd88b0d0e7ff57b76a65b5e2a1201dd18aa6c8019fb6ceb9c387af9b5",
+        xpnft:
+          "hash-5dcc145e51ed1e989b9411ee8312c408db3b21dcd6f91cbe70cc5202d18ba4fa",
+        notifier,
+        feeMargin,
+      },
       tonParams: {
         tonweb: new TonWeb(
           new TonWeb.HttpProvider(TestNetRpcUri.TON, {

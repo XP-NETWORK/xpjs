@@ -76,6 +76,7 @@ import {
   isWrappedNft,
 } from "./utils";
 import base64url from "base64url";
+import { CasperParams } from "../helpers/casper";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -337,6 +338,7 @@ export interface ChainParams {
   okcParams: Web3Params;
   arbitrumParams: Web3Params;
   bitgertParams: Web3Params;
+  casperParams: CasperParams;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -399,6 +401,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.OKC, chainParams.okcParams);
   cToP.set(Chain.ARBITRUM, chainParams.arbitrumParams);
   cToP.set(Chain.BITGERT, chainParams.bitgertParams);
+  cToP.set(Chain.CASPER, chainParams.casperParams);
   return cToP;
 }
 /**
