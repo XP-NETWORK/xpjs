@@ -145,7 +145,9 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
 
     try {
       const cell = CellF.fromBoc(Buffer.from(bytes, "base64")).at(0);
+
       const slice = Slice.fromCell(cell!);
+
       const whitelistedCollectionsMap = parseDictRefs(slice, 256);
 
       const whitelistedCollections = Array.from(
@@ -159,7 +161,7 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
       if (!this.whiteListedCollections.length) {
         this.whiteListedCollections = whitelistedCollections;
         setTimeout(() => {
-          (this.whiteListedCollections = []), 5_000;
+          (this.whiteListedCollections = []), 10_000;
         });
       }
 

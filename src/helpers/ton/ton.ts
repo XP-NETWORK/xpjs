@@ -100,6 +100,8 @@ type TonWallet = {
   handleResponse(res: ResponseUnionType): Promise<string>;
 };
 
+let wl_prom: Promise<string[]> | undefined;
+
 export async function tonHelper(args: TonParams): Promise<TonHelper> {
   const bridge = new BridgeContract(args.tonweb.provider, {
     address: args.bridgeAddr,
@@ -451,10 +453,18 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async isNftWhitelisted(nft) {
       const collectionAddress = nft.native?.collectionAddress;
       if (!collectionAddress) return false;
+      let whitelistedCollections: Promise<string[]>;
 
-      const whitelistedCollections = await bridge.getWhitelist();
+      if (wl_prom) {
+        whitelistedCollections = wl_prom;
+      } else {
+        whitelistedCollections = bridge.getWhitelist();
+        wl_prom = whitelistedCollections;
+      }
 
-      return whitelistedCollections.includes(collectionAddress) ? true : false;
+      const res = await wl_prom;
+      wl_prom = undefined;
+      return res.includes(collectionAddress) ? true : false;
     },
   };
 }
