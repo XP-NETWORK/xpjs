@@ -26,6 +26,7 @@ import {
   WhitelistCheck,
   ParamsGetter,
   IsApprovedForMinter,
+  GetExtraFees,
 } from "../chain";
 import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
@@ -110,7 +111,8 @@ export type DfinityHelper = ChainNonceGet &
   ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
-  } & IsApprovedForMinter<DfinitySigner, DfinityNft>;
+  } & IsApprovedForMinter<DfinitySigner, DfinityNft> &
+  GetExtraFees;
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -261,6 +263,9 @@ export async function dfinityHelper(
       } catch {
         return false;
       }
+    },
+    getExtraFees() {
+      return new BigNumber(0);
     },
     async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
       isBrowser
