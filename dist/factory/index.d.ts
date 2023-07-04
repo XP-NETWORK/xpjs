@@ -18,6 +18,7 @@ import { TezosParams } from "../helpers/tezos";
 import { TonParams } from "../helpers/ton/ton";
 import { Web3ERC20Params } from "../helpers/evm/web3_erc20";
 import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
+import { CasperParams } from "../helpers/casper";
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & EstimateDeployFees & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
@@ -169,6 +170,7 @@ export interface ChainParams {
     okcParams: Web3Params;
     arbitrumParams: Web3Params;
     bitgertParams: Web3Params;
+    casperParams: CasperParams;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**

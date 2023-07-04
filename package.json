@@ -63,7 +63,9 @@
     "bignumber.js": "=9.0.1",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
-    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#a2915673342ee33aedd1cb4a12b304c36f55fa15",
+    "casper-cep78-js-client": "^1.4.0",
+    "casper-js-sdk": "=2.12.1",
+    "crypto-exchange-rate": "git+https://github.com/xp-network/exchange-rate#50f1f0eb25316868996be72d98fbf8050edd3b6a",
     "ethers": "^5.5.4",
     "js-base64": "^3.6.1",
     "near-api-js": "1.0.0",
@@ -75,6 +77,7 @@
     "tronstation": "^1.0.1",
     "tronweb": "^4.1.0",
     "web3-providers-connex": "^0.3.1",
+    "xpbridge-client": "git+https://github.com/XP-NETWORK/xp-casper-bridge-client#bleeding-edge",
     "xpnet-web3-contracts": "git+https://github.com/xp-network/XP.network-HECO-Migration#dist-erc1155"
   }
 }

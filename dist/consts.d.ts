@@ -12,6 +12,7 @@ import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams } from "./helpers/near";
 import { AptosHelper, AptosParams } from "./helpers/aptos";
 import { Web3ERC20Params } from "./helpers/evm/web3_erc20";
+import { CasperHelper, CasperParams } from "./helpers/casper";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.multiversx.com",
     HECO = "https://http-testnet.hecochain.com",
@@ -44,7 +45,8 @@ export declare enum TestNetRpcUri {
     CADUCEUS = "https://galaxy.block.caduceus.foundation",
     OKC = "https://exchaintestrpc.okex.org",
     ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
-    BITGERT = "https://testnet-rpc.brisescan.com"
+    BITGERT = "https://testnet-rpc.brisescan.com",
+    CASPER = "https://rpc.testnet.casperlabs.io/rpc"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.multiversx.com",
@@ -92,6 +94,7 @@ type DfinityMeta = [DfinityHelper, DfinityParams];
 type NearMeta = [NearHelper, NearParams];
 type Web3ERC20Meta = [Web3Helper, Web3ERC20Params];
 type AptosMeta = [AptosHelper, AptosParams];
+type CasperMeta = [CasperHelper, CasperParams];
 type MetaMapAssert = {
     [idx in (typeof Chain)[keyof typeof Chain]]: unknown;
 };
@@ -132,6 +135,7 @@ export type MetaMap = {
     0x24: Web3Meta;
     0x25: Web3Meta;
     0x26: Web3Meta;
+    0x27: CasperMeta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -170,6 +174,7 @@ export declare namespace Chain {
     const OKC = 36;
     const ARBITRUM = 37;
     const BITGERT = 38;
+    const CASPER = 39;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
@@ -203,7 +208,8 @@ export declare enum ChainType {
     TON = "TON",
     NEAR = "NEAR",
     HEDERA = "HEDERA",
-    APTOS = "APTOS"
+    APTOS = "APTOS",
+    CASPER = "CASPER"
 }
 export declare const CHAIN_INFO: ChainInfo;
 export {};
