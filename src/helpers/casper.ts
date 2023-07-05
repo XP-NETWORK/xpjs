@@ -28,6 +28,7 @@ import { AsymmetricKey } from "casper-js-sdk/dist/lib/Keys";
 import { EvNotifier } from "../services/notifier";
 import { XpBridgeClient } from "xpbridge-client";
 import { Chain } from "../consts";
+import { SignatureService } from "../services/estimator";
 
 export interface CasperParams {
   rpc: string;
@@ -36,6 +37,7 @@ export interface CasperParams {
   notifier: EvNotifier;
   xpnft: string;
   feeMargin: FeeMargins;
+  sig: SignatureService;
 }
 
 export interface CasperNFT {
@@ -77,12 +79,17 @@ function getTokenIdentifier(nft: NftInfo<CasperNFT>): string {
   throw new Error(`No Token Identifier found`);
 }
 
+function raise(msg: string): never {
+  throw new Error(msg);
+}
+
 export async function casperHelper({
   rpc,
   network,
   bridge,
   feeMargin,
   xpnft,
+  sig,
 }: CasperParams): Promise<CasperHelper> {
   const client = new CasperClient(rpc);
   const cep78Client = new CEP78Client(rpc, network);
@@ -150,15 +157,23 @@ export async function casperHelper({
     getExtraFees() {
       return new BigNumber("0");
     },
-    async transferNftToForeign(sender, chain_nonce, to, id, txFees, mintWith) {
+    async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
+      const signature = await sig.casper(
+        Chain.CASPER,
+        chain_nonce,
+        to,
+        id.collectionIdent,
+        id.native.tokenId || id.native.tokenHash || raise("No Token Identifier")
+      );
+
       const deploy = bridgeClient.freezeNft(
         {
-          amt: txFees.toString(),
+          amt: signature.fees,
           chain_nonce,
           to,
           contract: id.native.contract,
           mint_with: mintWith,
-          sig_data: new Uint8Array(0),
+          sig_data: Buffer.from(signature.sig, "hex"),
           token_id: id.native.tokenId || id.native.tokenHash || "",
         },
         "15000000000",
@@ -172,14 +187,22 @@ export async function casperHelper({
       const dep = client.deployFromJson(signed).unwrap();
       return await client.putDeploy(dep);
     },
-    async unfreezeWrappedNft(sender, to, id, txFees, nonce) {
+    async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
+      const signature = await sig.casper(
+        Chain.CASPER,
+        nonce,
+        to,
+        id.collectionIdent,
+        id.native.tokenId || id.native.tokenHash || raise("No Token Identifier")
+      );
+
       const deploy = bridgeClient.withdrawNft(
         {
-          amt: txFees.toString(),
-          chain_nonce: parseInt(nonce),
+          amt: signature.fees,
+          chain_nonce: nonce,
           to,
           contract: id.native.contract,
-          sig_data: new Uint8Array(0),
+          sig_data: Buffer.from(signature.sig, "hex"),
           token_id: id.native.tokenId || id.native.tokenHash || "",
         },
         "15000000000",
