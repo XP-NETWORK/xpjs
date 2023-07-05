@@ -271,10 +271,9 @@ export async function nearHelperFactory({
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
       const res = await signatureSvc
-        .getSignatureNear(
+        .near(
           Chain.NEAR,
           chain_nonce as any,
-          id.native.tokenId,
           id.collectionIdent,
           id.native.tokenId,
           to
@@ -304,15 +303,15 @@ export async function nearHelperFactory({
             amt: new BigNumber(txFees) /*.div(2)*/,
             mint_with,
             token_contract: id.native.contract,
-            ...(res?.signature
+            ...(res.sig
               ? {
-                  sig_data: [...Buffer.from(res.signature, "hex")],
+                  sig_data: [...Buffer.from(res.sig, "hex")],
                 }
               : {}),
             approval_id,
           },
           methodName: "freeze_nft",
-          attachedDeposit: new BN(res?.fee) /*.div(new BN(2))*/,
+          attachedDeposit: new BN(res.fees) /*.div(new BN(2))*/,
           gas: new BN("300000000000000"),
           ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
         });
@@ -338,10 +337,9 @@ export async function nearHelperFactory({
         )}&contract=${encodeURIComponent(id.native.contract)}`
       );
 
-      const res = await signatureSvc.getSignatureNear(
+      const res = await signatureSvc.near(
         Chain.NEAR,
         nonce as any,
-        id.native.tokenId,
         id.collectionIdent,
         id.native.tokenId,
         to
@@ -355,10 +353,10 @@ export async function nearHelperFactory({
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,
-          sig_data: [...Buffer.from(res?.signature, "hex")],
+          sig_data: [...Buffer.from(res.sig, "hex")],
         },
         methodName: "withdraw_nft",
-        attachedDeposit: new BN(res?.fee),
+        attachedDeposit: new BN(res.sig),
         gas: new BN("300000000000000"),
         ...(walletCallbackUrl ? { walletCallbackUrl } : {}),
       });
