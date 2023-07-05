@@ -77,9 +77,9 @@ export namespace ChainFactoryConfigs {
         network: "casper-test",
         rpc: TestNetRpcUri.CASPER,
         bridge:
-          "hash-df3387efd88b0d0e7ff57b76a65b5e2a1201dd18aa6c8019fb6ceb9c387af9b5",
+          "hash-99801f22b6a828e7b459818b190e99fa2df02695b1a7b44c978c80199b0e2265",
         xpnft:
-          "hash-5dcc145e51ed1e989b9411ee8312c408db3b21dcd6f91cbe70cc5202d18ba4fa",
+          "hash-52bd0f55fbd08e4cecf2a633f23ec8a94dc7e7e947a4d4fbefc04d91295fa3ef",
         umt: "hash-23ecf377ab0de596cbda5b6e1cdfd230bad2f8eee688d7b5902bd560ffd96b4e",
         notifier,
         feeMargin,
