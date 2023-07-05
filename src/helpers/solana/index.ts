@@ -264,12 +264,7 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       });
 
       const tx = await bridgeContract.methods
-        .withdrawNft(
-          parseInt(nonce),
-          to,
-          new BN(txFees.toString(10)),
-          bridgeBump
-        )
+        .withdrawNft(nonce, to, new BN(txFees.toString(10)), bridgeBump)
         .accounts({
           bridge,
           authority: sender.publicKey,

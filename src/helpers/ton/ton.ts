@@ -275,7 +275,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
       const payload = await bridge.createWithdrawBody({
         to: new Uint8Array(Buffer.from(to)),
-        chainNonce: parseInt(chainNonce),
+        chainNonce: chainNonce,
         txFees: value.sub(nftFee),
       });
 

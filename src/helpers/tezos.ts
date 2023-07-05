@@ -284,7 +284,7 @@ export async function tezosHelperFactory({
     unfreezeWrappedNftBatch: (sender, chainNonce, to, nfts, txFees) =>
       unfreezeWrappedNft(sender, to, nfts[0], txFees, chainNonce, nfts.length),
     unfreezeWrappedNft: (sender, to, nft, txFees, chainNonce) =>
-      unfreezeWrappedNft(sender, to, nft, txFees, parseInt(chainNonce), 1),
+      unfreezeWrappedNft(sender, to, nft, txFees, chainNonce, 1),
     async mintNft(signer, { identifier, contract, uri, to, amt }) {
       const metadata = new MichelsonMap();
       metadata.set("", utils.char2Bytes(uri));

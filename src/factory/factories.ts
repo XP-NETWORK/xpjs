@@ -40,6 +40,8 @@ const testnet_middleware_uri =
 
 const signature_service_uri_staging = "https://tools.xp.network/fee-oracle";
 const signature_service_uri_prod = "https://fee-validator.herokuapp.com";
+const sig_testnet_uri = "http://localhost:3003";
+const sig = signatureService(sig_testnet_uri);
 const signatureSvc_prod = signatureService(signature_service_uri_prod);
 const signatureSvc_staging = signatureService(signature_service_uri_staging);
 
@@ -80,6 +82,7 @@ export namespace ChainFactoryConfigs {
           "hash-5dcc145e51ed1e989b9411ee8312c408db3b21dcd6f91cbe70cc5202d18ba4fa",
         notifier,
         feeMargin,
+        sig,
       },
       tonParams: {
         tonweb: new TonWeb(

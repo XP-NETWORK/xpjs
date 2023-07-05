@@ -48,6 +48,7 @@ import {
 } from "./chain";
 import {
   Chain,
+  ChainNonce,
   ChainNonceGet,
   EstimateTxFees,
   ExtractAction,
@@ -450,7 +451,7 @@ export async function elrondHelperFactory(
     to: string,
     { tokenIdentifier, nonce }: EsdtNftInfo,
     tx_fees: BigNumber,
-    chain_nonce: string
+    chain_nonce: ChainNonce
   ) => {
     return new Transaction({
       receiver: address,

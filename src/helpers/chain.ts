@@ -44,7 +44,7 @@ export interface PreTransfer<Signer, Nft, Ret, ExtraArgs> {
 export interface TransferNftForeign<Signer, RawNft, Resp> {
   transferNftToForeign(
     sender: Signer,
-    chain_nonce: number,
+    chain_nonce: ChainNonce,
     to: string,
     id: NftInfo<RawNft>,
     txFees: BigNumber,
@@ -71,7 +71,7 @@ export interface UnfreezeForeignNft<Signer, RawNft, Resp> {
     to: string,
     id: NftInfo<RawNft>,
     txFees: BigNumber,
-    nonce: string,
+    nonce: ChainNonce,
     gasLimit: ethers.BigNumberish | undefined,
     gasPrice: ethers.BigNumberish | undefined
   ): Promise<Resp>;
