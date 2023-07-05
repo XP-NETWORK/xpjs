@@ -18,7 +18,7 @@ export namespace AppConfigs {
   };
   export const TestNet: () => AppConfig = () => {
     return {
-      exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+      exchangeRateUri: "https://testnet-notifier.xp.network/ex/exchange/",
       nftListUri: "https://testnet-notifier.xp.network/testnet-indexer/",
       whitelistedUri: "https://testnet-notifier.xp.network/",
       nftListAuthToken:
