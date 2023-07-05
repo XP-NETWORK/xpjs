@@ -49,10 +49,8 @@ export interface CasperNFT {
 
 export interface CasperMintNft {
   contract?: string;
-  name: string;
-  description: string;
-  image: string;
   collectionName: string;
+  uri: string;
 }
 
 export type CasperHelper = ChainNonceGet &
@@ -112,9 +110,7 @@ export async function casperHelper({
       const deploy = cep78Client.mint(
         {
           meta: {
-            name: options.name,
-            description: options.description,
-            image: options.image,
+            token_uri: options.uri,
           },
           owner: CLPublicKey.fromHex(await owner.getActivePublicKey()),
           collectionName: options.contract
