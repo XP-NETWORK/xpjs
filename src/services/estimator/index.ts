@@ -15,6 +15,13 @@ export interface SignatureService {
     to: string,
     num: number
   ): Promise<SignatureServiceResponse>;
+  casper(
+    from: ChainNonce,
+    to: ChainNonce,
+    receiver: string,
+    contract: string,
+    token_id: string
+  ): Promise<SignatureServiceResponse>;
 }
 
 interface SignatureServiceResponse {
@@ -56,6 +63,21 @@ export function signatureService(url: string): SignatureService {
           to,
           receiver,
           num,
+        }
+      );
+      return result.data.data;
+    },
+    async casper(from, to, receiver, contract, token_id) {
+      const result = await signer.post<{ data: SignatureServiceResponse }>(
+        "/api/casper/",
+        {
+          from,
+          to,
+          receiver,
+          nft: {
+            token_id,
+            contract,
+          },
         }
       );
       return result.data.data;
