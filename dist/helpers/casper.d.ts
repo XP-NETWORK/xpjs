@@ -10,6 +10,7 @@ export interface CasperParams {
     bridge: string;
     notifier: EvNotifier;
     xpnft: string;
+    umt: string;
     feeMargin: FeeMargins;
     sig: SignatureService;
 }
@@ -19,7 +20,7 @@ export interface CasperNFT {
     contract: string;
 }
 export interface CasperMintNft {
-    contract: string;
+    contract?: string;
     name: string;
     description: string;
     image: string;
@@ -30,6 +31,6 @@ export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<Caspe
 } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> & UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> & EstimateTxFees<CasperNFT> & {
     XpNft: string;
 } & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string>;
-export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, sig, }: CasperParams): Promise<CasperHelper>;
+export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, umt, sig, }: CasperParams): Promise<CasperHelper>;
 export declare function CasperHelperFromKeys(keys: AsymmetricKey): CasperLabsHelper;
 //# sourceMappingURL=casper.d.ts.map
