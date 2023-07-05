@@ -3,6 +3,7 @@ import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetExtraFees, 
 import { CasperLabsHelper } from "casper-js-sdk/dist/@types/casperlabsSigner";
 import { AsymmetricKey } from "casper-js-sdk/dist/lib/Keys";
 import { EvNotifier } from "../services/notifier";
+import { SignatureService } from "../services/estimator";
 export interface CasperParams {
     rpc: string;
     network: string;
@@ -10,6 +11,7 @@ export interface CasperParams {
     notifier: EvNotifier;
     xpnft: string;
     feeMargin: FeeMargins;
+    sig: SignatureService;
 }
 export interface CasperNFT {
     tokenId?: string;
@@ -28,6 +30,6 @@ export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<Caspe
 } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> & UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> & EstimateTxFees<CasperNFT> & {
     XpNft: string;
 } & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string>;
-export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, }: CasperParams): Promise<CasperHelper>;
+export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, sig, }: CasperParams): Promise<CasperHelper>;
 export declare function CasperHelperFromKeys(keys: AsymmetricKey): CasperLabsHelper;
 //# sourceMappingURL=casper.d.ts.map
