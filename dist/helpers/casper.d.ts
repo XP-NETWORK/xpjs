@@ -21,10 +21,8 @@ export interface CasperNFT {
 }
 export interface CasperMintNft {
     contract?: string;
-    name: string;
-    description: string;
-    image: string;
     collectionName: string;
+    uri: string;
 }
 export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<CasperLabsHelper, CasperNFT, string, undefined>, "preTransfer"> & ValidateAddress & GetFeeMargins & GetProvider<CasperClient> & {
     isApprovedForMinter(sender: CasperLabsHelper, nft: NftInfo<CasperNFT>): Promise<boolean>;
