@@ -277,14 +277,14 @@ export async function dfinityHelper(
         throw new Error(`Nft not approved for minter`);
       }
 
-      const sig = await args.signatureSvc.getSignatureDfinity(
+      const sig = await args.signatureSvc.dfinity(
         Chain.DFINITY,
         chain_nonce as ChainNonce,
         to,
         1
       );
 
-      const txFeeBlock = await transferTxFee(new BigNumber(sig.fee), sender);
+      const txFeeBlock = await transferTxFee(new BigNumber(sig.fees), sender);
 
       const actionId = await minter.freeze_nft(
         txFeeBlock,
@@ -293,7 +293,7 @@ export async function dfinityHelper(
         BigInt(chain_nonce),
         to,
         mintWith,
-        [...Buffer.from(sig.signature, "hex")]
+        [...Buffer.from(sig.sig, "hex")]
       );
 
       await args.notifier.notifyDfinity(actionId.toString());
@@ -334,14 +334,14 @@ export async function dfinityHelper(
       if (!(await isApprovedForMinter(sender, id))) {
         throw new Error(`Nft not approved for minter`);
       }
-      const sig = await args.signatureSvc.getSignatureDfinity(
+      const sig = await args.signatureSvc.dfinity(
         Chain.DFINITY,
         parseInt(nonce) as ChainNonce,
         to,
         1
       );
 
-      const txFeeBlock = await transferTxFee(new BigNumber(sig.fee), sender);
+      const txFeeBlock = await transferTxFee(new BigNumber(sig.fees), sender);
 
       const actionId = await minter.withdraw_nft(
         txFeeBlock,
@@ -349,7 +349,7 @@ export async function dfinityHelper(
         BigInt(id.native.tokenId),
         BigInt(nonce),
         to,
-        [...Buffer.from(sig.signature, "hex")]
+        [...Buffer.from(sig.sig, "hex")]
       );
 
       await args.notifier.notifyDfinity(actionId.toString());
