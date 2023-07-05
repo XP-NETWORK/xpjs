@@ -451,7 +451,8 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       };
     },
     async isNftWhitelisted(nft) {
-      const collectionAddress = nft.native?.collectionAddress;
+      return true;
+      /*const collectionAddress = nft.native?.collectionAddress;
       if (!collectionAddress) return false;
       let whitelistedCollections: Promise<string[]>;
 
@@ -464,7 +465,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
 
       const res = await wl_prom;
       wl_prom = undefined;
-      return res.includes(collectionAddress) ? true : false;
+      return res.includes(collectionAddress) ? true : false;*/
     },
   };
 }

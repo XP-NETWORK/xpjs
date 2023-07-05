@@ -270,7 +270,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-        noWhitelist: true,
+
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -792,7 +792,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-        noWhitelist: true,
+
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
       },
       arbitrumParams: {
