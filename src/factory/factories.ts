@@ -40,7 +40,7 @@ const testnet_middleware_uri =
 
 const signature_service_uri_staging = "https://tools.xp.network/fee-oracle";
 const signature_service_uri_prod = "https://fee-validator.herokuapp.com";
-const sig_testnet_uri = "http://localhost:3003";
+const sig_testnet_uri = "https://testnet-notifier.xp.network/oracle/";
 const sig = signatureService(sig_testnet_uri);
 const signatureSvc_prod = signatureService(signature_service_uri_prod);
 const signatureSvc_staging = signatureService(signature_service_uri_staging);
