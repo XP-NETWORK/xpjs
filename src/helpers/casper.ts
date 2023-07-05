@@ -6,7 +6,7 @@ import {
   CasperClient,
   DeployUtil,
 } from "casper-js-sdk";
-import { CEP78Client } from "casper-cep78-js-client";
+import { CEP78Client } from "casper-cep78-js-client/dist/src";
 import {
   BalanceCheck,
   ChainNonceGet,
@@ -36,6 +36,7 @@ export interface CasperParams {
   bridge: string;
   notifier: EvNotifier;
   xpnft: string;
+  umt: string;
   feeMargin: FeeMargins;
   sig: SignatureService;
 }
@@ -47,7 +48,7 @@ export interface CasperNFT {
 }
 
 export interface CasperMintNft {
-  contract: string;
+  contract?: string;
   name: string;
   description: string;
   image: string;
@@ -89,6 +90,7 @@ export async function casperHelper({
   bridge,
   feeMargin,
   xpnft,
+  umt,
   sig,
 }: CasperParams): Promise<CasperHelper> {
   const client = new CasperClient(rpc);
@@ -106,25 +108,31 @@ export async function casperHelper({
       }
     },
     async mintNft(owner, options) {
-      cep78Client.setContractHash(options.contract);
-      return cep78Client
-        .mint(
-          {
-            meta: {
-              name: options.name,
-              description: options.description,
-              image: options.image,
-            },
-            owner: CLPublicKey.fromHex(await owner.getActivePublicKey()),
-            collectionName: options.collectionName,
+      cep78Client.setContractHash(options.contract ?? umt);
+      const deploy = cep78Client.mint(
+        {
+          meta: {
+            name: options.name,
+            description: options.description,
+            image: options.image,
           },
-          {
-            useSessionCode: true,
-          },
-          "15000000000",
-          CLPublicKey.fromHex(await owner.getActivePublicKey())
-        )
-        .send(rpc);
+          owner: CLPublicKey.fromHex(await owner.getActivePublicKey()),
+          collectionName: options.contract
+            ? options.collectionName
+            : "UserNftMinter",
+        },
+        {
+          useSessionCode: false,
+        },
+        "15000000000",
+        CLPublicKey.fromHex(await owner.getActivePublicKey())
+      );
+
+      const signed = await owner.sign(
+        DeployUtil.deployToJson(deploy),
+        await owner.getActivePublicKey()
+      );
+      return DeployUtil.deployFromJson(signed).unwrap().send(rpc);
     },
 
     async isApprovedForMinter(_sender, nft) {
@@ -220,7 +228,9 @@ export async function casperHelper({
     },
     async balance(address) {
       return new BigNumber(
-        (await client.balanceOfByAccountHash(address)).toString()
+        (
+          await client.balanceOfByPublicKey(CLPublicKey.fromHex(address))
+        ).toString()
       );
     },
     getFeeMargin() {
