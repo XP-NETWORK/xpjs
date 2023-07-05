@@ -349,7 +349,7 @@ export async function nearHelperFactory({
         contractId: bridge,
         args: {
           token_id: id.native.tokenId,
-          chain_nonce: parseInt(nonce),
+          chain_nonce: nonce,
           to,
           amt: parseInt(txFees.toString()),
           token_contract: id.native.contract,

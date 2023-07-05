@@ -969,7 +969,7 @@ export function ChainFactory(
           receiver,
           nft,
           new BigNumber(fee),
-          String(toNonce),
+          toNonce,
           gasLimit,
           gasPrice
         );

@@ -221,7 +221,7 @@ export async function aptosHelper({
         id.native.token_name,
         id.native.property_version.toString(),
         BigInt(txFees.toString()),
-        parseInt(nonce),
+        nonce,
         to,
         id.native.collection_creator
       );

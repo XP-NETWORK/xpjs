@@ -424,9 +424,7 @@ export function algorandHelper(args: AlgorandParams): AlgorandHelper {
       const appArgs = [
         encoder.encode("withdraw_nft"),
         encoder.encode(to),
-        new Uint8Array(
-          Buffer.from(new Uint32Array([parseInt(nonce)]).buffer).reverse()
-        ),
+        new Uint8Array(Buffer.from(new Uint32Array([nonce]).buffer).reverse()),
         new Uint8Array(Buffer.from("")),
       ];
       const tCallTx = algosdk.makeApplicationNoOpTxnFromObject({

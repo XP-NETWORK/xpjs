@@ -334,12 +334,7 @@ export async function dfinityHelper(
       if (!(await isApprovedForMinter(sender, id))) {
         throw new Error(`Nft not approved for minter`);
       }
-      const sig = await args.signatureSvc.dfinity(
-        Chain.DFINITY,
-        parseInt(nonce) as ChainNonce,
-        to,
-        1
-      );
+      const sig = await args.signatureSvc.dfinity(Chain.DFINITY, nonce, to, 1);
 
       const txFeeBlock = await transferTxFee(new BigNumber(sig.fees), sender);
 
