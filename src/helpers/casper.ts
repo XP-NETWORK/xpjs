@@ -44,7 +44,7 @@ export interface CasperParams {
 export interface CasperNFT {
   tokenId?: string;
   tokenHash?: string;
-  contract: string;
+  contract_hash: string;
 }
 
 export interface CasperMintNft {
@@ -132,7 +132,7 @@ export async function casperHelper({
     },
 
     async isApprovedForMinter(_sender, nft) {
-      cep78Client.setContractHash(nft.native.contract);
+      cep78Client.setContractHash(nft.native.contract_hash);
       const tid = getTokenIdentifier(nft);
       const result = (await cep78Client.contractClient.queryContractDictionary(
         "approved",
@@ -175,12 +175,12 @@ export async function casperHelper({
           amt: signature.fees,
           chain_nonce,
           to,
-          contract: id.native.contract,
+          contract: id.native.contract_hash,
           mint_with: mintWith,
           sig_data: Buffer.from(signature.sig, "hex"),
           token_id: id.native.tokenId || id.native.tokenHash || "",
         },
-        "15000000000",
+        "35000000000",
         CLPublicKey.fromHex(await sender.getActivePublicKey())
       );
 
@@ -205,7 +205,7 @@ export async function casperHelper({
           amt: signature.fees,
           chain_nonce: nonce,
           to,
-          contract: id.native.contract,
+          contract: id.native.contract_hash,
           sig_data: Buffer.from(signature.sig, "hex"),
           token_id: id.native.tokenId || id.native.tokenHash || "",
         },
@@ -234,7 +234,7 @@ export async function casperHelper({
     },
 
     async preTransfer(sender, nft) {
-      cep78Client.setContractHash(nft.native.contract);
+      cep78Client.setContractHash(nft.native.contract_hash);
       const deploy = cep78Client.approve(
         {
           operator: new CLByteArray(Buffer.from(bridge.split("-")[1], "hex")),
