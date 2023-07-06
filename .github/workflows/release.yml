@@ -44,12 +44,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
 
-      - name: Prepare CurrentProd Release
+      - name: Prepare Testnet Release
         uses: s0/git-publish-subdir-action@develop
-        if: ${{ github.ref == 'refs/heads/preDfinityApprove' }}
+        if: ${{ github.ref == 'refs/heads/testnet' }}
         env:
           REPO: self
-          BRANCH: currentProd-dist
+          BRANCH: testnet-dist
           FOLDER: out
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
