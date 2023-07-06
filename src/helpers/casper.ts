@@ -90,6 +90,7 @@ export async function casperHelper({
   xpnft,
   umt,
   sig,
+  notifier,
 }: CasperParams): Promise<CasperHelper> {
   const client = new CasperClient(rpc);
   const cep78Client = new CEP78Client(rpc, network);
@@ -189,7 +190,10 @@ export async function casperHelper({
         await sender.getActivePublicKey()
       );
       const dep = client.deployFromJson(signed).unwrap();
-      return await client.putDeploy(dep);
+      const hash = await client.putDeploy(dep);
+
+      await notifier.notifyCasper(hash);
+      return hash;
     },
     async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
       const signature = await sig.casper(
@@ -217,7 +221,11 @@ export async function casperHelper({
         await sender.getActivePublicKey()
       );
       const dep = client.deployFromJson(signed).unwrap();
-      return await client.putDeploy(dep);
+      const hash = await client.putDeploy(dep);
+
+      await notifier.notifyCasper(hash);
+
+      return hash;
     },
     getNonce() {
       return Chain.CASPER;

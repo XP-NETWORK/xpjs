@@ -152,5 +152,8 @@ export function evNotifier(url: string) {
         chain_nonce: nonce,
       });
     },
+    async notifyCasper(txHash: string) {
+      await api.post("/tx/casper", { tx_hash: txHash });
+    },
   };
 }
