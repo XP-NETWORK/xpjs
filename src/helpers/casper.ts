@@ -97,6 +97,30 @@ export async function casperHelper({
   const bridgeClient = new XpBridgeClient(rpc, network);
   bridgeClient.setContractHash(bridge);
 
+  async function isApprovedForMinter(
+    _sender: CasperLabsHelper,
+    nft: NftInfo<CasperNFT>
+  ) {
+    cep78Client.setContractHash(nft.native.contract_hash);
+    const tid = getTokenIdentifier(nft);
+    const result = (await cep78Client.contractClient
+      .queryContractDictionary("approved", tid)
+      .catch(() => undefined)) as CLOption<CLKey>;
+
+    if (result === undefined) {
+      return false;
+    }
+    if (result.isNone()) {
+      return false;
+    }
+    console.log(Buffer.from(result.data.unwrap().data.data).toString("hex"));
+    return (
+      Buffer.from(result.data.unwrap().data.data)
+        .toString("hex")
+        .toLowerCase() === bridge.split("-")[1].toLowerCase()
+    );
+  }
+
   return {
     async validateAddress(adr) {
       try {
@@ -131,24 +155,7 @@ export async function casperHelper({
       );
       return DeployUtil.deployFromJson(signed).unwrap().send(rpc);
     },
-
-    async isApprovedForMinter(_sender, nft) {
-      cep78Client.setContractHash(nft.native.contract_hash);
-      const tid = getTokenIdentifier(nft);
-      const result = (await cep78Client.contractClient.queryContractDictionary(
-        "approved",
-        tid
-      )) as CLOption<CLKey>;
-
-      if (result.isNone()) {
-        return false;
-      }
-      return (
-        Buffer.from(result.data.unwrap().data.data)
-          .toString("hex")
-          .toLowerCase() === bridge.split("-")[1].toLowerCase()
-      );
-    },
+    isApprovedForMinter,
     getProvider() {
       return client;
     },
@@ -213,7 +220,7 @@ export async function casperHelper({
           sig_data: Buffer.from(signature.sig, "hex"),
           token_id: id.native.tokenId || id.native.tokenHash || "",
         },
-        "15000000000",
+        "35000000000",
         CLPublicKey.fromHex(await sender.getActivePublicKey())
       );
       const signed = await sender.sign(
@@ -242,6 +249,9 @@ export async function casperHelper({
     },
 
     async preTransfer(sender, nft) {
+      if (await isApprovedForMinter(sender, nft)) {
+        return undefined;
+      }
       cep78Client.setContractHash(nft.native.contract_hash);
       const deploy = cep78Client.approve(
         {
