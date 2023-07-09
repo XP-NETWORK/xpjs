@@ -54,6 +54,11 @@ export interface CasperMintNft {
   uri: string;
 }
 
+interface CasperBrowserAdapt {
+  setProxy(proxy: string): void;
+  toAccountHash(account: string): string;
+}
+
 export type CasperHelper = ChainNonceGet &
   BalanceCheck &
   Pick<
@@ -70,9 +75,8 @@ export type CasperHelper = ChainNonceGet &
   } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> &
   UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> &
   EstimateTxFees<CasperNFT> & { XpNft: string } & GetExtraFees &
-  MintNft<CasperLabsHelper, CasperMintNft, string> & {
-    setProxy(proxy: string): void;
-  };
+  MintNft<CasperLabsHelper, CasperMintNft, string> &
+  CasperBrowserAdapt;
 
 function getTokenIdentifier(nft: NftInfo<CasperNFT>): string {
   if (nft.native.tokenId || nft.native.tokenHash) {
@@ -184,6 +188,9 @@ export async function casperHelper({
       cep78Client = new CEP78Client(rpc, network);
       bridgeClient = new XpBridgeClient(rpc, network);
       bridgeClient.setContractHash(bridge);
+    },
+    toAccountHash(account: string) {
+      return CLPublicKey.fromHex(account).toAccountRawHashStr();
     },
     async estimateValidateTransferNft() {
       return new BigNumber("30000000000");
@@ -308,6 +315,7 @@ export function CasperHelperFromKeys(keys: AsymmetricKey): CasperLabsHelper {
     disconnectFromSite() {
       throw new Error("Not implemented");
     },
+
     async getActivePublicKey() {
       return keys.publicKey.toHex();
     },

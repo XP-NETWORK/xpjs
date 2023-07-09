@@ -1227,11 +1227,7 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.1.tgz#5bd16082261d7364eabb511c788f00937dac588d"
   integrity sha512-z+ILK8Q3y+nfUl43ctCPuR4Y2bIxk/ooCQFwZxhtci1EhAtMDzMAx2W25qx8G1PPL9UUOdnUax19+F0OjXoj4w==
 
-<<<<<<< HEAD
 "@make-software/ces-js-parser@latest":
-=======
-"@make-software/ces-js-parser@=1.1.0", "@make-software/ces-js-parser@latest":
->>>>>>> db758baa (Casper: setProxy method for helper, browser case for mint)
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@make-software/ces-js-parser/-/ces-js-parser-1.1.0.tgz#62879fc5962afe85068f29fc0d58a5ba4d130848"
   integrity sha512-Fg5ZVXMxOK5REVtC4cHgXVKFqYcL6NSMdEhrxOnstBQvSBJC6MgWt548ftuTWOmUOAMLGbg7nhv7lqKcG/p68Q==
