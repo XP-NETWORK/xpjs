@@ -24,13 +24,16 @@ export interface CasperMintNft {
     collectionName: string;
     uri: string;
 }
+interface CasperBrowserAdapt {
+    setProxy(proxy: string): void;
+    toAccountHash(account: string): string;
+}
 export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<CasperLabsHelper, CasperNFT, string, undefined>, "preTransfer"> & ValidateAddress & GetFeeMargins & GetProvider<CasperClient> & {
     isApprovedForMinter(sender: CasperLabsHelper, nft: NftInfo<CasperNFT>): Promise<boolean>;
 } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> & UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> & EstimateTxFees<CasperNFT> & {
     XpNft: string;
-} & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & {
-    setProxy(proxy: string): void;
-};
+} & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & CasperBrowserAdapt;
 export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, umt, sig, notifier, }: CasperParams): Promise<CasperHelper>;
 export declare function CasperHelperFromKeys(keys: AsymmetricKey): CasperLabsHelper;
+export {};
 //# sourceMappingURL=casper.d.ts.map
