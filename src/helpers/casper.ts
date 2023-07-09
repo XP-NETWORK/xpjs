@@ -29,6 +29,7 @@ import { EvNotifier } from "../services/notifier";
 import { XpBridgeClient } from "xpbridge-client";
 import { Chain } from "../consts";
 import { SignatureService } from "../services/estimator";
+import { isBrowser } from "@pedrouid/environment";
 
 export interface CasperParams {
   rpc: string;
@@ -69,7 +70,9 @@ export type CasperHelper = ChainNonceGet &
   } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> &
   UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> &
   EstimateTxFees<CasperNFT> & { XpNft: string } & GetExtraFees &
-  MintNft<CasperLabsHelper, CasperMintNft, string>;
+  MintNft<CasperLabsHelper, CasperMintNft, string> & {
+    setProxy(proxy: string): void;
+  };
 
 function getTokenIdentifier(nft: NftInfo<CasperNFT>): string {
   if (nft.native.tokenId || nft.native.tokenHash) {
@@ -92,9 +95,9 @@ export async function casperHelper({
   sig,
   notifier,
 }: CasperParams): Promise<CasperHelper> {
-  const client = new CasperClient(rpc);
-  const cep78Client = new CEP78Client(rpc, network);
-  const bridgeClient = new XpBridgeClient(rpc, network);
+  let client = new CasperClient(rpc);
+  let cep78Client = new CEP78Client(rpc, network);
+  let bridgeClient = new XpBridgeClient(rpc, network);
   bridgeClient.setContractHash(bridge);
 
   async function isApprovedForMinter(
@@ -132,12 +135,14 @@ export async function casperHelper({
     },
     async mintNft(owner, options) {
       cep78Client.setContractHash(options.contract ?? umt);
+      const address = await owner.getActivePublicKey();
+
       const deploy = cep78Client.mint(
         {
           meta: {
             token_uri: options.uri,
           },
-          owner: CLPublicKey.fromHex(await owner.getActivePublicKey()),
+          owner: CLPublicKey.fromHex(address),
           collectionName: options.contract
             ? options.collectionName
             : "UserNftMinter",
@@ -146,8 +151,22 @@ export async function casperHelper({
           useSessionCode: false,
         },
         "15000000000",
-        CLPublicKey.fromHex(await owner.getActivePublicKey())
+        CLPublicKey.fromHex(address)
       );
+
+      if (isBrowser()) {
+        (owner as any)
+          .sign(JSON.stringify(DeployUtil.deployToJson(deploy)), address)
+          .then(async (signedDeployJson: any) => {
+            const signedDeploy = DeployUtil.setSignature(
+              deploy,
+              signedDeployJson.signature,
+              CLPublicKey.fromHex(address)
+            );
+
+            return await client.putDeploy(signedDeploy);
+          });
+      }
 
       const signed = await owner.sign(
         DeployUtil.deployToJson(deploy),
@@ -158,6 +177,13 @@ export async function casperHelper({
     isApprovedForMinter,
     getProvider() {
       return client;
+    },
+    setProxy(proxy: string) {
+      rpc = proxy + rpc;
+      client = new CasperClient(rpc);
+      cep78Client = new CEP78Client(rpc, network);
+      bridgeClient = new XpBridgeClient(rpc, network);
+      bridgeClient.setContractHash(bridge);
     },
     async estimateValidateTransferNft() {
       return new BigNumber("30000000000");

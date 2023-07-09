@@ -1227,7 +1227,11 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.1.tgz#5bd16082261d7364eabb511c788f00937dac588d"
   integrity sha512-z+ILK8Q3y+nfUl43ctCPuR4Y2bIxk/ooCQFwZxhtci1EhAtMDzMAx2W25qx8G1PPL9UUOdnUax19+F0OjXoj4w==
 
+<<<<<<< HEAD
 "@make-software/ces-js-parser@latest":
+=======
+"@make-software/ces-js-parser@=1.1.0", "@make-software/ces-js-parser@latest":
+>>>>>>> db758baa (Casper: setProxy method for helper, browser case for mint)
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@make-software/ces-js-parser/-/ces-js-parser-1.1.0.tgz#62879fc5962afe85068f29fc0d58a5ba4d130848"
   integrity sha512-Fg5ZVXMxOK5REVtC4cHgXVKFqYcL6NSMdEhrxOnstBQvSBJC6MgWt548ftuTWOmUOAMLGbg7nhv7lqKcG/p68Q==
@@ -3399,9 +3403,9 @@ casper-js-sdk@=2.12.1:
     typedjson "^1.6.0-rc2"
 
 casper-js-sdk@^2.11.0:
-  version "2.13.2"
-  resolved "https://registry.yarnpkg.com/casper-js-sdk/-/casper-js-sdk-2.13.2.tgz#6a46ed17d01154068d413b285681fdc5bd0e2be6"
-  integrity sha512-42tkYnz3JBCdpM0AfXiTJjEKc4pWbVMU044BNvBi+9cE3G57p6Ica1VgnftMAwK4uY+6EAhiVo2VW+UZghwF4w==
+  version "2.13.3"
+  resolved "https://registry.yarnpkg.com/casper-js-sdk/-/casper-js-sdk-2.13.3.tgz#8a846dcca773bb7c83b6da2e84381802d88fa723"
+  integrity sha512-//AOGj62GlDjiHX4a5dE3s0DaBu3CmPjrtDQOSeoLRMPy4vyQsXpLyaQpuQ8Q4JAnbqV2ySeON1edAfssN04pw==
   dependencies:
     "@ethersproject/bignumber" "^5.0.8"
     "@ethersproject/bytes" "^5.0.5"
