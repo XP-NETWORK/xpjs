@@ -5,6 +5,7 @@ import { EvNotifier } from "../../services/notifier";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck } from "../chain";
 import { PreTransfer } from "../..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
+import { NftListUtils } from "../../services/nftList";
 export type TonSigner = {
     wallet?: TonWallet;
     accIdx: number;
@@ -34,7 +35,7 @@ export type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
-} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees;
+} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils;
 export type TonParams = {
     tonweb: TonWeb;
     notifier: EvNotifier;
