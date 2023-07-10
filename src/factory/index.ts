@@ -25,11 +25,11 @@ import {
 import { UserSigner } from "@elrondnetwork/erdjs/out";
 import { ContractFactory, Wallet } from "@hashgraph/hethers";
 import algosdk from "algosdk";
-import axios from "axios";
 import { ethers, utils } from "ethers";
 import { Base64 } from "js-base64";
 import { bridgeHeartbeat } from "../services/heartbeat";
 import { exchangeRateRepo } from "../services/exchangeRate";
+import { nftList } from "../services/nftList";
 import { scVerify } from "../services/scVerify";
 import {
   AlgorandHelper,
@@ -75,7 +75,6 @@ import {
   checkNotOldWrappedNft,
   isWrappedNft,
 } from "./utils";
-import base64url from "base64url";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -420,12 +419,10 @@ export function ChainFactory(
 
   const txSocket = socketHelper(appConfig.txSocketUri);
 
-  const nftlistRest = axios.create({
-    baseURL: appConfig.nftListUri,
-    headers: {
-      Authorization: `Bearer ${appConfig.nftListAuthToken}`,
-    },
-  });
+  const nftListService = nftList(
+    appConfig.nftListUri,
+    appConfig.nftListAuthToken
+  );
 
   const scVerifyRest = scVerify(appConfig.scVerifyUri);
 
@@ -891,20 +888,7 @@ export function ChainFactory(
       cToP.set(chainNonce, params);
     },
     async nftList<T>(chain: ChainNonceGet & T, owner: string) {
-      if (chain.getNonce() === Chain.TON) {
-        console.log("decode for ton");
-        owner = base64url.encode(owner);
-      }
-
-      let res = await nftlistRest.get<{
-        data: NftInfo<InferNativeNft<T>>[];
-      }>(`/nfts/${chain.getNonce()}/${owner}`);
-
-      if (res.headers["Retry-After"]) {
-        await new Promise((r) => setTimeout(r, 30000));
-        return await this.nftList(chain, owner);
-      }
-      return res.data.data;
+      return nftListService.get(chain, owner);
     },
     transferNft: async (
       fromChain,
