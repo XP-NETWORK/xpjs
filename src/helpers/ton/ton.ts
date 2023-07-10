@@ -29,6 +29,10 @@ import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { fromUint8Array } from "js-base64";
 import axios from "ton/node_modules/axios";
 
+import { NftListUtils } from "../../services/nftList";
+
+import base64url from "base64url";
+
 export type TonSigner = {
   wallet?: TonWallet;
   accIdx: number;
@@ -68,7 +72,8 @@ export type TonHelper = ChainNonceGet &
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
   } & GetFeeMargins &
   WhitelistCheck<TonNft> &
-  GetExtraFees;
+  GetExtraFees &
+  NftListUtils;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -99,6 +104,8 @@ type TonWallet = {
   onSuccess?(): Function;
   handleResponse(res: ResponseUnionType): Promise<string>;
 };
+
+let wl_prom: Promise<string[]> | undefined;
 
 export async function tonHelper(args: TonParams): Promise<TonHelper> {
   const bridge = new BridgeContract(args.tonweb.provider, {
@@ -451,10 +458,22 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     async isNftWhitelisted(nft) {
       const collectionAddress = nft.native?.collectionAddress;
       if (!collectionAddress) return false;
+      let whitelistedCollections: Promise<string[]>;
 
-      const whitelistedCollections = await bridge.getWhitelist();
+      if (wl_prom) {
+        whitelistedCollections = wl_prom;
+      } else {
+        whitelistedCollections = bridge.getWhitelist();
+        wl_prom = whitelistedCollections;
+      }
 
-      return whitelistedCollections.includes(collectionAddress) ? true : false;
+      const res = await wl_prom;
+      wl_prom = undefined;
+      return res.includes(collectionAddress) ? true : false;
+    },
+    getNftListAddr(address) {
+      console.log("decode for ton");
+      return base64url.encode(address);
     },
   };
 }
