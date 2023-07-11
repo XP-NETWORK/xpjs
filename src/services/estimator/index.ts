@@ -2,14 +2,15 @@ import axios from "axios";
 import { ChainNonce } from "../../type-utils";
 
 export interface SignatureService {
-  near(
+  getSignatureNear(
     from: ChainNonce,
     toChain: ChainNonce,
+    nft: string,
     tokenContract: string,
     tokenId: string,
     to: string
   ): Promise<SignatureServiceResponse>;
-  dfinity(
+  getSignatureDfinity(
     fc: ChainNonce,
     tc: ChainNonce,
     to: string,
@@ -25,8 +26,8 @@ export interface SignatureService {
 }
 
 interface SignatureServiceResponse {
-  sig: string;
-  fees: string;
+  signature: string;
+  fee: string;
 }
 
 export function signatureService(url: string): SignatureService {
@@ -34,35 +35,37 @@ export function signatureService(url: string): SignatureService {
     baseURL: url,
   });
   return {
-    async near(
-      from: ChainNonce,
-      to: ChainNonce,
-      contract: string,
-      token_id: string,
-      receiver: string
+    async getSignatureNear(
+      fromChain: ChainNonce,
+      toChain: ChainNonce,
+      nft: string,
+      tokenContract: string,
+      tokenId: string,
+      to: string
     ) {
       const result = await signer.post<{ data: SignatureServiceResponse }>(
-        "/api/near/",
+        "/api/get-signature/",
         {
-          from,
+          fromChain,
+          toChain,
+          nft,
           to,
-          receiver,
-          nft: {
-            token_id,
-            contract,
-          },
+          tokenId,
+          tokenContract,
         }
       );
+      console.log("near signature response", result);
       return result.data.data;
     },
-    async dfinity(from, to, receiver, num: number) {
+    async getSignatureDfinity(fc, tc, to, num: number) {
       const result = await signer.post<{ data: SignatureServiceResponse }>(
-        "/api/dfinity/",
+        "/api/get-signature/",
         {
-          from,
+          fromChain: fc,
+          toChain: tc,
           to,
-          receiver,
           num,
+          nft: {},
         }
       );
       return result.data.data;
