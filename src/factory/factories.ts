@@ -284,7 +284,6 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -440,7 +439,7 @@ export namespace ChainFactoryConfigs {
       },
       gateChainParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.GATECHAIN),
         minter_addr: "0x2B24de7BFf5d2ab01b1C53682Ee5987c9BCf1BAc",
         erc721_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
@@ -806,7 +805,6 @@ export namespace ChainFactoryConfigs {
         feeMargin,
         nonce: Chain.OKC,
         notifier,
-        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
       },
       arbitrumParams: {
@@ -837,9 +835,9 @@ export namespace ChainFactoryConfigs {
         agent: new HttpAgent({
           host: "https://ic0.app",
         }),
-        bridgeContract: Principal.fromText("53bb2-rqaaa-aaaap-aa3vq-cai"),
-        xpnftId: Principal.fromText("5ogqx-qyaaa-aaaap-aa3wa-cai"),
-        umt: Principal.fromText("54aho-4iaaa-aaaap-aa3va-cai"),
+        bridgeContract: Principal.fromText("nwewk-zyaaa-aaaan-qd3kq-cai"),
+        xpnftId: Principal.fromText("n7h5w-pqaaa-aaaan-qd3la-cai"),
+        umt: Principal.fromText("mvi7m-naaaa-aaaan-qd3ma-cai"),
         notifier,
         feeMargin,
         signatureSvc: signatureSvc_prod,
@@ -988,7 +986,7 @@ export namespace ChainFactoryConfigs {
       },
       fuseParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.FUSE),
         erc721Minter: "0xC81D46c6F2D59182c5A64FD5C372266c98985AdF",
         erc1155Minter: "0x146a99Ff19ece88EC87f5be03085cA6CD3163E15",
@@ -1063,7 +1061,7 @@ export namespace ChainFactoryConfigs {
       },
       gateChainParams: {
         notifier,
-
+        noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.GATECHAIN),
         minter_addr: "0xFc7f7fD2DBdAF6D8F3ee3f222b3a6a9f89729f05",
         erc721_addr: "0xD6939f722B977afd7DD934A31bc94d08d4ea4336",

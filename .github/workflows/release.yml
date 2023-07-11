@@ -43,3 +43,13 @@ jobs:
           FOLDER: out
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
+
+      - name: Prepare CurrentProd Release
+        uses: s0/git-publish-subdir-action@develop
+        if: ${{ github.ref == 'refs/heads/preDfinityApprove' }}
+        env:
+          REPO: self
+          BRANCH: currentProd-dist
+          FOLDER: out
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "Build: ({sha}) {msg}"

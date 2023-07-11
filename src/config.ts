@@ -3,7 +3,7 @@ import { AppConfig, ChainFactory, ChainFactoryConfigs } from ".";
 export namespace AppConfigs {
   export const MainNet: () => AppConfig = () => {
     return {
-      exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+      exchangeRateUri: "https://testing-bridge-staging.xp.network/exchange/",
       nftListUri: "https://nft-index.xp.network/index/",
       whitelistedUri: "https://nft-index.xp.network/",
       nftListAuthToken:
@@ -34,7 +34,7 @@ export namespace AppConfigs {
 
   export const Staging: () => AppConfig = () => {
     return {
-      exchangeRateUri: "https://testing-bridge.xp.network/exchange/",
+      exchangeRateUri: "https://testing-bridge-staging.xp.network/exchange/",
       nftListUri: "https://tools.xp.network/index",
       whitelistedUri: "https://tools.xp.network/",
       nftListAuthToken:
