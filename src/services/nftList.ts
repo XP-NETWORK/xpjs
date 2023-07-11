@@ -10,7 +10,7 @@ export interface NftList<T> {
 }
 
 export type NftListUtils = {
-  getNftListAddr?(address: string): string;
+  getNftListAddr(address: string): string;
 };
 
 export function nftList<T>(url: string, nftListAuthToken: string): NftList<T> {
@@ -21,12 +21,15 @@ export function nftList<T>(url: string, nftListAuthToken: string): NftList<T> {
     },
   });
 
-  const nftlistRestReserve = axios.create({
-    baseURL: AppConfigs.Staging().nftListUri,
-    headers: {
-      Authorization: `Bearer ${nftListAuthToken}`,
-    },
-  });
+  //if this is mainnet, than backup it with staging indexer
+  const nftlistRestBackup =
+    url === AppConfigs.MainNet().nftListUri &&
+    axios.create({
+      baseURL: AppConfigs.Staging().nftListUri,
+      headers: {
+        Authorization: `Bearer ${nftListAuthToken}`,
+      },
+    });
   return {
     async get(chain: ChainNonceGet & T & NftListUtils, owner: string) {
       if (chain.getNftListAddr) {
@@ -37,8 +40,9 @@ export function nftList<T>(url: string, nftListAuthToken: string): NftList<T> {
         .get<{
           data: NftInfo<InferNativeNft<T>>[];
         }>(`/nfts/${chain.getNonce()}/${owner}`)
-        .catch(async (_) => {
-          return await nftlistRestReserve.get<{
+        .catch(async (e) => {
+          if (!nftlistRestBackup) return e;
+          return await nftlistRestBackup.get<{
             data: NftInfo<InferNativeNft<T>>[];
           }>(`/nfts/${chain.getNonce()}/${owner}`);
         });

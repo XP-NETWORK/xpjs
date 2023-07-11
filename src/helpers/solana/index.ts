@@ -351,7 +351,7 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
     },
     async estimateContractDeploy() {
       //0.01
-      return new BigNumber(8000000);
+      return new BigNumber(6000000);
     },
   };
 }
