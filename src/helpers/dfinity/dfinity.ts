@@ -245,9 +245,7 @@ export async function dfinityHelper(
       agent,
       canisterId: args.bridgeContract,
     });
-    /* ledger = LedgerCanister.create({
-            agent,
-        });*/
+    args.agent = agent;
   };
 
   return {
