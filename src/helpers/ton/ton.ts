@@ -29,6 +29,10 @@ import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { fromUint8Array } from "js-base64";
 import axios from "ton/node_modules/axios";
 
+import { NftListUtils } from "../../services/nftList";
+
+import base64url from "base64url";
+
 export type TonSigner = {
   wallet?: TonWallet;
   accIdx: number;
@@ -68,7 +72,8 @@ export type TonHelper = ChainNonceGet &
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
   } & GetFeeMargins &
   WhitelistCheck<TonNft> &
-  GetExtraFees;
+  GetExtraFees &
+  NftListUtils;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -465,6 +470,10 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       const res = await wl_prom;
       wl_prom = undefined;
       return res.includes(collectionAddress) ? true : false;
+    },
+    getNftListAddr(address) {
+      console.log("decode for ton");
+      return base64url.encode(address);
     },
   };
 }

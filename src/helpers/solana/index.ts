@@ -42,6 +42,7 @@ import {
   ValidateAddress,
   BalanceCheck,
   MintNft,
+  EstimateDeployFees,
 } from "../chain";
 import { IDL } from "./idl";
 
@@ -64,7 +65,8 @@ export type SolanaHelper = ChainNonceGet &
   ValidateAddress & {
     connection: Connection;
   } & { XpNft: string } & GetFeeMargins &
-  GetProvider<Connection>;
+  GetProvider<Connection> &
+  EstimateDeployFees;
 
 export type SolanaParams = {
   endpoint: string;
@@ -83,6 +85,7 @@ async function getOrCreateAssociatedTokenAccount(
   allowOwnerOffCurve = false
 ) {
   const provider = new AnchorProvider(connection, payer, {});
+
   const associatedToken = await getAssociatedTokenAddress(
     mint,
     owner,
@@ -340,6 +343,10 @@ export async function solanaHelper(args: SolanaParams): Promise<SolanaHelper> {
       } catch {
         return false;
       }
+    },
+    async estimateContractDeploy() {
+      //0.01
+      return new BigNumber(8000000);
     },
   };
 }
