@@ -33,7 +33,7 @@ import { _SERVICE } from "./minter.did";
 import * as utils from "@dfinity/utils";
 import { XPNFTSERVICE, xpnftIdl } from "./xpnft.idl";
 
-export type DfinitySigner = Identity;
+export type DfinitySigner = Identity & { agent?: HttpAgent };
 
 export type DfinityNft = {
   canisterId: string;
@@ -213,10 +213,7 @@ export async function dfinityHelper(
     sender: DfinitySigner,
     nft: NftInfo<DfinityNft>
   ) {
-    isBrowser
-      ? //@ts-ignore
-        adaptPlug(sender.agent)
-      : args.agent.replaceIdentity(sender);
+    sender.agent ? adaptPlug(sender.agent) : args.agent.replaceIdentity(sender);
 
     // const tid = tokenIdentifier(
     //   nft.collectionIdent,
@@ -266,9 +263,8 @@ export async function dfinityHelper(
       return new BigNumber(0);
     },
     async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
-      isBrowser
-        ? //@ts-ignore
-          adaptPlug(sender.agent)
+      sender.agent
+        ? adaptPlug(sender.agent)
         : args.agent.replaceIdentity(sender);
 
       if (!(await isApprovedForMinter(sender, id))) {
@@ -302,11 +298,9 @@ export async function dfinityHelper(
       const canister = Principal.fromText(
         options.canisterId ? options.canisterId : args.umt.toText()
       );
-      if (isBrowser) {
-        //@ts-ignore
-        args.agent = owner.agent;
-      }
-      const principal = isBrowser
+      if (owner.agent) args.agent = owner.agent;
+
+      const principal = owner.agent
         ? await args.agent.getPrincipal()
         : owner.getPrincipal();
 
@@ -324,9 +318,8 @@ export async function dfinityHelper(
       return mint;
     },
     async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
-      isBrowser
-        ? //@ts-ignore
-          adaptPlug(sender.agent)
+      sender.agent
+        ? adaptPlug(sender.agent)
         : args.agent.replaceIdentity(sender);
 
       if (!(await isApprovedForMinter(sender, id))) {
@@ -404,9 +397,8 @@ export async function dfinityHelper(
       return tokens;
     },
     async preTransfer(sender, nft) {
-      isBrowser
-        ? //@ts-ignore
-          adaptPlug(sender.agent)
+      sender.agent
+        ? adaptPlug(sender.agent)
         : args.agent.replaceIdentity(sender);
 
       if (await isApprovedForMinter(sender, nft)) {
