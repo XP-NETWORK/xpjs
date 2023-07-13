@@ -10,6 +10,7 @@ import { Chain } from "../../consts";
 import { SignatureService } from "../../services/estimator";
 import { EvNotifier } from "../../services/notifier";
 import { ChainNonce } from "../../type-utils";
+import { randomBigInt } from "../..";
 
 import {
   BalanceCheck,
@@ -30,6 +31,7 @@ import {
 } from "../chain";
 import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
+import ledgerIDL, { LEDGER_CANISTER } from "./ledger.did";
 import * as utils from "@dfinity/utils";
 import { XPNFTSERVICE, xpnftIdl } from "./xpnft.idl";
 
@@ -112,7 +114,9 @@ export type DfinityHelper = ChainNonceGet &
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
   } & IsApprovedForMinter<DfinitySigner, DfinityNft> &
-  GetExtraFees;
+  GetExtraFees & {
+    setActorCreator(provider: any): void;
+  };
 
 export type DfinityParams = {
   agent: HttpAgent;
@@ -127,12 +131,32 @@ export type DfinityParams = {
 export async function dfinityHelper(
   args: DfinityParams
 ): Promise<DfinityHelper> {
+  const createMinter = async (
+    agent: HttpAgent
+  ): Promise<ActorSubclass<_SERVICE>> =>
+    Actor.createActor(idlFactory, {
+      agent,
+      canisterId: args.bridgeContract,
+    });
+
+  //adapt agent for different wallets
+  const prepareAgent = (sender: Identity & { agent?: HttpAgent }) => {
+    //plug wallet
+    if (sender.agent?.rootKey) {
+      return sender.agent;
+    }
+    //bitfinity wallet
+    if (sender.agent) {
+      return args.agent;
+    }
+    //default
+    args.agent.replaceIdentity(sender);
+    return args.agent;
+  };
+
   //@ts-ignore
   let ledger = LedgerCanister.create({ agent: args.agent });
-  let minter: ActorSubclass<_SERVICE> = Actor.createActor(idlFactory, {
-    agent: args.agent,
-    canisterId: args.bridgeContract,
-  });
+  const minter = await createMinter(args.agent);
 
   const encode_withdraw_fees = async (to: string, actionId: string) => {
     /*const numbers = await minter.encode_withdraw_fees(BigInt(actionId), {
@@ -163,16 +187,58 @@ export async function dfinityHelper(
     return true;
   };
 
+  const getAccountIdentifier = (principal: string) =>
+    AccountIdentifier.fromPrincipal({
+      principal: Principal.fromText(principal),
+    }).toHex();
+
   async function transferTxFee(amt: BigNumber, sender?: any): Promise<bigint> {
+    //plug wallet
     if (sender.requestTransfer) {
       const res = await sender.requestTransfer({
         to: args.bridgeContract.toText(),
         amount: amt.integerValue().toNumber(),
       });
-      console.log(res, "res");
+      return BigInt(res.height);
+    }
+    //bitfinity wallt
+    if (sender.batchTransactions) {
+      const res = (await new Promise(async (resolve, reject) => {
+        await sender.batchTransactions(
+          [
+            {
+              idl: ledgerIDL,
+              canisterId: LEDGER_CANISTER,
+              methodName: "send_dfx",
+              args: [
+                {
+                  to: getAccountIdentifier(args.bridgeContract.toText()),
+                  fee: { e8s: BigInt(10000) },
+                  amount: {
+                    e8s: BigInt(amt.integerValue().toString()),
+                  },
+                  memo: randomBigInt(),
+                  from_subaccount: [],
+                  created_at_time: [],
+                },
+              ],
+              onSuccess: async (res: any) => {
+                resolve({ height: res });
+              },
+              onFail: (err: any) => {
+                console.log("transfer icp error", err);
+                reject(err);
+              },
+            },
+          ],
+          { host: undefined }
+        );
+      })) as { height: number };
+
       return BigInt(res.height);
     }
 
+    //default
     return await ledger.transfer({
       to: AccountIdentifier.fromPrincipal({
         principal: args.bridgeContract,
@@ -213,15 +279,14 @@ export async function dfinityHelper(
     sender: DfinitySigner,
     nft: NftInfo<DfinityNft>
   ) {
-    sender.agent ? adaptPlug(sender.agent) : args.agent.replaceIdentity(sender);
-
+    const agent = prepareAgent(sender);
     // const tid = tokenIdentifier(
     //   nft.collectionIdent,
     //   Number(nft.native.tokenId)
     // );
     // const nftContract = Principal.fromText(nft.native.canisterId);
-    const nftCan = Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
-      agent: args.agent,
+    const nftCan = await Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
+      agent,
       canisterId: nft.native.canisterId,
     });
     const allowances = await nftCan.getAllowances();
@@ -236,14 +301,6 @@ export async function dfinityHelper(
     }
     return false;
   }
-
-  const adaptPlug = (agent: HttpAgent) => {
-    minter = Actor.createActor(idlFactory, {
-      agent,
-      canisterId: args.bridgeContract,
-    });
-    args.agent = agent;
-  };
 
   return {
     XpNft: args.xpnftId.toString(),
@@ -263,9 +320,7 @@ export async function dfinityHelper(
       return new BigNumber(0);
     },
     async transferNftToForeign(sender, chain_nonce, to, id, _txFees, mintWith) {
-      sender.agent
-        ? adaptPlug(sender.agent)
-        : args.agent.replaceIdentity(sender);
+      const agent = prepareAgent(sender);
 
       if (!(await isApprovedForMinter(sender, id))) {
         throw new Error(`Nft not approved for minter`);
@@ -279,6 +334,8 @@ export async function dfinityHelper(
       );
 
       const txFeeBlock = await transferTxFee(new BigNumber(sig.fee), sender);
+
+      const minter: ActorSubclass<_SERVICE> = await createMinter(agent);
 
       const actionId = await minter.freeze_nft(
         txFeeBlock,
@@ -295,17 +352,18 @@ export async function dfinityHelper(
       return actionId.toString();
     },
     async mintNft(owner, options) {
+      const agent = prepareAgent(owner);
+
       const canister = Principal.fromText(
         options.canisterId ? options.canisterId : args.umt.toText()
       );
-      if (owner.agent) args.agent = owner.agent;
 
       const principal = owner.agent
         ? await args.agent.getPrincipal()
         : owner.getPrincipal();
 
-      const nftCan = Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
-        agent: args.agent,
+      const nftCan = await Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
+        agent,
         canisterId: canister,
       });
 
@@ -318,9 +376,7 @@ export async function dfinityHelper(
       return mint;
     },
     async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
-      sender.agent
-        ? adaptPlug(sender.agent)
-        : args.agent.replaceIdentity(sender);
+      const agent = prepareAgent(sender);
 
       if (!(await isApprovedForMinter(sender, id))) {
         throw new Error(`Nft not approved for minter`);
@@ -333,6 +389,8 @@ export async function dfinityHelper(
       );
 
       const txFeeBlock = await transferTxFee(new BigNumber(sig.fee), sender);
+
+      const minter: ActorSubclass<_SERVICE> = await createMinter(agent);
 
       const actionId = await minter.withdraw_nft(
         txFeeBlock,
@@ -397,9 +455,7 @@ export async function dfinityHelper(
       return tokens;
     },
     async preTransfer(sender, nft) {
-      sender.agent
-        ? adaptPlug(sender.agent)
-        : args.agent.replaceIdentity(sender);
+      const agent = prepareAgent(sender);
 
       if (await isApprovedForMinter(sender, nft)) {
         return undefined;
@@ -409,10 +465,11 @@ export async function dfinityHelper(
         nft.collectionIdent,
         Number(nft.native.tokenId)
       );
-      const actor = Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
+      const actor = await Actor.createActor<XPNFTSERVICE>(xpnftIdl, {
         canisterId: nft.collectionIdent,
-        agent: args.agent,
+        agent,
       });
+
       await actor.approve({
         allowance: 1n,
         spender: args.bridgeContract,
@@ -435,17 +492,28 @@ export async function dfinityHelper(
 
       return new BigNumber(e8s);
     },
-    getAccountIdentifier(principal: string) {
-      const x = AccountIdentifier.fromPrincipal({
-        principal: Principal.fromText(principal),
-      });
-      return x.toHex();
-    },
+    getAccountIdentifier,
 
     async isNftWhitelisted(nft) {
       return await minter.is_whitelisted(
         Principal.fromText(nft.native.canisterId)
       );
+    },
+    //replace default createActor (of Actor class) with custom of Bitfinity Wallet signer (it has different interface than Actor.createActor)
+    setActorCreator(provider: any) {
+      Actor.createActor = (iface, args) => {
+        //@ts-ignore
+        const cid = args.canisterId.toText
+          ? //@ts-ignore
+            args.canisterId.toText()
+          : args.canisterId;
+
+        return provider.createActor({
+          canisterId: cid,
+          interfaceFactory: iface,
+          host: undefined,
+        });
+      };
     },
     withdraw_fees,
     encode_withdraw_fees,
