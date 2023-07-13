@@ -134,6 +134,10 @@ export async function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number) {
     };
   }
 
+  if (nft.native.metadata?.wrapped) {
+    return { bool: true, wrapped: nft.native.metadata.wrapped };
+  }
+
   try {
     checkNotOldWrappedNft(nft.collectionIdent);
   } catch (_) {
