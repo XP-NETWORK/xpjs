@@ -34,7 +34,9 @@ export type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, Df
 } & WhitelistCheck<DfinityNft> & ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
-} & IsApprovedForMinter<DfinitySigner, DfinityNft> & GetExtraFees;
+} & IsApprovedForMinter<DfinitySigner, DfinityNft> & GetExtraFees & {
+    setActorCreator(provider: any): void;
+};
 export type DfinityParams = {
     agent: HttpAgent;
     bridgeContract: Principal;

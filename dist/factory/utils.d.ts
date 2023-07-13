@@ -12,4 +12,5 @@ export declare function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number)
     bool: boolean;
     wrapped: any;
 }>;
+export declare const randomBigInt: () => bigint;
 //# sourceMappingURL=utils.d.ts.map
