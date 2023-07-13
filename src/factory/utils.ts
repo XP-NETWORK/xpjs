@@ -1,6 +1,7 @@
 import { NftInfo, FullChain } from "..";
 import { CHAIN_INFO, ChainType, Chain } from "../consts";
 import axios from "axios";
+import BigNumber from "bignumber.js";
 
 export const _headers = {
   "Content-Type": "application/json",
@@ -153,3 +154,6 @@ export async function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number) {
 
   return { bool: typeof wrapped !== "undefined", wrapped };
 }
+
+export const randomBigInt = () =>
+  BigInt(new BigNumber(Math.random() * 150_000).integerValue().toString());
