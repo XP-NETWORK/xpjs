@@ -311,6 +311,7 @@ export namespace ChainFactoryConfigs {
 
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BITGERT),
       },
+
       xDaiParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.XDAI),
@@ -567,6 +568,18 @@ export namespace ChainFactoryConfigs {
         erc721Minter: "0x8411EeadD374bDE549F61a166FFBeFca592bC60a",
         minter_addr: "0x28c43F505d210D6f8f78C58b450b76890dc76F21",
         nonce: Chain.CADUCEUS,
+      },
+      optimismParams: {
+        erc721Minter: "0xBb5e9896cEe600DaC470775B6f235Db105E861BD",
+        erc1155Minter: "0x35c3c3959d19A310Fc052545fCC29200dc440CdA",
+        erc1155_addr: "0xF9DfD29ddEDEa3224f9c7E12c7Bbe37101341786",
+        erc721_addr: "0x55B1D1891ABb21A5d245d149B49007b55Bd3746D",
+        minter_addr: "0x4ceDb46481d7118E1D292C318E37510E5919bBe6",
+        feeMargin,
+        nonce: Chain.OPTIMISM,
+        notifier,
+        noWhitelist: true,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OPTIMISM),
       },
       avalancheParams: {
         notifier,

@@ -74,6 +74,7 @@ export enum TestNetRpcUri {
   ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
   BITGERT = "https://testnet-rpc.brisescan.com",
   CASPER = "https://rpc.testnet.casperlabs.io/rpc",
+  OPTIMISM = "https://goerli.optimism.io",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -111,6 +112,7 @@ export enum MainNetRpcUri {
   ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
   SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
+  OPTIMISM = "https://goerli.optimism.io",
   // TODO: Algorand
 }
 
@@ -169,6 +171,7 @@ export type MetaMap = {
   0x25: Web3Meta;
   0x26: Web3Meta;
   0x27: CasperMeta;
+  0x28: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -209,6 +212,7 @@ export namespace Chain {
   export const ARBITRUM = 0x25; //37
   export const BITGERT = 0x26; //38
   export const CASPER = 0x27; //39
+  export const OPTIMISM = 0x28; //40
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -767,4 +771,23 @@ CHAIN_INFO.set(Chain.CASPER, {
   name: "Casper",
   nonce: Chain.CASPER,
   type: ChainType.CASPER,
+});
+
+CHAIN_INFO.set(Chain.OPTIMISM, {
+  //blockExplorerUrl: "https://optimistic.etherscan.io/tx/",
+  //blockExplorerUrlAddr: "https://optimistic.etherscan.io/address/",
+  blockExplorerUrl: "https://goerli-optimism.etherscan.io/tx/",
+  blockExplorerUrlAddr: "https://goerli-optimism.etherscan.io/address/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.OPTM,
+  currencySymbol: SupportedCurrencyName.OPTM,
+  decimals: Decimals.ETH,
+  name: "Optimism",
+  nonce: Chain.OPTIMISM,
+  type: ChainType.EVM,
+  //chainId: 10,
+  chainId: 420,
+  tnBlockExplorerUrl: "https://goerli-optimism.etherscan.io/tx/",
+  tnBlockExplorerUrlAddr: "https://goerli-optimism.etherscan.io/address/",
+  tnChainId: 420,
 });

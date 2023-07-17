@@ -338,6 +338,7 @@ export interface ChainParams {
   okcParams: Web3Params;
   arbitrumParams: Web3Params;
   bitgertParams: Web3Params;
+  optimismParams: Web3Params;
   casperParams: CasperParams;
 }
 
@@ -401,6 +402,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.OKC, chainParams.okcParams);
   cToP.set(Chain.ARBITRUM, chainParams.arbitrumParams);
   cToP.set(Chain.BITGERT, chainParams.bitgertParams);
+  cToP.set(Chain.OPTIMISM, chainParams.optimismParams);
   cToP.set(Chain.CASPER, chainParams.casperParams);
   return cToP;
 }
