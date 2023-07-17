@@ -170,6 +170,7 @@ export interface ChainParams {
     okcParams: Web3Params;
     arbitrumParams: Web3Params;
     bitgertParams: Web3Params;
+    optimismParams: Web3Params;
     casperParams: CasperParams;
 }
 export type MoralisNetwork = "mainnet" | "testnet";

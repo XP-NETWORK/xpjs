@@ -46,7 +46,8 @@ export declare enum TestNetRpcUri {
     OKC = "https://exchaintestrpc.okex.org",
     ARBITRUM = "https://goerli-rollup.arbitrum.io/rpc",
     BITGERT = "https://testnet-rpc.brisescan.com",
-    CASPER = "https://rpc.testnet.casperlabs.io/rpc"
+    CASPER = "https://rpc.testnet.casperlabs.io/rpc",
+    OPTIMISM = "https://goerli.optimism.io"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.multiversx.com",
@@ -80,7 +81,8 @@ export declare enum MainNetRpcUri {
     OKC = "https://exchainrpc.okex.org/",
     ARBITRUM = "https://nova.arbitrum.io/rpc",
     BITGERT = "https://dedicated.brisescan.com",
-    SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx"
+    SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
+    OPTIMISM = "https://goerli.optimism.io"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -136,6 +138,7 @@ export type MetaMap = {
     0x25: Web3Meta;
     0x26: Web3Meta;
     0x27: CasperMeta;
+    0x28: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -175,6 +178,7 @@ export declare namespace Chain {
     const ARBITRUM = 37;
     const BITGERT = 38;
     const CASPER = 39;
+    const OPTIMISM = 40;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
