@@ -30,6 +30,7 @@ import { fromUint8Array } from "js-base64";
 import axios from "ton/node_modules/axios";
 
 import { NftListUtils } from "../../services/nftList";
+import { ScVerifyUtils } from "../../services/scVerify";
 
 import base64url from "base64url";
 
@@ -73,7 +74,8 @@ export type TonHelper = ChainNonceGet &
   } & GetFeeMargins &
   WhitelistCheck<TonNft> &
   GetExtraFees &
-  NftListUtils;
+  NftListUtils &
+  ScVerifyUtils;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -472,8 +474,10 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       return res.includes(collectionAddress) ? true : false;
     },
     getNftListAddr(address) {
-      console.log("decode for ton");
       return base64url.encode(address);
+    },
+    getScVerifyAddr(address) {
+      return address.replace(/[^a-zA-Z0-9]/g, "");
     },
   };
 }

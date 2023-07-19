@@ -908,27 +908,20 @@ export async function web3HelperFactory(
       return new BigNumber(gas.mul(150_000).toString());
     },
     estimateUserStoreDeploy,
-    async estimateContractDeploy(toChain: any): Promise<BigNumber> {
+    async estimateContractDeploy(): Promise<BigNumber> {
       try {
-        const gas = await provider.getGasPrice();
-        const pro = toChain.getProvider();
-        const wl = ["0x47Bf0dae6e92e49a3c95e5b0c71422891D5cd4FE"];
-        const gk = 123;
-        const gkx = 42;
+        const gasPrice = await provider.getGasPrice();
         const factory = new ethers.ContractFactory(
-          Minter__factory.abi,
-          Minter__factory.bytecode
+          UserNftMinter__factory.abi,
+          UserNftMinter__factory.bytecode
         );
-        const estimateGas = await pro.estimateGas(
-          factory.getDeployTransaction(gk, gkx, wl)
-        );
-        const contractFee = gas.mul(estimateGas);
-        const sum = new BigNumber(contractFee.toString());
-        return sum;
+        const gas = await provider.estimateGas(factory.getDeployTransaction());
+        const contractFee = gasPrice.mul(gas);
+        return new BigNumber(contractFee.toString());
       } catch (error: any) {
         console.log(error.message);
-        const gas = await provider.getGasPrice();
-        return new BigNumber(gas.mul(150_000).toString());
+        const gasPrice = await provider.getGasPrice();
+        return new BigNumber(gasPrice.mul(150_000).toString());
       }
     },
 
