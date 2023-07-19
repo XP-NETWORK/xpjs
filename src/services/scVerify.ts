@@ -43,10 +43,7 @@ export function scVerify(url: string): ScVerifyService {
             sc: from.getScVerifyAddr ? from.getScVerifyAddr(sc) : sc,
           })
           .catch(async (e: AxiosError) => {
-<<<<<<< HEAD
-=======
             //@ts-ignore
->>>>>>> b947ccbf (TON: add scVerify format address mathod, estimate gas for destination deploy evm)
             if (e.code === "404" && from.getScVerifyAddr) {
               return await request
                 .post("/default/checkWithOutTokenId", {
