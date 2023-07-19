@@ -1,8 +1,18 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 import { _headers } from "..";
 
+import { FullChain } from "..";
+
+export type ScVerifyUtils = {
+  getScVerifyAddr(address: string): string;
+};
+
 export interface ScVerifyService {
-  checkWithOutTokenId(from: number, chain: number, sc: string): Promise<any>;
+  checkWithOutTokenId(
+    from: FullChain<any, any, any> & ScVerifyUtils,
+    chain: number,
+    sc: string
+  ): Promise<any>;
   list(from: string, targetChain: number, fromChain: number): Promise<any>;
   default(
     sc: string,
@@ -19,25 +29,31 @@ export interface ScVerifyService {
   ): Promise<AxiosResponse<{ data: "allowed" | "not allowed" }> | undefined>;
 }
 
-/*interface SignatureServiceResponse {
-  signature: string;
-  fee: string;
-}*/
-
 export function scVerify(url: string): ScVerifyService {
   const request = axios.create({
     baseURL: url,
   });
   return {
-    async checkWithOutTokenId(from: number, chain: number, sc: string) {
+    async checkWithOutTokenId(from, chain: number, sc: string) {
       return (
         await request
           .post("/default/checkWithOutTokenId", {
-            fromChain: from,
+            fromChain: from.getNonce(),
             chain,
-            sc,
+            sc: from.getScVerifyAddr ? from.getScVerifyAddr(sc) : sc,
           })
-          .catch(() => ({ data: false }))
+          .catch(async (e: AxiosError) => {
+            if (e.code === "404" && from.getScVerifyAddr) {
+              return await request
+                .post("/default/checkWithOutTokenId", {
+                  fromChain: from.getNonce(),
+                  chain,
+                  sc,
+                })
+                .catch(() => ({ data: false }));
+            }
+            return { data: false };
+          })
       ).data;
     },
 

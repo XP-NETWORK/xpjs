@@ -272,10 +272,10 @@ export type ChainFactory = {
    */
   claimableAlgorandNfts(claimer: string): Promise<ClaimNftInfo[]>;
 
-  getVerifiedContract(
+  getVerifiedContract<SignerF, RawNftF, Resp>(
     from: string,
     targetChain: number,
-    fc: number,
+    fc: FullChain<SignerF, RawNftF, Resp>,
     tokenId?: string
   ): Promise<string | undefined>;
 
@@ -562,22 +562,15 @@ export function ChainFactory(
           ? from
           : to; //all the rest
 
-      const [checkWithOutTokenId, verifyList] = await Promise.all([
-        scVerifyRest.checkWithOutTokenId(
-          Number(originalChain),
-          _chain,
-          originalContract
-        ),
-        scVerifyRest.list(originalContract, to, from),
-      ]);
+      const isMapped = await scVerifyRest.checkWithOutTokenId(
+        fromChain as any,
+        _chain,
+        originalContract
+      );
 
-      if (
-        !checkWithOutTokenId &&
-        !verifyList &&
-        toChain?.estimateContractDeploy
-      ) {
+      if (!isMapped && toChain?.estimateContractDeploy) {
         //@ts-ignore
-        const contractFee = await toChain?.estimateContractDeploy(toChain);
+        const contractFee = await toChain?.estimateContractDeploy();
         calcContractDep = (
           await calcExchangeFees(from, to, contractFee, toChain.getFeeMargin())
         ).multipliedBy(1.1);
@@ -679,14 +672,14 @@ export function ChainFactory(
     }
   }
 
-  async function getVerifiedContract(
+  async function getVerifiedContract<SignerF, RawNftF, Resp>(
     from: string,
     tc: number,
-    fc: number,
+    fc: FullChain<SignerF, RawNftF, Resp>,
     _?: string
   ): Promise<string | undefined> {
     const res = await scVerifyRest.checkWithOutTokenId(
-      fc,
+      fc as any,
       tc,
       from
     ); /*await scVerifyRest.default(
