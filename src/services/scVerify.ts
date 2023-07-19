@@ -34,7 +34,7 @@ export function scVerify(url: string): ScVerifyService {
     baseURL: url,
   });
   return {
-    async checkWithOutTokenId(from, chain: number, sc: string) {
+    async checkWithOutTokenId(from: any, chain: number, sc: string) {
       return (
         await request
           .post("/default/checkWithOutTokenId", {
@@ -43,8 +43,10 @@ export function scVerify(url: string): ScVerifyService {
             sc: from.getScVerifyAddr ? from.getScVerifyAddr(sc) : sc,
           })
           .catch(async (e: AxiosError) => {
-            //@ts-ignore
-            if (e.code === "404" && from.getScVerifyAddr) {
+            if (
+              (e.code == "404" || e.message.includes("404")) &&
+              from.getScVerifyAddr
+            ) {
               return await request
                 .post("/default/checkWithOutTokenId", {
                   fromChain: from.getNonce(),

@@ -578,10 +578,6 @@ export function ChainFactory(
 
       return { calcContractDep };
     } catch (error: any) {
-      console.log(
-        error.message,
-        console.log("error in estimateWithContractDep")
-      );
       return { calcContractDep };
     }
   };
