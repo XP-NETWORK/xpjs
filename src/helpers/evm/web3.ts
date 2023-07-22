@@ -28,6 +28,7 @@ import {
   Signer,
   VoidSigner,
   Wallet,
+  Overrides,
 } from "ethers";
 import { Provider, TransactionResponse } from "@ethersproject/providers";
 import {
@@ -101,7 +102,7 @@ export interface Approve<Sender> {
     address: NftInfo<EthNftInfo>,
     sender: Sender,
     txFee: BigNumber,
-    gasPrice?: ethers.BigNumber,
+    gasPrice?: ethers.Overrides,
     toApprove?: string
   ): Promise<string | undefined>;
 }
@@ -158,8 +159,6 @@ export type BaseWeb3Helper = BalanceCheck &
     ): Promise<ContractTransaction>;
   };
 
-type ExtraArgs = { gasPrice: ethers.BigNumber };
-
 /**
  * Traits implemented by this module
  */
@@ -177,7 +176,7 @@ export type Web3Helper = BaseWeb3Helper &
   ValidateAddress &
   ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-  } & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> &
+  } & Pick<PreTransfer<Signer, EthNftInfo, string, Overrides>, "preTransfer"> &
   PreTransferRawTxn<EthNftInfo, PopulatedTransaction> &
   ExtractTxnStatus &
   GetProvider<providers.Provider> & {
@@ -280,7 +279,7 @@ type NftMethodVal<T, Tx> = {
     tok: string,
     txnUp: (tx: PopulatedTransaction) => Promise<void>,
     customData: NullableCustomData,
-    gasPrice: ethers.BigNumberish | undefined
+    gasPrice: ethers.Overrides | undefined
   ) => Promise<Tx>;
 };
 
@@ -516,7 +515,7 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     sender: Signer,
     _txFees: BigNumber,
-    gasPrice: ethers.BigNumberish | undefined,
+    overrides?: ethers.Overrides,
     toApprove?: string
   ) => {
     if (!toApprove) {
@@ -544,7 +543,7 @@ export async function web3HelperFactory(
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
       params.nonce === 0x1d ? {} : undefined,
-      gasPrice
+      overrides
     );
     await receipt.wait();
     return receipt.hash;
@@ -643,8 +642,8 @@ export async function web3HelperFactory(
       return params.feeMargin;
     },
     isApprovedForMinter,
-    preTransfer: (s, id, fee, args) =>
-      approveForMinter(id, s, fee, args?.gasPrice),
+    preTransfer: (s, id, fee, overrides) =>
+      approveForMinter(id, s, fee, overrides),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
@@ -779,14 +778,12 @@ export async function web3HelperFactory(
       gasPrice,
       toParams: Web3Params
     ): Promise<TransactionResponse> {
-      const { contract: minter, address } = await getUserStore(
+      const { contract: minter } = await getUserStore(
         sender,
         id,
         undefined,
         mintWith !== toParams.erc721_addr
       );
-
-      await approveForMinter(id, sender, txFees, gasPrice, address);
 
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
@@ -852,8 +849,6 @@ export async function web3HelperFactory(
       gasLimit = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
-
       // Chain is Hedera
       if (params.nonce === 0x1d) {
         id.native.tokenId = ethers.utils.solidityPack(
