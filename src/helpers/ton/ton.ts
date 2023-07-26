@@ -19,7 +19,7 @@ import {
   WhitelistCheck,
 } from "../chain";
 
-import { PreTransfer } from "../..";
+import { ChainNonce, PreTransfer } from "../..";
 
 import { BridgeContract } from "./ton-bridge";
 
@@ -84,7 +84,7 @@ export type TonParams = {
   burnerAddr: string;
   xpnftAddr: string;
   feeMargin: FeeMargins;
-  extraFees: string;
+  extraFees: Map<ChainNonce, string>;
 };
 
 type MethodMap = {
@@ -220,8 +220,9 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     preTransfer: () => Promise.resolve(true),
     preUnfreeze: () => Promise.resolve(true),
     getNonce: () => Chain.TON,
-    getExtraFees: () => {
-      return new BigNumber(TonWeb.utils.toNano(args.extraFees).toString(10));
+    getExtraFees: (toNonce: ChainNonce) => {
+      const extra = args.extraFees.get(toNonce) || "0";
+      return new BigNumber(TonWeb.utils.toNano(extra).toString(10));
     },
     XpNft: args.xpnftAddr,
     async balance(address: string) {
