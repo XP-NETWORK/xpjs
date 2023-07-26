@@ -501,7 +501,9 @@ export function ChainFactory(
       conv = conv.multipliedBy(extraFee).integerValue(BigNumber.ROUND_CEIL);
     }
 
-    return fromChain.getExtraFees ? fromChain.getExtraFees().plus(conv) : conv;
+    return fromChain.getExtraFees
+      ? fromChain.getExtraFees(toChain.getNonce()).plus(conv)
+      : conv;
   };
 
   const estimateWithContractDep = async <

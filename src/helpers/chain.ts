@@ -230,7 +230,7 @@ export interface GetFeeMargins {
 }
 
 export interface GetExtraFees {
-  getExtraFees(): BigNumber;
+  getExtraFees(toNonce: number): BigNumber;
 }
 
 export interface ClaimNFT<Signer, ClaimArgs, Ret> {

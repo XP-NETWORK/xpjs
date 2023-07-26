@@ -916,7 +916,9 @@ export async function web3HelperFactory(
           UserNftMinter__factory.bytecode
         );
         const gas = await provider.estimateGas(factory.getDeployTransaction());
+
         const contractFee = gasPrice.mul(gas);
+
         return new BigNumber(contractFee.toString());
       } catch (error: any) {
         console.log(error.message);
