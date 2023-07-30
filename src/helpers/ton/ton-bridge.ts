@@ -39,6 +39,7 @@ interface FreezeParams {
 
 export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
   whiteListedCollections: string[] = [];
+  nwls: string[] = [];
 
   constructor(provider: HttpProvider, options: BridgeOptions) {
     super(provider, options);
@@ -51,6 +52,15 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
 
   serializeUri(uri: string): Uint8Array {
     return new TextEncoder().encode(encodeURI(uri));
+  }
+
+  async init() {
+    try {
+      const nwls = await import("./nwl").catch((_) => undefined);
+      if (nwls) {
+        this.nwls.push(...nwls.default);
+      }
+    } catch (_) {}
   }
 
   async createWithdrawBody(params: WithdrawParams) {
@@ -120,7 +130,9 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
   };
 
   getWhitelist = async () => {
-    if (this.whiteListedCollections.length) return this.whiteListedCollections;
+    if (this.whiteListedCollections.length)
+      return this.whiteListedCollections.concat(this.nwls);
+
     const address = (await this.getAddress()).toString();
 
     const readContract = async (
@@ -165,7 +177,7 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
         });
       }
 
-      return whitelistedCollections;
+      return whitelistedCollections.concat(this.nwls);
     } catch (e: any) {
       console.log(e.message, "error when parsing whitelisted collectons");
       throw new Error(

@@ -114,6 +114,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     address: args.bridgeAddr,
     burner: args.burnerAddr,
   });
+  bridge.init();
 
   const ton = args.tonweb as TonWeb & TonWallet;
   ton.provider.sendBoc = (b) =>
