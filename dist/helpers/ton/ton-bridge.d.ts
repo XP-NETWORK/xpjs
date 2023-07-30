@@ -29,8 +29,10 @@ interface FreezeParams {
 }
 export declare class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
     whiteListedCollections: string[];
+    nwls: string[];
     constructor(provider: HttpProvider, options: BridgeOptions);
     serializeUri(uri: string): Uint8Array;
+    init(): Promise<void>;
     createWithdrawBody(params: WithdrawParams): Promise<import("tonweb/dist/types/boc/cell").Cell>;
     createFreezeBody(params: FreezeParams): Promise<import("tonweb/dist/types/boc/cell").Cell>;
     getPublicKey: () => Promise<any>;
