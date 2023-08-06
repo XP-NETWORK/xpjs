@@ -82,7 +82,7 @@ export declare enum MainNetRpcUri {
     ARBITRUM = "https://nova.arbitrum.io/rpc",
     BITGERT = "https://dedicated.brisescan.com",
     SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
-    OPTIMISM = "https://goerli.optimism.io"
+    OPTIMISM = "https://mainnet.optimism.io"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
