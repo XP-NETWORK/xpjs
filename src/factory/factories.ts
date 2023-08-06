@@ -579,7 +579,7 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.OPTIMISM,
         notifier,
         noWhitelist: true,
-        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OPTIMISM),
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OPTIMISM),
       },
       avalancheParams: {
         notifier,
@@ -819,6 +819,18 @@ export namespace ChainFactoryConfigs {
         nonce: Chain.OKC,
         notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
+      },
+      optimismParams: {
+        erc721Minter: "0x7deC0896CFaFB47D6d8416d07C6bFba06c86B938",
+        erc1155Minter: "0x79a3C39EF62F5052Af6C8b7874fB0FD809e4e998",
+        erc1155_addr: "0x6912B65711431820DfbcE2526Ab801fa76161B7C",
+        erc721_addr: "0xDfC4bF686Adf9B4B5c33277661Ce1640651cB0b6",
+        minter_addr: "0xb709848FB8446D4991407486Eda08b2936CD0050",
+        feeMargin,
+        nonce: Chain.OPTIMISM,
+        notifier,
+        noWhitelist: true,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OPTIMISM),
       },
       arbitrumParams: {
         erc721Minter: "0x536dDc3Be14A980d3cd15635b3D05985C297FD07",
