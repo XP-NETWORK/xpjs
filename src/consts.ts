@@ -774,10 +774,8 @@ CHAIN_INFO.set(Chain.CASPER, {
 });
 
 CHAIN_INFO.set(Chain.OPTIMISM, {
-  //blockExplorerUrl: "https://optimistic.etherscan.io/tx/",
-  //blockExplorerUrlAddr: "https://optimistic.etherscan.io/address/",
-  blockExplorerUrl: "https://goerli-optimism.etherscan.io/tx/",
-  blockExplorerUrlAddr: "https://goerli-optimism.etherscan.io/address/",
+  blockExplorerUrl: "https://optimistic.etherscan.io/tx/",
+  blockExplorerUrlAddr: "https://optimistic.etherscan.io/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.OPTM,
   currencySymbol: SupportedCurrencyName.OPTM,
@@ -785,8 +783,7 @@ CHAIN_INFO.set(Chain.OPTIMISM, {
   name: "Optimism",
   nonce: Chain.OPTIMISM,
   type: ChainType.EVM,
-  //chainId: 10,
-  chainId: 420,
+  chainId: 10,
   tnBlockExplorerUrl: "https://goerli-optimism.etherscan.io/tx/",
   tnBlockExplorerUrlAddr: "https://goerli-optimism.etherscan.io/address/",
   tnChainId: 420,
