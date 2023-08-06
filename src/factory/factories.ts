@@ -733,6 +733,18 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x33DC209D33AddF60cf90Dd4B10f9a198A1A93f63",
         paymentTokenAddress: "0x59ab97Ee239e02112652587F9Ef86CB6F762983b", // Euphoria ETH (ETH) Token
       },
+      okcParams: {
+        erc721Minter: "0x8B7f2bC31976230E374B93DF88D6eCD14f7B5D7F",
+        erc1155Minter: "0xf331D7A450C2fB7ca7B58b675e46D7E344A57186",
+        erc1155_addr: "0xD580913Ef2c8CA4Ca90D4bE6851ACa004cf586D8",
+        erc721_addr: "0x5Ed657a379e06CBAc1Ba1a9cF6D28e71c66B0c83",
+        minter_addr: "0x8776073043eef8929F4a9cBa8Aacc6B59A21BA52",
+        feeMargin,
+        nonce: Chain.OKC,
+        notifier,
+        noWhitelist: true,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.OKC),
+      },
       aptosParams: {
         rpcUrl: MainNetRpcUri.APTOS,
         bridge:
