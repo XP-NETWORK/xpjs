@@ -112,7 +112,7 @@ export enum MainNetRpcUri {
   ARBITRUM = "https://nova.arbitrum.io/rpc",
   BITGERT = "https://dedicated.brisescan.com",
   SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
-  OPTIMISM = "https://goerli.optimism.io",
+  OPTIMISM = "https://mainnet.optimism.io",
   // TODO: Algorand
 }
 
@@ -540,8 +540,8 @@ CHAIN_INFO.set(Chain.GATECHAIN, {
 CHAIN_INFO.set(Chain.VECHAIN, {
   name: "VeChain",
   tnBlockExplorerUrl: "https://explore-testnet.vechain.org/transactions/",
-  blockExplorerUrlAddr: "https://explore.vechain.org/accounts/",
-  blockExplorerUrl: "https://explore.vechain.org/transactions/",
+  blockExplorerUrlAddr: "https://vechainstats.com/account/",
+  blockExplorerUrl: "https://vechainstats.com/transaction/",
   tnBlockExplorerUrlAddr: "https://explore-testnet.vechain.org/accounts/",
   constructor: web3HelperFactory,
   nonce: 0x19,
