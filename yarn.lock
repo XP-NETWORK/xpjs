@@ -1213,7 +1213,7 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.1.tgz#5bd16082261d7364eabb511c788f00937dac588d"
   integrity sha512-z+ILK8Q3y+nfUl43ctCPuR4Y2bIxk/ooCQFwZxhtci1EhAtMDzMAx2W25qx8G1PPL9UUOdnUax19+F0OjXoj4w==
 
-"@make-software/ces-js-parser@^1.3.1":
+"@make-software/ces-js-parser@^1.3.1", "@make-software/ces-js-parser@^1.3.3":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@make-software/ces-js-parser/-/ces-js-parser-1.3.3.tgz#7e50b2824f6189f365662fa81e1a2eb22dfcb214"
   integrity sha512-uJ7BgnaVbb1pkGfDCgBqES+f5+RVlVPkAYxOC6Qz9kxzIcu9HYH1eA+8EkjRO2T36uBemTjBRO6R0TdH61PIAA==
@@ -5787,6 +5787,11 @@ js-base64@^3.6.1, js-base64@^3.7.4:
   version "3.7.5"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
   integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
+
+js-logger@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/js-logger/-/js-logger-1.6.1.tgz#8f09671b515e4a6f31dced8fdb8923432e2c60af"
+  integrity sha512-yTgMCPXVjhmg28CuUH8CKjU+cIKL/G+zTu4Fn4lQxs8mRFH/03QTNvEFngcxfg/gRDiQAOoyCKmMTOm9ayOzXA==
 
 js-sha256@0.9.0, js-sha256@^0.9.0:
   version "0.9.0"

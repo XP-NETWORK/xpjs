@@ -227,7 +227,10 @@ export async function baseWeb3HelperFactory(
     ): Promise<ContractTransaction> {
       const erc721 = UserNftMinter__factory.connect(contract!, owner);
       const txm = await erc721
-        .mint(uri, { gasLimit: 1000000 })
+        .mint(uri, {
+          gasLimit: 1000000,
+          gasPrice: await provider.getGasPrice(),
+        })
         .catch(async (e) => {
           if (nonce === 33) {
             let tx;
@@ -313,7 +316,8 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       forAddr: string,
       _tok: string,
       txnUp: (tx: PopulatedTransaction) => Promise<void>,
-      customData: NullableCustomData
+      customData: NullableCustomData,
+      gasPrice: ethers.BigNumberish | undefined
     ) => {
       const tx = await umt.populateTransaction.setApprovalForAll(
         forAddr,
@@ -321,6 +325,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         {
           gasLimit: "85000",
           customData,
+          gasPrice,
         }
       );
       await txnUp(tx);
@@ -352,10 +357,13 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       umt: UserNftMinter,
       forAddr: string,
       tok: string,
-      txnUp: (tx: PopulatedTransaction) => Promise<void>
+      txnUp: (tx: PopulatedTransaction) => Promise<void>,
+      _customData: NullableCustomData,
+      gasPrice: ethers.BigNumberish | undefined
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
         gasLimit: "85000",
+        gasPrice,
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
