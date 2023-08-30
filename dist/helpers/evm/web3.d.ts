@@ -37,7 +37,7 @@ export interface IsApproved<Sender> {
     isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, toApprove: string): Promise<boolean>;
 }
 export interface Approve<Sender> {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber, toApprove?: string): Promise<string | undefined>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, overrides?: ethers.Overrides, toApprove?: string): Promise<string | undefined>;
 }
 type NullableCustomData = Record<string, any> | undefined;
 /**
@@ -61,7 +61,7 @@ export type BaseWeb3Helper = BalanceCheck &
     mintNftErc1155(owner: Signer, options: MintArgs): Promise<ContractTransaction>;
 };
 type ExtraArgs = {
-    gasPrice: ethers.BigNumber;
+    overrides: ethers.Overrides;
 };
 /**
  * Traits implemented by this module
@@ -102,7 +102,7 @@ type NftMethodVal<T, Tx> = {
     validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
     umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
     approved: (umt: T, sender: string, minterAddr: string, tok: string, customData: NullableCustomData) => Promise<boolean>;
-    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData, gasPrice: ethers.BigNumberish | undefined) => Promise<Tx>;
+    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData, overrides: ethers.Overrides | undefined) => Promise<Tx>;
 };
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
 type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
