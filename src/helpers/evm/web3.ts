@@ -101,7 +101,7 @@ export interface Approve<Sender> {
     address: NftInfo<EthNftInfo>,
     sender: Sender,
     txFee: BigNumber,
-    gasPrice?: ethers.BigNumber,
+    overrides?: ethers.Overrides,
     toApprove?: string
   ): Promise<string | undefined>;
 }
@@ -158,7 +158,7 @@ export type BaseWeb3Helper = BalanceCheck &
     ): Promise<ContractTransaction>;
   };
 
-type ExtraArgs = { gasPrice: ethers.BigNumber };
+type ExtraArgs = { overrides: ethers.Overrides };
 
 /**
  * Traits implemented by this module
@@ -283,7 +283,7 @@ type NftMethodVal<T, Tx> = {
     tok: string,
     txnUp: (tx: PopulatedTransaction) => Promise<void>,
     customData: NullableCustomData,
-    gasPrice: ethers.BigNumberish | undefined
+    overrides: ethers.Overrides | undefined
   ) => Promise<Tx>;
 };
 
@@ -317,15 +317,14 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       _tok: string,
       txnUp: (tx: PopulatedTransaction) => Promise<void>,
       customData: NullableCustomData,
-      gasPrice: ethers.BigNumberish | undefined
+      overrides: ethers.Overrides | undefined
     ) => {
       const tx = await umt.populateTransaction.setApprovalForAll(
         forAddr,
         true,
         {
-          gasLimit: "85000",
+          gasLimit: overrides?.gasLimit || "85000",
           customData,
-          gasPrice,
         }
       );
       await txnUp(tx);
@@ -359,11 +358,11 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       tok: string,
       txnUp: (tx: PopulatedTransaction) => Promise<void>,
       _customData: NullableCustomData,
-      gasPrice: ethers.BigNumberish | undefined
+      overrides: ethers.Overrides | undefined
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: "85000",
-        gasPrice,
+        gasLimit: overrides?.gasLimit || "85000",
+        gasPrice: overrides?.gasPrice,
       });
       await txnUp(tx);
       return await umt.signer.sendTransaction(tx);
@@ -524,7 +523,7 @@ export async function web3HelperFactory(
     id: NftInfo<EthNftInfo>,
     sender: Signer,
     _txFees: BigNumber,
-    gasPrice: ethers.BigNumberish | undefined,
+    overrides: ethers.Overrides | undefined,
     toApprove?: string
   ) => {
     if (!toApprove) {
@@ -552,7 +551,7 @@ export async function web3HelperFactory(
       id.native.tokenId,
       txnUnderpricedPolyWorkaround,
       params.nonce === 0x1d ? {} : undefined,
-      gasPrice
+      overrides
     );
     await receipt.wait();
     return receipt.hash;
@@ -652,7 +651,7 @@ export async function web3HelperFactory(
     },
     isApprovedForMinter,
     preTransfer: (s, id, fee, args) =>
-      approveForMinter(id, s, fee, args?.gasPrice),
+      approveForMinter(id, s, fee, args?.overrides),
     extractAction,
     async isContractAddress(address) {
       const code = await provider.getCode(address);
@@ -794,7 +793,7 @@ export async function web3HelperFactory(
         mintWith !== toParams.erc721_addr
       );
 
-      await approveForMinter(id, sender, txFees, gasPrice, address);
+      await approveForMinter(id, sender, txFees, { gasPrice }, address);
 
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
 
@@ -860,7 +859,7 @@ export async function web3HelperFactory(
       gasLimit = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, gasPrice);
+      await approveForMinter(id, sender, txFees, { gasPrice });
 
       // Chain is Hedera
       if (params.nonce === 0x1d) {
