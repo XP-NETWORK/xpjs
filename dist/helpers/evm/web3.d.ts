@@ -4,7 +4,7 @@
  */
 import BigNumber from "bignumber.js";
 import { BalanceCheck, EstimateTxFeesBatch, EstimateDeployFees, UserStore, FeeMargins, GetFeeMargins, GetProvider, IsContractAddress, MintNft, TransferNftForeign, TransferNftForeignBatch, UnfreezeForeignNft, UnfreezeForeignNftBatch, ParamsGetter } from "../chain";
-import { ContractTransaction, ethers, PopulatedTransaction, providers, Signer, Wallet, Overrides } from "ethers";
+import { ContractTransaction, ethers, PopulatedTransaction, providers, Signer, Wallet } from "ethers";
 import { Provider, TransactionResponse } from "@ethersproject/providers";
 import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__factory } from "xpnet-web3-contracts";
 import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "../..";
@@ -37,7 +37,7 @@ export interface IsApproved<Sender> {
     isApprovedForMinter(address: NftInfo<EthNftInfo>, sender: Sender, toApprove: string): Promise<boolean>;
 }
 export interface Approve<Sender> {
-    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.Overrides, toApprove?: string): Promise<string | undefined>;
+    approveForMinter(address: NftInfo<EthNftInfo>, sender: Sender, txFee: BigNumber, gasPrice?: ethers.BigNumber, toApprove?: string): Promise<string | undefined>;
 }
 type NullableCustomData = Record<string, any> | undefined;
 /**
@@ -60,12 +60,15 @@ export type BaseWeb3Helper = BalanceCheck &
 } & {
     mintNftErc1155(owner: Signer, options: MintArgs): Promise<ContractTransaction>;
 };
+type ExtraArgs = {
+    gasPrice: ethers.BigNumber;
+};
 /**
  * Traits implemented by this module
  */
 export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo, TransactionResponse> & UnfreezeForeignNft<Signer, EthNftInfo, TransactionResponse> & TransferNftForeignBatch<Signer, EthNftInfo, TransactionResponse> & UnfreezeForeignNftBatch<Signer, EthNftInfo, TransactionResponse> & EstimateTxFees<EthNftInfo> & EstimateTxFeesBatch<EthNftInfo> & EstimateDeployFees & ChainNonceGet & IsApproved<Signer> & Approve<Signer> & ValidateAddress & ExtractAction<TransactionResponse> & {
     createWallet(privateKey: string): Wallet;
-} & Pick<PreTransfer<Signer, EthNftInfo, string, Overrides>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
+} & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
     XpNft1155: string;
 } & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params> & UserStore;
@@ -99,7 +102,7 @@ type NftMethodVal<T, Tx> = {
     validateUnfreeze: "validateUnfreezeErc1155" | "validateUnfreezeErc721";
     umt: typeof Erc1155Minter__factory | typeof UserNftMinter__factory;
     approved: (umt: T, sender: string, minterAddr: string, tok: string, customData: NullableCustomData) => Promise<boolean>;
-    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData, gasPrice: ethers.Overrides | undefined) => Promise<Tx>;
+    approve: (umt: T, forAddr: string, tok: string, txnUp: (tx: PopulatedTransaction) => Promise<void>, customData: NullableCustomData, gasPrice: ethers.BigNumberish | undefined) => Promise<Tx>;
 };
 type EthNftMethodVal<T> = NftMethodVal<T, ContractTransaction>;
 type NftMethodMap = Record<"ERC1155" | "ERC721", EthNftMethodVal<Erc1155Minter> | EthNftMethodVal<UserNftMinter>>;
