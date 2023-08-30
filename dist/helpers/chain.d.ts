@@ -132,7 +132,7 @@ export interface GetFeeMargins {
     getFeeMargin(): FeeMargins;
 }
 export interface GetExtraFees {
-    getExtraFees(toNonce: number): BigNumber;
+    getExtraFees(): BigNumber;
 }
 export interface ClaimNFT<Signer, ClaimArgs, Ret> {
     claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;

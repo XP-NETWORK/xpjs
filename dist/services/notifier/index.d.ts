@@ -14,5 +14,6 @@ export declare function evNotifier(url: string): {
     notifyTon(txHash: string): Promise<void>;
     notifyAptos(txHash: string): Promise<void>;
     notifyEVM(nonce: number, address: string): Promise<void>;
+    notifyCasper(txHash: string): Promise<void>;
 };
 //# sourceMappingURL=index.d.ts.map
