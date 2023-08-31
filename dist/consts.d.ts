@@ -12,7 +12,7 @@ import { DfinityHelper, DfinityParams } from "./helpers/dfinity/dfinity";
 import { NearHelper, NearParams } from "./helpers/near";
 import { AptosHelper, AptosParams } from "./helpers/aptos";
 import { Web3ERC20Params } from "./helpers/evm/web3_erc20";
-import { CasperHelper, CasperParams } from "./helpers/casper";
+import { CasperHelper, CasperParams } from "./helpers/casper/casper";
 export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.multiversx.com",
     HECO = "https://http-testnet.hecochain.com",

@@ -89,8 +89,8 @@ var ChainFactoryConfigs;
             casperParams: {
                 network: "casper-test",
                 rpc: consts_1.TestNetRpcUri.CASPER,
-                bridge: "hash-99801f22b6a828e7b459818b190e99fa2df02695b1a7b44c978c80199b0e2265",
-                xpnft: "hash-52bd0f55fbd08e4cecf2a633f23ec8a94dc7e7e947a4d4fbefc04d91295fa3ef",
+                bridge: "hash-b98df19ef3a2b1d5330dcc7c98ffa7d1ee8f07e62f7bcdeb996cbc08bd9a9e80",
+                xpnft: "hash-e1b2053806777e058ffa8566c47793ce403530a195953c9c1f063cf5fb05a396",
                 umt: "hash-23ecf377ab0de596cbda5b6e1cdfd230bad2f8eee688d7b5902bd560ffd96b4e",
                 notifier,
                 feeMargin,
@@ -736,7 +736,7 @@ var ChainFactoryConfigs;
                 agent: new agent_1.HttpAgent({
                     host: "https://ic0.app",
                 }),
-                bridgeContract: principal_1.Principal.fromText("coptt-jaaaa-aaaap-qbjbq-cai"),
+                bridgeContract: principal_1.Principal.fromText("eqfbe-gaaaa-aaaap-abiyq-cai"),
                 xpnftId: principal_1.Principal.fromText("cvkpw-tyaaa-aaaap-qbjda-cai"),
                 umt: principal_1.Principal.fromText("c4jek-fqaaa-aaaap-qbjcq-cai"),
                 notifier,

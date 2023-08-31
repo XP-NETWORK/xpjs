@@ -1,9 +1,9 @@
 import { CasperClient } from "casper-js-sdk";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetExtraFees, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "./chain";
+import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetExtraFees, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 import { CasperLabsHelper } from "casper-js-sdk/dist/@types/casperlabsSigner";
 import { AsymmetricKey } from "casper-js-sdk/dist/lib/Keys";
-import { EvNotifier } from "../services/notifier";
-import { SignatureService } from "../services/estimator";
+import { EvNotifier } from "../../services/notifier";
+import { SignatureService } from "../../services/estimator";
 export interface CasperParams {
     rpc: string;
     network: string;
