@@ -324,6 +324,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         true,
         {
           gasLimit: overrides?.gasLimit || "85000",
+          gasPrice: overrides?.gasPrice,
           customData,
         }
       );

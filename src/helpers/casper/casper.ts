@@ -21,15 +21,16 @@ import {
   TransferNftForeign,
   UnfreezeForeignNft,
   ValidateAddress,
-} from "./chain";
+} from "../chain";
 import BigNumber from "bignumber.js";
 import { CasperLabsHelper } from "casper-js-sdk/dist/@types/casperlabsSigner";
 import { AsymmetricKey } from "casper-js-sdk/dist/lib/Keys";
-import { EvNotifier } from "../services/notifier";
+import { EvNotifier } from "../../services/notifier";
 import { XpBridgeClient } from "xpbridge-client";
-import { Chain } from "../consts";
-import { SignatureService } from "../services/estimator";
+import { Chain } from "../../consts";
+import { SignatureService } from "../../services/estimator";
 import { isBrowser } from "@pedrouid/environment";
+import { getDeploy } from "./wait";
 
 export interface CasperParams {
   rpc: string;
@@ -120,12 +121,34 @@ export async function casperHelper({
     if (result.isNone()) {
       return false;
     }
-    console.log(Buffer.from(result.data.unwrap().data.data).toString("hex"));
+
     return (
       Buffer.from(result.data.unwrap().data.data)
         .toString("hex")
         .toLowerCase() === bridge.split("-")[1].toLowerCase()
     );
+  }
+
+  async function signWithCasperWallet(sender: any, deploy: DeployUtil.Deploy) {
+    const address = await sender.getActivePublicKey();
+    const signedDeployJson = await sender.sign(
+      JSON.stringify(DeployUtil.deployToJson(deploy)),
+      address
+    );
+
+    const signedDeploy = DeployUtil.setSignature(
+      deploy,
+      signedDeployJson.signature,
+      CLPublicKey.fromHex(address)
+    );
+
+    const res = await client.putDeploy(signedDeploy).catch((e) => {
+      console.log(e, "e in signWithCasperWallet");
+      return "";
+    });
+
+    res && (await getDeploy(client, res));
+    return res;
   }
 
   return {
@@ -159,17 +182,7 @@ export async function casperHelper({
       );
 
       if (isBrowser()) {
-        (owner as any)
-          .sign(JSON.stringify(DeployUtil.deployToJson(deploy)), address)
-          .then(async (signedDeployJson: any) => {
-            const signedDeploy = DeployUtil.setSignature(
-              deploy,
-              signedDeployJson.signature,
-              CLPublicKey.fromHex(address)
-            );
-
-            return await client.putDeploy(signedDeploy);
-          });
+        return signWithCasperWallet(owner, deploy);
       }
 
       const signed = await owner.sign(
@@ -213,7 +226,7 @@ export async function casperHelper({
 
       const deploy = bridgeClient.freezeNft(
         {
-          amt: signature.fee!,
+          amt: signature.fees!,
           chain_nonce,
           to,
           contract: id.native.contract_hash,
@@ -224,6 +237,12 @@ export async function casperHelper({
         "35000000000",
         CLPublicKey.fromHex(await sender.getActivePublicKey())
       );
+
+      if (isBrowser()) {
+        const hash = await signWithCasperWallet(sender, deploy);
+        await notifier.notifyCasper(hash);
+        return hash;
+      }
 
       const signed = await sender.sign(
         DeployUtil.deployToJson(deploy),
@@ -246,7 +265,7 @@ export async function casperHelper({
 
       const deploy = bridgeClient.withdrawNft(
         {
-          amt: signature.fee!,
+          amt: signature.fees!,
           chain_nonce: nonce,
           to,
           contract: id.native.contract_hash,
@@ -256,6 +275,13 @@ export async function casperHelper({
         "35000000000",
         CLPublicKey.fromHex(await sender.getActivePublicKey())
       );
+
+      if (isBrowser()) {
+        const hash = await signWithCasperWallet(sender, deploy);
+        await notifier.notifyCasper(hash);
+        return hash;
+      }
+
       const signed = await sender.sign(
         DeployUtil.deployToJson(deploy),
         await sender.getActivePublicKey()
@@ -295,6 +321,11 @@ export async function casperHelper({
         "2000000000",
         CLPublicKey.fromHex(await sender.getActivePublicKey())
       );
+
+      if (isBrowser()) {
+        return signWithCasperWallet(sender, deploy);
+      }
+
       const signed = await sender.sign(
         DeployUtil.deployToJson(deploy),
         await sender.getActivePublicKey()

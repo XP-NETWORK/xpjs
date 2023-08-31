@@ -37,7 +37,11 @@ import {
   web3ERC20HelperFactory,
   Web3ERC20Params,
 } from "./helpers/evm/web3_erc20";
-import { CasperHelper, CasperParams, casperHelper } from "./helpers/casper";
+import {
+  CasperHelper,
+  CasperParams,
+  casperHelper,
+} from "./helpers/casper/casper";
 
 // All the supported testnet uri's are here.
 export enum TestNetRpcUri {
@@ -763,11 +767,14 @@ CHAIN_INFO.set(Chain.BITGERT, {
 });
 
 CHAIN_INFO.set(Chain.CASPER, {
-  blockExplorerUrl: "https://testnet.cspr.live/address/",
+  blockExplorerUrl: "https://cspr.live/deploy/",
+  blockExplorerUrlAddr: "https://cspr.live/address/",
+  tnBlockExplorerUrl: "https://testnet.cspr.live/deploy/",
+  tnBlockExplorerUrlAddr: "https://testnet.cspr.live/address/",
   constructor: casperHelper,
   currency: SupportedCurrency.CSPR,
   currencySymbol: SupportedCurrencyName.CSPR,
-  decimals: Decimals.SOL,
+  decimals: Decimals.CSPR,
   name: "Casper",
   nonce: Chain.CASPER,
   type: ChainType.CASPER,

@@ -76,7 +76,7 @@ import {
   isWrappedNft,
 } from "./utils";
 
-import { CasperParams } from "../helpers/casper";
+import { CasperParams } from "../helpers/casper/casper";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,

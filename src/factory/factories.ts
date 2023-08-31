@@ -77,9 +77,9 @@ export namespace ChainFactoryConfigs {
         network: "casper-test",
         rpc: TestNetRpcUri.CASPER,
         bridge:
-          "hash-99801f22b6a828e7b459818b190e99fa2df02695b1a7b44c978c80199b0e2265",
+          "hash-b98df19ef3a2b1d5330dcc7c98ffa7d1ee8f07e62f7bcdeb996cbc08bd9a9e80",
         xpnft:
-          "hash-52bd0f55fbd08e4cecf2a633f23ec8a94dc7e7e947a4d4fbefc04d91295fa3ef",
+          "hash-e1b2053806777e058ffa8566c47793ce403530a195953c9c1f063cf5fb05a396",
         umt: "hash-23ecf377ab0de596cbda5b6e1cdfd230bad2f8eee688d7b5902bd560ffd96b4e",
         notifier,
         feeMargin,
@@ -760,7 +760,7 @@ export namespace ChainFactoryConfigs {
         agent: new HttpAgent({
           host: "https://ic0.app",
         }),
-        bridgeContract: Principal.fromText("coptt-jaaaa-aaaap-qbjbq-cai"),
+        bridgeContract: Principal.fromText("eqfbe-gaaaa-aaaap-abiyq-cai"),
         xpnftId: Principal.fromText("cvkpw-tyaaa-aaaap-qbjda-cai"),
         umt: Principal.fromText("c4jek-fqaaa-aaaap-qbjcq-cai"),
         notifier,
