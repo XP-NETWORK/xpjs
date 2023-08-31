@@ -56,6 +56,7 @@ export class BridgeContract extends Contract<BridgeOptions, BridgeMethods> {
 
   async init() {
     try {
+      //@ts-ignore
       const nwls = await import("./nwl").catch((_) => undefined);
       if (nwls) {
         this.nwls.push(...nwls.default);
