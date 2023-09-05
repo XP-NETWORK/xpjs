@@ -144,19 +144,19 @@ export type BaseWeb3Helper = BalanceCheck &
    * @argument signer  owner of the smart contract
    * @argument args  See [[MintArgs]]
    */ MintNft<Signer, MintArgs, ContractTransaction> & {
-    /**
-     * Deploy an ERC721 smart contract
-     *
-     * @argument owner  Owner of this smart contract
-     * @returns Address of the deployed smart contract
-     */
-    deployErc721(owner: Signer): Promise<string>;
-  } & {
-    mintNftErc1155(
-      owner: Signer,
-      options: MintArgs
-    ): Promise<ContractTransaction>;
-  };
+  /**
+   * Deploy an ERC721 smart contract
+   *
+   * @argument owner  Owner of this smart contract
+   * @returns Address of the deployed smart contract
+   */
+  deployErc721(owner: Signer): Promise<string>;
+} & {
+  mintNftErc1155(
+    owner: Signer,
+    options: MintArgs
+  ): Promise<ContractTransaction>;
+};
 
 type ExtraArgs = { overrides: ethers.Overrides };
 
@@ -323,7 +323,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         forAddr,
         true,
         {
-          gasLimit: overrides?.gasLimit || "85000",
+          gasLimit: overrides?.gasLimit || "100000",
           gasPrice: overrides?.gasPrice,
           customData,
         }
@@ -362,7 +362,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       overrides: ethers.Overrides | undefined
     ) => {
       const tx = await umt.populateTransaction.approve(forAddr, tok, {
-        gasLimit: overrides?.gasLimit || "85000",
+        gasLimit: overrides?.gasLimit || "100000",
         gasPrice: overrides?.gasPrice,
       });
       await txnUp(tx);
@@ -388,63 +388,69 @@ export async function web3HelperFactory(
       [BridgeTypes.UserStorage]: {
         getMinterForCollection:
           (isMapped: boolean) =>
-          async (
-            signer: Signer,
-            collection: string,
-            type: string,
-            fees?: number
-          ) => {
-            if (!params.noWhitelist) return defaultMinter;
+            async (
+              signer: Signer,
+              collection: string,
+              type: string,
+              fees?: number
+            ) => {
+              if (!params.noWhitelist) return defaultMinter;
 
-            try {
-              if (!type || !collection)
-                throw new Error(
-                  `That NFT has wrong format:${type}:${collection}`
+              try {
+                if (!type || !collection)
+                  throw new Error(
+                    `That NFT has wrong format:${type}:${collection}`
+                  );
+
+                const contract = await params.notifier.getCollectionContract(
+                  collection,
+                  params.nonce
                 );
 
-              const contract = await params.notifier.getCollectionContract(
-                collection,
-                params.nonce
-              );
+                if (contract)
+                  return {
+                    address: contract,
+                    contract: UserNFTStore__factory.connect(contract, provider),
+                  };
 
-              if (contract)
+                if (isMapped) return defaultMinter;
+
+                if (!fees) {
+                  console.log("calc deploy fees");
+                  if (params.nonce === 0x1d) {
+                    fees = new BigNumber("500000000000").toNumber();
+                    console.log(fees);
+                  } else {
+                    fees = (await estimateUserStoreDeploy(signer))
+                      .div(1e18)
+                      .integerValue()
+                      .toNumber();
+                  }
+                }
+                console.log("reach 1 ");
+
+                const tx = await payForDeployUserStore(signer, String(fees));
+
+                if (tx.status !== 1)
+                  throw new Error(
+                    "Faied to pay for deployment. Please come back later"
+                  );
+                console.log(collection);
+                const address = await params.notifier.createCollectionContract(
+                  collection,
+                  params.nonce,
+                  type
+                );
+
                 return {
-                  address: contract,
-                  contract: UserNFTStore__factory.connect(contract, provider),
+                  address,
+                  contract: UserNFTStore__factory.connect(address, provider),
                 };
-
-              if (isMapped) return defaultMinter;
-
-              if (!fees) {
-                console.log("calc deploy fees");
-                fees = (await estimateUserStoreDeploy(signer))
-                  .div(1e18)
-                  .integerValue()
-                  .toNumber();
+              } catch (e: any) {
+                throw e;
+                //return defaultMinter;
               }
-
-              const tx = await payForDeployUserStore(signer, String(fees));
-
-              if (tx.status !== 1)
-                throw new Error(
-                  "Faied to pay for deployment. Please come back later"
-                );
-
-              const address = await params.notifier.createCollectionContract(
-                collection,
-                params.nonce,
-                type
-              );
-
-              return {
-                address,
-                contract: UserNFTStore__factory.connect(address, provider),
-              };
-            } catch (e: any) {
-              throw e;
-              //return defaultMinter;
-            }
-          },
+            },
       },
     };
     //@ts-ignore
@@ -532,8 +538,8 @@ export async function web3HelperFactory(
         params.nonce !== 0x1d
           ? minter_addr
           : id.native.uri.includes("herokuapp.com")
-          ? params.minter_addr
-          : params.erc721_addr;
+            ? params.minter_addr
+            : params.erc721_addr;
     }
 
     const isApproved = await isApprovedForMinter(id, sender, toApprove);
