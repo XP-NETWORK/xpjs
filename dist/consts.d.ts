@@ -36,6 +36,7 @@ export declare enum TestNetRpcUri {
     SECRET = "https://api.pulsar.scrttestnet.com",
     SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
     HEDERA = "https://0.testnet.hedera.com/",
+    HEDERA_RELAY = "https://pool.arkhia.io/hedera/testnet/json-rpc/v1/4aX6a8J73ca92NXecaddCa4C295x62ap/",
     NEAR = "https://rpc.testnet.near.org",
     MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
     ABEYCHAIN = "https://testrpc.abeychain.com",
