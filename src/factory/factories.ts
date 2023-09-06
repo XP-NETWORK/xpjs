@@ -146,6 +146,18 @@ export namespace ChainFactoryConfigs {
         minter_addr: "0x3fe9EfFa80625B8167B2F0d8cF5697F61D77e4a2",
         nonce: Chain.CADUCEUS,
       },
+      zetaParams: {
+        erc721Minter: "0xF2D5d1835b47CcBd538BABeEF49D44B29e162E2a",
+        erc1155Minter: "0xF313e70ed3D0920e159869216b447e29d9666E84",
+        erc1155_addr: "0xf66C7826ce154D4f190E5D9F81492E1b6064be1a",
+        erc721_addr: "0x88B236a8bB82bC84e1074a9595538DF444a6F021",
+        minter_addr: "0x62c2749D02DDF48FbE68222D82966fcE30120806",
+        feeMargin,
+        nonce: Chain.ZETA,
+        notifier,
+        noWhitelist: true,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ZETA),
+      },
       avalancheParams: {
         notifier,
         noWhitelist: true,
@@ -584,6 +596,7 @@ export namespace ChainFactoryConfigs {
         noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.OPTIMISM),
       },
+
       avalancheParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.AVALANCHE),

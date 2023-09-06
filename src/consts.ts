@@ -80,6 +80,7 @@ export enum TestNetRpcUri {
   BITGERT = "https://testnet-rpc.brisescan.com",
   CASPER = "https://rpc.testnet.casperlabs.io/rpc",
   OPTIMISM = "https://goerli.optimism.io",
+  ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -118,6 +119,7 @@ export enum MainNetRpcUri {
   BITGERT = "https://dedicated.brisescan.com",
   SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
   OPTIMISM = "https://mainnet.optimism.io",
+  ZETA = "",
   // TODO: Algorand
 }
 
@@ -177,6 +179,7 @@ export type MetaMap = {
   0x26: Web3Meta;
   0x27: CasperMeta;
   0x28: Web3Meta;
+  0x29: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -218,6 +221,7 @@ export namespace Chain {
   export const BITGERT = 0x26; //38
   export const CASPER = 0x27; //39
   export const OPTIMISM = 0x28; //40
+  export const ZETA = 0x29; //41
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -795,4 +799,20 @@ CHAIN_INFO.set(Chain.OPTIMISM, {
   tnBlockExplorerUrl: "https://goerli-optimism.etherscan.io/tx/",
   tnBlockExplorerUrlAddr: "https://goerli-optimism.etherscan.io/address/",
   tnChainId: 420,
+});
+
+CHAIN_INFO.set(Chain.ZETA, {
+  blockExplorerUrl: "https://explorer.zetachain.com/cc/tx/",
+  blockExplorerUrlAddr: "https://explorer.zetachain.com/address/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ZETA,
+  currencySymbol: SupportedCurrencyName.ZETA,
+  decimals: Decimals.ETH,
+  name: "Zeta",
+  nonce: Chain.ZETA,
+  type: ChainType.EVM,
+  chainId: 7000,
+  tnChainId: 7001,
+  tnBlockExplorerUrl: "https://explorer.zetachain.com/cc/tx/",
+  tnBlockExplorerUrlAddr: "https://explorer.zetachain.com/address/",
 });
