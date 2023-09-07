@@ -560,17 +560,19 @@ export namespace ChainFactoryConfigs {
         hederaApi: hederaService(
           "https://mainnet-public.mirrornode.hedera.com/api/v1"
         ),
-        provider: hethers.getDefaultProvider() as any,
+        provider: new ethers.providers.JsonRpcProvider(
+          MainNetRpcUri.HEDERA_RELAY
+        ),
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
-        Xpnfthtsclaims: "0x000000000000000000000000000000000026eb9e",
-        htcToken: "0x000000000000000000000000000000000026EfFC",
-        erc721_addr: "0x000000000000000000000000000000000026eb6d",
-        erc1155_addr: "0x000000000000000000000000000000000026eb6d",
-        minter_addr: "0x00000000000000000000000000000000002308b6",
-        erc721Minter: "",
-        erc1155Minter: "",
+        noWhitelist: true,
+        htcToken: "0x10677B39A30A1f84ffae8aFCc23F210CafCEBc94",
+        erc721_addr: "0x0d5926E54dDF7cf0D4884C3D091DD41951fFd425",
+        erc1155_addr: "0x0d5926E54dDF7cf0D4884C3D091DD41951fFd425",
+        minter_addr: "0x66641ab2079cB83ba204447AAEAD2D361771E834",
+        erc721Minter: "0x000000000000000000000000000000000037008d",
+        erc1155Minter: "0x0000000000000000000000000000000000370090",
       },
       caduceusParams: {
         notifier,

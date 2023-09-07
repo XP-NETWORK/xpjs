@@ -108,6 +108,7 @@ export enum MainNetRpcUri {
   SECRET = "https://secret-4.api.trivium.network:9091/",
   SKALE = "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
   HEDERA = "https://mainnet.hashio.io/api",
+  HEDERA_RELAY = "https://testnet-notifier.xp.network/hedera",
   NEAR = "https://rpc.mainnet.near.org",
   MOONBEAM = "https://rpc.api.moonbeam.network",
   ABEYCHAIN = "https://rpc.abeychain.com",
