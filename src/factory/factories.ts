@@ -99,6 +99,18 @@ export namespace ChainFactoryConfigs {
         extraFees: new Map().set(Chain.ETHEREUM, "1"),
         notifier,
       },
+      baseParams: {
+        erc1155_addr: "0x97DBa947956d40D95C13bCcee2F5EaAd8558FF81",
+        erc721_addr: "0xf33e51DccC7727F1ac62782de7811712420841a0",
+        erc1155Minter: "0x9e80c0Cd4c8ac838263e114E4E565284BcEBF254",
+        erc721Minter: "0x9539D4776B7D71B8D74e8d55E4a2b9397f30935f",
+        feeMargin,
+        notifier,
+        noWhitelist: true,
+        minter_addr: "0x0cD3bF4F57f370286E8984c1ca4CE8D1a4Fc9412",
+        nonce: Chain.BASE,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.BASE),
+      },
       solanaParams: {
         xpnftAddr: "C7bw5dJZwhjWd6TZE3LnE2b1RLqWDiy9XRMA1rajPKQY",
         bridgeContractAddr: "FXaXLtmkuoJCJeX6BnLwQJWgT8cPdwuXN8BmmQzVvuRA",

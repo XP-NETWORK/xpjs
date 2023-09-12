@@ -342,6 +342,7 @@ export interface ChainParams {
   zetaParams: Web3Params;
   energiParams: Web3Params;
   casperParams: CasperParams;
+  baseParams: Web3Params;
 }
 
 export type MoralisNetwork = "mainnet" | "testnet";
@@ -408,6 +409,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.ZETA, chainParams.zetaParams);
   cToP.set(Chain.ENERGI, chainParams.energiParams);
   cToP.set(Chain.CASPER, chainParams.casperParams);
+  cToP.set(Chain.BASE, chainParams.baseParams);
   return cToP;
 }
 /**

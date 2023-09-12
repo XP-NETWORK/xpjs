@@ -82,6 +82,7 @@ export enum TestNetRpcUri {
   OPTIMISM = "https://goerli.optimism.io",
   ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
   ENERGI = "https://nodeapi.test.energi.network",
+  BASE = "https://base-goerli.diamondswap.org/rpc",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -184,6 +185,7 @@ export type MetaMap = {
   0x28: Web3Meta;
   0x29: Web3Meta;
   0x2a: Web3Meta;
+  0x2b: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -227,6 +229,7 @@ export namespace Chain {
   export const OPTIMISM = 0x28; //40
   export const ZETA = 0x29; //41
   export const ENERGI = 0x2a; //42
+  export const BASE = 0x2b; //43
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -836,4 +839,19 @@ CHAIN_INFO.set(Chain.ENERGI, {
   tnChainId: 49797,
   tnBlockExplorerUrl: "https://explorer.test.energi.network/tx/",
   tnBlockExplorerUrlAddr: "https://explorer.test.energi.network/address/",
+});
+
+CHAIN_INFO.set(Chain.BASE, {
+  blockExplorerUrl: "https://explorer.baseledger.net/tx/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ETH,
+  currencySymbol: SupportedCurrencyName.ETH,
+  decimals: Decimals.ETH,
+  name: "Base Goerli",
+  nonce: Chain.BASE,
+  type: ChainType.EVM,
+  chainId: 84531,
+  tnBlockExplorerUrl: "https://goerli.basescan.org/tx/",
+  tnBlockExplorerUrlAddr: "https://goerli.basescan.org/address/",
+  tnChainId: 84531,
 });
