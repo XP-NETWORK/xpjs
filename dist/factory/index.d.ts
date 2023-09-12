@@ -174,6 +174,7 @@ export interface ChainParams {
     zetaParams: Web3Params;
     energiParams: Web3Params;
     casperParams: CasperParams;
+    baseParams: Web3Params;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**
