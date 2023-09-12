@@ -49,7 +49,8 @@ export declare enum TestNetRpcUri {
     BITGERT = "https://testnet-rpc.brisescan.com",
     CASPER = "https://rpc.testnet.casperlabs.io/rpc",
     OPTIMISM = "https://goerli.optimism.io",
-    ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
+    ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
+    ENERGI = "https://nodeapi.test.energi.network"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.multiversx.com",
@@ -86,7 +87,8 @@ export declare enum MainNetRpcUri {
     BITGERT = "https://dedicated.brisescan.com",
     SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
     OPTIMISM = "https://mainnet.optimism.io",
-    ZETA = ""
+    ZETA = "",
+    ENERGI = ""
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -144,6 +146,7 @@ export type MetaMap = {
     0x27: CasperMeta;
     0x28: Web3Meta;
     0x29: Web3Meta;
+    0x2a: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -185,6 +188,7 @@ export declare namespace Chain {
     const CASPER = 39;
     const OPTIMISM = 40;
     const ZETA = 41;
+    const ENERGI = 42;
 }
 interface ChainData<T extends ChainNonce> {
     name: string;
