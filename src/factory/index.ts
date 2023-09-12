@@ -340,6 +340,7 @@ export interface ChainParams {
   bitgertParams: Web3Params;
   optimismParams: Web3Params;
   zetaParams: Web3Params;
+  energiParams: Web3Params;
   casperParams: CasperParams;
 }
 
@@ -405,6 +406,7 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
   cToP.set(Chain.BITGERT, chainParams.bitgertParams);
   cToP.set(Chain.OPTIMISM, chainParams.optimismParams);
   cToP.set(Chain.ZETA, chainParams.zetaParams);
+  cToP.set(Chain.ENERGI, chainParams.energiParams);
   cToP.set(Chain.CASPER, chainParams.casperParams);
   return cToP;
 }

@@ -81,6 +81,7 @@ export enum TestNetRpcUri {
   CASPER = "https://rpc.testnet.casperlabs.io/rpc",
   OPTIMISM = "https://goerli.optimism.io",
   ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
+  ENERGI = "https://nodeapi.test.energi.network",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -121,6 +122,7 @@ export enum MainNetRpcUri {
   SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
   OPTIMISM = "https://mainnet.optimism.io",
   ZETA = "",
+  ENERGI = "",
   // TODO: Algorand
 }
 
@@ -181,6 +183,7 @@ export type MetaMap = {
   0x27: CasperMeta;
   0x28: Web3Meta;
   0x29: Web3Meta;
+  0x2a: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -223,6 +226,7 @@ export namespace Chain {
   export const CASPER = 0x27; //39
   export const OPTIMISM = 0x28; //40
   export const ZETA = 0x29; //41
+  export const ENERGI = 0x2a; //42
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -806,7 +810,7 @@ CHAIN_INFO.set(Chain.ZETA, {
   blockExplorerUrl: "https://explorer.zetachain.com/cc/tx/",
   blockExplorerUrlAddr: "https://explorer.zetachain.com/address/",
   constructor: web3HelperFactory,
-  currency: SupportedCurrency.ZETA,
+  currency: SupportedCurrency.ETH,
   currencySymbol: SupportedCurrencyName.ZETA,
   decimals: Decimals.ETH,
   name: "Zeta",
@@ -816,4 +820,20 @@ CHAIN_INFO.set(Chain.ZETA, {
   tnChainId: 7001,
   tnBlockExplorerUrl: "https://explorer.zetachain.com/cc/tx/",
   tnBlockExplorerUrlAddr: "https://explorer.zetachain.com/address/",
+});
+
+CHAIN_INFO.set(Chain.ENERGI, {
+  blockExplorerUrl: "https://explorer.energi.network/tx/",
+  blockExplorerUrlAddr: "https://explorer.energi.network/address/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.NRG,
+  currencySymbol: SupportedCurrencyName.NRG,
+  decimals: Decimals.ETH,
+  name: "Energi",
+  nonce: Chain.ENERGI,
+  type: ChainType.EVM,
+  chainId: 39797,
+  tnChainId: 49797,
+  tnBlockExplorerUrl: "https://explorer.test.energi.network/tx/",
+  tnBlockExplorerUrlAddr: "https://explorer.test.energi.network/address/",
 });
