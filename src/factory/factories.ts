@@ -438,9 +438,7 @@ export namespace ChainFactoryConfigs {
         hederaApi: hederaService(
           "https://testnet.mirrornode.hedera.com/api/v1"
         ),
-        provider: new ethers.providers.JsonRpcProvider(
-          TestNetRpcUri.HEDERA_RELAY
-        ),
+        provider: hethers.getDefaultProvider("testnet") as any,
         evmProvider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
