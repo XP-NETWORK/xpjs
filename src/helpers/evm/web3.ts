@@ -376,6 +376,13 @@ export async function web3HelperFactory(
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7 ? UnderpricedWorkaround : () => Promise.resolve();
+  const customData = () => {
+    if (params.nonce === 0x1d) {
+      return { usingContractAlias: true };
+    } else {
+      return undefined;
+    }
+  };
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   function Bridge<T>(type: BridgeTypes): T {
@@ -824,9 +831,7 @@ export async function web3HelperFactory(
             value: params.nonce === 0x1d ? EthBN.from("50") : txFees.toFixed(0),
             gasLimit,
             gasPrice,
-            customData: {
-              usingContractAlias: true,
-            },
+            customData: customData(),
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -892,9 +897,7 @@ export async function web3HelperFactory(
             value: params.nonce === 0x1d ? EthBN.from("50") : txFees.toFixed(0),
             gasLimit,
             gasPrice,
-            customData: {
-              usingContractAlias: true,
-            },
+            customData: customData(),
           }
         );
 
