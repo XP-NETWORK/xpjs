@@ -544,6 +544,18 @@ export namespace ChainFactoryConfigs {
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
+      casperParams: {
+        bridge:
+          "hash-26c86e10df5d2ee7ad88651b7e398fa0dd6b0386de43e658cf67219a23014926",
+        feeMargin,
+        network: "casper",
+        notifier,
+        rpc: MainNetRpcUri.CASPER,
+        sig: signatureSvc_staging,
+        umt: "to be filled",
+        xpnft:
+          "hash-7319bb6688fd3dcd8ef90d5df3e4f2782d007fd9ab3c7bb1390fa6c88743bfb2",
+      },
       arbitrumParams: {
         erc721Minter: "0x66A47ff1b6d3072942582dACe797BEe8C9F28273",
         erc1155Minter: "0xBF180ceEcDA4b5449AF8618a1DE2B82211eDC82c",
