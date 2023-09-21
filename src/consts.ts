@@ -50,15 +50,15 @@ export enum TestNetRpcUri {
   BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
   ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
-  POLYGON = "https://matic-mumbai.chainstacklabs.com",
-  FANTOM = "https://fantom-testnet.public.blastapi.io",
+  POLYGON = "https://polygon-mumbai.blockpi.network/v1/rpc/public",
+  FANTOM = "https://rpc.testnet.fantom.network/",
   TRON = "https://api.shasta.trongrid.io/",
   CELO = "https://alfajores-forno.celo-testnet.org",
   HARMONY = "https://api.s0.b.hmny.io",
-  XDAI = "https://sokol.poa.network",
+  XDAI = "https://rpc.chiadochain.net",
   UNIQUE = "https://rpc-opal.unique.network/",
   TEZOS = "https://ghostnet.smartpy.io",
-  VELAS = "https://explorer.testnet.velas.com/rpc",
+  VELAS = "https://evmexplorer.testnet.velas.com/rpc",
   IOTEX = "https://babel-api.testnet.iotex.io",
   AURORA = "https://testnet.aurora.dev/",
   GODWOKEN = "https://godwoken-testnet-v1.ckbapp.dev",
@@ -124,6 +124,7 @@ export enum MainNetRpcUri {
   OPTIMISM = "https://mainnet.optimism.io",
   ZETA = "",
   ENERGI = "",
+  BASE = "",
   // TODO: Algorand
 }
 
@@ -843,6 +844,7 @@ CHAIN_INFO.set(Chain.ENERGI, {
 
 CHAIN_INFO.set(Chain.BASE, {
   blockExplorerUrl: "https://explorer.baseledger.net/tx/",
+  blockExplorerUrlAddr: "https://explorer.baseledger.net/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ETH,
   currencySymbol: SupportedCurrencyName.ETH,
@@ -850,7 +852,7 @@ CHAIN_INFO.set(Chain.BASE, {
   name: "Base Goerli",
   nonce: Chain.BASE,
   type: ChainType.EVM,
-  chainId: 84531,
+  chainId: 8453,
   tnBlockExplorerUrl: "https://goerli.basescan.org/tx/",
   tnBlockExplorerUrlAddr: "https://goerli.basescan.org/address/",
   tnChainId: 84531,

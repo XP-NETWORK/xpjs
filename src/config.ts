@@ -26,7 +26,7 @@ export namespace AppConfigs {
       txSocketUri: "https://testnet-tx-socket.herokuapp.com",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
-      wrappedNftPrefix: "https://testnet-w-nft-api.herokuapp.com/",
+      wrappedNftPrefix: "https://bridge-wnftapi.herokuapp.com/",
       scVerifyUri: "https://testnet-sc-verify.herokuapp.com",
       network: "testnet",
     };
