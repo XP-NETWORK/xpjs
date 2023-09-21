@@ -88,6 +88,7 @@ export declare enum MainNetRpcUri {
     BITGERT = "https://dedicated.brisescan.com",
     SOLANA = "https://solana-mainnet.g.alchemy.com/v2/4Fm2r6LjJO91nXrKVcZBQXcWgtVe-_gx",
     OPTIMISM = "https://mainnet.optimism.io",
+    CASPER = "https://rpc.mainnet.casperlabs.io/rpc",
     ZETA = "",
     ENERGI = "",
     BASE = ""
