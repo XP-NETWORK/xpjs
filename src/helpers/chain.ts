@@ -98,8 +98,8 @@ export interface ValidateAddress {
 }
 
 export interface EstimateDeployFees {
-  estimateUserStoreDeploy(signer: ethers.Signer): Promise<BigNumber>;
-  estimateContractDeploy(toChain: FullChain<T, U, V>): Promise<BigNumber>;
+  estimateUserStoreDeploy?(signer: ethers.Signer): Promise<BigNumber>;
+  estimateContractDeploy?(toChain: any): Promise<BigNumber>;
 }
 
 export interface EstimateTxFees<RawNftF> {
