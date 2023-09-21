@@ -300,20 +300,20 @@ const nftc = metaplex.nfts();
 
 ```ts
 import { hethers, Wallet } from "@hashgraph/hethers";
-import { config } from "dotenv"; config();
+import { config } from "dotenv";
+config();
 
 const testnetProvider = hethers.getDefaultProvider("testnet");
 const mainnetProvider = hethers.getDefaultProvider("mainnet");
 
 const hederaSigner = new Wallet(
-    {
-      privateKey:
-      process.env.SK!,
-      account: process.env.PK!,
-      isED25519Type: true,
-    } as any,
-    mainnetProvider,
-  );
+  {
+    privateKey: process.env.SK!,
+    account: process.env.PK!,
+    isED25519Type: true,
+  } as any,
+  mainnetProvider
+);
 ```
 
 <hr/>
@@ -464,7 +464,7 @@ This operation does not depend on a wallet since reading operations are free and
   const hederaNFTs = await factory.nftList(
     hedera,
     "0.0.xxxxxxx" // Hedera / EVM address
-  )
+  );
 })();
 ```
 
