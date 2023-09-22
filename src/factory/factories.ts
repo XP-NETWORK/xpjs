@@ -546,7 +546,7 @@ export namespace ChainFactoryConfigs {
       },
       casperParams: {
         bridge:
-          "hash-26c86e10df5d2ee7ad88651b7e398fa0dd6b0386de43e658cf67219a23014926",
+          "hash-9af986599cf7625dae425a9e0e65b333d0d0daaaa67abca5b5abcf59e65b81b4",
         feeMargin,
         network: "casper",
         notifier,
