@@ -83,6 +83,7 @@ export enum TestNetRpcUri {
   ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
   ENERGI = "https://nodeapi.test.energi.network",
   BASE = "https://base-goerli.diamondswap.org/rpc",
+  FINDORA = "https://prod-testnet.prod.findora.org:8545",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -126,6 +127,7 @@ export enum MainNetRpcUri {
   ZETA = "",
   ENERGI = "",
   BASE = "",
+  FINDORA = "",
   // TODO: Algorand
 }
 
@@ -188,6 +190,7 @@ export type MetaMap = {
   0x29: Web3Meta;
   0x2a: Web3Meta;
   0x2b: Web3Meta;
+  0x2c: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -232,6 +235,7 @@ export namespace Chain {
   export const ZETA = 0x29; //41
   export const ENERGI = 0x2a; //42
   export const BASE = 0x2b; //43
+  export const FINDORA = 0x2c; //44
 }
 
 interface ChainData<T extends ChainNonce> {
@@ -857,4 +861,20 @@ CHAIN_INFO.set(Chain.BASE, {
   tnBlockExplorerUrl: "https://goerli.basescan.org/tx/",
   tnBlockExplorerUrlAddr: "https://goerli.basescan.org/address/",
   tnChainId: 84531,
+});
+
+CHAIN_INFO.set(Chain.FINDORA, {
+  blockExplorerUrl: "https://evm.findorascan.io/tx/",
+  blockExplorerUrlAddr: "https://evm.findorascan.io/address/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.FRA,
+  currencySymbol: SupportedCurrencyName.FRA,
+  decimals: Decimals.ETH,
+  name: "Findora",
+  nonce: Chain.FINDORA,
+  type: ChainType.EVM,
+  chainId: 2152,
+  tnBlockExplorerUrl: "https://testnet-anvil.evm.findorascan.io/tx/",
+  tnBlockExplorerUrlAddr: "https://testnet-anvil.evm.findorascan.io/address/",
+  tnChainId: 2153,
 });

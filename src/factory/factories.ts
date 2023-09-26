@@ -182,6 +182,18 @@ export namespace ChainFactoryConfigs {
         noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.ENERGI),
       },
+      findoraParams: {
+        erc721Minter: "0x833A2efC56B3625829727bb9D15F70cd2971Cd84",
+        erc1155Minter: "0x539daC37CF7d918fe93897D4C02277a220cE3a6e",
+        erc1155_addr: "0xfba2Eb48b18d436B8884E2A0c791D936D0022587",
+        erc721_addr: "0xa8b11D31D8083eD5Ef0261ef9ADcf867898E1b5a",
+        minter_addr: "0xDb199384BA327126653Ab8AcAB1fB3D5d88E2Ee2",
+        feeMargin,
+        nonce: Chain.FINDORA,
+        notifier,
+        noWhitelist: true,
+        provider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.FINDORA),
+      },
       avalancheParams: {
         notifier,
         noWhitelist: true,
