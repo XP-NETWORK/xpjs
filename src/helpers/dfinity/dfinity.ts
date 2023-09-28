@@ -113,6 +113,7 @@ export type DfinityHelper = ChainNonceGet &
   ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
+    getMinter(): ActorSubclass<_SERVICE>;
   } & IsApprovedForMinter<DfinitySigner, DfinityNft> &
   GetExtraFees & {
     setActorCreator(provider: any): void;
@@ -303,6 +304,7 @@ export async function dfinityHelper(
   }
 
   return {
+    getMinter: () => minter,
     XpNft: args.xpnftId.toString(),
     getParams: () => args,
     getNonce: () => Chain.DFINITY,
