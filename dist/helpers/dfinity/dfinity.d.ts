@@ -1,10 +1,11 @@
 /// <reference types="node" />
-import { HttpAgent, Identity } from "@dfinity/agent";
+import { ActorSubclass, HttpAgent, Identity } from "@dfinity/agent";
 import { AccountIdentifier } from "@dfinity/nns";
 import { Principal } from "@dfinity/principal";
 import { SignatureService } from "../../services/estimator";
 import { EvNotifier } from "../../services/notifier";
 import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, WhitelistCheck, ParamsGetter, IsApprovedForMinter, GetExtraFees } from "../chain";
+import { _SERVICE } from "./minter.did";
 export type DfinitySigner = Identity & {
     agent?: HttpAgent;
 };
@@ -34,6 +35,7 @@ export type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, Df
 } & WhitelistCheck<DfinityNft> & ParamsGetter<DfinityParams> & {
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
+    getMinter(): ActorSubclass<_SERVICE>;
 } & IsApprovedForMinter<DfinitySigner, DfinityNft> & GetExtraFees & {
     setActorCreator(provider: any): void;
 };
