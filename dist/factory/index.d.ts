@@ -175,6 +175,7 @@ export interface ChainParams {
     energiParams: Web3Params;
     casperParams: CasperParams;
     baseParams: Web3Params;
+    findoraParams: Web3Params;
 }
 export type MoralisNetwork = "mainnet" | "testnet";
 /**

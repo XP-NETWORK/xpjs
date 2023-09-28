@@ -7,6 +7,7 @@ export interface HederaService {
         treasury_account_id: string;
     }>;
     isContract(address: string): Promise<boolean>;
+    getEVMAddress(address: string): Promise<string>;
     readContract(to: string, data: any): Promise<any>;
 }
 export declare function hederaService(url: string): HederaService;
