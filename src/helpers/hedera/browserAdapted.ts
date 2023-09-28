@@ -346,10 +346,6 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         result
       );
 
-      console.log(umt.address, "umt.address", tok);
-
-      console.log(approvedContract, minterAddr);
-
       return approvedContract.at(0)?.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
@@ -361,8 +357,6 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       __: any,
       signer: any
     ) => {
-      console.log(umt.address);
-      console.log(forAddr, "forAddr");
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
         .setGas(1_000_000)
@@ -375,7 +369,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
             .addUint256(Number(tok))
         )
         .freezeWithSigner(signer);
-      console.log("x");
+
       //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
       const txResponse = await transaction.executeWithSigner(signer);
 
@@ -481,11 +475,17 @@ export async function web3HelperFactory(
     return action_id;
   }
 
-  const sanifyTrx = (trx: any) => {
-    const validTrx = String(trx).replace("@", "-");
-    const array = validTrx.split("");
-    array[validTrx.lastIndexOf(".")] = "-";
-    return array.join("");
+  /* const sanifyTrx = (trx: any) => {
+        const validTrx = String(trx).replace("@", "-");
+        const array = validTrx.split("");
+        array[validTrx.lastIndexOf(".")] = "-";
+        return array.join("");
+    };*/
+
+  const getEVMContractByHtsToken = async (htsToken: string) => {
+    const token = toHederaAccountId(htsToken);
+    const res = await params.hederaApi.getokenInfo(token);
+    return await params.hederaApi.getEVMAddress(res.treasury_account_id);
   };
 
   const isApprovedForMinter = async (
@@ -516,15 +516,10 @@ export async function web3HelperFactory(
     if (isWrappedNft === undefined)
       isWrappedNft = (await getWrapped(id, +id.native.chainId)).bool;
 
-    const toApprove = isWrappedNft
-      ? toSolidityAddress(
-          (
-            await params.hederaApi.getokenInfo(
-              toHederaAccountId(id.native.contract)
-            )
-          ).treasury_account_id
-        )
-      : params.erc721_addr;
+    let toApprove = params.erc721_addr;
+
+    if (isWrappedNft)
+      toApprove = await getEVMContractByHtsToken(id.native.contract);
 
     const isApproved = await isApprovedForMinter(id, sender, toApprove);
     if (isApproved) {
@@ -747,8 +742,8 @@ export async function web3HelperFactory(
 
       const txResponse = await transaction.executeWithSigner(sender as any);
 
-      const hash = sanifyTrx(txResponse.transactionId);
-      await notifyValidator(getEvmHash(txResponse));
+      const hash = getEvmHash(txResponse);
+      await notifyValidator(hash);
       return {
         hash,
       } as any;
@@ -767,21 +762,12 @@ export async function web3HelperFactory(
         [id.collectionIdent, id.native.tokenId]
       );
 
-      const contract = toSolidityAddress(
-        (
-          await params.hederaApi.getokenInfo(
-            toHederaAccountId(id.native.contract)
-          )
-        ).treasury_account_id
-      );
-
-      console.log(contract);
+      const contract = await getEVMContractByHtsToken(id.native.contract);
 
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(
-          hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
+          hashSDK.ContractId.fromEvmAddress(0, 0, params.minter_addr)
         )
-
         .setGas(1_200_000)
         .setPayableAmount(fees.shiftedBy(-8).integerValue().toString())
         .setFunction(
@@ -797,9 +783,8 @@ export async function web3HelperFactory(
         .freezeWithSigner(sender);
 
       const txResponse = await transaction.executeWithSigner(sender);
-      const hash = sanifyTrx(txResponse.transactionId);
-
-      await notifyValidator(getEvmHash(txResponse));
+      const hash = getEvmHash(txResponse);
+      await notifyValidator(hash);
       return {
         hash,
       } as any;
