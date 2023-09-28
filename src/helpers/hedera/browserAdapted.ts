@@ -346,6 +346,10 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         result
       );
 
+      console.log(umt.address, "umt.address", tok);
+
+      console.log(approvedContract, minterAddr);
+
       return approvedContract.at(0)?.toLowerCase() == minterAddr.toLowerCase();
     },
     approve: async (
@@ -357,6 +361,8 @@ export const NFT_METHOD_MAP: NftMethodMap = {
       __: any,
       signer: any
     ) => {
+      console.log(umt.address);
+      console.log(forAddr, "forAddr");
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(hashSDK.ContractId.fromSolidityAddress(umt.address))
         .setGas(1_000_000)
@@ -369,7 +375,7 @@ export const NFT_METHOD_MAP: NftMethodMap = {
             .addUint256(Number(tok))
         )
         .freezeWithSigner(signer);
-
+      console.log("x");
       //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
       const txResponse = await transaction.executeWithSigner(signer);
 
@@ -552,6 +558,9 @@ export async function web3HelperFactory(
 
   const toHederaAccountId = (address: string) =>
     hashSDK.AccountId.fromSolidityAddress(address).toString();
+
+  const getEvmHash = (trx: any) =>
+    "0x" + String(trx.transactionHash).slice(0, 64);
 
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
 
@@ -739,7 +748,7 @@ export async function web3HelperFactory(
       const txResponse = await transaction.executeWithSigner(sender as any);
 
       const hash = sanifyTrx(txResponse.transactionId);
-      await notifyValidator(hash);
+      await notifyValidator(getEvmHash(txResponse));
       return {
         hash,
       } as any;
@@ -766,6 +775,8 @@ export async function web3HelperFactory(
         ).treasury_account_id
       );
 
+      console.log(contract);
+
       const transaction = await new hashSDK.ContractExecuteTransaction()
         .setContractId(
           hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
@@ -787,7 +798,8 @@ export async function web3HelperFactory(
 
       const txResponse = await transaction.executeWithSigner(sender);
       const hash = sanifyTrx(txResponse.transactionId);
-      await notifyValidator(hash);
+
+      await notifyValidator(getEvmHash(txResponse));
       return {
         hash,
       } as any;

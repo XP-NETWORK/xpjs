@@ -606,17 +606,15 @@ export namespace ChainFactoryConfigs {
         hederaApi: hederaService(
           "https://mainnet-public.mirrornode.hedera.com/api/v1"
         ),
-        provider: new ethers.providers.JsonRpcProvider(
-          MainNetRpcUri.HEDERA_RELAY
-        ),
+        provider: hethers.getDefaultProvider() as any,
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
         noWhitelist: true,
         htcToken: "0x10677B39A30A1f84ffae8aFCc23F210CafCEBc94",
-        erc721_addr: "0x0d5926E54dDF7cf0D4884C3D091DD41951fFd425",
-        erc1155_addr: "0x0d5926E54dDF7cf0D4884C3D091DD41951fFd425",
-        minter_addr: "0x66641ab2079cB83ba204447AAEAD2D361771E834",
+        erc721_addr: "0x2f374eDEEAdA5aD8D26d7BC804753D7d27E8fa77",
+        erc1155_addr: "0x2f374eDEEAdA5aD8D26d7BC804753D7d27E8fa77",
+        minter_addr: "0x75c65c71bf2f8f29ab51d8423f9b390f709fc275",
         erc721Minter: "0x000000000000000000000000000000000037008d",
         erc1155Minter: "0x0000000000000000000000000000000000370090",
       },
