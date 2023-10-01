@@ -552,7 +552,7 @@ export function ChainFactory(
 
       const toType = CHAIN_INFO.get(to)?.type;
 
-      const deployable = [
+      const fromEnabled = [
         ChainType.EVM,
         ChainType.SOLANA,
         ChainType.NEAR,
@@ -560,8 +560,17 @@ export function ChainFactory(
         ChainType.TON,
       ];
 
-      const deployableFrom = deployable.find((type) => type === fromType);
-      const deployableTo = deployable.find((type) => type === toType);
+      const toEnabled = [
+        ChainType.EVM,
+        ChainType.SOLANA,
+        ChainType.NEAR,
+        ChainType.APTOS,
+        ChainType.TON,
+        ChainType.DFINITY,
+      ];
+
+      const deployableFrom = fromEnabled.find((type) => type === fromType);
+      const deployableTo = toEnabled.find((type) => type === toType);
 
       if (!deployableFrom || !deployableTo) throw noDeploy;
 

@@ -28,6 +28,7 @@ import {
   ParamsGetter,
   IsApprovedForMinter,
   GetExtraFees,
+  EstimateDeployFees,
 } from "../chain";
 import { idlFactory } from "./idl";
 import { _SERVICE } from "./minter.did";
@@ -99,6 +100,7 @@ export type DfinityHelper = ChainNonceGet &
   TransferNftForeign<DfinitySigner, DfinityNft, string> &
   UnfreezeForeignNft<DfinitySigner, DfinityNft, string> &
   EstimateTxFees<DfinityNft> &
+  EstimateDeployFees &
   ValidateAddress & { XpNft: string } & Pick<
     PreTransfer<DfinitySigner, DfinityNft, string, undefined>,
     "preTransfer"
@@ -311,7 +313,10 @@ export async function dfinityHelper(
     getNonce: () => Chain.DFINITY,
     estimateValidateTransferNft: async () => new BigNumber(0), // TODO
     estimateValidateUnfreezeNft: async () => new BigNumber(0), // TODO
-    async validateAddress(adr) {
+    estimateContractDeploy: async () => {
+      return new BigNumber("500000");
+    },
+    validateAddress(adr) {
       try {
         Principal.fromText(adr);
         return true;

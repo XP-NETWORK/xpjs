@@ -94,7 +94,7 @@ export interface MintNft<Signer, Args, Identifier> {
 }
 
 export interface ValidateAddress {
-  validateAddress(adr: string): Promise<boolean>;
+  validateAddress(adr: string): Promise<boolean> | boolean;
 }
 
 export interface EstimateDeployFees {
