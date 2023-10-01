@@ -114,6 +114,7 @@ export type DfinityHelper = ChainNonceGet &
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
     getMinter(): ActorSubclass<_SERVICE>;
+    validatedMint(actionId: string): Promise<string>;
   } & IsApprovedForMinter<DfinitySigner, DfinityNft> &
   GetExtraFees & {
     setActorCreator(provider: any): void;
@@ -375,6 +376,7 @@ export async function dfinityHelper(
           principal,
         },
       });
+
       return mint;
     },
     async unfreezeWrappedNft(sender, to, id, _txFees, nonce) {
@@ -519,5 +521,18 @@ export async function dfinityHelper(
     },
     withdraw_fees,
     encode_withdraw_fees,
+    async validatedMint(actionId: string) {
+      const data = await minter
+        .get_validated_event(BigInt(actionId))
+        .catch((e) => {
+          console.log(e, "in validatedMint");
+        });
+
+      if (data?.at(0)?.ValidatedMint?.mint_with) {
+        return data.at(0)!.ValidatedMint!.mint_with.toString();
+      }
+
+      return "";
+    },
   };
 }

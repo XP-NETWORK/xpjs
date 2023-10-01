@@ -251,6 +251,8 @@ interface ChainData<T extends ChainNonce> {
   currencySymbol: SupportedCurrencyName;
   type: string;
   blockExplorerUrlAddr?: string;
+  blockExplorerUrlCollection?: string;
+  tnBlockExplorerUrlCollection?: string;
   tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
   rejectUnfreeze?: string[];
 }
@@ -652,6 +654,10 @@ CHAIN_INFO.set(Chain.DFINITY, {
   blockExplorerUrlAddr: "https://dashboard.internetcomputer.org/account/",
   tnBlockExplorerUrl: "https://dashboard.internetcomputer.org/account/",
   tnBlockExplorerUrlAddr: "https://dashboard.internetcomputer.org/account/",
+  tnBlockExplorerUrlCollection:
+    "https://dashboard.internetcomputer.org/canister/",
+  blockExplorerUrlCollection:
+    "https://dashboard.internetcomputer.org/canister/",
 });
 
 CHAIN_INFO.set(Chain.NEAR, {

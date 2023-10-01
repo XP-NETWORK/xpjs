@@ -341,36 +341,30 @@ export interface ValidateWhitelistDip721 {
 export interface ValidateWithdrawFees {
   to: Principal;
 }
-export type ValidatedEvent =
-  | { ValidatedPause: { paused: boolean } }
-  | {
-      ValidatedUpdateKey: {
-        key: Uint8Array | number[];
-        key_type: KeyType;
-      };
-    }
-  | {
-      ValidatedUnfreeze: {
-        to: Principal;
-        token_id: bigint;
-        contract: Principal;
-      };
-    }
-  | {
-      ValidatedUnfreezeBatch: {
-        to: Principal;
-        contracts: Array<Principal>;
-        token_ids: Array<bigint>;
-      };
-    }
-  | {
-      ValidatedMintBatch: {
-        mint_with: Array<Principal>;
-        token_ids: Uint32Array | number[];
-      };
-    }
-  | { ValidatedMint: { token_id: number; mint_with: Principal } }
-  | { ValidatedFeeWithdraw: { to: Principal; block_index: bigint } };
+export type ValidatedEvent = {
+  ValidatedPause?: { paused: boolean };
+  ValidatedUpdateKey?: {
+    key: Uint8Array | number[];
+    key_type: KeyType;
+  };
+  ValidatedUnfreeze?: {
+    to: Principal;
+    token_id: bigint;
+    contract: Principal;
+  };
+  ValidatedUnfreezeBatch?: {
+    to: Principal;
+    contracts: Array<Principal>;
+    token_ids: Array<bigint>;
+  };
+  ValidatedMintBatch?: {
+    mint_with: Array<Principal>;
+    token_ids: Uint32Array | number[];
+  };
+  ValidatedMint?: { token_id: number; mint_with: Principal };
+  ValidatedFeeWithdraw?: { to: Principal; block_index: bigint };
+};
+
 export interface _SERVICE {
   add_whitelist: ActorMethod<
     [bigint, ValidateWhitelistDip721, Uint8Array | number[]],
@@ -422,7 +416,7 @@ export interface _SERVICE {
   >;
   get_config: ActorMethod<[], Config>;
   get_event: ActorMethod<[bigint], [] | [[BridgeEventCtx, BridgeEvent]]>;
-  get_validated_event: ActorMethod<[bigint], [] | [ValidatedEvent]>;
+  get_validated_event: ActorMethod<[bigint], [] | ValidatedEvent[]>;
   is_whitelisted: ActorMethod<[Principal], boolean>;
   set_fee_group_key: ActorMethod<
     [bigint, ValidateSetGroupKey, Uint8Array | number[]],

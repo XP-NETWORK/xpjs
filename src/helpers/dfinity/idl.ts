@@ -41,6 +41,39 @@ export const idlFactory = ({ IDL }: any) => {
     token_ids: IDL.Vec(IDL.Nat),
     burner: IDL.Principal,
   });
+  const KeyType = IDL.Variant({
+    FeeKey: IDL.Null,
+    BridgeGroupKey: IDL.Null,
+  });
+  const ValidatedEvent = IDL.Variant({
+    ValidatedPause: IDL.Record({ paused: IDL.Bool }),
+    ValidatedUpdateKey: IDL.Record({
+      key: IDL.Vec(IDL.Nat8),
+      key_type: KeyType,
+    }),
+    ValidatedUnfreeze: IDL.Record({
+      to: IDL.Principal,
+      token_id: IDL.Nat,
+      contract: IDL.Principal,
+    }),
+    ValidatedUnfreezeBatch: IDL.Record({
+      to: IDL.Principal,
+      contracts: IDL.Vec(IDL.Principal),
+      token_ids: IDL.Vec(IDL.Nat),
+    }),
+    ValidatedMintBatch: IDL.Record({
+      mint_with: IDL.Vec(IDL.Principal),
+      token_ids: IDL.Vec(IDL.Nat32),
+    }),
+    ValidatedMint: IDL.Record({
+      token_id: IDL.Nat32,
+      mint_with: IDL.Principal,
+    }),
+    ValidatedFeeWithdraw: IDL.Record({
+      to: IDL.Principal,
+      block_index: IDL.Nat64,
+    }),
+  });
   const UnfreezeNft = IDL.Record({
     uri: IDL.Text,
     token_id: IDL.Nat,
@@ -132,6 +165,11 @@ export const idlFactory = ({ IDL }: any) => {
     get_event: IDL.Func(
       [IDL.Nat],
       [IDL.Opt(IDL.Tuple(BridgeEventCtx, BridgeEvent))],
+      ["query"]
+    ),
+    get_validated_event: IDL.Func(
+      [IDL.Nat],
+      [IDL.Opt(ValidatedEvent)],
       ["query"]
     ),
     is_whitelisted: IDL.Func([IDL.Principal], [IDL.Bool], ["query"]),
