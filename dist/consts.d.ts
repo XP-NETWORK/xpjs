@@ -212,6 +212,8 @@ interface ChainData<T extends ChainNonce> {
     currencySymbol: SupportedCurrencyName;
     type: string;
     blockExplorerUrlAddr?: string;
+    blockExplorerUrlCollection?: string;
+    tnBlockExplorerUrlCollection?: string;
     tnBlockExplorerUrlAddr?: string | ((tx: string) => string);
     rejectUnfreeze?: string[];
 }

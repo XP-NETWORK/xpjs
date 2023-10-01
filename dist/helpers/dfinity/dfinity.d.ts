@@ -36,6 +36,7 @@ export type DfinityHelper = ChainNonceGet & TransferNftForeign<DfinitySigner, Df
     withdraw_fees(to: string, actionId: string, sig: Buffer): Promise<boolean>;
     encode_withdraw_fees(to: string, actionId: string): Promise<Uint8Array>;
     getMinter(): ActorSubclass<_SERVICE>;
+    validatedMint(actionId: string): Promise<string>;
 } & IsApprovedForMinter<DfinitySigner, DfinityNft> & GetExtraFees & {
     setActorCreator(provider: any): void;
 };
