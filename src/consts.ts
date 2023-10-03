@@ -585,10 +585,10 @@ CHAIN_INFO.set(Chain.SECRET, {
   currencySymbol: SupportedCurrencyName.SCRT,
   decimals: Decimals.SCRT,
   type: ChainType.COSMOS,
-  blockExplorerUrl: "https://secretnodes.com/secret/transactions/",
-  blockExplorerUrlAddr: "https://secretnodes.com/secret/accounts/",
-  tnBlockExplorerUrl: "https://secretnodes.com/pulsar/transactions/",
-  tnBlockExplorerUrlAddr: "https://secretnodes.com/pulsar/accounts/",
+  blockExplorerUrl: "https://www.mintscan.io/secret/tx/",
+  blockExplorerUrlAddr: "https://www.mintscan.io/secret/address/",
+  tnBlockExplorerUrl: "https://testnet.ping.pub/secret/tx/",
+  tnBlockExplorerUrlAddr: "https://testnet.ping.pub/secret/account/",
 });
 CHAIN_INFO.set(Chain.SOLANA, {
   name: "Solana",

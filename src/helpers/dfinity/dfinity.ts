@@ -537,6 +537,10 @@ export async function dfinityHelper(
         return data.at(0)!.ValidatedMint!.mint_with.toString();
       }
 
+      if (data?.at(0)?.ValidatedUnfreeze?.contract) {
+        return data.at(0)!.ValidatedUnfreeze!.contract.toString();
+      }
+
       return "";
     },
   };
