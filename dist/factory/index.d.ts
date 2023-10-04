@@ -129,6 +129,7 @@ export type ChainFactory = {
     whitelistEVM<T extends ChainNonce>(chain: T, address: string, nonce: number): Promise<{
         success: true;
     }>;
+    hederaGetMintedCollection(from: number, receiver: string): Promise<any[]>;
 };
 /**
  * A type representing all the supported chain params.

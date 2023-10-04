@@ -15,6 +15,7 @@ export type TxnSocketHelper = {
 export type AlgorandSocketHelper = {
     waitAlgorandNft(sourceChain: number, receiver: string, action_id: string): Promise<ClaimNftInfo>;
     claimNfts(receiver: string): Promise<DbClaimInfo[]>;
+    claimHederaNfts(from: number, to: string): Promise<any[]>;
     cleanNfts(owner: string): Promise<void>;
 };
 type DbClaimInfo = {
