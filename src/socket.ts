@@ -50,6 +50,7 @@ export type AlgorandSocketHelper = {
     action_id: string
   ): Promise<ClaimNftInfo>;
   claimNfts(receiver: string): Promise<DbClaimInfo[]>;
+  claimHederaNfts(from: number, to: string): Promise<any[]>;
   cleanNfts(owner: string): Promise<void>;
 };
 
@@ -207,6 +208,10 @@ export function socketHelper(
         `/algorand_event/${receiver}`
       );
       return dbData.data.result;
+    },
+    async claimHederaNfts(from, to) {
+      const response = await dbApi.get(`/hedera_event/${from}/${to}`);
+      return response.data;
     },
     async cleanNfts(owner: string): Promise<void> {
       await dbApi.delete(`/algorand_event/${owner}`);

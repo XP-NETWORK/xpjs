@@ -296,6 +296,8 @@ export type ChainFactory = {
     address: string,
     nonce: number
   ): Promise<{ success: true }>;
+
+  hederaGetMintedCollection(from: number, receiver: string): Promise<any[]>;
 };
 
 /**
@@ -1075,6 +1077,10 @@ export function ChainFactory(
     claimableAlgorandNfts: async (claimer) => {
       const algo: AlgorandHelper = await inner(Chain.ALGORAND);
       return await algo.claimableNfts(txSocket, claimer);
+    },
+    hederaGetMintedCollection: async (from, claimer) => {
+      const result = await txSocket.claimHederaNfts(from, claimer);
+      return result;
     },
     async checkWhitelist(chain, nft) {
       if (
