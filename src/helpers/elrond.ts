@@ -274,9 +274,10 @@ export async function elrondHelperFactory(
     tx.setNonce(acc.nonce);
     let stx: Transaction;
 
-    if (typeof (signer as any).walletConnector !== "undefined") {
+    if ((signer as any).signTransactions) {
       const wcSigenr = signer as any;
       const address = (await signer.getAddress()) as string;
+
       const res = await (
         await axios(`https://gateway.multiversx.com/address/${address}/nonce`)
       ).data;
@@ -290,6 +291,7 @@ export async function elrondHelperFactory(
         value: tx.getValue(),
         nonce: new Nonce(res.data.nonce),
       });
+
       const txs = await wcSigenr.signTransactions([payload]);
 
       stx = txs[0];
@@ -479,7 +481,9 @@ export async function elrondHelperFactory(
 
   const listEsdt = async (owner: string) => {
     const raw = await providerRest(`/address/${owner}/esdt`);
-    const dat = raw.data.data.esdts as { [index: string]: MaybeEsdtNftInfo };
+    const dat = raw.data.data.esdts as {
+      [index: string]: MaybeEsdtNftInfo;
+    };
 
     return dat;
   };
@@ -628,7 +632,7 @@ export async function elrondHelperFactory(
       const tx = await signAndSend(sender, txu);
       await notifyValidator(
         tx,
-        sender.getAddress().toString(),
+        (await sender.getAddress()).toString(),
         [info.uri],
         undefined
         // await extractAction(tx)
@@ -654,7 +658,7 @@ export async function elrondHelperFactory(
       const tx = await signAndSend(sender, txu);
       await notifyValidator(
         tx,
-        sender.getAddress().toString(),
+        (await sender.getAddress()).toString(),
         [nft.uri],
         undefined
         // await extractAction(tx)
@@ -786,7 +790,7 @@ export async function elrondHelperFactory(
       const tx = await signAndSend(sender, txu);
       await notifyValidator(
         tx,
-        sender.getAddress().toString(),
+        (await sender.getAddress()).toString(),
         nfts.map((n) => n.uri),
         undefined
         // await extractAction(tx)
@@ -830,7 +834,7 @@ export async function elrondHelperFactory(
       const tx = await signAndSend(sender, txu);
       await notifyValidator(
         tx,
-        sender.getAddress().toString(),
+        (await sender.getAddress()).toString(),
         nfts.map((n) => n.uri),
         undefined
         // await extractAction(tx)
@@ -868,13 +872,16 @@ export async function elrondHelperFactory(
     async estimateValidateUnfreezeNftBatch(_, nfts) {
       return estimateGas(new BigNumber(340000000 + 5000000 * nfts.length));
     },
-    async validateAddress(adr: string) {
+    validateAddress(adr: string, options) {
       try {
         new Address(adr);
-        return await providerRest
-          .get(`/address/${adr}/esdt`)
-          .then((_) => true)
-          .catch((_) => false);
+        if (options?.apiValidation) {
+          return providerRest
+            .get(`/address/${adr}/esdt`)
+            .then((_) => true)
+            .catch((_) => false);
+        }
+        return true;
       } catch (_) {
         return false;
       }

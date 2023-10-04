@@ -94,8 +94,15 @@ export interface MintNft<Signer, Args, Identifier> {
 }
 
 export interface ValidateAddress {
-  validateAddress(adr: string): Promise<boolean> | boolean;
+  validateAddress(
+    adr: string,
+    options?: AddressValidationOptions
+  ): Promise<boolean> | boolean;
 }
+
+export type AddressValidationOptions = {
+  apiValidation: boolean;
+};
 
 export interface EstimateDeployFees {
   estimateUserStoreDeploy?(signer: ethers.Signer): Promise<BigNumber>;
