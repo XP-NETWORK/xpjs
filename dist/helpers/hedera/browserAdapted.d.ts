@@ -69,6 +69,12 @@ type tokenListResponce = {
     contract: string;
     htsToken: string;
     tokens: string[];
+    associated?: boolean;
+};
+type tokenListRequest = {
+    contract: string;
+    hts_token: string;
+    nft_id: string;
 };
 /**
  * Traits implemented by this module
@@ -82,11 +88,12 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
     injectSDK(sdk: HSDK): void;
     toSolidityAddress(address: string): string;
 } & {
-    listHederaClaimableNFT(proxyContract: string | undefined, htsToken: string | undefined, signer: any): Promise<tokenListResponce[]>;
+    listHederaClaimableNFT(tokens: tokenListRequest[], signer: any): Promise<tokenListResponce[]>;
 } & {
     claimNFT(proxyContract: string | undefined, htsToken: string | undefined, tokenId: string, signer: any): Promise<boolean>;
 } & {
-    assosiateToken(htsToken: string | undefined, signer: any): Promise<boolean>;
+    checkAndAssociate(tokens: tokenListRequest[], signer: any): Promise<boolean>;
+    associateToken(tokens: tokenListResponce[], signer: any): Promise<boolean>;
 };
 /**
  * Create an object implementing minimal utilities for a web3 chain
