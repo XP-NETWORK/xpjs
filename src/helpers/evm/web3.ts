@@ -463,6 +463,7 @@ export async function web3HelperFactory(
     return res[type];
   }
   const minter = Bridge<MinterBridge>(BridgeTypes.Minter).contract;
+
   async function notifyValidator(
     fromHash: string,
     actionId?: string,
@@ -657,7 +658,7 @@ export async function web3HelperFactory(
     getUserStore,
     async estimateValidateUnfreezeNft(_to, _id, _mW) {
       const gas = await provider.getGasPrice();
-      return new BigNumber(gas.mul(150_000).toString());
+      return new BigNumber(gas.mul(180_000).toString());
     },
     getFeeMargin() {
       return params.feeMargin;
@@ -928,7 +929,25 @@ export async function web3HelperFactory(
     ): Promise<BigNumber> {
       const gas = await provider.getGasPrice();
 
-      return new BigNumber(gas.mul(150_000).toString());
+      /* const factory = new ethers.ContractFactory(
+                Minter__factory.abi,
+                Minter__factory.bytecode
+            ).connect(provider)*/
+
+      /* const last_Trx = (
+                await minter.queryFilter(minter.filters.UnfreezeNft())
+            ).at(-1);
+            console.log(await last_Trx?.getTransaction());
+            console.log(await last_Trx?.getTransactionReceipt());
+
+            /* const x = await provider.estimateGas({
+                to: "0xaB0dBe37d86bc566Dc027D9C65E40851F3CcB097",
+                gasLimit: "250000",
+                data: "",
+            })*/
+
+      // console.log(x.toString(), "x");
+      return new BigNumber(gas.mul(180_000).toString());
     },
     estimateUserStoreDeploy,
     async estimateContractDeploy(): Promise<BigNumber> {
@@ -946,7 +965,7 @@ export async function web3HelperFactory(
       } catch (error: any) {
         console.log(error.message);
         const gasPrice = await provider.getGasPrice();
-        return new BigNumber(gasPrice.mul(150_000).toString());
+        return new BigNumber(gasPrice.mul(180_000).toString());
       }
     },
 

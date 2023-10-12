@@ -55,7 +55,7 @@ import { EvNotifier } from "../../services/notifier";
 import axios from "axios";
 import { hethers } from "@hashgraph/hethers";
 
-import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
+//import { HEDERA_PROXY_CLAIMS_ABI } from "./hts_abi";
 import { HederaService } from "../../services/hederaApi";
 
 //import { tryTimes } from "../evm/web3_utils";
@@ -141,6 +141,13 @@ type tokenListResponce = {
   contract: string;
   htsToken: string;
   tokens: string[];
+  associated?: boolean;
+};
+
+type tokenListRequest = {
+  contract: string;
+  hts_token: string;
+  nft_id: string;
 };
 
 /**
@@ -175,8 +182,9 @@ export type Web3Helper = BaseWeb3Helper &
     toSolidityAddress(address: string): string;
   } & {
     listHederaClaimableNFT(
-      proxyContract: string | undefined,
-      htsToken: string | undefined,
+      tokens: tokenListRequest[],
+      //proxyContract: string | undefined,
+      //htsToken: string | undefined,
       signer: any
     ): Promise<tokenListResponce[]>;
   } & {
@@ -187,7 +195,11 @@ export type Web3Helper = BaseWeb3Helper &
       signer: any
     ): Promise<boolean>;
   } & {
-    assosiateToken(htsToken: string | undefined, signer: any): Promise<boolean>;
+    checkAndAssociate(
+      tokens: tokenListRequest[],
+      signer: any
+    ): Promise<boolean>;
+    associateToken(tokens: tokenListResponce[], signer: any): Promise<boolean>;
   };
 
 /**
@@ -547,6 +559,71 @@ export async function web3HelperFactory(
     return receipt.hash;
   };
 
+  const listHederaClaimableNFT = async (
+    tokens: tokenListRequest[],
+    // _ = params.Xpnfthtsclaims,
+    //__ = params.htcToken,
+    signer: any
+  ) => {
+    const address = signer.address;
+
+    const res = await params.hederaApi.getTokens(address);
+
+    const htsTokens = res.map((t) => t.token_id);
+    const freshTokens = res
+      .filter((t) => t.balance === 0)
+      .map((t) => t.token_id);
+
+    const dublicates: string[] = [];
+    const toAssociate = tokens.filter((t) => {
+      const token = hashSDK.TokenId.fromSolidityAddress(t.hts_token).toString();
+      if (
+        !dublicates.includes(t.hts_token) &&
+        (!htsTokens.includes(token) || freshTokens.includes(token))
+      ) {
+        dublicates.push(t.hts_token);
+        return true;
+      }
+
+      return false;
+    });
+    //.map((token) => hashSDK.TokenId.fromSolidityAddress(token.hts_token));
+
+    if (!toAssociate.length) {
+      throw new Error("No matching tokens");
+    }
+
+    return toAssociate.map((t) => {
+      const token = hashSDK.TokenId.fromSolidityAddress(t.hts_token).toString();
+
+      return {
+        contract: t.contract,
+        htsToken: t.hts_token,
+        tokens: [t.nft_id],
+        associated: freshTokens.includes(token) ? true : false,
+      };
+    });
+  };
+
+  const associateToken = async (token: tokenListResponce[], signer: any) => {
+    const trx = await new hashSDK.TokenAssociateTransaction()
+      .setAccountId(signer.accountToSign)
+      .setTokenIds(
+        token.map((t) => hashSDK.TokenId.fromSolidityAddress(t.htsToken))
+      )
+      .freezeWithSigner(signer);
+
+    const result = await trx.executeWithSigner(signer).catch((err) => {
+      console.log(err, "assoc");
+    });
+
+    if (!result) {
+      throw new Error("Failed to Associate token to an account");
+    }
+
+    return true;
+  };
+
   const toSolidityAddress = (address: string) => {
     return hethers.utils.getAddressFromAccount(address);
   };
@@ -838,109 +915,14 @@ export async function web3HelperFactory(
         "0x0000000000000000000000000000000000000000000000000000000000000001"
       );
     },
-    async listHederaClaimableNFT(
-      _ = params.Xpnfthtsclaims,
-      __ = params.htcToken,
-      signer
-    ) {
-      const address = signer.address;
+    listHederaClaimableNFT,
 
-      const htsTokens = (await params.hederaApi.getTokens(address))
-        .filter((token) => token.balance === 0)
-        .map((token) => token.token_id);
+    async checkAndAssociate(tokens, signer) {
+      const toAssociate = await listHederaClaimableNFT(tokens, signer);
 
-      const fetchToken = async (htsToken: string) =>
-        new Promise(async (resolve) => {
-          try {
-            const tokenInfo = await params.hederaApi.getokenInfo(htsToken);
-
-            const treasuryAccount = toSolidityAddress(
-              tokenInfo.treasury_account_id
-            );
-
-            const isContract = await params.hederaApi.isContract(
-              treasuryAccount
-            );
-            console.log(isContract, treasuryAccount);
-            if (isContract) {
-              const nftContract = new ethers.Contract(
-                treasuryAccount,
-                ["function claimContract() public view returns (address)"],
-                params.evmProvider
-              );
-
-              const result = await params.hederaApi.readContract(
-                treasuryAccount,
-                nftContract.interface.encodeFunctionData("claimContract", [])
-              );
-
-              const nftClaimsContract =
-                nftContract.interface.decodeFunctionResult(
-                  "claimContract",
-                  result
-                );
-
-              console.log(nftClaimsContract, "nftClaimsContract");
-              if (nftClaimsContract) {
-                const _nftClaimsContract = new ethers.Contract(
-                  nftClaimsContract[0],
-                  HEDERA_PROXY_CLAIMS_ABI,
-                  params.evmProvider
-                );
-
-                const result = await params.hederaApi.readContract(
-                  nftClaimsContract[0],
-                  _nftClaimsContract.interface.encodeFunctionData(
-                    "getClaimableNfts",
-                    [address, toSolidityAddress(htsToken)]
-                  )
-                );
-
-                const toClaim =
-                  _nftClaimsContract.interface.decodeFunctionResult(
-                    "getClaimableNfts",
-                    result
-                  );
-
-                console.log(toClaim, "toClaim");
-
-                resolve({
-                  contract: treasuryAccount,
-                  htsToken: toSolidityAddress(htsToken),
-                  tokens: toClaim.at(0),
-                });
-                return;
-              }
-            }
-
-            resolve(null);
-          } catch {
-            resolve(null);
-          }
-        });
-
-      const results = (await Promise.all(
-        htsTokens.map(fetchToken)
-      )) as tokenListResponce[];
-
-      return results.filter((i) => i);
+      return await associateToken(toAssociate, signer);
     },
-    async assosiateToken(token = params.htcToken, signer) {
-      const trx = await new hashSDK.TokenAssociateTransaction()
-        .setAccountId(signer.accountToSign)
-        .setTokenIds([hashSDK.TokenId.fromSolidityAddress(token)])
-        .freezeWithSigner(signer);
-
-      const result = await trx.executeWithSigner(signer).catch((err) => {
-        console.log(err, "assoc");
-      });
-
-      if (!result) {
-        throw new Error("Failed to Associate token to an account");
-      }
-
-      return true;
-    },
+    associateToken,
     async claimNFT(
       proxyContract = params.erc721_addr,
       htsToken = params.htcToken,
