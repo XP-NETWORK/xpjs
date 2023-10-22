@@ -60,7 +60,7 @@ export type BaseWeb3Helper = BalanceCheck &
 } & {
     mintNftErc1155(owner: Signer, options: MintArgs): Promise<ContractTransaction>;
 };
-type ExtraArgs = {
+export type ExtraArgs = {
     overrides: ethers.Overrides;
 };
 /**

@@ -136,4 +136,4 @@ export declare function web3HelperFactory(params: Web3Params & {
     hederaApi: HederaService;
 }): Promise<Web3Helper>;
 export {};
-//# sourceMappingURL=browserAdapted.d.ts.map
+//# sourceMappingURL=depricated.d.ts.map
