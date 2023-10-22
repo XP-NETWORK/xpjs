@@ -431,7 +431,10 @@ export async function web3HelperFactory(
   const { minter_addr, provider } = params;
   const minter = Minter__factory.connect(minter_addr, provider);
 
-  const hashioMinter = Minter__factory.connect(minter_addr, params.evmProvider);
+  /*const hashioMinter = Minter__factory.connect(
+        minter_addr,
+        params.evmProvider
+    );*/
 
   async function notifyValidator(
     fromHash: string,
@@ -803,7 +806,7 @@ export async function web3HelperFactory(
           hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
         )
         .setGas(1_200_000)
-        .setPayableAmount(fees.shiftedBy(-8).integerValue().toString())
+        .setPayableAmount(fees.shiftedBy(-18).integerValue().toString())
         .setFunction(
           method,
           new hashSDK.ContractFunctionParameters()
@@ -846,7 +849,7 @@ export async function web3HelperFactory(
           hashSDK.ContractId.fromEvmAddress(0, 0, params.minter_addr)
         )
         .setGas(1_200_000)
-        .setPayableAmount(fees.shiftedBy(-8).integerValue().toString())
+        .setPayableAmount(fees.shiftedBy(-18).integerValue().toString())
         .setFunction(
           "withdrawNft",
           new hashSDK.ContractFunctionParameters()
@@ -901,14 +904,11 @@ export async function web3HelperFactory(
       return Promise.resolve(ethers.utils.isAddress(adr));
     },
     async isNftWhitelisted(nft) {
-      const data = hashioMinter.interface.encodeFunctionData("nftWhitelist", [
+      const data = minter.interface.encodeFunctionData("nftWhitelist", [
         nft.native.contract,
       ]);
 
-      const result = await params.hederaApi.readContract(
-        hashioMinter.address,
-        data
-      );
+      const result = await params.hederaApi.readContract(minter.address, data);
 
       return (
         result ===

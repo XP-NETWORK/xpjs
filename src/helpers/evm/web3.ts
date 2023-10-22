@@ -158,7 +158,7 @@ export type BaseWeb3Helper = BalanceCheck &
     ): Promise<ContractTransaction>;
   };
 
-type ExtraArgs = { overrides: ethers.Overrides };
+export type ExtraArgs = { overrides: ethers.Overrides };
 
 /**
  * Traits implemented by this module
@@ -376,13 +376,14 @@ export async function web3HelperFactory(
 ): Promise<Web3Helper> {
   const txnUnderpricedPolyWorkaround =
     params.nonce == 7 ? UnderpricedWorkaround : () => Promise.resolve();
-  const customData = () => {
-    if (params.nonce === 0x1d) {
-      return { usingContractAlias: true };
-    } else {
-      return undefined;
-    }
-  };
+
+  /* const customData = () => {
+        if (params.nonce === 0x1d) {
+            return { usingContractAlias: true };
+        } else {
+            return undefined;
+        }
+    };*/
   const w3 = params.provider;
   const { minter_addr, provider } = params;
   function Bridge<T>(type: BridgeTypes): T {
@@ -424,15 +425,17 @@ export async function web3HelperFactory(
 
               if (!fees) {
                 console.log("calc deploy fees");
-                if (params.nonce === 0x1d) {
-                  fees = new BigNumber("500000000000").toNumber();
-                  console.log(fees);
-                } else {
-                  fees = (await estimateUserStoreDeploy(signer))
-                    .div(1e18)
-                    .integerValue()
-                    .toNumber();
-                }
+                /*if (params.nonce === 0x1d) {
+                                    fees = new BigNumber(
+                                        "500000000000"
+                                    ).toNumber();
+                                    console.log(fees);
+                                } else {*/
+                fees = (await estimateUserStoreDeploy(signer))
+                  .div(1e18)
+                  .integerValue()
+                  .toNumber();
+                // }
               }
 
               const tx = await payForDeployUserStore(signer, String(fees));
@@ -441,7 +444,7 @@ export async function web3HelperFactory(
                 throw new Error(
                   "Faied to pay for deployment. Please come back later"
                 );
-              console.log(collection);
+
               const address = await params.notifier.createCollectionContract(
                 collection,
                 params.nonce,
@@ -504,6 +507,7 @@ export async function web3HelperFactory(
 
     return trx as TransactionResponse;
   }
+
   async function extractAction(txr: TransactionResponse): Promise<string> {
     const receipt = await txr.wait();
     const log = receipt.logs.find((log) => log.address === minter.address);
@@ -584,8 +588,6 @@ export async function web3HelperFactory(
       to: /*ethereum ? "0xd84268df6915bFDdd1b639556101992EF0c97C9D" :*/ address,
       value: ethers.utils.parseEther(amount),
       nonce: await provider.getTransactionCount(from, "latest"),
-      gasLimit: ethers.utils.hexlify(100000),
-      gasPrice: await provider.getGasPrice(),
     });
 
     return await tx.wait();
@@ -810,28 +812,34 @@ export async function web3HelperFactory(
       await approveForMinter(id, sender, txFees, { gasPrice }, address);
 
       const method = NFT_METHOD_MAP[id.native.contractType].freeze;
+      let tokenId = id.native.tokenId;
+      let contract = id.native.contract;
 
       // Chain is Hedera
       if (params.nonce === 0x1d) {
-        id.native.tokenId = ethers.utils.solidityPack(
+        tokenId = ethers.utils.solidityPack(
           ["uint160", "int96"],
           [id.collectionIdent, id.native.tokenId]
         );
-        id.native.contract = params.erc721_addr;
+        contract = params.erc721_addr;
       }
+
       const tx = await minter
         .connect(sender)
         .populateTransaction[method](
-          id.native.contract,
-          id.native.tokenId,
+          contract,
+          tokenId,
           chain_nonce,
           to,
           mintWith,
           {
-            value: params.nonce === 0x1d ? EthBN.from("50") : txFees.toFixed(0),
+            value:
+              /*params.nonce === 0x1d
+                                ? EthBN.from("50")
+                                : */ txFees.toFixed(0),
             gasLimit,
             gasPrice,
-            customData: customData(),
+            customData: undefined /* customData(),*/,
           }
         );
       await txnUnderpricedPolyWorkaround(tx);
@@ -875,16 +883,8 @@ export async function web3HelperFactory(
       gasLimit = undefined,
       gasPrice
     ): Promise<TransactionResponse> {
-      await approveForMinter(id, sender, txFees, { gasPrice });
-
-      // Chain is Hedera
-      if (params.nonce === 0x1d) {
-        id.native.tokenId = ethers.utils.solidityPack(
-          ["uint160", "int96"],
-          [EthBN.from(id.collectionIdent), id.native.tokenId]
-        );
-        id.native.contract = params.erc721_addr;
-      }
+      params.nonce !== 0x1d &&
+        (await approveForMinter(id, sender, txFees, { gasPrice }));
 
       const txn = await minter
         .connect(sender)
@@ -894,10 +894,13 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value: params.nonce === 0x1d ? EthBN.from("50") : txFees.toFixed(0),
+            value:
+              /* params.nonce === 0x1d
+                                ? EthBN.from("50")
+                                : */ txFees.toFixed(0),
             gasLimit,
             gasPrice,
-            customData: customData(),
+            customData: undefined /*customData()*/,
           }
         );
 

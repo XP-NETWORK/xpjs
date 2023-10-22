@@ -8,7 +8,7 @@ import { evNotifier } from "../services/notifier";
 import { Driver, SimpleNet } from "@vechain/connex-driver";
 import * as thor from "web3-providers-connex";
 import { Framework } from "@vechain/connex-framework";
-import { hethers } from "@hashgraph/hethers";
+//import { hethers } from "@hashgraph/hethers";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
@@ -450,8 +450,12 @@ export namespace ChainFactoryConfigs {
         hederaApi: hederaService(
           "https://testnet.mirrornode.hedera.com/api/v1"
         ),
-        provider: hethers.getDefaultProvider("testnet") as any,
-        evmProvider: new ethers.providers.JsonRpcProvider(TestNetRpcUri.HEDERA),
+        provider: new ethers.providers.JsonRpcProvider(
+          TestNetRpcUri.HEDERA_RELAY
+        ),
+        evmProvider: new ethers.providers.JsonRpcProvider(
+          TestNetRpcUri.HEDERA_RELAY
+        ),
         feeMargin,
         nonce: Chain.HEDERA,
         noWhitelist: true,
@@ -606,7 +610,7 @@ export namespace ChainFactoryConfigs {
         hederaApi: hederaService(
           "https://mainnet-public.mirrornode.hedera.com/api/v1"
         ),
-        provider: hethers.getDefaultProvider() as any,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         feeMargin,
         nonce: Chain.HEDERA,
@@ -1251,7 +1255,7 @@ export namespace ChainFactoryConfigs {
       },
       hederaParams: {
         notifier,
-        provider: hethers.getDefaultProvider() as any,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         hederaApi: hederaService(
           "https://mainnet-public.mirrornode.hedera.com/api/v1"

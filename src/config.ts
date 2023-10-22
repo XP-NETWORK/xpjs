@@ -39,7 +39,7 @@ export namespace AppConfigs {
       whitelistedUri: "https://tools.xp.network/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
-      txSocketUri: "https://bridge1.xp.network/tx-socket",
+      txSocketUri: "https://staging-tx-socket-925db65784a7.herokuapp.com/", //"https://bridge1.xp.network/tx-socket",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
       wrappedNftPrefix: "https://staging-nft.xp.network/w/",

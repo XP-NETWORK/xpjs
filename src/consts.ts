@@ -5,8 +5,7 @@ import {
 } from "./helpers/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/evm/web3";
-import { web3HelperFactory as HederaHelperFactory } from "./helpers/hedera/browserAdapted";
-
+import { HederaHelperFactory } from "./helpers/hedera/hedera_refactor";
 import {
   SupportedCurrency,
   SupportedCurrencyName,
@@ -67,7 +66,7 @@ export enum TestNetRpcUri {
   SECRET = "https://api.pulsar.scrttestnet.com",
   SKALE = "https://staging-v3.skalenodes.com/v1/staging-utter-unripe-menkar",
   HEDERA = "https://0.testnet.hedera.com/",
-  HEDERA_RELAY = "https://pool.arkhia.io/hedera/testnet/json-rpc/v1/4aX6a8J73ca92NXecaddCa4C295x62ap/",
+  HEDERA_RELAY = "https://pool.arkhia.io/hedera/testnet/json-rpc/v1/4aX6a8J73ca92NXecaddCa4C295x62ap/", //"https://testnet.hashio.io/api", //"https://pool.arkhia.io/hedera/testnet/json-rpc/v1/4aX6a8J73ca92NXecaddCa4C295x62ap/",
   NEAR = "https://rpc.testnet.near.org",
   MOONBEAM = "https://rpc.api.moonbase.moonbeam.network",
   ABEYCHAIN = "https://testrpc.abeychain.com",
@@ -610,16 +609,18 @@ CHAIN_INFO.set(Chain.HEDERA, {
   blockExplorerUrl: "https://hashscan.io/mainnet/transaction/",
   tnBlockExplorerUrl: "https://hashscan.io/testnet/transaction/",
   //@ts-ignore
-  constructor:
-    typeof window !== "undefined" ? HederaHelperFactory : web3HelperFactory,
+  constructor: HederaHelperFactory,
+  //typeof window !== "undefined" ? HederaHelperFactory : web3HelperFactory,
   currency: SupportedCurrency.HBAR,
   currencySymbol: SupportedCurrencyName.HBAR,
-  decimals: Decimals.HBAR,
+  decimals: Decimals.ETH,
   nonce: Chain.HEDERA,
   name: "Hedera",
   type: ChainType.HEDERA,
   blockExplorerUrlAddr: "https://hashscan.io/mainnet/account/",
   tnBlockExplorerUrlAddr: "https://hashscan.io/testnet/account/",
+  chainId: 295,
+  tnChainId: 296,
 });
 
 CHAIN_INFO.set(Chain.SKALE, {

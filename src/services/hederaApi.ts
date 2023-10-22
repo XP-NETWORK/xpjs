@@ -6,6 +6,7 @@ export interface HederaService {
   isContract(address: string): Promise<boolean>;
   getEVMAddress(address: string): Promise<string>;
   readContract(to: string, data: any): Promise<any>;
+  getEVMAccount(address: string): Promise<string>;
 }
 
 export function hederaService(url: string): HederaService {
@@ -35,6 +36,13 @@ export function hederaService(url: string): HederaService {
     },
     async getEVMAddress(address) {
       const res = await getContract(address);
+      if (res?.data?.evm_address) {
+        return res.data.evm_address;
+      }
+      throw new Error("Failed to convert address to EVM format");
+    },
+    async getEVMAccount(address) {
+      const res = await request.get(`/accounts/${address}`);
       if (res?.data?.evm_address) {
         return res.data.evm_address;
       }
