@@ -70,6 +70,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       casperParams: {
+        nwl: true,
         network: "casper-test",
         rpc: TestNetRpcUri.CASPER,
         bridge:
@@ -560,6 +561,7 @@ export namespace ChainFactoryConfigs {
         feeMargin,
       },
       casperParams: {
+        nwl: false,
         bridge:
           "hash-9af986599cf7625dae425a9e0e65b333d0d0daaaa67abca5b5abcf59e65b81b4",
         feeMargin,

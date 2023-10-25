@@ -10,6 +10,7 @@ import { CEP78Client } from "casper-cep78-js-client/dist/src";
 import {
   BalanceCheck,
   ChainNonceGet,
+  EstimateDeployFees,
   EstimateTxFees,
   FeeMargins,
   GetExtraFees,
@@ -41,6 +42,7 @@ export interface CasperParams {
   umt: string;
   feeMargin: FeeMargins;
   sig: SignatureService;
+  nwl: boolean;
 }
 
 export interface CasperNFT {
@@ -77,7 +79,8 @@ export type CasperHelper = ChainNonceGet &
   UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> &
   EstimateTxFees<CasperNFT> & { XpNft: string } & GetExtraFees &
   MintNft<CasperLabsHelper, CasperMintNft, string> &
-  CasperBrowserAdapt;
+  CasperBrowserAdapt &
+  EstimateDeployFees;
 
 function getTokenIdentifier(nft: NftInfo<CasperNFT>): string {
   if (nft.native.tokenId || nft.native.tokenHash) {
@@ -201,6 +204,12 @@ export async function casperHelper({
       cep78Client = new CEP78Client(rpc, network);
       bridgeClient = new XpBridgeClient(rpc, network);
       bridgeClient.setContractHash(bridge);
+    },
+    async estimateUserStoreDeploy() {
+      return new BigNumber("30000000000");
+    },
+    async estimateContractDeploy() {
+      return new BigNumber("30000000000");
     },
     toAccountHash(account: string) {
       return CLPublicKey.fromHex(account).toAccountRawHashStr();
