@@ -27,6 +27,7 @@ type HederaParams = {
     htcToken: string;
     Xpnfthtsclaims: string;
     hederaApi: HederaService;
+    noWhitelist?: boolean;
 };
 export declare const HederaHelperFactory: (params: Web3Params & HederaParams) => Promise<HederaHelperFactory>;
 export {};

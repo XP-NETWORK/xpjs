@@ -10,6 +10,7 @@ export interface HederaService {
     getEVMAddress(address: string): Promise<string>;
     readContract(to: string, data: any): Promise<any>;
     getEVMAccount(address: string): Promise<string>;
+    getTranactionIdByHash(hash: string): Promise<string>;
 }
 export declare function hederaService(url: string): HederaService;
 //# sourceMappingURL=hederaApi.d.ts.map
