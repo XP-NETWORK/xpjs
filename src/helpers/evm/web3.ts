@@ -365,7 +365,9 @@ export const NFT_METHOD_MAP: NftMethodMap = {
         gasLimit: overrides?.gasLimit || "1000000",
         gasPrice: overrides?.gasPrice,
       });
+
       await txnUp(tx);
+
       return await umt.signer.sendTransaction(tx);
     },
   },
@@ -425,12 +427,7 @@ export async function web3HelperFactory(
 
               if (!fees) {
                 console.log("calc deploy fees");
-                /*if (params.nonce === 0x1d) {
-                                    fees = new BigNumber(
-                                        "500000000000"
-                                    ).toNumber();
-                                    console.log(fees);
-                                } else {*/
+
                 fees = (await estimateUserStoreDeploy(signer))
                   .div(1e18)
                   .integerValue()
@@ -558,6 +555,7 @@ export async function web3HelperFactory(
     if (isApproved) {
       return undefined;
     }
+
     const erc = NFT_METHOD_MAP[id.native.contractType].umt.connect(
       id.native.contract,
       sender
@@ -571,7 +569,9 @@ export async function web3HelperFactory(
       params.nonce === 0x1d ? {} : undefined,
       overrides
     );
+
     await receipt.wait();
+
     return receipt.hash;
   };
   const base = await baseWeb3HelperFactory(params.provider, params.nonce);
@@ -833,30 +833,28 @@ export async function web3HelperFactory(
           to,
           mintWith,
           {
-            value:
-              /*params.nonce === 0x1d
-                                ? EthBN.from("50")
-                                : */ txFees.toFixed(0),
+            value: txFees.toFixed(0),
             gasLimit,
             gasPrice,
-            customData: undefined /* customData(),*/,
+            customData: undefined,
           }
         );
+
       await txnUnderpricedPolyWorkaround(tx);
 
-      const txr: TransactionResponse | unknown = await sender
+      const txr: TransactionResponse = await sender
         .sendTransaction(tx)
         .catch((e) => {
-          if (params.nonce === 33) {
+          if (params.nonce === 33 || params.nonce === 0x1d) {
             return e;
           } else throw e;
         });
+
       let txHash: string;
       if (params.nonce === 0x1d) {
-        //@ts-ignore checked hedera
-        const waited = await txr.wait();
-        //@ts-ignore checked hedera
-        txHash = waited["transactionHash"];
+        const hederaTx = txr as any;
+        typeof hederaTx.wait === "function" && (await hederaTx.wait());
+        return hederaTx;
       } else if (params.nonce === 33) {
         //@ts-ignore checked abeychain
         txHash = txr["returnedHash"] || txr.hash;
@@ -894,23 +892,24 @@ export async function web3HelperFactory(
           id.native.tokenId,
           id.native.contract,
           {
-            value:
-              /* params.nonce === 0x1d
-                                ? EthBN.from("50")
-                                : */ txFees.toFixed(0),
+            value: txFees.toFixed(0),
             gasLimit,
             gasPrice,
-            customData: undefined /*customData()*/,
+            customData: undefined,
           }
         );
 
       await txnUnderpricedPolyWorkaround(txn);
-      const txr = await sender.sendTransaction(txn);
+      const txr = await sender.sendTransaction(txn).catch((e) => {
+        if (params.nonce === 0x1d) {
+          return e;
+        } else throw e;
+      });
       let txHash: string;
       if (params.nonce === 0x1d) {
-        const waited = await txr.wait();
-        //@ts-ignore checked hedera
-        txHash = waited["transactionHash"];
+        const hederaTx = txr as any;
+        typeof hederaTx.wait === "function" && (await hederaTx.wait());
+        return hederaTx;
       } else if (params.nonce === 33) {
         //@ts-ignore checked abeychain
         txHash = txr["returnedHash"] || txr.hash;

@@ -7,6 +7,7 @@ export interface HederaService {
   getEVMAddress(address: string): Promise<string>;
   readContract(to: string, data: any): Promise<any>;
   getEVMAccount(address: string): Promise<string>;
+  getTranactionIdByHash(hash: string): Promise<string>;
 }
 
 export function hederaService(url: string): HederaService {
@@ -54,6 +55,46 @@ export function hederaService(url: string): HederaService {
         to,
       });
       return res.data.result;
+    },
+    async getTranactionIdByHash(hash) {
+      const getTimestamp = (hash: string) =>
+        new Promise(async (resolve, reject) => {
+          let timestamp: string | undefined;
+          const tm = setTimeout(
+            () => reject("Time out on getTimestapm "),
+            120 * 1000
+          );
+          while (!timestamp) {
+            await new Promise((r) => setTimeout(r, 3000));
+
+            const result = await request
+              .get(`/contracts/results/${hash}`)
+              .catch(() => undefined);
+            timestamp = result?.data?.timestamp;
+          }
+          clearTimeout(tm);
+          resolve(timestamp);
+        });
+
+      const timestamp = await getTimestamp(hash);
+
+      const error = new Error(`Failed to decode ${hash} to transactionId`);
+      if (!timestamp) {
+        throw error;
+      }
+
+      await new Promise((r) => setTimeout(r, 4000));
+
+      const transactions = await request
+        .get(`/transactions?timestamp=${timestamp}`)
+        .catch(() => undefined);
+
+      const transaction = transactions?.data?.transactions?.at(0);
+      if (!transaction?.transaction_id) {
+        throw error;
+      }
+
+      return transaction.transaction_id;
     },
   };
 }

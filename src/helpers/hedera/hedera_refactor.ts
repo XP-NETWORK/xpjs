@@ -10,7 +10,7 @@ import { EthNftInfo } from "../evm/web3";
 import { BigNumber } from "bignumber.js";
 
 import { isWrappedNft as getWrapped } from "../../factory/utils";
-import { UserNftMinter__factory } from "xpnet-web3-contracts";
+import { UserNftMinter__factory, Minter__factory } from "xpnet-web3-contracts";
 
 type HSDK = typeof import("@hashgraph/sdk");
 
@@ -49,12 +49,29 @@ type HederaParams = {
   Xpnfthtsclaims: string;
   //evmProvider: ethers.providers.JsonRpcProvider;
   hederaApi: HederaService;
+  noWhitelist?: boolean;
 };
 
 export const HederaHelperFactory = async (
   params: Web3Params & HederaParams
 ): Promise<HederaHelperFactory> => {
   const base = await web3HelperFactory(params);
+
+  const minter = Minter__factory.connect(params.minter_addr, params.provider);
+
+  const isNftWhitelisted = async (nft: NftInfo<EthNftInfo>) => {
+    //const _contract = await getEVMContractByHtsToken(nft.native.contract);
+    const data = minter.interface.encodeFunctionData("nftWhitelist", [
+      nft.native.contract,
+    ]);
+
+    const result = await params.hederaApi.readContract(minter.address, data);
+
+    return (
+      result ===
+      "0x0000000000000000000000000000000000000000000000000000000000000001"
+    );
+  };
 
   const toHederaAccountId = (address: string) => {
     const acc = hethers.utils.getAccountFromAddress(address);
@@ -176,6 +193,12 @@ export const HederaHelperFactory = async (
 
     return await associateToken(toAssociate, signer);
   };
+  const sanifyTrx = (trx: any) => {
+    const validTrx = String(trx).replace("@", "-");
+    const array = validTrx.split("");
+    array[validTrx.lastIndexOf(".")] = "-";
+    return array.join("");
+  };
 
   return {
     ...base,
@@ -184,8 +207,8 @@ export const HederaHelperFactory = async (
         return hethers.utils.getAddressFromAccount(address);
       };
 
-      const getEvmHash = (trx: any) =>
-        "0x" + String(trx.transactionHash).slice(0, 64);
+      /*const getEvmHash = (trx: any) =>
+                "0x" + String(trx.transactionHash).slice(0, 64);*/
 
       const listHederaClaimableNFT = async (
         tokens: tokenListRequest[],
@@ -301,13 +324,12 @@ export const HederaHelperFactory = async (
         _: ethers.Overrides | undefined,
         toApprove?: string
       ) {
+        console.log(toApprove);
         const forAddress = toApprove || (await getApproveFor(id));
 
         console.log(forAddress, "forAddress");
         const isApproved = await isApprovedForMinter(id, sender, forAddress);
 
-        console.log(isApproved, "isApproved");
-        console.log(id, "isApproved");
         if (isApproved) return undefined;
 
         const transaction = await new hashSDK.ContractExecuteTransaction()
@@ -342,6 +364,13 @@ export const HederaHelperFactory = async (
         fees?: number,
         isMapped: boolean = false
       ) => {
+        const defaultMinter = {
+          address: params.minter_addr,
+          contract: undefined,
+        };
+
+        if (!params.noWhitelist) return defaultMinter;
+
         const contract = await params.notifier.getCollectionContract(
           nft.native.contract,
           params.nonce
@@ -353,11 +382,7 @@ export const HederaHelperFactory = async (
             contract: undefined,
           };
 
-        if (isMapped)
-          return {
-            address: params.minter_addr,
-            contract: undefined,
-          };
+        if (isMapped) return defaultMinter;
 
         const amount =
           fees ||
@@ -390,6 +415,7 @@ export const HederaHelperFactory = async (
         listHederaClaimableNFT,
         claimNFT,
         associateToken,
+        isNftWhitelisted,
         checkAndAssociate,
         isApprovedForMinter,
         approveForMinter,
@@ -412,7 +438,13 @@ export const HederaHelperFactory = async (
             mintWith !== toParams.erc721_addr
           );
 
-          await approveForMinter(id, sender, txFees, { gasPrice }, address);
+          await approveForMinter(
+            id,
+            sender,
+            txFees,
+            { gasPrice },
+            params.erc721_addr
+          );
           const tokenId = ethers.utils.solidityPack(
             ["uint160", "int96"],
             [id.collectionIdent, id.native.tokenId]
@@ -440,7 +472,8 @@ export const HederaHelperFactory = async (
 
           const txResponse = await transaction.executeWithSigner(sender as any);
 
-          const hash = getEvmHash(txResponse);
+          const hash = sanifyTrx(txResponse.transactionId);
+
           await params.notifier.notifyWeb3(params.nonce, hash);
           return {
             hash,
@@ -464,7 +497,7 @@ export const HederaHelperFactory = async (
 
           const transaction = await new hashSDK.ContractExecuteTransaction()
             .setContractId(
-              hashSDK.ContractId.fromEvmAddress(0, 0, params.minter_addr)
+              hashSDK.ContractId.fromSolidityAddress(params.minter_addr)
             )
             .setGas(1_200_000)
             .setPayableAmount(txFees.shiftedBy(-18).integerValue().toString())
@@ -481,7 +514,7 @@ export const HederaHelperFactory = async (
             .freezeWithSigner(sender);
 
           const txResponse = await transaction.executeWithSigner(sender);
-          const hash = getEvmHash(txResponse);
+          const hash = sanifyTrx(txResponse.transactionId);
           await params.notifier.notifyWeb3(params.nonce, hash);
           return {
             hash,
@@ -491,12 +524,55 @@ export const HederaHelperFactory = async (
       };
     },
     async approveForMinter(...args) {
-      if (!args[4]) {
-        const forAddress = await getApproveFor(args[0]);
-        args[4] = forAddress;
+      try {
+        if (!args[4]) {
+          const forAddress = await getApproveFor(args[0]);
+          args[4] = forAddress;
+        }
+
+        return await base.approveForMinter(...args);
+      } catch (e: any) {
+        if (
+          typeof e?.message === "string" &&
+          e.message.match(
+            /No matching record found for transaction id 0\.0\.\d+@\d+\.\d+/gi
+          )
+        ) {
+          return e.message.match(/0\.0\.\d+@\d+\.\d+/gi)?.at(0) || "";
+        }
+        throw e;
+      }
+    },
+    async transferNftToForeign(...args) {
+      const res = (await base.transferNftToForeign(...args)) as any;
+
+      if (
+        typeof res?.message === "string" &&
+        res.message.match(
+          /No matching record found for transaction id 0\.0\.\d+@\d+\.\d+/gi
+        )
+      ) {
+        const transactionId = sanifyTrx(
+          res.message.match(/0\.0\.\d+@\d+\.\d+/gi)?.at(0) || ""
+        );
+        if (!transactionId) {
+          throw new Error("Invalid trx id");
+        }
+        await params.notifier.notifyWeb3(params.nonce, transactionId);
+        return {
+          hash: transactionId,
+        };
       }
 
-      return base.approveForMinter(...args);
+      if (!res?.hash) {
+        throw new Error(res?.message || "Unknow error");
+      }
+
+      const transactionId = await params.hederaApi.getTranactionIdByHash(
+        res.hash
+      );
+      await params.notifier.notifyWeb3(params.nonce, transactionId);
+      return res;
     },
     async unfreezeWrappedNft(...args) {
       const id = args[2];
@@ -523,8 +599,37 @@ export const HederaHelperFactory = async (
         },
       };
 
-      return base.unfreezeWrappedNft(...args);
+      const res = (await base.unfreezeWrappedNft(...args)) as any;
+
+      if (
+        typeof res?.message === "string" &&
+        res?.message?.match(
+          /No matching record found for transaction id 0\.0\.\d+@\d+\.\d+/gi
+        )
+      ) {
+        const transactionId = sanifyTrx(
+          res.message.match(/0\.0\.\d+@\d+\.\d+/gi)?.at(0) || ""
+        );
+        if (!transactionId) {
+          throw new Error("Invalid trx id");
+        }
+        await params.notifier.notifyWeb3(params.nonce, transactionId);
+        return {
+          hash: transactionId,
+        };
+      }
+
+      if (!res?.hash) {
+        throw new Error(res?.message || "Unknow error");
+      }
+
+      const transactionId = await params.hederaApi.getTranactionIdByHash(
+        res.hash
+      );
+      await params.notifier.notifyWeb3(params.nonce, transactionId);
+      return res;
     },
+
     estimateUserStoreDeploy: async (signer: any) => {
       if (typeof base.estimateUserStoreDeploy === "function") {
         const amount = await base.estimateUserStoreDeploy(signer);
@@ -585,5 +690,6 @@ export const HederaHelperFactory = async (
     },
     associateToken,
     checkAndAssociate,
+    isNftWhitelisted,
   };
 };
