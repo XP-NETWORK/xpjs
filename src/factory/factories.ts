@@ -8,7 +8,6 @@ import { evNotifier } from "../services/notifier";
 import { Driver, SimpleNet } from "@vechain/connex-driver";
 import * as thor from "web3-providers-connex";
 import { Framework } from "@vechain/connex-framework";
-//import { hethers } from "@hashgraph/hethers";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import TonWeb from "tonweb";
@@ -35,21 +34,18 @@ import { hederaService } from "../services/hederaApi";
 // ];
 
 const middleware_uri = "https://notifier.xp.network";
-const testnet_middleware_uri =
-  "https://testnet-notifier.xp.network/notify-test/";
 
-const signature_service_uri_staging = "https://tools.xp.network/fee-oracle";
 const signature_service_uri_prod = "https://fee-validator.herokuapp.com";
-const sig_testnet_uri = "https://testnet-notifier.xp.network/oracle/";
-const sig = signatureService(sig_testnet_uri);
+
 const signatureSvc_prod = signatureService(signature_service_uri_prod);
-const signatureSvc_staging = signatureService(signature_service_uri_staging);
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 1, max: 5 };
-
-    const notifier = evNotifier(testnet_middleware_uri);
+    const testnet_oracle = signatureService(
+      "https://tools.xp.network/testnet-oracle/"
+    );
+    const notifier = evNotifier("https://tools.xp.network/testnet-notifier/");
 
     // VeChain related:
     const net = new SimpleNet(TestNetRpcUri.VECHAIN);
@@ -83,7 +79,7 @@ export namespace ChainFactoryConfigs {
         umt: "hash-23ecf377ab0de596cbda5b6e1cdfd230bad2f8eee688d7b5902bd560ffd96b4e",
         notifier,
         feeMargin,
-        sig,
+        sig: testnet_oracle,
       },
       tonParams: {
         tonweb: new TonWeb(
@@ -543,7 +539,10 @@ export namespace ChainFactoryConfigs {
 
   export const Staging: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin: FeeMargins = { min: 1, max: 5 };
-    const notifier = evNotifier("https://bridge1.xp.network/notifier");
+    const notifier = evNotifier("https://tools.xp.network/notifier");
+    const signatureSvc_staging = signatureService(
+      "https://tools.xp.network/fee-oracle"
+    );
 
     return {
       tonParams: {

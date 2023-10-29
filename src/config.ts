@@ -18,16 +18,16 @@ export namespace AppConfigs {
   };
   export const TestNet: () => AppConfig = () => {
     return {
-      exchangeRateUri: "https://testnet-notifier.xp.network/ex/exchange/",
-      nftListUri: "https://testnet-notifier.xp.network/testnet-indexer/",
-      whitelistedUri: "https://testnet-notifier.xp.network/",
+      exchangeRateUri: "https://tools.xp.network/exchange-rate/exchange/",
+      nftListUri: "https://tools.xp.network/testnet-indexer/",
+      whitelistedUri: "https://tools.xp.network/testnet-notifier/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
       txSocketUri: "https://testnet-tx-socket.herokuapp.com",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
       wrappedNftPrefix: "https://bridge-wnftapi.herokuapp.com/",
-      scVerifyUri: "https://testnet-sc-verify.herokuapp.com",
+      scVerifyUri: "https://tools.xp.network/testnet-sc-verify/",
       network: "testnet",
     };
   };
@@ -39,11 +39,11 @@ export namespace AppConfigs {
       whitelistedUri: "https://tools.xp.network/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
-      txSocketUri: "https://staging-tx-socket-925db65784a7.herokuapp.com/", //"https://bridge1.xp.network/tx-socket",
+      txSocketUri: "https://staging-tx-socket-925db65784a7.herokuapp.com/",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
       wrappedNftPrefix: "https://staging-nft.xp.network/w/",
-      scVerifyUri: "https://bridge1.xp.network/sc-verify",
+      scVerifyUri: "https://tools.xp.network/sc-verify",
       network: "staging",
     };
   };
