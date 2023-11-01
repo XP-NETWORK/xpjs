@@ -3,7 +3,7 @@ import { AppConfig, ChainFactory, ChainFactoryConfigs } from ".";
 export namespace AppConfigs {
   export const MainNet: () => AppConfig = () => {
     return {
-      exchangeRateUri: "https://testing-bridge-staging.xp.network/exchange/",
+      exchangeRateUri: "https://tools.xp.network/exchange-rate/exchange/",
       nftListUri: "https://nft-index.xp.network/index/",
       whitelistedUri: "https://nft-index.xp.network/",
       nftListAuthToken:
@@ -23,10 +23,10 @@ export namespace AppConfigs {
       whitelistedUri: "https://tools.xp.network/testnet-notifier/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1MjA4NzAwNiwiZXhwIjoxNjU5ODYzMDA2fQ.ERjXpljkyuklPTJCSXQXZ-Wh09oxQwA4u8HKIbIwO1TSajvLIlNgxseqBVEd5D4lkqXYGwcezkuezuRc3kKkKg",
-      txSocketUri: "https://testnet-tx-socket.herokuapp.com",
+      txSocketUri: "https://tools.xp.network/testnet-tx-socket", //"https://testnet-tx-socket.herokuapp.com",
       tronScanUri: "https://apilist.tronscan.org/api/",
-      heartbeatUri: "https://testnet-validator-pinger.herokuapp.com/",
-      wrappedNftPrefix: "https://bridge-wnftapi.herokuapp.com/",
+      heartbeatUri: "https://tools.xp.network/testnet-pinger/",
+      wrappedNftPrefix: "https://tools.xp.network/testnet-wnft/", //"https://bridge-wnftapi.herokuapp.com/",
       scVerifyUri: "https://tools.xp.network/testnet-sc-verify/",
       network: "testnet",
     };
@@ -34,15 +34,15 @@ export namespace AppConfigs {
 
   export const Staging: () => AppConfig = () => {
     return {
-      exchangeRateUri: "https://testing-bridge-staging.xp.network/exchange/",
-      nftListUri: "https://tools.xp.network/index",
-      whitelistedUri: "https://tools.xp.network/",
+      exchangeRateUri: "https://tools.xp.network/exchange-rate/exchange/",
+      nftListUri: "https://tools.xp.network/index/",
+      whitelistedUri: "https://tools.xp.network/notifier/",
       nftListAuthToken:
         "eyJhbGciOiJFUzI1NiJ9.eyJhdXRob3JpdHkiOjEsImlhdCI6MTY1Mjc5MTU1NiwiZXhwIjoxNjY4MzQzNTU2fQ.gOzLCBPNGFfjqLzSZsMes0yplAhsRiQYzidVfE-IYtQ-aVqQU6LhzKevLxYLudnm28F5_7CzTKsiuUginuLTtQ",
-      txSocketUri: "https://staging-tx-socket-925db65784a7.herokuapp.com/",
+      txSocketUri: "https://tools.xp.network/tx-socket/", //"https://staging-tx-socket-925db65784a7.herokuapp.com/",
       tronScanUri: "https://apilist.tronscan.org/api/",
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
-      wrappedNftPrefix: "https://staging-nft.xp.network/w/",
+      wrappedNftPrefix: "https://tools.xp.network/wnft/", //"https://staging-nft.xp.network/w/",
       scVerifyUri: "https://tools.xp.network/sc-verify",
       network: "staging",
     };
