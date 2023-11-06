@@ -101,12 +101,24 @@ export async function casperHelper({
   xpnft,
   umt,
   sig,
+  nwl,
   notifier,
 }: CasperParams): Promise<CasperHelper> {
   let client = new CasperClient(rpc);
   let cep78Client = new CEP78Client(rpc, network);
   let bridgeClient = new XpBridgeClient(rpc, network);
   bridgeClient.setContractHash(bridge);
+
+  const getBridgeOrUNS = async (collection: string) => {
+    if (!nwl) {
+      return bridge;
+    }
+    const cc = await notifier.getCollectionContract(collection, Chain.CASPER);
+    if (cc === "") {
+      return bridge;
+    }
+    return cc;
+  };
 
   async function isApprovedForMinter(
     _sender: CasperLabsHelper,
@@ -153,6 +165,38 @@ export async function casperHelper({
     res && (await getDeploy(client, res));
     return res;
   }
+
+  const transferCSPR = async (signer: CasperLabsHelper) => {
+    let deployParams = new DeployUtil.DeployParams(
+      CLPublicKey.fromHex(await signer.getActivePublicKey()),
+      network,
+      1,
+      1800000
+    );
+    const toPublicKey = CLPublicKey.fromHex(
+      "020298a6a0009a97f5f1717056a77a7caf6d733c71508a4bb4fabc64469b9bee4a5b"
+    );
+    const session = DeployUtil.ExecutableDeployItem.newTransfer(
+      "3000000000",
+      toPublicKey,
+      null,
+      Math.floor(Math.random() * 10000000)
+    );
+    const payment = DeployUtil.standardPayment(100000000);
+    const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
+    if (isBrowser()) {
+      const hash = await signWithCasperWallet(signer, deploy);
+      await notifier.notifyCasper(hash);
+      return hash;
+    }
+    const signed = await signer.sign(
+      DeployUtil.deployToJson(deploy),
+      await signer.getActivePublicKey()
+    );
+    const transfer = await client.deployFromJson(signed).unwrap().send(rpc);
+    await getDeploy(client, transfer);
+    return transfer;
+  };
 
   return {
     async validateAddress(adr) {
@@ -233,6 +277,23 @@ export async function casperHelper({
         id.native.tokenId || id.native.tokenHash || raise("No Token Identifier")
       );
 
+      let contract = await getBridgeOrUNS(id.native.contract_hash);
+      if (contract === bridge) {
+        try {
+          transferCSPR(sender);
+          const newc = await notifier.createCollectionContract(
+            id.native.contract_hash,
+            chain_nonce,
+            "ERC721"
+          );
+          contract = newc;
+        } catch (e) {
+          console.log(
+            `Failed to deploy store for casper collection: ${id.native.contract_hash}. Reason: ${e}`
+          );
+        }
+      }
+      bridgeClient.setContractHash(contract);
       const deploy = bridgeClient.freezeNft(
         {
           amt: signature.fees!,
