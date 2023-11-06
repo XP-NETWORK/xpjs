@@ -1,5 +1,5 @@
 import { CasperClient } from "casper-js-sdk";
-import { BalanceCheck, ChainNonceGet, EstimateTxFees, FeeMargins, GetExtraFees, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
+import { BalanceCheck, ChainNonceGet, EstimateDeployFees, EstimateTxFees, FeeMargins, GetExtraFees, GetFeeMargins, GetProvider, MintNft, NftInfo, PreTransfer, TransferNftForeign, UnfreezeForeignNft, ValidateAddress } from "../chain";
 import { CasperLabsHelper } from "casper-js-sdk/dist/@types/casperlabsSigner";
 import { AsymmetricKey } from "casper-js-sdk/dist/lib/Keys";
 import { EvNotifier } from "../../services/notifier";
@@ -13,6 +13,7 @@ export interface CasperParams {
     umt: string;
     feeMargin: FeeMargins;
     sig: SignatureService;
+    nwl: boolean;
 }
 export interface CasperNFT {
     tokenId?: string;
@@ -32,8 +33,8 @@ export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<Caspe
     isApprovedForMinter(sender: CasperLabsHelper, nft: NftInfo<CasperNFT>): Promise<boolean>;
 } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> & UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> & EstimateTxFees<CasperNFT> & {
     XpNft: string;
-} & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & CasperBrowserAdapt;
-export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, umt, sig, notifier, }: CasperParams): Promise<CasperHelper>;
+} & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & CasperBrowserAdapt & EstimateDeployFees;
+export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, umt, sig, nwl, notifier, }: CasperParams): Promise<CasperHelper>;
 export declare function CasperHelperFromKeys(keys: AsymmetricKey): CasperLabsHelper;
 export {};
 //# sourceMappingURL=casper.d.ts.map
