@@ -445,5 +445,11 @@ export async function web3ERC20HelperFactory(
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
     },
+    async lockNFT() {
+      return undefined;
+    },
+    async claimV3NFT() {
+      return undefined;
+    },
   };
 }

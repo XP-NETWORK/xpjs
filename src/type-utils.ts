@@ -1,4 +1,4 @@
-import { MetaMap, TransferNftForeign } from ".";
+import { MetaMap, TransferNftForeign, v3_ChainId } from ".";
 
 type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -7,6 +7,7 @@ type TransferNftChain<Signer, RawNft, Resp> = TransferNftForeign<
 >;
 
 export type ChainNonce = keyof MetaMap;
+export type V3_ChainId = `${v3_ChainId}`;
 
 export type InferChainParam<K extends ChainNonce> = MetaMap[K][1];
 export type InferChainH<K extends ChainNonce> = MetaMap[K][0];

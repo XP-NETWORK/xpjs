@@ -13,6 +13,8 @@ export namespace AppConfigs {
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
       wrappedNftPrefix: "https://nft.xp.network/w/",
       scVerifyUri: "https://sc-verify.xp.network",
+      storageContract: "",
+      storegeNetwork: "",
       network: "mainnet",
     };
   };
@@ -28,6 +30,8 @@ export namespace AppConfigs {
       heartbeatUri: "https://tools.xp.network/testnet-pinger/",
       wrappedNftPrefix: "https://tools.xp.network/testnet-wnft/", //"https://bridge-wnftapi.herokuapp.com/",
       scVerifyUri: "https://tools.xp.network/testnet-sc-verify/",
+      storageContract: "0x5bB1EdcACf79F59Dfa9d0e054847B33eb20d2AA4",
+      storegeNetwork: "https://optimism-goerli.publicnode.com",
       network: "testnet",
     };
   };
@@ -44,6 +48,8 @@ export namespace AppConfigs {
       heartbeatUri: "https://xpheartbeat.herokuapp.com",
       wrappedNftPrefix: "https://tools.xp.network/wnft/", //"https://staging-nft.xp.network/w/",
       scVerifyUri: "https://tools.xp.network/sc-verify",
+      storageContract: "",
+      storegeNetwork: "",
       network: "staging",
     };
   };

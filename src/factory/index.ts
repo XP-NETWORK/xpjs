@@ -1,7 +1,7 @@
 import { Chain, CHAIN_INFO, ChainType } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
-import { Web3Params } from "../helpers/evm/web3";
+import { Web3Params, getClaimFee } from "../helpers/evm/web3";
 
 export * from "./utils";
 export * from "./factories";
@@ -48,6 +48,8 @@ import {
   UnfreezeForeignNftBatch,
   WhitelistCheck,
   GetExtraFees,
+  LockNFT,
+  ClaimV3NFT,
 } from "../helpers/chain";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import {
@@ -88,7 +90,9 @@ export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   EstimateDeployFees &
   ChainNonceGet &
   ValidateAddress & { XpNft: string; XpNft1155?: string } & GetFeeMargins &
-  GetExtraFees;
+  GetExtraFees &
+  LockNFT<Signer, RawNft, Resp> &
+  ClaimV3NFT<Signer, Resp>;
 
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> &
   TransferNftForeignBatch<Signer, RawNft, Resp> &
@@ -298,6 +302,27 @@ export type ChainFactory = {
   ): Promise<{ success: true }>;
 
   hederaGetMintedCollection(from: number, receiver: string): Promise<any[]>;
+
+  lockNFT<SignerF, RawNftF, Resp>(
+    fromChain: FullChain<SignerF, RawNftF, Resp>,
+    toChain: FullChain<never, unknown, unknown>,
+    nft: NftInfo<RawNftF>,
+    sender: SignerF,
+    receiver: string,
+    fee?: BigNumber.Value
+  ): Promise<Resp | undefined>;
+
+  claimNFT<SignerF, RawNftF, Resp>(
+    fromChain: FullChain<never, unknown, unknown>,
+    toChain: FullChain<SignerF, RawNftF, Resp>,
+    txHash: string,
+    sender: SignerF,
+    fee: string | undefined
+  ): Promise<Resp | undefined>;
+
+  estimateClaimFee(
+    fromChain: FullChain<never, unknown, unknown>
+  ): Promise<string>;
 };
 
 /**
@@ -367,6 +392,8 @@ export interface AppConfig {
   tronScanUri: string;
   wrappedNftPrefix: string;
   scVerifyUri: string;
+  storageContract: string;
+  storegeNetwork: string;
   network: "testnet" | "mainnet" | "staging";
 }
 
@@ -709,23 +736,13 @@ export function ChainFactory(
     return res?.data;
   }
 
-  /*async function checkMintWith(
-        from: string,
-        to: string,
-        targetChain: number,
-        fromChain: number,
-        tokenId?: string
-    ): Promise<boolean> {
-        const res = await scVerifyRest.verify(
-            from,
-            to,
-            targetChain,
-            fromChain,
-            tokenId
-        );
-
-        return res?.data.data == "allowed";
-    }*/
+  const estimateClaimFee = async (
+    fromChain: FullChain<never, unknown, unknown>
+  ) => {
+    const v3_chainId = CHAIN_INFO.get(fromChain.getNonce())!.v3_chainId;
+    if (!v3_chainId) return "0";
+    return await getClaimFee(v3_chainId, appConfig);
+  };
 
   return {
     estimateWithContractDep,
@@ -1094,5 +1111,19 @@ export function ChainFactory(
     },
     isWrappedNft,
     setProvider,
+    async lockNFT(from, to, nft, signer, receiver) {
+      const toChain = CHAIN_INFO.get(to.getNonce());
+      if (!toChain?.v3_chainId) {
+        throw new Error(`Chain ${toChain?.name} is not supported in Bridge v3`);
+      }
+
+      return await from.lockNFT(signer, toChain.v3_chainId, nft, receiver);
+    },
+    async claimNFT(from, to, txHash, signer, fee) {
+      const fromChain = CHAIN_INFO.get(from.getNonce())!;
+      if (!fee) fee = await estimateClaimFee(from);
+      return await to.claimV3NFT(signer, fromChain.v3_chainId, txHash, fee);
+    },
+    estimateClaimFee,
   };
 }

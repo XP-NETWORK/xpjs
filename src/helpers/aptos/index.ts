@@ -1,6 +1,5 @@
 import {
   ChainNonceGet,
-  ClaimNFT,
   EstimateTxFees,
   FeeMargins,
   GetFeeMargins,
@@ -54,6 +53,10 @@ export type AptosClaimArgs = {
   creator: string;
   name: string;
 };
+
+interface ClaimNFT<Signer, ClaimArgs, Ret> {
+  claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;
+}
 
 export type AptosHelper = ChainNonceGet &
   TransferNftForeign<AptosAccount, AptosNFT, string> &

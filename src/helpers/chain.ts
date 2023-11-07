@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
-import { ChainNonce } from "../type-utils";
+import { ChainNonce, V3_ChainId } from "../type-utils";
 
 /**
  * NFT Info
@@ -52,6 +52,24 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
     gasLimit?: ethers.BigNumberish | undefined,
     gasPrice?: ethers.BigNumberish | undefined,
     toParams?: any
+  ): Promise<Resp | undefined>;
+}
+
+export interface LockNFT<Signer, RawNft, Resp> {
+  lockNFT(
+    sender: Signer,
+    toChain: V3_ChainId,
+    id: NftInfo<RawNft>,
+    receiver: string
+  ): Promise<Resp | undefined>;
+}
+
+export interface ClaimV3NFT<Signer, Resp> {
+  claimV3NFT(
+    sender: Signer,
+    fromChain: V3_ChainId,
+    txHash: string,
+    fee?: string
   ): Promise<Resp | undefined>;
 }
 
@@ -238,8 +256,4 @@ export interface GetFeeMargins {
 
 export interface GetExtraFees {
   getExtraFees(toNonce: number): BigNumber;
-}
-
-export interface ClaimNFT<Signer, ClaimArgs, Ret> {
-  claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;
 }

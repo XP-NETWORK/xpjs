@@ -43,7 +43,6 @@ import { UserNFTStore__factory } from "xpnet-web3-contracts/dist/factories/UserS
 import { UserNFTStore } from "xpnet-web3-contracts/dist/UserStore.sol";
 
 import { UserNFTStore__factory as UserNFTStore721__factory } from "xpnet-web3-contracts/dist/factories/UserNFTStore721.sol/index";
-//import { UserNFTStore as b } from "xpnet-web3-contracts/dist/UserNFTStore721.sol";
 
 import {
   ChainNonceGet,
@@ -57,11 +56,17 @@ import {
   TransactionStatus,
   ValidateAddress,
   WhitelistCheck,
+  LockNFT,
+  ClaimV3NFT,
+  AppConfig,
 } from "../..";
-import { ChainNonce } from "../../type-utils";
+import { ChainNonce, V3_ChainId } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
 import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
+
+import { Bridge__factory as V3Bridge__factory } from "xpnet-web3-contracts/dist/v3/factories/contracts/Bridge__factory";
+import { BridgeStorage__factory } from "xpnet-web3-contracts/dist/v3/factories/contracts/BridgeStorage__factory";
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -188,7 +193,9 @@ export type Web3Helper = BaseWeb3Helper &
   IsContractAddress &
   GetTokenURI &
   ParamsGetter<Web3Params> &
-  UserStore;
+  UserStore &
+  LockNFT<Signer, EthNftInfo, TransactionResponse> &
+  ClaimV3NFT<Signer, TransactionResponse>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -264,6 +271,7 @@ export interface Web3Params {
   nonce: ChainNonce;
   feeMargin: FeeMargins;
   noWhitelist?: boolean;
+  v3_bridge?: string;
 }
 
 type NftMethodVal<T, Tx> = {
@@ -977,5 +985,74 @@ export async function web3HelperFactory(
     isNftWhitelisted(nft) {
       return minter.nftWhitelist(nft.native.contract);
     },
+    async lockNFT(signer, to, id, receiver) {
+      const bridge = V3Bridge__factory.connect(
+        params.v3_bridge!,
+        params.provider
+      );
+
+      const tx = await bridge.populateTransaction.lock721(
+        id.tokenId,
+        to,
+        receiver,
+        id.native.contract
+      );
+
+      console.log(tx);
+
+      const lockTx = await signer.sendTransaction(tx);
+
+      await lockTx.wait();
+      return lockTx;
+    },
+    async claimV3NFT(signer, from, txHash, fee) {
+      const bridge = V3Bridge__factory.connect(
+        params.v3_bridge!,
+        params.provider
+      );
+      console.log(signer, from, fee);
+      const destTrx = await provider
+        .getTransactionReceipt(txHash)
+        .catch((e) => {
+          throw new Error(e.message || e);
+        });
+      console.log(destTrx);
+      const x = bridge.interface.getEvent("Locked");
+      console.log(x, "xxx");
+      /*const log = destTrx.logs.find((log) =>
+                log.topics.includes(topicHash)
+            );
+            if (!log) {
+                throw new Error("Failed to decode destTrx logs at " + txHash);
+            }
+
+            //@ts-ignore
+            const parsed = bridge.interface.parseLog(log);
+            const tokenId = String(parsed.args[0]);
+            const destinationChain = parsed.args[1];
+            const destinationUserAddress = parsed.args[2];
+            const sourceNftContractAddress = parsed.args[3];
+            const tokenAmount = String(parsed.args[4]);
+            const nftType = parsed.args[5];
+            const sourceChain = parsed.args[6];
+
+            const erc721 = UserNftMinter__factory.connect(
+                sourceNftContractAddress,
+                provider
+            );*/
+      return undefined;
+      //const [name, symbol] = await Promise([erc721.ge]);
+    },
   };
 }
+
+export const getClaimFee = async (toChain: V3_ChainId, config: AppConfig) => {
+  const provider = new ethers.providers.JsonRpcProvider(config.storegeNetwork);
+  const storageContract = BridgeStorage__factory.connect(
+    config.storageContract,
+    provider
+  );
+  const fee = await storageContract.chainFee(toChain);
+
+  return String(fee);
+};
