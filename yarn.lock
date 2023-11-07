@@ -2599,13 +2599,14 @@ algo-msgpack-with-bigint@^2.1.1:
   resolved "https://registry.yarnpkg.com/algo-msgpack-with-bigint/-/algo-msgpack-with-bigint-2.1.1.tgz#38bb717220525b3ff42232eefdcd9efb9ad405d6"
   integrity sha512-F1tGh056XczEaEAqu7s+hlZUDWwOBT70Eq0lfMpBP2YguSQVyxRbprLq5rELXKQOyOaixTWYhMeMQMzP0U5FoQ==
 
-algosdk@^2.2.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/algosdk/-/algosdk-2.7.0.tgz#6ebab130d25fc3cb4c74dce4d8753c7e86db1404"
-  integrity sha512-sBE9lpV7bup3rZ+q2j3JQaFAE9JwZvjWKX00vPlG8e9txctXbgLL56jZhSWZndqhDI9oI+0P4NldkuQIWdrUyg==
+algosdk@=2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/algosdk/-/algosdk-2.2.0.tgz#12f80b5f68c955b338aa5b9d5fc6cbd64ce6ea7a"
+  integrity sha512-FG3u/60DzjMK9Cffy9itst7WcfsTgZKfsD1r8pT33PfsA7r8NoXiUSL7cf0fNWFus6S3E14BpE2CY64VJ8KV1A==
   dependencies:
     algo-msgpack-with-bigint "^2.1.1"
     buffer "^6.0.3"
+    cross-fetch "^3.1.5"
     hi-base32 "^0.5.1"
     js-sha256 "^0.9.0"
     js-sha3 "^0.8.0"
