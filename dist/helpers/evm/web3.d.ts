@@ -7,9 +7,10 @@ import { BalanceCheck, EstimateTxFeesBatch, EstimateDeployFees, UserStore, FeeMa
 import { ContractTransaction, ethers, PopulatedTransaction, providers, Signer, Wallet } from "ethers";
 import { Provider, TransactionResponse } from "@ethersproject/providers";
 import { Erc1155Minter, Erc1155Minter__factory, UserNftMinter, UserNftMinter__factory } from "xpnet-web3-contracts";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck } from "../..";
+import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, GetTokenURI, NftInfo, PreTransfer, PreTransferRawTxn, ValidateAddress, WhitelistCheck, LockNFT, GetClaimData, ClaimV3NFT } from "../..";
 import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
+import { Bridge as V3Bridge } from "xpnet-web3-contracts/dist/v3";
 /**
  * Information required to perform NFT transfers in this chain
  */
@@ -71,7 +72,7 @@ export type Web3Helper = BaseWeb3Helper & TransferNftForeign<Signer, EthNftInfo,
 } & Pick<PreTransfer<Signer, EthNftInfo, string, ExtraArgs>, "preTransfer"> & PreTransferRawTxn<EthNftInfo, PopulatedTransaction> & ExtractTxnStatus & GetProvider<providers.Provider> & {
     XpNft: string;
     XpNft1155: string;
-} & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params> & UserStore;
+} & WhitelistCheck<EthNftInfo> & GetFeeMargins & IsContractAddress & GetTokenURI & ParamsGetter<Web3Params> & UserStore & LockNFT<Signer, EthNftInfo, TransactionResponse> & ClaimV3NFT<Signer, TransactionResponse> & GetClaimData<V3Bridge>;
 /**
  * Create an object implementing minimal utilities for a web3 chain
  *
@@ -96,6 +97,7 @@ export interface Web3Params {
     nonce: ChainNonce;
     feeMargin: FeeMargins;
     noWhitelist?: boolean;
+    v3_bridge?: string;
 }
 type NftMethodVal<T, Tx> = {
     freeze: "freezeErc1155" | "freezeErc721";

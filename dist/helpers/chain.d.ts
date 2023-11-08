@@ -1,6 +1,8 @@
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
-import { ChainNonce } from "../type-utils";
+import { ChainNonce, V3_ChainId } from "../type-utils";
+import { FullChain } from "../factory";
+import { BridgeStorage } from "xpnet-web3-contracts/dist/v3";
 /**
  * NFT Info
  */
@@ -30,6 +32,29 @@ export interface PreTransfer<Signer, Nft, Ret, ExtraArgs> {
  */
 export interface TransferNftForeign<Signer, RawNft, Resp> {
     transferNftToForeign(sender: Signer, chain_nonce: ChainNonce, to: string, id: NftInfo<RawNft>, txFees: BigNumber, mintWith: string, gasLimit?: ethers.BigNumberish | undefined, gasPrice?: ethers.BigNumberish | undefined, toParams?: any): Promise<Resp | undefined>;
+}
+export interface LockNFT<Signer, RawNft, Resp> {
+    lockNFT(sender: Signer, toChain: V3_ChainId, id: NftInfo<RawNft>, receiver: string): Promise<Resp | undefined>;
+}
+export type ClaimData = {
+    tokenId: string;
+    destinationChain: V3_ChainId;
+    destinationUserAddress: string;
+    sourceNftContractAddress: string;
+    tokenAmount: string;
+    nftType: "singular" | "multiple";
+    sourceChain: V3_ChainId;
+    royalty: string;
+    royaltyReceiver: string;
+    metadata: string;
+    name: string;
+    symbol: string;
+};
+export interface GetClaimData<BridgeType> {
+    getClaimData(hash: string, bridge: BridgeType): Promise<ClaimData>;
+}
+export interface ClaimV3NFT<Signer, Resp> {
+    claimV3NFT(sender: Signer, fromChain: FullChain<never, unknown, unknown>, txHash: string, storageContract: BridgeStorage, fee: string): Promise<Resp | undefined>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)
@@ -136,8 +161,5 @@ export interface GetFeeMargins {
 }
 export interface GetExtraFees {
     getExtraFees(toNonce: number): BigNumber;
-}
-export interface ClaimNFT<Signer, ClaimArgs, Ret> {
-    claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;
 }
 //# sourceMappingURL=chain.d.ts.map

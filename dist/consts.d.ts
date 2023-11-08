@@ -199,6 +199,12 @@ export declare namespace Chain {
     const BASE = 43;
     const FINDORA = 44;
 }
+export declare enum v3_ChainId {
+    BSC = "BSC",
+    POLYGON = "MATIC",
+    ETHEREUM = "ETH",
+    DEFAULT = ""
+}
 interface ChainData<T extends ChainNonce> {
     name: string;
     nonce: number;
@@ -211,6 +217,7 @@ interface ChainData<T extends ChainNonce> {
     currency: SupportedCurrency;
     currencySymbol: SupportedCurrencyName;
     type: string;
+    v3_chainId: `${v3_ChainId}`;
     blockExplorerUrlAddr?: string;
     blockExplorerUrlCollection?: string;
     tnBlockExplorerUrlCollection?: string;

@@ -9,7 +9,7 @@ import { Wallet } from "@hashgraph/hethers";
 import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { AptosParams } from "../helpers/aptos";
-import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck, GetExtraFees } from "../helpers/chain";
+import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck, GetExtraFees, LockNFT, ClaimV3NFT } from "../helpers/chain";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { SecretParams } from "../helpers/secret";
@@ -17,12 +17,13 @@ import { SolanaParams } from "../helpers/solana";
 import { TezosParams } from "../helpers/tezos";
 import { TonParams } from "../helpers/ton/ton";
 import { Web3ERC20Params } from "../helpers/evm/web3_erc20";
-import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner } from "../type-utils";
+import { ChainNonce, InferChainH, InferChainParam, InferNativeNft, InferSigner, V3_ChainId } from "../type-utils";
 import { CasperParams } from "../helpers/casper/casper";
+import { BridgeStorage } from "xpnet-web3-contracts/dist/v3";
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<Signer, RawNft, Resp> & UnfreezeForeignNft<Signer, RawNft, Resp> & EstimateTxFees<RawNft> & EstimateDeployFees & ChainNonceGet & ValidateAddress & {
     XpNft: string;
     XpNft1155?: string;
-} & GetFeeMargins & GetExtraFees;
+} & GetFeeMargins & GetExtraFees & LockNFT<Signer, RawNft, Resp> & ClaimV3NFT<Signer, Resp>;
 type FullChainBatch<Signer, RawNft, Resp> = FullChain<Signer, RawNft, Resp> & TransferNftForeignBatch<Signer, RawNft, Resp> & UnfreezeForeignNftBatch<Signer, RawNft, Resp> & EstimateTxFeesBatch<RawNft>;
 /**
  * A type representing a chain factory.
@@ -130,6 +131,9 @@ export type ChainFactory = {
         success: true;
     }>;
     hederaGetMintedCollection(from: number, receiver: string): Promise<any[]>;
+    lockNFT<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value): Promise<Resp | undefined>;
+    claimNFT<SignerF, RawNftF, Resp>(fromChain: FullChain<never, unknown, unknown>, toChain: FullChain<SignerF, RawNftF, Resp>, txHash: string, sender: SignerF, fee: string | undefined): Promise<Resp | undefined>;
+    estimateClaimFee(fromChain: FullChain<never, unknown, unknown>, storageContract: BridgeStorage | undefined): Promise<string>;
 };
 /**
  * A type representing all the supported chain params.
@@ -196,6 +200,8 @@ export interface AppConfig {
     tronScanUri: string;
     wrappedNftPrefix: string;
     scVerifyUri: string;
+    storageContract: string;
+    storegeNetwork: string;
     network: "testnet" | "mainnet" | "staging";
 }
 /**
@@ -204,5 +210,7 @@ export interface AppConfig {
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
+export declare const getStorageContract: (config: AppConfig) => BridgeStorage;
+export declare const getClaimFee: (toChain: V3_ChainId, storageContract: BridgeStorage) => Promise<string>;
 export declare function ChainFactory(appConfig: AppConfig, chainParams: Partial<ChainParams>): ChainFactory;
 //# sourceMappingURL=index.d.ts.map

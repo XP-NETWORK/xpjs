@@ -1,4 +1,4 @@
-import { ChainNonceGet, ClaimNFT, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "../chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "../chain";
 import { AptosAccount, AptosClient, HexString } from "aptos";
 import { EvNotifier } from "../../services/notifier";
 export type AptosNFT = {
@@ -28,6 +28,9 @@ export type AptosClaimArgs = {
     creator: string;
     name: string;
 };
+interface ClaimNFT<Signer, ClaimArgs, Ret> {
+    claimNFT(signer: Signer, args: ClaimArgs): Promise<Ret>;
+}
 export type AptosHelper = ChainNonceGet & TransferNftForeign<AptosAccount, AptosNFT, string> & UnfreezeForeignNft<AptosAccount, AptosNFT, string> & EstimateTxFees<AptosNFT> & ValidateAddress & {
     XpNft: string;
 } & GetFeeMargins & MintNft<AptosAccount, AptosMintArgs, string> & GetProvider<AptosClient> & ClaimNFT<AptosAccount, AptosClaimArgs, string> & BalanceCheck & {
@@ -42,4 +45,5 @@ export type AptosParams = {
     network: "mainnet" | "staging" | "testnet";
 };
 export declare function aptosHelper({ feeMargin, rpcUrl, xpnft, bridge, notifier, network, }: AptosParams): Promise<AptosHelper>;
+export {};
 //# sourceMappingURL=index.d.ts.map
