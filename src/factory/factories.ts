@@ -319,6 +319,7 @@ export namespace ChainFactoryConfigs {
         erc1155Minter: "0xE90105827d04522e52AdfA6BF695730E5706C0C2",
         erc721Minter: "0x90d38996B210D45bDF2FD54d091C6061dff0dA9F",
         minter_addr: "0x04a5f9158829Cae5a0a549954AdEaBD47BbB3d2d",
+        v3_bridge: "0x7935f469298002c0Fb11F853B415B08aDCaC9Cf7",
         nonce: Chain.ETHEREUM,
         feeMargin,
       },

@@ -451,5 +451,8 @@ export async function web3ERC20HelperFactory(
     async claimV3NFT() {
       return undefined;
     },
+    async getClaimData() {
+      return undefined as any;
+    },
   };
 }

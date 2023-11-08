@@ -240,6 +240,7 @@ export namespace Chain {
 export enum v3_ChainId {
   BSC = "BSC",
   POLYGON = "MATIC",
+  ETHEREUM = "ETH",
   DEFAULT = "",
 }
 
@@ -329,7 +330,7 @@ CHAIN_INFO.set(Chain.BSC, {
 CHAIN_INFO.set(Chain.ETHEREUM, {
   name: "Ethereum",
   nonce: 5,
-  v3_chainId: v3_ChainId.DEFAULT,
+  v3_chainId: v3_ChainId.ETHEREUM,
   currency: SupportedCurrency.ETH,
   currencySymbol: SupportedCurrencyName.ETH,
   chainId: 5,

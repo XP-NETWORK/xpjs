@@ -1,7 +1,7 @@
 import { Chain, CHAIN_INFO, ChainType } from "../consts";
 import { ElrondParams } from "../helpers/elrond";
 import { TronParams } from "../helpers/tron";
-import { Web3Params, getClaimFee } from "../helpers/evm/web3";
+import { Web3Params } from "../helpers/evm/web3";
 
 export * from "./utils";
 export * from "./factories";
@@ -71,6 +71,7 @@ import {
   InferNativeNft,
   InferSigner,
   ParamMap,
+  V3_ChainId,
 } from "../type-utils";
 import {
   getDefaultContract,
@@ -79,6 +80,8 @@ import {
 } from "./utils";
 
 import { CasperParams } from "../helpers/casper/casper";
+import { BridgeStorage__factory } from "xpnet-web3-contracts/dist/v3/factories/contracts/BridgeStorage__factory";
+import { BridgeStorage } from "xpnet-web3-contracts/dist/v3";
 
 export type FullChain<Signer, RawNft, Resp> = TransferNftForeign<
   Signer,
@@ -321,7 +324,8 @@ export type ChainFactory = {
   ): Promise<Resp | undefined>;
 
   estimateClaimFee(
-    fromChain: FullChain<never, unknown, unknown>
+    fromChain: FullChain<never, unknown, unknown>,
+    storageContract: BridgeStorage | undefined
   ): Promise<string>;
 };
 
@@ -449,6 +453,26 @@ function mapNonceToParams(chainParams: Partial<ChainParams>): ParamMap {
  * @param chainParams: {@link ChainParams} Contains the details for all the chains to mint and transfer NFTs between them.
  * @returns {ChainFactory}: A factory object that can be used to mint and transfer NFTs between chains.
  */
+
+export const getStorageContract = (config: AppConfig) => {
+  const provider = new ethers.providers.JsonRpcProvider(config.storegeNetwork);
+  const storageContract = BridgeStorage__factory.connect(
+    config.storageContract,
+    provider
+  );
+
+  return storageContract;
+};
+
+export const getClaimFee = async (
+  toChain: V3_ChainId,
+  storageContract: BridgeStorage
+) => {
+  const fee = await storageContract.chainFee(toChain);
+
+  return String(fee);
+};
+
 export function ChainFactory(
   appConfig: AppConfig,
   chainParams: Partial<ChainParams>
@@ -737,11 +761,15 @@ export function ChainFactory(
   }
 
   const estimateClaimFee = async (
-    fromChain: FullChain<never, unknown, unknown>
+    fromChain: FullChain<never, unknown, unknown>,
+    storageContract: BridgeStorage | undefined
   ) => {
+    if (!storageContract) {
+      storageContract = getStorageContract(appConfig);
+    }
     const v3_chainId = CHAIN_INFO.get(fromChain.getNonce())!.v3_chainId;
     if (!v3_chainId) return "0";
-    return await getClaimFee(v3_chainId, appConfig);
+    return await getClaimFee(v3_chainId, storageContract);
   };
 
   return {
@@ -1120,9 +1148,10 @@ export function ChainFactory(
       return await from.lockNFT(signer, toChain.v3_chainId, nft, receiver);
     },
     async claimNFT(from, to, txHash, signer, fee) {
-      const fromChain = CHAIN_INFO.get(from.getNonce())!;
-      if (!fee) fee = await estimateClaimFee(from);
-      return await to.claimV3NFT(signer, fromChain.v3_chainId, txHash, fee);
+      const storageContract = getStorageContract(appConfig);
+      if (!fee) fee = await estimateClaimFee(from, storageContract);
+
+      return await to.claimV3NFT(signer, from, txHash, storageContract, fee);
     },
     estimateClaimFee,
   };

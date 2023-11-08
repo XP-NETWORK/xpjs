@@ -57,16 +57,21 @@ import {
   ValidateAddress,
   WhitelistCheck,
   LockNFT,
+  GetClaimData,
   ClaimV3NFT,
-  AppConfig,
+  CHAIN_INFO,
 } from "../..";
-import { ChainNonce, V3_ChainId } from "../../type-utils";
+import { ChainNonce } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
 import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
 
-import { Bridge__factory as V3Bridge__factory } from "xpnet-web3-contracts/dist/v3/factories/contracts/Bridge__factory";
-import { BridgeStorage__factory } from "xpnet-web3-contracts/dist/v3/factories/contracts/BridgeStorage__factory";
+import {
+  Bridge__factory as V3Bridge__factory,
+  Bridge as V3Bridge,
+  ERC721Royalty__factory,
+  ERC1155Royalty__factory,
+} from "xpnet-web3-contracts/dist/v3";
 
 /**
  * Information required to perform NFT transfers in this chain
@@ -195,7 +200,8 @@ export type Web3Helper = BaseWeb3Helper &
   ParamsGetter<Web3Params> &
   UserStore &
   LockNFT<Signer, EthNftInfo, TransactionResponse> &
-  ClaimV3NFT<Signer, TransactionResponse>;
+  ClaimV3NFT<Signer, TransactionResponse> &
+  GetClaimData<V3Bridge>;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -992,7 +998,7 @@ export async function web3HelperFactory(
       );
 
       const tx = await bridge.populateTransaction.lock721(
-        id.tokenId,
+        BigInt(id.native.tokenId),
         to,
         receiver,
         id.native.contract
@@ -1003,56 +1009,145 @@ export async function web3HelperFactory(
       const lockTx = await signer.sendTransaction(tx);
 
       await lockTx.wait();
+
       return lockTx;
     },
-    async claimV3NFT(signer, from, txHash, fee) {
-      const bridge = V3Bridge__factory.connect(
-        params.v3_bridge!,
-        params.provider
-      );
-      console.log(signer, from, fee);
-      const destTrx = await provider
-        .getTransactionReceipt(txHash)
-        .catch((e) => {
-          throw new Error(e.message || e);
+    async getClaimData(hash, bridge) {
+      const getTx = (hash: string) =>
+        new Promise(async (resolve, reject) => {
+          let tx: ethers.providers.TransactionReceipt | undefined;
+          const tm = setTimeout(() => reject("Time out on getTx "), 120 * 1000);
+          while (!tx) {
+            await new Promise((r) => setTimeout(r, 5000));
+            tx = await provider
+              .getTransactionReceipt(hash)
+              .catch(() => undefined);
+          }
+          clearTimeout(tm);
+          resolve(tx);
         });
-      console.log(destTrx);
-      const x = bridge.interface.getEvent("Locked");
-      console.log(x, "xxx");
-      /*const log = destTrx.logs.find((log) =>
-                log.topics.includes(topicHash)
-            );
-            if (!log) {
-                throw new Error("Failed to decode destTrx logs at " + txHash);
-            }
 
-            //@ts-ignore
-            const parsed = bridge.interface.parseLog(log);
-            const tokenId = String(parsed.args[0]);
-            const destinationChain = parsed.args[1];
-            const destinationUserAddress = parsed.args[2];
-            const sourceNftContractAddress = parsed.args[3];
-            const tokenAmount = String(parsed.args[4]);
-            const nftType = parsed.args[5];
-            const sourceChain = parsed.args[6];
+      const destTrx = (await getTx(
+        hash
+      )) as ethers.providers.TransactionReceipt;
 
-            const erc721 = UserNftMinter__factory.connect(
-                sourceNftContractAddress,
-                provider
-            );*/
-      return undefined;
-      //const [name, symbol] = await Promise([erc721.ge]);
+      const log = destTrx.logs.find(
+        (log) => log.address.toLowerCase() === params.v3_bridge!.toLowerCase()
+      );
+      if (!log) {
+        throw new Error("Failed to decode destTrx logs at " + hash);
+      }
+      const parsed = bridge.interface.parseLog(log);
+
+      const decoded = {
+        tokenId: String(parsed.args[0]),
+        destinationChain: parsed.args[1],
+        destinationUserAddress: parsed.args[2],
+        sourceNftContractAddress: parsed.args[3],
+        tokenAmount: String(parsed.args[4]),
+        nftType: parsed.args[5],
+        sourceChain: parsed.args[5],
+      };
+
+      const singular = decoded.nftType === "singular";
+
+      const salePriceToGetTotalRoyalityPercentage = 10000;
+      let royalty: string = String(BigInt("0")); // set default royalty 0
+      let royaltyReceiver = "0x0000000000000000000000000000000000000000"; // set default reciever none
+      let metadata = ""; // set default matadata empty
+      let name = ""; // set empty default name
+      let symbol = ""; // set empty default symbol
+
+      if (singular) {
+        const _contract = ERC721Royalty__factory.connect(
+          decoded.sourceNftContractAddress,
+          provider
+        );
+
+        const results = await Promise.allSettled([
+          _contract.name(),
+          _contract.symbol(),
+          _contract.royaltyInfo(
+            ethers.BigNumber.from(decoded.tokenId),
+            ethers.BigNumber.from(salePriceToGetTotalRoyalityPercentage)
+          ),
+          _contract.tokenURI(ethers.BigNumber.from(decoded.tokenId)),
+        ]);
+        name = results[0].status === "fulfilled" ? results[0].value : name;
+        symbol = results[1].status === "fulfilled" ? results[1].value : symbol;
+        royaltyReceiver =
+          results[2].status === "fulfilled"
+            ? results[2].value[0]
+            : royaltyReceiver;
+        royalty =
+          results[2].status === "fulfilled"
+            ? results[2].value[1].toString()
+            : royalty;
+        metadata =
+          results[3].status === "fulfilled" ? results[3].value : metadata;
+      }
+
+      if (!singular) {
+        const _contract = ERC1155Royalty__factory.connect(
+          decoded.sourceNftContractAddress,
+          provider
+        );
+
+        const results = await Promise.allSettled([
+          _contract.royaltyInfo(
+            ethers.BigNumber.from(decoded.tokenId),
+            ethers.BigNumber.from(salePriceToGetTotalRoyalityPercentage)
+          ),
+          _contract.uri(ethers.BigNumber.from(decoded.tokenId)),
+        ]);
+
+        royaltyReceiver =
+          results[0].status === "fulfilled"
+            ? results[0].value[0]
+            : royaltyReceiver;
+        royalty =
+          results[0].status === "fulfilled"
+            ? results[0].value[1].toString()
+            : royalty;
+        metadata =
+          results[1].status === "fulfilled" ? results[1].value : metadata;
+      }
+
+      return {
+        ...decoded,
+        name,
+        symbol,
+        metadata,
+        royalty,
+        royaltyReceiver,
+      };
+    },
+    async claimV3NFT(signer, from, transactionHash, storageContract, fee) {
+      const bridge = V3Bridge__factory.connect(params.v3_bridge!, signer);
+      signer;
+      fee;
+
+      const claimData = await (from as unknown as Web3Helper).getClaimData(
+        transactionHash,
+        bridge
+      );
+      const signatures = (
+        await storageContract.getLockNftSignatures(
+          transactionHash,
+          CHAIN_INFO.get(from.getNonce())?.v3_chainId!
+        )
+      ).map((s) => s[1]);
+
+      const tx = await bridge.claimNFT721(
+        { ...claimData, transactionHash, fee },
+        signatures,
+        {
+          value: fee,
+        }
+      );
+
+      await tx.wait();
+      return tx;
     },
   };
 }
-
-export const getClaimFee = async (toChain: V3_ChainId, config: AppConfig) => {
-  const provider = new ethers.providers.JsonRpcProvider(config.storegeNetwork);
-  const storageContract = BridgeStorage__factory.connect(
-    config.storageContract,
-    provider
-  );
-  const fee = await storageContract.chainFee(toChain);
-
-  return String(fee);
-};
