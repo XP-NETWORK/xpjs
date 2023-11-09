@@ -29,8 +29,8 @@ interface CasperBrowserAdapt {
     setProxy(proxy: string): void;
     toAccountHash(account: string): string;
 }
-export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<CasperLabsHelper, CasperNFT, string, undefined>, "preTransfer"> & ValidateAddress & GetFeeMargins & GetProvider<CasperClient> & {
-    isApprovedForMinter(sender: CasperLabsHelper, nft: NftInfo<CasperNFT>): Promise<boolean>;
+export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<CasperLabsHelper, CasperNFT, string, string | undefined>, "preTransfer"> & ValidateAddress & GetFeeMargins & GetProvider<CasperClient> & {
+    isApprovedForMinter(sender: CasperLabsHelper, nft: NftInfo<CasperNFT>, contract: string): Promise<boolean>;
 } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> & UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> & EstimateTxFees<CasperNFT> & {
     XpNft: string;
 } & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & CasperBrowserAdapt & EstimateDeployFees;
