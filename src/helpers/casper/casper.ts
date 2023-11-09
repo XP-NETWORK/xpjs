@@ -3,6 +3,7 @@ import {
   CLKey,
   CLOption,
   CLPublicKey,
+  CLURef,
   CasperClient,
   DeployUtil,
 } from "casper-js-sdk";
@@ -65,7 +66,7 @@ interface CasperBrowserAdapt {
 export type CasperHelper = ChainNonceGet &
   BalanceCheck &
   Pick<
-    PreTransfer<CasperLabsHelper, CasperNFT, string, undefined>,
+    PreTransfer<CasperLabsHelper, CasperNFT, string, string | undefined>,
     "preTransfer"
   > &
   ValidateAddress &
@@ -73,7 +74,8 @@ export type CasperHelper = ChainNonceGet &
   GetProvider<CasperClient> & {
     isApprovedForMinter(
       sender: CasperLabsHelper,
-      nft: NftInfo<CasperNFT>
+      nft: NftInfo<CasperNFT>,
+      contract: string
     ): Promise<boolean>;
   } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> &
   UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> &
@@ -122,7 +124,8 @@ export async function casperHelper({
 
   async function isApprovedForMinter(
     _sender: CasperLabsHelper,
-    nft: NftInfo<CasperNFT>
+    nft: NftInfo<CasperNFT>,
+    contract: string
   ) {
     cep78Client.setContractHash(nft.native.contract_hash);
     const tid = getTokenIdentifier(nft);
@@ -140,7 +143,7 @@ export async function casperHelper({
     return (
       Buffer.from(result.data.unwrap().data.data)
         .toString("hex")
-        .toLowerCase() === bridge.split("-")[1].toLowerCase()
+        .toLowerCase() === contract.split("-")[1].toLowerCase()
     );
   }
 
@@ -166,6 +169,7 @@ export async function casperHelper({
     return res;
   }
 
+  //@ts-ignore
   const transferCSPR = async (signer: CasperLabsHelper) => {
     let deployParams = new DeployUtil.DeployParams(
       CLPublicKey.fromHex(await signer.getActivePublicKey()),
@@ -179,7 +183,18 @@ export async function casperHelper({
     const session = DeployUtil.ExecutableDeployItem.newTransfer(
       "3000000000",
       toPublicKey,
-      null,
+
+      await client
+        .getAccountMainPurseUref(
+          CLPublicKey.fromHex(await signer.getActivePublicKey())
+        )
+        .then((e) => {
+          if (e) {
+            return CLURef.fromFormattedStr(e);
+          }
+          return undefined;
+        }),
+
       Math.floor(Math.random() * 10000000)
     );
     const payment = DeployUtil.standardPayment(100000000);
@@ -198,7 +213,41 @@ export async function casperHelper({
     return transfer;
   };
 
+  async function preTransfer(
+    sender: CasperLabsHelper,
+    nft: NftInfo<CasperNFT>,
+    _: BigNumber,
+    address?: string
+  ) {
+    let approveFor = address ?? bridge;
+    if (await isApprovedForMinter(sender, nft, approveFor)) {
+      return undefined;
+    }
+    cep78Client.setContractHash(nft.native.contract_hash);
+    const deploy = cep78Client.approve(
+      {
+        operator: new CLByteArray(Buffer.from(approveFor.split("-")[1], "hex")),
+        tokenHash: nft.native.tokenHash,
+        tokenId: nft.native.tokenId,
+      },
+      "2000000000",
+      CLPublicKey.fromHex(await sender.getActivePublicKey())
+    );
+
+    if (isBrowser()) {
+      return signWithCasperWallet(sender, deploy);
+    }
+
+    const signed = await sender.sign(
+      DeployUtil.deployToJson(deploy),
+      await sender.getActivePublicKey()
+    );
+    const dep = client.deployFromJson(signed).unwrap();
+    return await client.putDeploy(dep);
+  }
+
   return {
+    preTransfer,
     async validateAddress(adr) {
       try {
         CLPublicKey.fromHex(adr);
@@ -280,10 +329,10 @@ export async function casperHelper({
       let contract = await getBridgeOrUNS(id.native.contract_hash);
       if (contract === bridge) {
         try {
-          transferCSPR(sender);
+          await transferCSPR(sender);
           const newc = await notifier.createCollectionContract(
             id.native.contract_hash,
-            chain_nonce,
+            Chain.CASPER,
             "ERC721"
           );
           contract = newc;
@@ -293,6 +342,8 @@ export async function casperHelper({
           );
         }
       }
+      let newPt = await preTransfer(sender, id, new BigNumber(0), contract);
+      newPt && (await getDeploy(client, newPt));
       bridgeClient.setContractHash(contract);
       const deploy = bridgeClient.freezeNft(
         {
@@ -375,33 +426,6 @@ export async function casperHelper({
     },
     getFeeMargin() {
       return feeMargin;
-    },
-
-    async preTransfer(sender, nft) {
-      if (await isApprovedForMinter(sender, nft)) {
-        return undefined;
-      }
-      cep78Client.setContractHash(nft.native.contract_hash);
-      const deploy = cep78Client.approve(
-        {
-          operator: new CLByteArray(Buffer.from(bridge.split("-")[1], "hex")),
-          tokenHash: nft.native.tokenHash,
-          tokenId: nft.native.tokenId,
-        },
-        "2000000000",
-        CLPublicKey.fromHex(await sender.getActivePublicKey())
-      );
-
-      if (isBrowser()) {
-        return signWithCasperWallet(sender, deploy);
-      }
-
-      const signed = await sender.sign(
-        DeployUtil.deployToJson(deploy),
-        await sender.getActivePublicKey()
-      );
-      const dep = client.deployFromJson(signed).unwrap();
-      return await client.putDeploy(dep);
     },
   };
 }
