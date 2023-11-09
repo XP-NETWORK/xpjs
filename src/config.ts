@@ -30,7 +30,7 @@ export namespace AppConfigs {
       heartbeatUri: "https://tools.xp.network/testnet-pinger/",
       wrappedNftPrefix: "https://tools.xp.network/testnet-wnft/", //"https://bridge-wnftapi.herokuapp.com/",
       scVerifyUri: "https://tools.xp.network/testnet-sc-verify/",
-      storageContract: "0x5bB1EdcACf79F59Dfa9d0e054847B33eb20d2AA4",
+      storageContract: "0x38AEDf581C90D8EA955FC9a124b0A2B4471A61DD",
       storegeNetwork: "https://optimism-goerli.publicnode.com",
       network: "testnet",
     };

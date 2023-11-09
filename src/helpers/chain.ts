@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
-import { ChainNonce, V3_ChainId } from "../type-utils";
+import { ChainNonce, HelperMap, V3_ChainId } from "../type-utils";
 import { FullChain } from "../factory";
 import { BridgeStorage } from "xpnet-web3-contracts/dist/v3";
 
@@ -75,23 +75,31 @@ export type ClaimData = {
   nftType: "singular" | "multiple";
   sourceChain: V3_ChainId;
   royalty: string;
-  royaltyReceiver: string;
   metadata: string;
   name: string;
   symbol: string;
 };
 
-export interface GetClaimData<BridgeType> {
-  getClaimData(hash: string, bridge: BridgeType): Promise<ClaimData>;
+export interface GetClaimData {
+  getClaimData(
+    hash: string,
+    helpers: HelperMap<ChainNonce>,
+    to: FullChain<never, unknown, unknown>
+  ): Promise<ClaimData>;
 }
 
 export interface ClaimV3NFT<Signer, Resp> {
   claimV3NFT(
     sender: Signer,
+    helpers: HelperMap<ChainNonce>,
     fromChain: FullChain<never, unknown, unknown>,
+    toChain: FullChain<never, unknown, unknown>,
     txHash: string,
     storageContract: BridgeStorage,
-    fee: string
+    initialClaimData: {
+      fee: string;
+      royaltyReceiver: string;
+    }
   ): Promise<Resp | undefined>;
 }
 

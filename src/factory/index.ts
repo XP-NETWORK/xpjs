@@ -1149,9 +1149,32 @@ export function ChainFactory(
     },
     async claimNFT(from, to, txHash, signer, fee) {
       const storageContract = getStorageContract(appConfig);
-      if (!fee) fee = await estimateClaimFee(from, storageContract);
 
-      return await to.claimV3NFT(signer, from, txHash, storageContract, fee);
+      const initialClaimData = await Promise.allSettled([
+        fee || estimateClaimFee(from, storageContract),
+        storageContract.chainRoyalty(
+          CHAIN_INFO.get(from.getNonce())?.v3_chainId!
+        ),
+      ]);
+
+      return await to.claimV3NFT(
+        signer,
+        helpers,
+        from,
+        to,
+        txHash,
+        storageContract,
+        {
+          fee:
+            initialClaimData[0].status === "fulfilled"
+              ? initialClaimData[0].value
+              : "",
+          royaltyReceiver:
+            initialClaimData[1].status === "fulfilled"
+              ? initialClaimData[1].value
+              : "",
+        }
+      );
     },
     estimateClaimFee,
   };
