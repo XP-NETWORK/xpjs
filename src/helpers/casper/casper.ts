@@ -3,7 +3,6 @@ import {
   CLKey,
   CLOption,
   CLPublicKey,
-  CLURef,
   CasperClient,
   DeployUtil,
 } from "casper-js-sdk";
@@ -183,25 +182,13 @@ export async function casperHelper({
     const session = DeployUtil.ExecutableDeployItem.newTransfer(
       "3000000000",
       toPublicKey,
-
-      await client
-        .getAccountMainPurseUref(
-          CLPublicKey.fromHex(await signer.getActivePublicKey())
-        )
-        .then((e) => {
-          if (e) {
-            return CLURef.fromFormattedStr(e);
-          }
-          return undefined;
-        }),
-
+      undefined,
       Math.floor(Math.random() * 10000000)
     );
     const payment = DeployUtil.standardPayment(100000000);
     const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
     if (isBrowser()) {
       const hash = await signWithCasperWallet(signer, deploy);
-      await notifier.notifyCasper(hash);
       return hash;
     }
     const signed = await signer.sign(
@@ -327,15 +314,15 @@ export async function casperHelper({
       );
 
       let contract = await getBridgeOrUNS(id.native.contract_hash);
-      if (contract === bridge) {
+      if (true) {
         try {
           await transferCSPR(sender);
-          const newc = await notifier.createCollectionContract(
-            id.native.contract_hash,
-            Chain.CASPER,
-            "ERC721"
-          );
-          contract = newc;
+          // const newc = await notifier.createCollectionContract(
+          //   id.native.contract_hash,
+          //   Chain.CASPER,
+          //   "ERC721"
+          // );
+          // contract = newc;
         } catch (e) {
           console.log(
             `Failed to deploy store for casper collection: ${id.native.contract_hash}. Reason: ${e}`
