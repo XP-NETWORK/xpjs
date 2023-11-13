@@ -81,7 +81,9 @@ export type CasperHelper = ChainNonceGet &
   EstimateTxFees<CasperNFT> & { XpNft: string } & GetExtraFees &
   MintNft<CasperLabsHelper, CasperMintNft, string> &
   CasperBrowserAdapt &
-  EstimateDeployFees;
+  EstimateDeployFees & {
+    convertToAccountHash(adr: string): string;
+  };
 
 function getTokenIdentifier(nft: NftInfo<CasperNFT>): string {
   if (nft.native.tokenId || nft.native.tokenHash) {
@@ -241,6 +243,15 @@ export async function casperHelper({
         return true;
       } catch (e) {
         return false;
+      }
+    },
+    convertToAccountHash(adr) {
+      try {
+        return Buffer.from(CLPublicKey.fromHex(adr).toAccountHash()).toString(
+          "hex"
+        );
+      } catch {
+        return "";
       }
     },
     async mintNft(owner, options) {

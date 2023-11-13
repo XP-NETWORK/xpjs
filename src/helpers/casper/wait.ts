@@ -7,9 +7,8 @@ export const getDeploy = async (client: CasperClient, deployHash: string) => {
   let i = 300;
   while (i !== 0) {
     try {
-      console.log("bf");
       const [_, raw] = await client.getDeploy(deployHash);
-      console.log("af");
+
       if (raw.execution_results.length !== 0) {
         // @ts-ignore
         if (raw.execution_results[0].result.Success) {

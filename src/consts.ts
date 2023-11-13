@@ -837,9 +837,9 @@ CHAIN_INFO.set(Chain.BITGERT, {
 
 CHAIN_INFO.set(Chain.CASPER, {
   blockExplorerUrl: "https://cspr.live/deploy/",
-  blockExplorerUrlAddr: "https://cspr.live/address/",
+  blockExplorerUrlAddr: "https://cspr.live/account/",
   tnBlockExplorerUrl: "https://testnet.cspr.live/deploy/",
-  tnBlockExplorerUrlAddr: "https://testnet.cspr.live/address/",
+  tnBlockExplorerUrlAddr: "https://testnet.cspr.live/account/",
   constructor: casperHelper,
   currency: SupportedCurrency.CSPR,
   currencySymbol: SupportedCurrencyName.CSPR,
