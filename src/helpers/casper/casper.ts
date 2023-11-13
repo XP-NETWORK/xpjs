@@ -314,15 +314,15 @@ export async function casperHelper({
       );
 
       let contract = await getBridgeOrUNS(id.native.contract_hash);
-      if (true) {
+      if (contract === bridge) {
         try {
           await transferCSPR(sender);
-          // const newc = await notifier.createCollectionContract(
-          //   id.native.contract_hash,
-          //   Chain.CASPER,
-          //   "ERC721"
-          // );
-          // contract = newc;
+          const newc = await notifier.createCollectionContract(
+            id.native.contract_hash,
+            Chain.CASPER,
+            "ERC721"
+          );
+          contract = newc;
         } catch (e) {
           console.log(
             `Failed to deploy store for casper collection: ${id.native.contract_hash}. Reason: ${e}`
