@@ -2,7 +2,7 @@ import {
   elrondHelperFactory,
   ElrondParams,
   ElrondHelper,
-} from "./helpers/elrond";
+} from "./helpers/elrond/elrond";
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/evm/web3";
 import { HederaHelperFactory } from "./helpers/hedera/hedera_refactor";
@@ -241,6 +241,7 @@ export enum v3_ChainId {
   BSC = "BSC",
   POLYGON = "MATIC",
   ETHEREUM = "ETH",
+  ELROND = "MULTIVERSX",
   DEFAULT = "",
 }
 
@@ -289,7 +290,7 @@ export const CHAIN_INFO: ChainInfo = new Map();
 CHAIN_INFO.set(Chain.ELROND, {
   name: "Elrond",
   nonce: 2,
-  v3_chainId: v3_ChainId.DEFAULT,
+  v3_chainId: v3_ChainId.ELROND,
   decimals: Decimals.EGLD,
   constructor: elrondHelperFactory,
   blockExplorerUrl: "https://explorer.elrond.com/transactions/",

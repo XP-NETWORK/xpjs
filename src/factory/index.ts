@@ -1,5 +1,5 @@
 import { Chain, CHAIN_INFO, ChainType } from "../consts";
-import { ElrondParams } from "../helpers/elrond";
+import { ElrondParams } from "../helpers/elrond/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/evm/web3";
 

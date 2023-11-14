@@ -32,6 +32,7 @@ import { Chain } from "../../consts";
 import { SignatureService } from "../../services/estimator";
 import { isBrowser } from "@pedrouid/environment";
 import { getDeploy } from "./wait";
+import { isWrappedNft } from "../../factory";
 
 export interface CasperParams {
   rpc: string;
@@ -208,7 +209,11 @@ export async function casperHelper({
     _: BigNumber,
     address?: string
   ) {
-    let approveFor = address ?? bridge;
+    const contract = await getBridgeOrUNS(nft.native.contract_hash);
+    const wnft = await isWrappedNft(nft, 39);
+    if (!wnft.bool && !address && contract === bridge) return;
+    let approveFor = address ?? contract;
+
     if (await isApprovedForMinter(sender, nft, approveFor)) {
       return undefined;
     }

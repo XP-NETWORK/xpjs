@@ -27,7 +27,17 @@ import {
   WalletConnectProvider,
   Nonce,
 } from "@elrondnetwork/erdjs";
-import { Transaction as XTRX, Address as XADDR } from "@multiversx/sdk-core";
+
+import {
+  Transaction as XTRX,
+  Address as XADDR,
+  Account as XACC,
+  TransactionPayload as XTRXPayload /*AbiRegistry, SmartContract*/,
+} from "@multiversx/sdk-core";
+
+import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
+
+//import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -45,7 +55,9 @@ import {
   FeeMargins,
   IsContractAddress,
   GetTokenURI,
-} from "./chain";
+  LockNFT,
+  ClaimV3NFT,
+} from "../chain";
 import {
   Chain,
   ChainNonce,
@@ -57,11 +69,19 @@ import {
   PreTransfer,
   PreTransferRawTxn,
   ValidateAddress,
-} from "..";
-import { EvNotifier } from "../services/notifier";
+} from "../..";
+import { EvNotifier } from "../../services/notifier";
 import { Base64 } from "js-base64";
+//import abi from './v3Bridge_abi.json'
 
-type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
+type ElrondSigner = (
+  | ISigner
+  | ExtensionProvider
+  | WalletConnectProvider
+  | XExtensionProvider
+) & {
+  chainId?: string;
+};
 
 type EasyBalance = string | number | BigNumber;
 
@@ -211,7 +231,9 @@ export type ElrondHelper = BalanceCheck &
     wegldBalance(address: string): Promise<BigNumber>;
     unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
   } & IsContractAddress &
-  GetTokenURI;
+  GetTokenURI &
+  LockNFT<ElrondSigner, EsdtNftInfo, XTRX> &
+  ClaimV3NFT<ElrondSigner, XTRX>;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -224,10 +246,12 @@ export type ElrondHelper = BalanceCheck &
 export interface ElrondParams {
   node_uri: string;
   notifier: EvNotifier;
+  nonce: ChainNonce;
   minter_address: string;
   esdt_swap_address: string;
   esdt_nft: string;
   esdt_swap: string;
+  v3_bridge: string;
   feeMargin: FeeMargins;
 }
 
@@ -235,6 +259,9 @@ export async function elrondHelperFactory(
   elrondParams: ElrondParams
 ): Promise<ElrondHelper> {
   const provider = new ProxyProvider(elrondParams.node_uri);
+  /* const proxyNetworkProvider = new ProxyNetworkProvider(
+        elrondParams.node_uri
+    );*/
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(elrondParams.minter_address);
   const swapContract = new Address(elrondParams.esdt_swap_address);
@@ -247,6 +274,14 @@ export async function elrondHelperFactory(
   const gasPriceModif =
     networkConfig.MinGasPrice.valueOf() *
     networkConfig.GasPriceModifier.valueOf();
+
+  const bridgeAddress = new Address(elrondParams.v3_bridge);
+  /*const abiRegistry = AbiRegistry.create(abi);
+        const bridgeContract = new SmartContract({
+            address: bridgeAddress,
+            abi: abiRegistry,
+        });
+        bridgeContract;*/
 
   async function notifyValidator(
     txn: Transaction,
@@ -271,6 +306,7 @@ export async function elrondHelperFactory(
 
   const signAndSend = async (signer: ElrondSigner, tx: Transaction) => {
     const acc = await syncAccount(signer);
+
     tx.setNonce(acc.nonce);
     let stx: Transaction;
 
@@ -582,6 +618,7 @@ export async function elrondHelperFactory(
 
   return {
     XpNft: elrondParams.esdt_nft,
+    getNonce: () => elrondParams.nonce,
     async balance(address: string | Address): Promise<BigNumber> {
       const wallet = new Account(new Address(address));
 
@@ -752,9 +789,7 @@ export async function elrondHelperFactory(
 
       return await signAndSend(sender, txu);
     },
-    getNonce() {
-      return Chain.ELROND;
-    },
+
     async estimateValidateTransferNft(
       _toAddress: string,
       _nftUri: NftInfo<unknown>
@@ -901,6 +936,60 @@ export async function elrondHelperFactory(
         }
       }
       return "";
+    },
+    async lockNFT(signer, toChain, id, receiver) {
+      let collectionIdentifiers =
+        "@" + Buffer.from(id.collectionIdent).toString("hex");
+      let noncec = "@" + id.native.tokenIdentifier.split("-").at(2);
+      let quantity = "@" + "01";
+      let destination_address = "@" + bridgeAddress.hex();
+      let method = "@" + Buffer.from("lock721").toString("hex");
+      let token_id =
+        "@" + Buffer.from(id.native.tokenIdentifier).toString("hex");
+      let destination_chain = "@" + Buffer.from(toChain).toString("hex");
+      let destination_user_address =
+        "@" + Buffer.from(receiver).toString("hex");
+      let source_nft_contract_address = collectionIdentifiers;
+      const senderAddress = (await signer.getAddress()) as string;
+      const sender = new XADDR(senderAddress);
+      const trx = new XTRX({
+        data: new XTRXPayload(
+          "ESDTNFTTransfer" +
+            collectionIdentifiers +
+            noncec +
+            quantity +
+            destination_address +
+            method +
+            token_id +
+            destination_chain +
+            destination_user_address +
+            source_nft_contract_address +
+            noncec
+        ),
+        gasLimit: 600000000,
+        sender,
+        receiver: sender,
+        chainID: signer.chainId || "1",
+      });
+
+      const account = new XACC(sender);
+      account.update(await provider.getAccount(new Address(senderAddress)));
+      trx.setNonce(account.nonce);
+
+      const txs = await (signer as XExtensionProvider).signTransaction(trx);
+
+      await provider.sendTransaction(txs as unknown as Transaction);
+      return txs;
+    },
+    async claimV3NFT() /*sender,
+            helpers,
+            fromChain,
+            toChain,
+            txHash,
+            storageContract,
+            initialClaimData*/
+    {
+      return undefined;
     },
   };
 }

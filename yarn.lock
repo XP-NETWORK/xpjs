@@ -1233,6 +1233,11 @@
   dependencies:
     ts-results "^3.3.0"
 
+"@multiversx/sdk-bls-wasm@0.3.5":
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/@multiversx/sdk-bls-wasm/-/sdk-bls-wasm-0.3.5.tgz#2e83308fdc7a0928c6d5a7f910d796fd8eb2d90b"
+  integrity sha512-c0tIdQUnbBLSt6NYU+OpeGPYdL0+GV547HeHT8Xc0BKQ7Cj0v82QUoA2QRtWrR1G4MNZmLsIacZSsf6DrIS2Bw==
+
 "@multiversx/sdk-core@^12.9.0":
   version "12.12.0"
   resolved "https://registry.yarnpkg.com/@multiversx/sdk-core/-/sdk-core-12.12.0.tgz#02e7db8acf38b006bb5f77174a5bd8455a8bc41f"
@@ -1247,12 +1252,46 @@
     keccak "3.0.2"
     protobufjs "7.2.4"
 
+"@multiversx/sdk-extension-provider@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@multiversx/sdk-extension-provider/-/sdk-extension-provider-3.0.0.tgz#e0e178ee5555f9440457547759621f5c3152c5fa"
+  integrity sha512-xNHLShzimYbMXqEJoiNyB4fNOXQUwSJCzt9FiOA4GdxucJnCgIM25mXtSj2I93cz+KD39QgRjEYep+li/lykOw==
+
+"@multiversx/sdk-network-providers@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@multiversx/sdk-network-providers/-/sdk-network-providers-2.1.0.tgz#09972282da05fbdf34b023f4ef669f9a64b9e8d6"
+  integrity sha512-BiU2R9nu7OKKZckxZ7jjjUbFIyHM9Z6Qera224s9xIel+FjYDDkNCm1qtnvZ5Pc7ftQggFUZ7W/WnEgFhqEZGA==
+  dependencies:
+    axios "0.24.0"
+    bech32 "1.1.4"
+    bignumber.js "9.0.1"
+    buffer "6.0.3"
+    json-bigint "1.0.0"
+
 "@multiversx/sdk-transaction-decoder@1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@multiversx/sdk-transaction-decoder/-/sdk-transaction-decoder-1.0.2.tgz#83ded4f6d4b877b4421234856eb19709be2af31b"
   integrity sha512-j43QsKquu8N51WLmVlJ7dV2P3A1448R7/ktvl8r3i6wRMpfdtzDPNofTdHmMRT7DdQdvs4+RNgz8hVKL11Etsw==
   dependencies:
     bech32 "^2.0.0"
+
+"@multiversx/sdk-wallet@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@multiversx/sdk-wallet/-/sdk-wallet-4.2.0.tgz#00311338564abf0702b2063176f71db9585ecd06"
+  integrity sha512-EjSb9AnqMcpmDjZ7ebkUpOzpTfxj1plTuVXwZ6AaqJsdpxMfrE2izbPy18+bg5xFlr8V27wYZcW8zOhkBR50BA==
+  dependencies:
+    "@multiversx/sdk-bls-wasm" "0.3.5"
+    "@noble/ed25519" "1.7.3"
+    "@noble/hashes" "1.3.0"
+    bech32 "1.1.4"
+    bip39 "3.0.2"
+    blake2b "2.1.3"
+    ed25519-hd-key "1.1.2"
+    ed2curve "0.3.0"
+    keccak "3.0.1"
+    scryptsy "2.1.0"
+    tweetnacl "1.0.3"
+    uuid "8.3.2"
 
 "@noble/curves@1.1.0", "@noble/curves@~1.1.0":
   version "1.1.0"
@@ -1268,7 +1307,7 @@
   dependencies:
     "@noble/hashes" "1.3.2"
 
-"@noble/ed25519@^1.7.1", "@noble/ed25519@^1.7.3":
+"@noble/ed25519@1.7.3", "@noble/ed25519@^1.7.1", "@noble/ed25519@^1.7.3":
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/@noble/ed25519/-/ed25519-1.7.3.tgz#57e1677bf6885354b466c38e2b620c62f45a7123"
   integrity sha512-iR8GBkDt0Q3GyaVcIu7mSsVIqnFbkbRzGLWlvhwunacoLwt4J3swfKhfaM6rN6WY+TBGoYT1GtT1mIh2/jGbRQ==
@@ -1282,6 +1321,11 @@
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.3.tgz#360afc77610e0a61f3417e497dcf36862e4f8111"
   integrity sha512-CE0FCR57H2acVI5UOzIGSSIYxZ6v/HOhDR0Ro9VLyhnzLwx0o8W1mmgaqlEUx4049qJDlIBRztv5k+MM8vbO3A==
+
+"@noble/hashes@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.0.tgz#085fd70f6d7d9d109671090ccae1d3bec62554a1"
+  integrity sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==
 
 "@noble/hashes@1.3.1":
   version "1.3.1"
@@ -3943,6 +3987,13 @@ ed25519-hd-key@1.1.2:
     create-hmac "1.1.7"
     tweetnacl "1.0.3"
 
+ed2curve@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/ed2curve/-/ed2curve-0.3.0.tgz#322b575152a45305429d546b071823a93129a05d"
+  integrity sha512-8w2fmmq3hv9rCrcI7g9hms2pMunQr1JINfcjwR9tAyZqhtyaMN991lF/ZfHfr5tzZQ8c7y7aBgZbjfbd0fjFwQ==
+  dependencies:
+    tweetnacl "1.x.x"
+
 ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
@@ -5814,6 +5865,14 @@ jssha@3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/jssha/-/jssha-3.2.0.tgz#88ec50b866dd1411deaddbe6b3e3692e4c710f16"
   integrity sha512-QuruyBENDWdN4tZwJbQq7/eAK85FqrI4oDbXjy5IBhYD+2pTJyBUWZe8ctWaCkrV0gy6AaelgOZZBMeswEa/6Q==
+
+keccak@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/keccak/-/keccak-3.0.1.tgz#ae30a0e94dbe43414f741375cff6d64c8bea0bff"
+  integrity sha512-epq90L9jlFWCW7+pQa6JOnKn2Xgl2mtI664seYR6MHskvI9agt7AnDqmAlp9TqU4/caMYbA08Hi5DMZAl5zdkA==
+  dependencies:
+    node-addon-api "^2.0.0"
+    node-gyp-build "^4.2.0"
 
 keccak@3.0.2:
   version "3.0.2"
@@ -8047,7 +8106,7 @@ tunnel-agent@^0.6.0:
   dependencies:
     safe-buffer "^5.0.1"
 
-tweetnacl@1.0.3, tweetnacl@^1.0.1, tweetnacl@^1.0.3:
+tweetnacl@1.0.3, tweetnacl@1.x.x, tweetnacl@^1.0.1, tweetnacl@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
