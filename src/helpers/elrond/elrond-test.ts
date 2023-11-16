@@ -289,11 +289,12 @@ const account = new Account(address);
   createNft;
   transferToSc;
   //transferToSc(bridgeAddress, account, signer, "ALX-afef0b-01", "01");
-  await createNft("ALX-afef0b-06", address, account, signer);
   await createNft("ALX-afef0b-07", address, account, signer);
-  await createNft("ALX-afef0b-08", address, account, signer);
-  await createNft("ALX-afef0b-09", address, account, signer);
-  await createNft("ALX-afef0b-10", address, account, signer);
+
+  //await createNft("ALX-afef0b-07", address, account, signer);
+  //await createNft("ALX-afef0b-08", address, account, signer);
+  //await createNft("ALX-afef0b-09", address, account, signer);
+  //await createNft("ALX-afef0b-10", address, account, signer);
 })();
 
 //console.log(bridgeContract);

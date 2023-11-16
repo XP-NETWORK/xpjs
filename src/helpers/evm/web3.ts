@@ -18,6 +18,8 @@ import {
   UnfreezeForeignNft,
   UnfreezeForeignNftBatch,
   ParamsGetter,
+  DepTrxData,
+  GetTokenInfo,
 } from "../chain";
 import {
   BigNumber as EthBN,
@@ -203,7 +205,8 @@ export type Web3Helper = BaseWeb3Helper &
   UserStore &
   LockNFT<Signer, EthNftInfo, TransactionResponse> &
   ClaimV3NFT<Signer, TransactionResponse> &
-  GetClaimData;
+  GetClaimData &
+  GetTokenInfo;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -1012,52 +1015,8 @@ export async function web3HelperFactory(
 
       return lockTx;
     },
-    async getClaimData(hash, helpers, from) {
-      const address = (from as unknown as Web3Helper).getParams().v3_bridge!;
-      const destBridge = V3Bridge__factory.connect(
-        address,
-        (from as unknown as Web3Helper).getProvider()
-      );
-
-      const getTx = (hash: string) =>
-        new Promise(async (resolve, reject) => {
-          let tx: ethers.providers.TransactionReceipt | undefined;
-          const tm = setTimeout(() => reject("Time out on getTx "), 120 * 1000);
-          while (!tx) {
-            await new Promise((r) => setTimeout(r, 5000));
-            tx = await destBridge.provider
-              .getTransactionReceipt(hash)
-              .catch(() => undefined);
-          }
-          clearTimeout(tm);
-          resolve(tx);
-        });
-
-      const destTrx = (await getTx(
-        hash
-      )) as ethers.providers.TransactionReceipt;
-
-      const log = destTrx.logs.find(
-        (log) => log.address.toLowerCase() === address.toLowerCase()
-      );
-
-      if (!log) {
-        throw new Error("Failed to decode destTrx logs at " + hash);
-      }
-      const parsed = destBridge.interface.parseLog(log);
-
-      console.log(parsed, "parsedLog");
-      const decoded = {
-        tokenId: String(parsed.args[0]),
-        destinationChain: parsed.args[1],
-        destinationUserAddress: parsed.args[2],
-        sourceNftContractAddress: parsed.args[3],
-        tokenAmount: String(parsed.args[4]),
-        nftType: parsed.args[5],
-        sourceChain: parsed.args[6],
-      };
-
-      const singular = decoded.nftType === "singular";
+    async getTokenInfo(depTrxData) {
+      const singular = depTrxData.nftType === "singular";
 
       const salePriceToGetTotalRoyalityPercentage = 10000;
       let royalty: string = String(BigInt("0")); // set default royalty 0
@@ -1066,37 +1025,20 @@ export async function web3HelperFactory(
       let name = ""; // set empty default name
       let symbol = ""; // set empty default symbol
 
-      /*const sourceTransfer =
-                decoded.sourceChain ===
-                CHAIN_INFO.get(params.nonce)?.v3_chainId;
-            let sourceProiver: ethers.providers.Provider | undefined = provider;
-            if (!sourceTransfer) {*/
-      const sourceNonce = Array.from(CHAIN_INFO.values()).find(
-        (c) => c.v3_chainId === decoded.sourceChain
-      )?.nonce;
-      console.log(sourceNonce, "sourceNonce");
-      const sourceProiver = sourceNonce
-        ? (helpers.get(sourceNonce as ChainNonce) as Web3Helper).getProvider()
-        : undefined;
-
-      if (!sourceProiver) {
-        throw new Error("Source provider is undefined");
-      }
-
       if (singular) {
         const _contract = ERC721Royalty__factory.connect(
-          decoded.sourceNftContractAddress,
-          sourceProiver
+          depTrxData.sourceNftContractAddress,
+          provider
         );
 
         const results = await Promise.allSettled([
           _contract.name(),
           _contract.symbol(),
           _contract.royaltyInfo(
-            ethers.BigNumber.from(decoded.tokenId),
+            ethers.BigNumber.from(depTrxData.tokenId),
             ethers.BigNumber.from(salePriceToGetTotalRoyalityPercentage)
           ),
-          _contract.tokenURI(ethers.BigNumber.from(decoded.tokenId)),
+          _contract.tokenURI(ethers.BigNumber.from(depTrxData.tokenId)),
         ]);
         name = results[0].status === "fulfilled" ? results[0].value : name;
         symbol = results[1].status === "fulfilled" ? results[1].value : symbol;
@@ -1111,16 +1053,16 @@ export async function web3HelperFactory(
 
       if (!singular) {
         const _contract = ERC1155Royalty__factory.connect(
-          decoded.sourceNftContractAddress,
-          sourceProiver
+          depTrxData.sourceNftContractAddress,
+          provider
         );
 
         const results = await Promise.allSettled([
           _contract.royaltyInfo(
-            ethers.BigNumber.from(decoded.tokenId),
+            ethers.BigNumber.from(depTrxData.tokenId),
             ethers.BigNumber.from(salePriceToGetTotalRoyalityPercentage)
           ),
-          _contract.uri(ethers.BigNumber.from(decoded.tokenId)),
+          _contract.uri(ethers.BigNumber.from(depTrxData.tokenId)),
         ]);
 
         royalty =
@@ -1132,37 +1074,102 @@ export async function web3HelperFactory(
       }
 
       return {
-        ...decoded,
         name,
         symbol,
         metadata,
         royalty,
       };
     },
+    async getClaimData(hash, helpers) {
+      const bridgeAddress = params.v3_bridge!;
+
+      const depBridge = V3Bridge__factory.connect(bridgeAddress, provider);
+
+      const getTx = (hash: string) =>
+        new Promise(async (resolve, reject) => {
+          let tx: ethers.providers.TransactionReceipt | undefined;
+          const tm = setTimeout(() => reject("Time out on getTx "), 120 * 1000);
+          while (!tx) {
+            await new Promise((r) => setTimeout(r, 5000));
+            tx = await provider
+              .getTransactionReceipt(hash)
+              .catch(() => undefined);
+          }
+          clearTimeout(tm);
+          resolve(tx);
+        });
+
+      const destTrx = (await getTx(
+        hash
+      )) as ethers.providers.TransactionReceipt;
+
+      const log = destTrx.logs.find(
+        (log) => log.address.toLowerCase() === bridgeAddress.toLowerCase()
+      );
+
+      if (!log) {
+        throw new Error("Failed to decode destTrx logs at " + hash);
+      }
+      const parsed = depBridge.interface.parseLog(log);
+
+      const decoded: DepTrxData = {
+        tokenId: String(parsed.args[0]),
+        destinationChain: parsed.args[1],
+        destinationUserAddress: parsed.args[2],
+        sourceNftContractAddress: parsed.args[3],
+        tokenAmount: String(parsed.args[4]),
+        nftType: parsed.args[5],
+        sourceChain: parsed.args[6],
+      };
+
+      const sourceNonce = Array.from(CHAIN_INFO.values()).find(
+        (c) => c.v3_chainId === decoded.sourceChain
+      )?.nonce;
+
+      if (!sourceNonce) {
+        throw new Error("Source chain is undefined");
+      }
+      console.log(sourceNonce, "sourceNonce");
+
+      const sourceChain = helpers.get(sourceNonce as ChainNonce);
+
+      const tokenInfo = await (
+        sourceChain as unknown as Web3Helper
+      ).getTokenInfo(decoded);
+      return {
+        ...decoded,
+        ...tokenInfo,
+      };
+    },
     async claimV3NFT(
       signer,
       helpers,
       from,
-      to,
       transactionHash,
       storageContract,
       initialClaimData
     ) {
-      /*const bridge = V3Bridge__factory.connect(
-                params.v3_bridge!,
-                provider
-            );*/
+      const bridge = V3Bridge__factory.connect(params.v3_bridge!, signer);
 
-      const claimData = await (
-        helpers.get(params.nonce) as unknown as Web3Helper
-      ).getClaimData(transactionHash, helpers, from);
+      const [validatorsCount, claimDataRes] = await Promise.allSettled([
+        bridge.validatorsCount(),
+        from.getClaimData(transactionHash, helpers),
+      ]);
 
-      const destBridge = V3Bridge__factory.connect(
-        (to as unknown as Web3Helper).getParams().v3_bridge!,
-        signer
+      if (claimDataRes.status === "rejected") {
+        throw new Error("Failed to get claimData from dep chain");
+      }
+
+      const claimData = claimDataRes.value;
+      const sigNumber =
+        validatorsCount.status === "fulfilled"
+          ? validatorsCount.value.toNumber()
+          : 0;
+
+      console.log(
+        { ...claimData, ...initialClaimData, transactionHash },
+        "claimData"
       );
-
-      const sigNumber = (await destBridge.validatorsCount()).toNumber();
 
       const getSignatures = async (
         tryNumber = 0
@@ -1178,6 +1185,11 @@ export async function web3HelperFactory(
             console.log(e.message);
             return [];
           });
+        console.log(
+          signatures,
+          transactionHash,
+          CHAIN_INFO.get(from.getNonce())?.v3_chainId!
+        );
         if (signatures.length < sigNumber) return getSignatures(tryNumber + 1);
         return signatures;
       };
@@ -1190,11 +1202,6 @@ export async function web3HelperFactory(
         throw new Error("Error on getting signatures from contract");
       }
 
-      console.log(
-        { ...claimData, ...initialClaimData, transactionHash },
-        "data"
-      );
-
       console.log(signatures, "signatures");
 
       const signatureArray: string[] = [];
@@ -1204,9 +1211,7 @@ export async function web3HelperFactory(
 
       console.log(signatureArray, "signatureArray");
 
-      console.log(destBridge, "destBridge");
-
-      const trx = await destBridge.populateTransaction.claimNFT721(
+      const trx = await bridge.populateTransaction.claimNFT721(
         { ...claimData, ...initialClaimData, transactionHash },
         signatureArray,
         {

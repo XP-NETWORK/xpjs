@@ -66,7 +66,15 @@ export interface LockNFT<Signer, RawNft, Resp> {
   ): Promise<Resp | undefined>;
 }
 
-export type ClaimData = {
+export type TokenInfo = {
+  royalty: string;
+  metadata: string;
+  name: string;
+  symbol: string;
+  image?: string;
+};
+
+export type DepTrxData = {
   tokenId: string;
   destinationChain: V3_ChainId;
   destinationUserAddress: string;
@@ -74,26 +82,26 @@ export type ClaimData = {
   tokenAmount: string;
   nftType: "singular" | "multiple";
   sourceChain: V3_ChainId;
-  royalty: string;
-  metadata: string;
-  name: string;
-  symbol: string;
 };
+
+export type ClaimData = DepTrxData & TokenInfo;
 
 export interface GetClaimData {
   getClaimData(
     hash: string,
-    helpers: HelperMap<ChainNonce>,
-    to: FullChain<never, unknown, unknown>
+    helpers: HelperMap<ChainNonce>
   ): Promise<ClaimData>;
+}
+
+export interface GetTokenInfo {
+  getTokenInfo(depTrxData: DepTrxData): Promise<TokenInfo>;
 }
 
 export interface ClaimV3NFT<Signer, Resp> {
   claimV3NFT(
     sender: Signer,
     helpers: HelperMap<ChainNonce>,
-    fromChain: FullChain<never, unknown, unknown>,
-    toChain: FullChain<never, unknown, unknown>,
+    fromChain: FullChain<never, unknown, unknown> & GetClaimData,
     txHash: string,
     storageContract: BridgeStorage,
     initialClaimData: {

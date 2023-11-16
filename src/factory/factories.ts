@@ -65,6 +65,7 @@ export namespace ChainFactoryConfigs {
           "erd1qqqqqqqqqqqqqpgqc854pa9ruzgs5f8rdzzc02xgq8kqku3ng6vs59vmf8",
         esdt_nft: "XPNFT-af3fde",
         esdt_swap: "WEGLD-708f9b",
+        elrondApi: "https://devnet-api.multiversx.com",
         v3_bridge:
           "erd1qqqqqqqqqqqqqpgqghvly0npf6ewpmzh47ud76ssh6nppu4e7hnses7qlz",
         notifier,
@@ -698,6 +699,7 @@ export namespace ChainFactoryConfigs {
         esdt_nft: "XPNFT-976581",
         esdt_swap: "WEGLD-8c393e",
         v3_bridge: "",
+        elrondApi: "",
         notifier,
         nonce: Chain.ELROND,
         feeMargin,
@@ -879,6 +881,7 @@ export namespace ChainFactoryConfigs {
         esdt_nft: "XPNFT-cb7482",
         esdt_swap: "WEGLD-5f1f8d",
         v3_bridge: "",
+        elrondApi: "",
         notifier,
         nonce: Chain.ELROND,
         feeMargin,

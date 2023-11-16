@@ -50,6 +50,7 @@ import {
   GetExtraFees,
   LockNFT,
   ClaimV3NFT,
+  GetClaimData,
 } from "../helpers/chain";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import {
@@ -316,7 +317,7 @@ export type ChainFactory = {
   ): Promise<Resp | undefined>;
 
   claimNFT<SignerF, RawNftF, Resp>(
-    fromChain: FullChain<never, unknown, unknown>,
+    fromChain: FullChain<never, unknown, unknown> & GetClaimData,
     toChain: FullChain<SignerF, RawNftF, Resp>,
     txHash: string,
     sender: SignerF,
@@ -1153,15 +1154,14 @@ export function ChainFactory(
       const initialClaimData = await Promise.allSettled([
         fee || estimateClaimFee(from, storageContract),
         storageContract.chainRoyalty(
-          CHAIN_INFO.get(from.getNonce())?.v3_chainId!
+          CHAIN_INFO.get(to.getNonce())?.v3_chainId!
         ),
       ]);
-
+      console.log(initialClaimData, "initialClaimData");
       return await to.claimV3NFT(
         signer,
         helpers,
         from,
-        to,
         txHash,
         storageContract,
         {

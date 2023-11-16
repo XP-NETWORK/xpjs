@@ -454,5 +454,8 @@ export async function web3ERC20HelperFactory(
     async getClaimData() {
       return undefined as any;
     },
+    async getTokenInfo() {
+      return undefined as any;
+    },
   };
 }
