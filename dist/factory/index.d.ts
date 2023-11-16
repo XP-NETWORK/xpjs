@@ -1,4 +1,4 @@
-import { ElrondParams } from "../helpers/elrond";
+import { ElrondParams } from "../helpers/elrond/elrond";
 import { TronParams } from "../helpers/tron";
 import { Web3Params } from "../helpers/evm/web3";
 export * from "./utils";
@@ -9,7 +9,7 @@ import { Wallet } from "@hashgraph/hethers";
 import { ethers } from "ethers";
 import { AlgorandParams, AlgoSignerH, ClaimNftInfo } from "../helpers/algorand";
 import { AptosParams } from "../helpers/aptos";
-import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck, GetExtraFees, LockNFT, ClaimV3NFT } from "../helpers/chain";
+import { BalanceCheck, EstimateTxFeesBatch, GetFeeMargins, TransferNftForeignBatch, UnfreezeForeignNftBatch, WhitelistCheck, GetExtraFees, LockNFT, ClaimV3NFT, GetClaimData } from "../helpers/chain";
 import { DfinityParams } from "../helpers/dfinity/dfinity";
 import { NearParams } from "../helpers/near";
 import { SecretParams } from "../helpers/secret";
@@ -132,7 +132,7 @@ export type ChainFactory = {
     }>;
     hederaGetMintedCollection(from: number, receiver: string): Promise<any[]>;
     lockNFT<SignerF, RawNftF, Resp>(fromChain: FullChain<SignerF, RawNftF, Resp>, toChain: FullChain<never, unknown, unknown>, nft: NftInfo<RawNftF>, sender: SignerF, receiver: string, fee?: BigNumber.Value): Promise<Resp | undefined>;
-    claimNFT<SignerF, RawNftF, Resp>(fromChain: FullChain<never, unknown, unknown>, toChain: FullChain<SignerF, RawNftF, Resp>, txHash: string, sender: SignerF, fee: string | undefined): Promise<Resp | undefined>;
+    claimNFT<SignerF, RawNftF, Resp>(fromChain: FullChain<never, unknown, unknown> & GetClaimData, toChain: FullChain<SignerF, RawNftF, Resp>, txHash: string, sender: SignerF, fee: string | undefined): Promise<Resp | undefined>;
     estimateClaimFee(fromChain: FullChain<never, unknown, unknown>, storageContract: BridgeStorage | undefined): Promise<string>;
 };
 /**

@@ -15,7 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./helpers/chain"), exports);
-__exportStar(require("./helpers/elrond"), exports);
+__exportStar(require("./helpers/elrond/elrond"), exports);
 __exportStar(require("./helpers/evm/web3"), exports);
 __exportStar(require("./helpers/tron"), exports);
 __exportStar(require("./socket"), exports);
@@ -23,4 +23,4 @@ __exportStar(require("./services/emitter"), exports);
 __exportStar(require("./factory"), exports);
 __exportStar(require("./consts"), exports);
 __exportStar(require("./config"), exports);
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUFnQztBQUNoQyxtREFBaUM7QUFDakMscURBQW1DO0FBQ25DLGlEQUErQjtBQUMvQiwyQ0FBeUI7QUFDekIscURBQW1DO0FBQ25DLDRDQUEwQjtBQUMxQiwyQ0FBeUI7QUFDekIsMkNBQXlCIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUFnQztBQUNoQywwREFBd0M7QUFDeEMscURBQW1DO0FBQ25DLGlEQUErQjtBQUMvQiwyQ0FBeUI7QUFDekIscURBQW1DO0FBQ25DLDRDQUEwQjtBQUMxQiwyQ0FBeUI7QUFDekIsMkNBQXlCIn0=

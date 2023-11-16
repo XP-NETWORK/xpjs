@@ -33,7 +33,9 @@ export type CasperHelper = ChainNonceGet & BalanceCheck & Pick<PreTransfer<Caspe
     isApprovedForMinter(sender: CasperLabsHelper, nft: NftInfo<CasperNFT>, contract: string): Promise<boolean>;
 } & TransferNftForeign<CasperLabsHelper, CasperNFT, string> & UnfreezeForeignNft<CasperLabsHelper, CasperNFT, string> & EstimateTxFees<CasperNFT> & {
     XpNft: string;
-} & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & CasperBrowserAdapt & EstimateDeployFees;
+} & GetExtraFees & MintNft<CasperLabsHelper, CasperMintNft, string> & CasperBrowserAdapt & EstimateDeployFees & {
+    convertToAccountHash(adr: string): string;
+};
 export declare function casperHelper({ rpc, network, bridge, feeMargin, xpnft, umt, sig, nwl, notifier, }: CasperParams): Promise<CasperHelper>;
 export declare function CasperHelperFromKeys(keys: AsymmetricKey): CasperLabsHelper;
 export {};

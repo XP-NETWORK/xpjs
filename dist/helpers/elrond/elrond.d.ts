@@ -5,11 +5,15 @@
  * @module
  */
 import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
+import { Transaction as XTRX } from "@multiversx/sdk-core";
+import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
 import BigNumber from "bignumber.js";
-import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress, GetTokenURI } from "./chain";
-import { ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "..";
-import { EvNotifier } from "../services/notifier";
-type ElrondSigner = ISigner | ExtensionProvider | WalletConnectProvider;
+import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress, GetTokenURI, LockNFT, ClaimV3NFT, GetClaimData, GetTokenInfo } from "../chain";
+import { ChainNonce, ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "../..";
+import { EvNotifier } from "../../services/notifier";
+type ElrondSigner = (ISigner | ExtensionProvider | WalletConnectProvider | XExtensionProvider) & {
+    chainId?: string;
+};
 /**
  * Information associated with an ESDT Token
  */
@@ -105,7 +109,7 @@ export type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigner, EsdtN
 } & GetFeeMargins & {
     wegldBalance(address: string): Promise<BigNumber>;
     unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
-} & IsContractAddress & GetTokenURI;
+} & IsContractAddress & GetTokenURI & LockNFT<ElrondSigner, EsdtNftInfo, XTRX> & ClaimV3NFT<ElrondSigner, XTRX> & GetClaimData & GetTokenInfo;
 /**
  * Create an object implementing cross chain utilities for elrond
  *
@@ -117,10 +121,13 @@ export type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigner, EsdtN
 export interface ElrondParams {
     node_uri: string;
     notifier: EvNotifier;
+    nonce: ChainNonce;
     minter_address: string;
     esdt_swap_address: string;
     esdt_nft: string;
     esdt_swap: string;
+    v3_bridge: string;
+    elrondApi: string;
     feeMargin: FeeMargins;
 }
 export declare function elrondHelperFactory(elrondParams: ElrondParams): Promise<ElrondHelper>;

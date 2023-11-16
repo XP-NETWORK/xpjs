@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
-import { ChainNonce, V3_ChainId } from "../type-utils";
+import { ChainNonce, HelperMap, V3_ChainId } from "../type-utils";
 import { FullChain } from "../factory";
 import { BridgeStorage } from "xpnet-web3-contracts/dist/v3";
 /**
@@ -36,7 +36,14 @@ export interface TransferNftForeign<Signer, RawNft, Resp> {
 export interface LockNFT<Signer, RawNft, Resp> {
     lockNFT(sender: Signer, toChain: V3_ChainId, id: NftInfo<RawNft>, receiver: string): Promise<Resp | undefined>;
 }
-export type ClaimData = {
+export type TokenInfo = {
+    royalty: string;
+    metadata: string;
+    name: string;
+    symbol: string;
+    image?: string;
+};
+export type DepTrxData = {
     tokenId: string;
     destinationChain: V3_ChainId;
     destinationUserAddress: string;
@@ -44,17 +51,19 @@ export type ClaimData = {
     tokenAmount: string;
     nftType: "singular" | "multiple";
     sourceChain: V3_ChainId;
-    royalty: string;
-    royaltyReceiver: string;
-    metadata: string;
-    name: string;
-    symbol: string;
 };
-export interface GetClaimData<BridgeType> {
-    getClaimData(hash: string, bridge: BridgeType): Promise<ClaimData>;
+export type ClaimData = DepTrxData & TokenInfo;
+export interface GetClaimData {
+    getClaimData(hash: string, helpers: HelperMap<ChainNonce>): Promise<ClaimData>;
+}
+export interface GetTokenInfo {
+    getTokenInfo(depTrxData: DepTrxData): Promise<TokenInfo>;
 }
 export interface ClaimV3NFT<Signer, Resp> {
-    claimV3NFT(sender: Signer, fromChain: FullChain<never, unknown, unknown>, txHash: string, storageContract: BridgeStorage, fee: string): Promise<Resp | undefined>;
+    claimV3NFT(sender: Signer, helpers: HelperMap<ChainNonce>, fromChain: FullChain<never, unknown, unknown> & GetClaimData, txHash: string, storageContract: BridgeStorage, initialClaimData: {
+        fee: string;
+        royaltyReceiver: string;
+    }): Promise<Resp | undefined>;
 }
 /**
  * Unfreeze native NFT existing on a foreign chain(Send back NFT)

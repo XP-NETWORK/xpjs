@@ -1,4 +1,4 @@
-import { ElrondParams, ElrondHelper } from "./helpers/elrond";
+import { ElrondParams, ElrondHelper } from "./helpers/elrond/elrond";
 import { TronParams, TronHelper } from "./helpers/tron";
 import { Web3Params, Web3Helper } from "./helpers/evm/web3";
 import { SupportedCurrency, SupportedCurrencyName } from "crypto-exchange-rate/dist/model/domain";
@@ -17,7 +17,7 @@ export declare enum TestNetRpcUri {
     ELROND = "https://devnet-gateway.multiversx.com",
     HECO = "https://http-testnet.hecochain.com",
     BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
-    ROPSTEN = "https://goerli.infura.io/v3/cec5dc92097a46f0b895ac1e89865467",
+    ROPSTEN = "https://ultra-light-patina.ethereum-sepolia.discover.quiknode.pro/6f98178f32c668af8ee4bb1cc4b8b9308e29367b/",
     AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
     POLYGON = "https://polygon-mumbai.blockpi.network/v1/rpc/public",
     FANTOM = "https://rpc.testnet.fantom.network/",
@@ -203,6 +203,7 @@ export declare enum v3_ChainId {
     BSC = "BSC",
     POLYGON = "MATIC",
     ETHEREUM = "ETH",
+    ELROND = "MULTIVERSX",
     DEFAULT = ""
 }
 interface ChainData<T extends ChainNonce> {
