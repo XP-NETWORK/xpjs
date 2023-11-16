@@ -49,7 +49,7 @@ import {
   BigUIntValue as XBigUIntValue,
   //BinaryCodec,
   VariadicValue,
-  ResultsParser,
+  //ResultsParser,
   //SignableMessage,
 } from "@multiversx/sdk-core";
 
@@ -57,7 +57,7 @@ import {
 
 import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
 
-import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
+//import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -289,7 +289,7 @@ export async function elrondHelperFactory(
   elrondParams: ElrondParams
 ): Promise<ElrondHelper> {
   const provider = new ProxyProvider(elrondParams.node_uri);
-  const proxyNetworkProvider = new ProxyNetworkProvider(elrondParams.node_uri);
+  //const proxyNetworkProvider = new ProxyNetworkProvider(elrondParams.node_uri);
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(elrondParams.minter_address);
   const swapContract = new Address(elrondParams.esdt_swap_address);
@@ -1236,21 +1236,28 @@ export async function elrondHelperFactory(
 
       const address = new Address(await signer.getAddress());
 
-      let query = bridgeContract.createQuery({
+      /*let query = bridgeContract.createQuery({
         func: "validators",
         caller: address,
         args: [new XAddressValue(bridgeAddress)],
       });
 
-      let queryResponse = await proxyNetworkProvider.queryContract(query);
-      console.log(queryResponse);
-      const tokensDefinition = bridgeContract.getEndpoint("validators");
+            const queryResponse = await provider.queryContract({
+                caller: address,
+                args: [new AddressValue(bridgeAddress)],
+                func: new ContractFunction("validators"),
+                address: bridgeAddress,
+                value: Balance.Zero(),
+                toHttpRequest: () => {},
+            });
+            console.log(queryResponse);
+            //const tokensDefinition = bridgeContract.getEndpoint("validators");
 
-      const { firstValue } = new ResultsParser().parseQueryResponse(
+            /*const { firstValue } = new ResultsParser().parseQueryResponse(
         queryResponse,
         tokensDefinition
       );
-      console.log(firstValue?.valueOf(), "fis");
+      console.log(firstValue?.valueOf(), "fis");*/
 
       const signatures = await storageContract.getLockNftSignatures(
         transactionHash,
