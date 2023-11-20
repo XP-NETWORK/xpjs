@@ -546,7 +546,7 @@ var ChainFactoryConfigs;
             },
             casperParams: {
                 nwl: true,
-                bridge: "hash-9af986599cf7625dae425a9e0e65b333d0d0daaaa67abca5b5abcf59e65b81b4",
+                bridge: "hash-a7300a5ba39c64247263ddad7c1391c4674de073e2f35186766843eb4a1ae431",
                 feeMargin,
                 network: "casper",
                 notifier,
