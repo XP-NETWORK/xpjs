@@ -332,7 +332,7 @@ export async function casperHelper({
       let contract = await getBridgeOrUNS(id.native.contract_hash);
       if (contract === bridge) {
         try {
-          await transferCSPR(sender);
+          // await transferCSPR(sender);
           const newc = await notifier.createCollectionContract(
             id.native.contract_hash,
             Chain.CASPER,
