@@ -161,3 +161,9 @@ export async function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number) {
 
 export const randomBigInt = () =>
   BigInt(new BigNumber(Math.random() * 150_000).integerValue().toString());
+
+export const decodeBase64Array = (encodedArray: string[]): string[] | null => {
+  return encodedArray.map((encodedString) => {
+    return Buffer.from(encodedString, "base64").toString("utf-8");
+  });
+};

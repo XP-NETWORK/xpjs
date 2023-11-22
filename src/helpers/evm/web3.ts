@@ -1174,8 +1174,8 @@ export async function web3HelperFactory(
       const getSignatures = async (
         tryNumber = 0
       ): Promise<SignerAndSignatureStructOutput[] | undefined> => {
-        if (tryNumber === 10) return undefined;
-        await new Promise((r) => setTimeout(r, 3_000));
+        if (tryNumber === 100) return undefined;
+        await new Promise((r) => setTimeout(r, 5_000));
         const signatures = await storageContract
           .getLockNftSignatures(
             transactionHash,
@@ -1210,7 +1210,7 @@ export async function web3HelperFactory(
       });
 
       console.log(signatureArray, "signatureArray");
-
+      console.log({ ...claimData, ...initialClaimData, transactionHash });
       const trx = await bridge.populateTransaction.claimNFT721(
         { ...claimData, ...initialClaimData, transactionHash },
         signatureArray,

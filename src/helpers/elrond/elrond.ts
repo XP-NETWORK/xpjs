@@ -6,7 +6,6 @@
  */
 import {
   Account,
-  Address,
   AddressValue,
   Balance,
   BigUIntValue,
@@ -26,6 +25,7 @@ import {
   UserSigner,
   WalletConnectProvider,
   Nonce,
+  Address,
 } from "@elrondnetwork/erdjs";
 
 import { CHAIN_INFO } from "../..";
@@ -53,11 +53,9 @@ import {
   //SignableMessage,
 } from "@multiversx/sdk-core";
 
-//import { keccak256 } from "ethers/lib/utils";
-
 import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
 
-//import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
+//import { Nonce as XNonce } from "@multiversx/sdk-network-providers/out/primitives";
 
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -79,7 +77,6 @@ import {
   ClaimV3NFT,
   GetClaimData,
   GetTokenInfo,
-  DepTrxData,
 } from "../chain";
 import {
   //Chain,
@@ -96,7 +93,8 @@ import {
 import { EvNotifier } from "../../services/notifier";
 import { Base64 } from "js-base64";
 import abi from "./v3Bridge_abi.json";
-import { V3_ChainId } from "../../type-utils";
+
+import { multiversexService } from "../../services/multiversex";
 
 type ElrondSigner = (
   | ISigner
@@ -118,7 +116,7 @@ const NFT_TRANSFER_COST = new BigNumber(350000000);
 const NFT_UNFREEZE_COST = new BigNumber(350000000);
 const DEFAULT_V3_ROYALTY_RECEIVER =
   "2130d2c16f919f634de847801cdccefbbc1f89bdd2524d5b6b94edbf821b2b00";
-const DEFAULT_V3_ROYALTY = "1000";
+//const DEFAULT_V3_ROYALTY = "1000";
 
 type ContractRes = {
   readonly [idx: string]: number | string;
@@ -282,6 +280,7 @@ export interface ElrondParams {
   esdt_swap: string;
   v3_bridge: string;
   elrondApi: string;
+  elrondIndex: string;
   feeMargin: FeeMargins;
 }
 
@@ -309,6 +308,11 @@ export async function elrondHelperFactory(
     address: bridgeAddress,
     abi: abiRegistry,
   });
+
+  const multiversexApiService = multiversexService(
+    elrondParams.elrondApi,
+    elrondParams.elrondIndex
+  );
 
   async function notifyValidator(
     txn: Transaction,
@@ -965,82 +969,102 @@ export async function elrondHelperFactory(
       return "";
     },
     async getTokenInfo(depTrxData) {
-      const nftData = (
-        await axios(
-          `${elrondParams.elrondApi}/nfts/${depTrxData.tokenId}`
-        ).catch(() => undefined)
-      )?.data;
+      console.log(depTrxData, "depTrxData");
+
+      const nftData = await multiversexApiService.getTokenInfo(
+        depTrxData.sourceNftContractAddress,
+        Number(depTrxData.tokenId).toString(16)
+      );
+
+      const collectionData = await multiversexApiService.getCollectionInfo(
+        depTrxData.sourceNftContractAddress
+      );
+
+      console.log(collectionData, "collectionData");
 
       return {
         metadata: Base64.decode(nftData?.uris?.at(1) || ""),
-        name: depTrxData.sourceNftContractAddress,
+        name: collectionData.name,
         symbol: depTrxData.sourceNftContractAddress,
-        image: Base64.decode(nftData?.uris?.at(0) || ""),
-        royalty: "",
+        //image: Base64.decode(nftData?.uris?.at(0) || ""),
+        royalty: String(nftData.royalties * 100),
       };
     },
     async getClaimData(hash, helpers) {
-      const sourceNonce = Array.from(CHAIN_INFO.values()).find(
-        (c) => c.v3_chainId === "MULTIVERSX"
-      )?.nonce;
+      try {
+        /*const sourceNonce = Array.from(CHAIN_INFO.values()).find((c) => c.v3_chainId === "MULTIVERSX")?.nonce;
 
-      if (!sourceNonce) {
-        throw new Error("Source chain is undefined");
+                if (!sourceNonce) {
+                    throw new Error("Source chain is undefined");
+                }
+                console.log(sourceNonce, "sourceNonce in elrond");
+
+                const sourceChain = helpers.get(sourceNonce as ChainNonce);
+
+                const data = (
+                    await axios(`${elrondParams.elrondApi}/transaction/${hash}?withResults=true`).catch(() => undefined)
+                )?.data?.data?.transaction;
+
+                // const x = provider.getTransaction();
+
+                if (!data) {
+                    throw new Error("Failed to get Multiversex trx data");
+                }
+
+                const topics = data.logs.events.find((e: any) => e.address === data.sender).topics;
+                console.log(topics, "topics");
+
+                const decodedData = decodeBase64Array(topics);
+
+                console.log(decodedData);
+
+                if (!decodedData) {
+                    throw new Error("Failed to get Multiversex trx data");
+                }
+
+                const tokenId = String(decodedData[1].charCodeAt(0));
+                const destinationChain = decodedData[2] as V3_ChainId;
+                const destinationUserAddress = decodedData[3];
+                const sourceNftContractAddress = decodedData[4];
+                const tokenAmount = String(decodedData[5].charCodeAt(0));
+                const nftType = decodedData[6] as "singular" | "multiple";
+                const sourceChain = decodedData[7] as V3_ChainId;*/
+
+        const decoded = await multiversexApiService.getLockDecodedArgs(hash);
+
+        /*const decoded: DepTrxData = {
+                    destinationChain,
+                    destinationUserAddress,
+                    nftType,
+                    sourceChain,
+                    sourceNftContractAddress,
+                    tokenAmount,
+                    tokenId,
+                };*/
+
+        const sourceNonce = Array.from(CHAIN_INFO.values()).find(
+          (c) => c.v3_chainId === decoded.sourceChain
+        )?.nonce;
+
+        if (!sourceNonce) {
+          throw new Error("Source chain is undefined");
+        }
+        console.log(sourceNonce, "sourceNonce in elrond");
+
+        const sourceChainHelper = helpers.get(sourceNonce as ChainNonce);
+
+        const tokenInfo = await (sourceChainHelper as any).getTokenInfo(
+          decoded
+        );
+
+        return {
+          ...tokenInfo,
+          ...decoded,
+        };
+      } catch (e) {
+        console.log(e, "e");
+        throw e;
       }
-      console.log(sourceNonce, "sourceNonce in elrond");
-
-      const sourceChain = helpers.get(sourceNonce as ChainNonce);
-
-      const data = (
-        await axios(`${elrondParams.elrondApi}/transaction/${hash}`).catch(
-          () => undefined
-        )
-      )?.data?.data?.transaction?.data;
-
-      if (!data) {
-        throw new Error("Failed to get Multiversex trx data");
-      }
-
-      const decodedData = Base64.decode(data).split("@");
-
-      const decoded: DepTrxData = {
-        destinationChain: Buffer.from(
-          decodedData.at(7)!,
-          "hex"
-        ).toString() as V3_ChainId,
-        destinationUserAddress: Buffer.from(
-          decodedData.at(8) || "",
-          "hex"
-        ).toString(),
-        nftType:
-          Buffer.from(decodedData.at(5) || "lock721", "hex").toString() ===
-          "lock721"
-            ? "singular"
-            : "multiple",
-        sourceChain: "MULTIVERSX",
-        sourceNftContractAddress: Buffer.from(
-          decodedData.at(9) || "",
-          "hex"
-        ).toString(),
-        tokenAmount: decodedData.at(3) || "",
-        tokenId: Buffer.from(decodedData.at(6) || "", "hex").toString(),
-      };
-
-      const tokenInfo = await (
-        sourceChain as unknown as ElrondHelper
-      ).getTokenInfo(decoded);
-
-      return {
-        ...tokenInfo,
-        destinationChain: "BSC",
-        destinationUserAddress: "0xFe6bcdF43396A774836D98332d9eD5dA945f687e",
-        nftType: "singular",
-        sourceChain: "MULTIVERSX",
-        sourceNftContractAddress: "ALX-afef0b",
-        symbol: "ALX-afef0b",
-        tokenAmount: "1",
-        tokenId: "ALX-afef0b-09",
-      };
     },
     async lockNFT(signer, toChain, id, receiver) {
       let collectionIdentifiers =
@@ -1166,16 +1190,12 @@ export async function elrondHelperFactory(
         new FieldDefinition("fee", "attributes of the nft", new BigUIntType()),
       ]);
 
-      const structSigInfo = new StructType("SignatureInfo", [
-        new FieldDefinition(
-          "public_key",
-          "attributes of the nft",
-          new AddressType()
-        ),
-        new FieldDefinition("sig", "attributes of the nft", new BytesType()),
-      ]);
+      /*const structSigInfo = new StructType("SignatureInfo", [
+                new FieldDefinition("public_key", "attributes of the nft", new AddressType()),
+                new FieldDefinition("sig", "attributes of the nft", new BytesType()),
+            ]);*/
 
-      let claimDataArgs = new Struct(structClaimData, [
+      const claimDataArgs = new Struct(structClaimData, [
         new Field(
           new XBytesValue(
             Buffer.from(Number(claimData.tokenId).toString(16), "hex")
@@ -1191,7 +1211,7 @@ export async function elrondHelperFactory(
           "destination_chain"
         ),
         new Field(
-          new XAddressValue(new Address(claimData.destinationUserAddress)),
+          new XAddressValue(new XADDR(claimData.destinationUserAddress)),
           "destination_user_address"
         ),
         new Field(
@@ -1200,12 +1220,15 @@ export async function elrondHelperFactory(
         ),
         new Field(new XBytesValue(Buffer.from(claimData.name)), "name"),
         new Field(new XBytesValue(Buffer.from(claimData.symbol)), "symbol"),
-        new Field(new XBigUIntValue(DEFAULT_V3_ROYALTY), "royalty"),
         new Field(
-          new XAddressValue(new Address(initialClaimData.royaltyReceiver)),
+          new XBigUIntValue(Number(claimData.royalty) / 100),
+          "royalty"
+        ),
+        new Field(
+          new XAddressValue(new XADDR(initialClaimData.royaltyReceiver)),
           "royalty_receiver"
         ),
-        new Field(new XBytesValue(Buffer.from("v4t/1")), "attrs"),
+        new Field(new XBytesValue(Buffer.from(claimData.metadata)), "attrs"),
         new Field(
           new XBytesValue(Buffer.from(transactionHash)),
           "transaction_hash"
@@ -1218,46 +1241,7 @@ export async function elrondHelperFactory(
         ),
       ]);
 
-      //let binaryCodec = new BinaryCodec();
-
-      /*let signedMsg = await (
-            let hassh = Buffer.from(
-                keccak256(binaryCodec.encodeNested(claimDataArgs))
-            );
-
-            /*let signedMsg = await (
-                signer as XExtensionProvider
-            ).signMessage(
-                new SignableMessage({
-                    message: hassh,
-                })
-            );
-           */
-
-      const address = new Address(await signer.getAddress());
-
-      /*let query = bridgeContract.createQuery({
-        func: "validators",
-        caller: address,
-        args: [new XAddressValue(bridgeAddress)],
-      });
-
-            const queryResponse = await provider.queryContract({
-                caller: address,
-                args: [new AddressValue(bridgeAddress)],
-                func: new ContractFunction("validators"),
-                address: bridgeAddress,
-                value: Balance.Zero(),
-                toHttpRequest: () => {},
-            });
-            console.log(queryResponse);
-            //const tokensDefinition = bridgeContract.getEndpoint("validators");
-
-            /*const { firstValue } = new ResultsParser().parseQueryResponse(
-        queryResponse,
-        tokensDefinition
-      );
-      console.log(firstValue?.valueOf(), "fis");*/
+      const address = new XADDR((await signer.getAddress()) as string);
 
       const signatures = await storageContract.getLockNftSignatures(
         transactionHash,
@@ -1266,26 +1250,25 @@ export async function elrondHelperFactory(
 
       console.log(signatures, "signatures");
 
-      const signatureArgs = signatures.map((s) => {
-        return new Struct(structSigInfo, [
-          new Field(new XAddressValue(address), "public_key"),
-          new Field(
-            new XBytesValue(Buffer.from(s.signature || "", "hex")),
-            "sig"
-          ),
-        ]);
-      });
-
       const image =
         (await axios(claimData.metadata).catch(() => undefined))?.data?.image ||
         "";
-      console.log(image, "image");
 
+      const sigArgs = signatures.map((item) => {
+        return {
+          sig: new XBytesValue(
+            Buffer.from(item.signature.replace("0x", ""), "hex")
+          ),
+          public_key: new XAddressValue(
+            new XADDR(Buffer.from(item.signerAddress, "hex"))
+          ),
+        };
+      });
       const data = [
         claimDataArgs,
-        signatureArgs,
+        sigArgs,
         VariadicValue.fromItems(
-          new XBytesValue(Buffer.from(claimData.image || "", "utf-8")),
+          new XBytesValue(Buffer.from(image, "utf-8")),
           new XBytesValue(Buffer.from(claimData.metadata, "utf-8"))
         ),
       ];
@@ -1299,7 +1282,7 @@ export async function elrondHelperFactory(
         .buildTransaction();
 
       const account = new XACC(address);
-      account.update(await provider.getAccount(address));
+      account.update(await provider.getAccount(Address.fromHex(address.hex())));
       trx.setNonce(account.nonce);
 
       const txs = await (signer as XExtensionProvider).signTransaction(trx);
