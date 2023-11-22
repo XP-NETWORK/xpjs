@@ -13,4 +13,5 @@ export declare function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number)
     wrapped: any;
 }>;
 export declare const randomBigInt: () => bigint;
+export declare const decodeBase64Array: (encodedArray: string[]) => string[] | null;
 //# sourceMappingURL=utils.d.ts.map

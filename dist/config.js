@@ -31,7 +31,7 @@ var AppConfigs;
             heartbeatUri: "https://tools.xp.network/testnet-pinger/",
             wrappedNftPrefix: "https://tools.xp.network/testnet-wnft/",
             scVerifyUri: "https://tools.xp.network/testnet-sc-verify/",
-            storageContract: "0x38AEDf581C90D8EA955FC9a124b0A2B4471A61DD",
+            storageContract: "0x54194d68528B72EEb96d0a7ce7ffabaF14bD250D",
             storegeNetwork: "https://optimism-goerli.publicnode.com",
             network: "testnet",
         };

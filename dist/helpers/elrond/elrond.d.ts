@@ -4,7 +4,7 @@
  * Note that Unsigned Transactions need to be manually handled after they have been added to the block
  * @module
  */
-import { Address, ExtensionProvider, ISigner, Transaction, WalletConnectProvider } from "@elrondnetwork/erdjs";
+import { ExtensionProvider, ISigner, Transaction, WalletConnectProvider, Address } from "@elrondnetwork/erdjs";
 import { Transaction as XTRX } from "@multiversx/sdk-core";
 import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
 import BigNumber from "bignumber.js";
@@ -128,6 +128,7 @@ export interface ElrondParams {
     esdt_swap: string;
     v3_bridge: string;
     elrondApi: string;
+    elrondIndex: string;
     feeMargin: FeeMargins;
 }
 export declare function elrondHelperFactory(elrondParams: ElrondParams): Promise<ElrondHelper>;
