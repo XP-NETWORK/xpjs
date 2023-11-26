@@ -9,7 +9,7 @@ import { Transaction as XTRX } from "@multiversx/sdk-core";
 import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
 import BigNumber from "bignumber.js";
 import { BalanceCheck, MintNft, TransferNftForeign, UnfreezeForeignNft, TransferNftForeignBatch, UnfreezeForeignNftBatch, EstimateTxFeesBatch, GetFeeMargins, FeeMargins, IsContractAddress, GetTokenURI, LockNFT, ClaimV3NFT, GetClaimData, GetTokenInfo } from "../chain";
-import { ChainNonce, ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress } from "../..";
+import { ChainNonce, ChainNonceGet, EstimateTxFees, ExtractAction, ExtractTxnStatus, PreTransfer, PreTransferRawTxn, ValidateAddress, GetNftOrigin } from "../..";
 import { EvNotifier } from "../../services/notifier";
 type ElrondSigner = (ISigner | ExtensionProvider | WalletConnectProvider | XExtensionProvider) & {
     chainId?: string;
@@ -109,7 +109,7 @@ export type ElrondHelper = BalanceCheck & TransferNftForeign<ElrondSigner, EsdtN
 } & GetFeeMargins & {
     wegldBalance(address: string): Promise<BigNumber>;
     unwrapWegld(sender: ElrondSigner, amt: BigNumber): Promise<string>;
-} & IsContractAddress & GetTokenURI & LockNFT<ElrondSigner, EsdtNftInfo, XTRX> & ClaimV3NFT<ElrondSigner, XTRX> & GetClaimData & GetTokenInfo;
+} & IsContractAddress & GetTokenURI & LockNFT<ElrondSigner, EsdtNftInfo, XTRX> & ClaimV3NFT<ElrondSigner, XTRX> & GetClaimData & GetTokenInfo & GetNftOrigin;
 /**
  * Create an object implementing cross chain utilities for elrond
  *

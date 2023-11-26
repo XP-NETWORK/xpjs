@@ -59,6 +59,12 @@ export interface GetClaimData {
 export interface GetTokenInfo {
     getTokenInfo(depTrxData: DepTrxData): Promise<TokenInfo>;
 }
+export interface GetNftOrigin {
+    getNftOrigin(address: string): Promise<{
+        origin: string;
+        contract?: string;
+    }>;
+}
 export interface ClaimV3NFT<Signer, Resp> {
     claimV3NFT(sender: Signer, helpers: HelperMap<ChainNonce>, fromChain: FullChain<never, unknown, unknown> & GetClaimData, txHash: string, storageContract: BridgeStorage, initialClaimData: {
         fee: string;

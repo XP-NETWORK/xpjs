@@ -1,4 +1,5 @@
 import { NftInfo, FullChain } from "..";
+import { V3_ChainId } from "../type-utils";
 export declare const _headers: {
     "Content-Type": string;
     Accept: string;
@@ -14,4 +15,5 @@ export declare function isWrappedNft(nft: NftInfo<any>, fc: number, tc?: number)
 }>;
 export declare const randomBigInt: () => bigint;
 export declare const decodeBase64Array: (encodedArray: string[]) => string[] | null;
+export declare const v3BridgeIdToNonce: (id: V3_ChainId) => string;
 //# sourceMappingURL=utils.d.ts.map
