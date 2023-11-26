@@ -457,5 +457,8 @@ export async function web3ERC20HelperFactory(
     async getTokenInfo() {
       return undefined as any;
     },
+    async getNftOrigin() {
+      return undefined as any;
+    },
   };
 }

@@ -3,6 +3,7 @@ import {
   ElrondParams,
   ElrondHelper,
 } from "./helpers/elrond/elrond";
+
 import { tronHelperFactory, TronParams, TronHelper } from "./helpers/tron";
 import { web3HelperFactory, Web3Params, Web3Helper } from "./helpers/evm/web3";
 import { HederaHelperFactory } from "./helpers/hedera/hedera_refactor";
@@ -47,7 +48,7 @@ export enum TestNetRpcUri {
   ELROND = "https://devnet-gateway.multiversx.com",
   HECO = "https://http-testnet.hecochain.com",
   BSC = "https://data-seed-prebsc-1-s1.binance.org:8545",
-  ROPSTEN = "https://ultra-light-patina.ethereum-sepolia.discover.quiknode.pro/6f98178f32c668af8ee4bb1cc4b8b9308e29367b/",
+  ROPSTEN = "https://ethereum-sepolia.blockpi.network/v1/rpc/public", //"https://ultra-light-patina.ethereum-sepolia.discover.quiknode.pro/6f98178f32c668af8ee4bb1cc4b8b9308e29367b/",
   AVALANCHE = "https://api.avax-test.network/ext/bc/C/rpc",
   POLYGON = "https://polygon-mumbai.blockpi.network/v1/rpc/public",
   FANTOM = "https://rpc.testnet.fantom.network/",
@@ -287,20 +288,8 @@ export enum ChainType {
 }
 
 export const CHAIN_INFO: ChainInfo = new Map();
-CHAIN_INFO.set(Chain.ELROND, {
-  name: "Elrond",
-  nonce: 2,
-  v3_chainId: v3_ChainId.ELROND,
-  decimals: Decimals.EGLD,
-  constructor: elrondHelperFactory,
-  blockExplorerUrl: "https://explorer.elrond.com/transactions/",
-  blockExplorerUrlAddr: "https://explorer.elrond.com/address/",
-  tnBlockExplorerUrl: "https://devnet-explorer.multiversx.com/transactions/",
-  tnBlockExplorerUrlAddr: "https://devnet-explorer.multiversx.com/accounts/",
-  currency: SupportedCurrency.EGLD,
-  currencySymbol: SupportedCurrencyName.EGLD,
-  type: ChainType.ELROND,
-});
+console.log(elrondHelperFactory, "elrondHelperFactory");
+
 CHAIN_INFO.set(Chain.HECO, {
   name: "HECO",
   nonce: 3,
@@ -935,3 +924,19 @@ CHAIN_INFO.set(Chain.FINDORA, {
   tnBlockExplorerUrlAddr: "https://testnet-anvil.evm.findorascan.io/address/",
   tnChainId: 2153,
 });
+setTimeout(() => {
+  CHAIN_INFO.set(Chain.ELROND, {
+    name: "Elrond",
+    nonce: 2,
+    v3_chainId: v3_ChainId.ELROND,
+    decimals: Decimals.EGLD,
+    constructor: elrondHelperFactory,
+    blockExplorerUrl: "https://explorer.elrond.com/transactions/",
+    blockExplorerUrlAddr: "https://explorer.elrond.com/address/",
+    tnBlockExplorerUrl: "https://devnet-explorer.multiversx.com/transactions/",
+    tnBlockExplorerUrlAddr: "https://devnet-explorer.multiversx.com/accounts/",
+    currency: SupportedCurrency.EGLD,
+    currencySymbol: SupportedCurrencyName.EGLD,
+    type: ChainType.ELROND,
+  });
+}, 300);

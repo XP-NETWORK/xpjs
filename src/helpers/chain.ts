@@ -97,6 +97,10 @@ export interface GetTokenInfo {
   getTokenInfo(depTrxData: DepTrxData): Promise<TokenInfo>;
 }
 
+export interface GetNftOrigin {
+  getNftOrigin(address: string): Promise<{ origin: string; contract?: string }>;
+}
+
 export interface ClaimV3NFT<Signer, Resp> {
   claimV3NFT(
     sender: Signer,

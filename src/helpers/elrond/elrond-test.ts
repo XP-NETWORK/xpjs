@@ -1,6 +1,6 @@
 //import { Mnemonic } from "@elrondnetwork/erdjs";
-
-/*import {
+/*
+import {
     AbiRegistry,
     SmartContract,
     Address,
@@ -9,13 +9,26 @@
     TransactionPayload,
     ResultsParser,
     BigUIntValue,
+    StructType,
+    BytesType,
+    FieldDefinition,
+    BigUIntType,
+    AddressType,
+    Field,
+    BytesValue,
+    Struct,
+    VariadicValue,
+    AddressValue,
 } from "@multiversx/sdk-core";
 import { ProxyNetworkProvider, ApiNetworkProvider } from "@multiversx/sdk-network-providers";
 import { UserSigner, Mnemonic } from "@multiversx/sdk-wallet";
 import abi from "./v3Bridge_abi.json";
-import { decodeBase64Array } from "../../factory";
-import axios from "axios";
+import { Nonce } from "@multiversx/sdk-network-providers/out/primitives";
+//import { decodeBase64Array } from "../../factory";
+//import axios from "axios";
 import BigNumber from "bignumber.js";
+import { decodeBase64Array } from "../../factory";
+import { inspect } from "node:util";
 
 const f = Mnemonic.fromString(
     `evidence liberty culture stuff canal minute toward trash boil cry verb recall during citizen social upper budget ranch distance business excite fox icon tool`
@@ -24,13 +37,13 @@ const proxyNetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.mu
 const apiNetworkProvider = new ApiNetworkProvider("https://devnet2-api.multiversx.com");
 const signer = new UserSigner(f.deriveKey());
 
-const bridgeAddress = new Address("erd1qqqqqqqqqqqqqpgqghvly0npf6ewpmzh47ud76ssh6nppu4e7hnses7qlz");
+const bridgeAddress = new Address("erd1qqqqqqqqqqqqqpgqtsw8s3evjjyqqa2j2tfn9yvufqskdv236n9s2a06h9");
 const abiRegistry = AbiRegistry.create(abi);
 const bridgeContract = new SmartContract({
     address: bridgeAddress,
     abi: abiRegistry,
 });
-bridgeContract;
+
 const collectionName = "Alex";
 const collectionTicker = "ALX";
 const collectionIdentifier = "ALX-afef0b";
@@ -188,6 +201,7 @@ async function transferToSc(
         receiver: signer.getAddress(),
         chainID: "D",
     });
+
     const nonce1 = account.getNonceThenIncrement();
     tx3.setNonce(nonce1);
 
@@ -197,6 +211,98 @@ async function transferToSc(
 
     let txHash = await proxyNetworkProvider.sendTransaction(tx3);
     console.log("Hash:", txHash);
+}
+
+async function claim(account: Account, signer: UserSigner) {
+    const structClaimData = new StructType("ClaimData", [
+        new FieldDefinition("token_id", "name of the nft", new BytesType()),
+        new FieldDefinition("source_chain", "attributes of the nft", new BytesType()),
+        new FieldDefinition("destination_chain", "attributes of the nft", new BytesType()),
+        new FieldDefinition("destination_user_address", "attributes of the nft", new AddressType()),
+        new FieldDefinition("source_nft_contract_address", "attributes of the nft", new BytesType()),
+        new FieldDefinition("name", "attributes of the nft", new BytesType()),
+        new FieldDefinition("symbol", "attributes of the nft", new BytesType()),
+        new FieldDefinition("royalty", "attributes of the nft", new BigUIntType()),
+        new FieldDefinition("royalty_receiver", "attributes of the nft", new AddressType()),
+        new FieldDefinition("attrs", "attributes of the nft", new BytesType()),
+        new FieldDefinition("transaction_hash", "attributes of the nft", new BytesType()),
+        new FieldDefinition("token_amount", "attributes of the nft", new BigUIntType()),
+        new FieldDefinition("nft_type", "attributes of the nft", new BytesType()),
+        new FieldDefinition("fee", "attributes of the nft", new BigUIntType()),
+    ]);
+
+    //copied from validator logs
+    const claimData = {
+        tokenId: "33",
+        sourceChain: "BSC",
+        destinationChain: "MULTIVERSX",
+        destinationUserAddress: "erd1ymdj4ze52a0tmcjzeyhcntzaf5uxpn2d6t203yreh6qx6fqeftgqmz9ly6",
+        sourceNftContractAddress: "0xc679bdad7c2a34ca93552eae75e4bc03bf505adc",
+        name: "Istra",
+        symbol: "NSA",
+        royalty: "0",
+        royaltyReceiver: "9fb927c978225cb7a93b8b3cd8d8423e176e009dc284c536d9c4372bbe128487",
+        metadata: "https://meta.polkamon.com/meta?id=10002366748",
+        transactionHash: "0x4e7cc1b533361fc39f013391c6fead3f0a55a4656f8e7f1a84af7740ff5a2abf",
+        tokenAmount: "1",
+        nftType: "singular",
+        fee: "100000000000000",
+    };
+
+    //sig copied validator logs
+    const signature = {
+        sig: "0xdccd31367579bfd82e46881e28c2201f7e9e58327e1c4366e972c170ad9b3b1924861101446bdc8ea1c5b364361fa12cabcea32c473e2f759a01e699e24bdc07",
+        public_key: "9fb927c978225cb7a93b8b3cd8d8423e176e009dc284c536d9c4372bbe128487",
+    };
+
+    const claimDataArgs = new Struct(structClaimData, [
+        new Field(new BytesValue(Buffer.from(new Nonce(Number(claimData.tokenId)).hex(), "hex")), "token_id"),
+        new Field(new BytesValue(Buffer.from(claimData.sourceChain)), "source_chain"),
+        new Field(new BytesValue(Buffer.from(claimData.destinationChain)), "destination_chain"),
+        new Field(new AddressValue(new Address(claimData.destinationUserAddress)), "destination_user_address"),
+        new Field(new BytesValue(Buffer.from(claimData.sourceNftContractAddress)), "source_nft_contract_address"),
+        new Field(new BytesValue(Buffer.from(claimData.name)), "name"),
+        new Field(new BytesValue(Buffer.from("N" + claimData.sourceChain.toUpperCase())), "symbol"),
+        new Field(new BigUIntValue(new Nonce(Number(claimData.royalty)).hex()), "royalty"),
+        new Field(new AddressValue(new Address(claimData.royaltyReceiver)), "royalty_receiver"),
+        new Field(new BytesValue(Buffer.from(claimData.metadata)), "attrs"),
+        new Field(new BytesValue(Buffer.from(claimData.transactionHash)), "transaction_hash"),
+        new Field(new BigUIntValue(claimData.tokenAmount), "token_amount"),
+        new Field(new BytesValue(Buffer.from(claimData.nftType)), "nft_type"),
+        new Field(new BigUIntValue(claimData.fee), "fee"),
+    ]);
+
+    const data = [
+        claimDataArgs,
+        [
+            {
+                public_key: new AddressValue(new Address(Buffer.from(signature.public_key, "hex"))),
+                sig: new BytesValue(Buffer.from(signature.sig.replace(/^0x/, ""), "hex")),
+            },
+        ],
+        VariadicValue.fromItems(
+            new BytesValue(
+                Buffer.from(
+                    "https://drive.polychainmonsters.com/ipfs/QmXBAiT4um5WSJZfoJ1arCbcJh89yBEYvi17bVM91rj3t4",
+                    "utf-8"
+                )
+            ),
+            new BytesValue(Buffer.from(claimData.metadata, "utf-8"))
+        ),
+    ];
+
+    const transaction = bridgeContract.methods
+        .claimNft721(data)
+        .withSender(signer.getAddress())
+        .withNonce(account.getNonceThenIncrement())
+        .withChainID("D")
+        .withGasLimit(6_000_000_00)
+        .withValue(new BigUIntValue(new BigNumber("50000000000000000")))
+        .buildTransaction();
+
+    transaction.applySignature(await signer.sign(transaction.serializeForSigning()));
+    const hash = await proxyNetworkProvider.sendTransaction(transaction);
+    console.log(hash);
 }
 
 const address = new Address("erd1ymdj4ze52a0tmcjzeyhcntzaf5uxpn2d6t203yreh6qx6fqeftgqmz9ly6");
@@ -215,36 +321,39 @@ const account = new Account(address);
     setSpecialRoles;
     createNft;
     transferToSc;
+
+    false && (await claim(account, signer));
     //transferToSc(bridgeAddress, account, signer, "ALX-afef0b-01", "01");
-    //await createNft("ALX-afef0b-07", address, account, signer);
+    //await createNft("ALX-afef0b-51", address, account, signer);
 
-    const data = {
-        headers: {
-            "Content-Type": "application/json",
-        },
-        data: {
-            _source: ["events"],
-            query: {
-                bool: {
-                    should: [
-                        {
-                            terms: {
-                                originalTxHash: ["6ae4c0fdb82785f7642975b0e1a21b5b3d441c7d74345e06667ea20dcadda150"],
-                            },
-                        },
-                    ],
-                },
-            },
-        },
-    };
-    const logs = (await axios.get(`https://devnet-index.multiversx.com/logs/_search`, data))?.data?.hits?.hits[0]
-        ?._source?.events;
+    const query = bridgeContract.createQuery({
+        func: "originalToDuplicateMapping",
+        args: [],
+        //caller: signer.getAddress(),
+    });
 
-    console.log(logs);
-    const x = decodeBase64Array(logs[1].topics) as string[];
+    const provider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
 
-    console.log(x, "x");
-    signer;
+    const queryResponse = await provider.queryContract(query);
+
+    const def = bridgeContract.getEndpoint("originalToDuplicateMapping");
+
+    const { firstValue } = new ResultsParser().parseQueryResponse(queryResponse, def);
+    const count = firstValue?.valueOf();
+
+    const decodedMapping = count.map((pair: any) => {
+        return pair.flatMap((item: any[]) => {
+            return Object.keys(item).map((key: any) => ({ [key]: Buffer.from(item[key]).toString() }));
+        });
+    });
+
+    const pair = decodedMapping.find((item: []) =>
+        item.find((obj) => Object.values(obj).find((val) => val === "NSA-42b661"))
+    );
+
+    console.log(pair[0].field0, pair[1].field1);
+
+    //console.log(decodeBase64Array(res.returnData), "res");
     //await createNft("ALX-afef0b-07", address, account, signer);
     //await createNft("ALX-afef0b-08", address, account, signer);
     //await createNft("ALX-afef0b-09", address, account, signer);

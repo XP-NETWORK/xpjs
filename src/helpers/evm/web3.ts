@@ -62,8 +62,10 @@ import {
   GetClaimData,
   ClaimV3NFT,
   CHAIN_INFO,
+  GetNftOrigin,
+  v3BridgeIdToNonce,
 } from "../..";
-import { ChainNonce } from "../../type-utils";
+import { ChainNonce, V3_ChainId } from "../../type-utils";
 import { EvNotifier } from "../../services/notifier";
 import { hethers } from "@hashgraph/hethers";
 import { txnUnderpricedPolyWorkaround as UnderpricedWorkaround } from "./web3_utils";
@@ -206,7 +208,8 @@ export type Web3Helper = BaseWeb3Helper &
   LockNFT<Signer, EthNftInfo, TransactionResponse> &
   ClaimV3NFT<Signer, TransactionResponse> &
   GetClaimData &
-  GetTokenInfo;
+  GetTokenInfo &
+  GetNftOrigin;
 
 /**
  * Create an object implementing minimal utilities for a web3 chain
@@ -1216,6 +1219,7 @@ export async function web3HelperFactory(
         signatureArray,
         {
           value: initialClaimData.fee,
+          gasLimit: "2000000",
         }
       );
 
@@ -1223,6 +1227,25 @@ export async function web3HelperFactory(
 
       await tx.wait();
       return tx;
+    },
+    async getNftOrigin(address) {
+      const nonce = String(params.nonce);
+      try {
+        const bridge = V3Bridge__factory.connect(
+          params.v3_bridge!,
+          params.provider
+        );
+        const chain = await bridge.functions.selfChain();
+        const res = await bridge.duplicateToOriginalMapping(address, chain[0]);
+        return {
+          origin: res.chain
+            ? v3BridgeIdToNonce(res.chain as V3_ChainId)
+            : nonce,
+          contract: res.contractAddress,
+        };
+      } catch {
+        return { origin: nonce };
+      }
     },
   };
 }

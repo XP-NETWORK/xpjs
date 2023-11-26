@@ -47,16 +47,14 @@ import {
   BytesValue as XBytesValue,
   AddressValue as XAddressValue,
   BigUIntValue as XBigUIntValue,
-  //BinaryCodec,
+  ResultsParser,
   VariadicValue,
-  //ResultsParser,
-  //SignableMessage,
 } from "@multiversx/sdk-core";
 
 import { ExtensionProvider as XExtensionProvider } from "@multiversx/sdk-extension-provider";
 
-//import { Nonce as XNonce } from "@multiversx/sdk-network-providers/out/primitives";
-
+import { Nonce as XNonce } from "@multiversx/sdk-network-providers/out/primitives";
+import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import {
@@ -89,6 +87,7 @@ import {
   PreTransfer,
   PreTransferRawTxn,
   ValidateAddress,
+  GetNftOrigin,
 } from "../..";
 import { EvNotifier } from "../../services/notifier";
 import { Base64 } from "js-base64";
@@ -260,7 +259,8 @@ export type ElrondHelper = BalanceCheck &
   LockNFT<ElrondSigner, EsdtNftInfo, XTRX> &
   ClaimV3NFT<ElrondSigner, XTRX> &
   GetClaimData &
-  GetTokenInfo;
+  GetTokenInfo &
+  GetNftOrigin;
 
 /**
  * Create an object implementing cross chain utilities for elrond
@@ -288,7 +288,7 @@ export async function elrondHelperFactory(
   elrondParams: ElrondParams
 ): Promise<ElrondHelper> {
   const provider = new ProxyProvider(elrondParams.node_uri);
-  //const proxyNetworkProvider = new ProxyNetworkProvider(elrondParams.node_uri);
+  const proxyNetworkProvider = new ProxyNetworkProvider(elrondParams.node_uri);
   await NetworkConfig.getDefault().sync(provider);
   const mintContract = new Address(elrondParams.minter_address);
   const swapContract = new Address(elrondParams.esdt_swap_address);
@@ -313,6 +313,28 @@ export async function elrondHelperFactory(
     elrondParams.elrondApi,
     elrondParams.elrondIndex
   );
+
+  let originalContractMapping: any;
+  const queryResponse = await proxyNetworkProvider
+    .queryContract(
+      bridgeContract.createQuery({
+        func: "originalToDuplicateMapping",
+        args: [],
+      })
+    )
+    .catch((e) => {
+      console.log(e, "originalToDuplicateMapping query multivers");
+    });
+
+  if (queryResponse) {
+    const def = bridgeContract.getEndpoint("originalToDuplicateMapping");
+
+    const { firstValue } = new ResultsParser().parseQueryResponse(
+      queryResponse,
+      def
+    );
+    originalContractMapping = firstValue?.valueOf();
+  }
 
   async function notifyValidator(
     txn: Transaction,
@@ -987,60 +1009,12 @@ export async function elrondHelperFactory(
         name: collectionData.name,
         symbol: depTrxData.sourceNftContractAddress,
         //image: Base64.decode(nftData?.uris?.at(0) || ""),
-        royalty: String(nftData.royalties * 100),
+        royalty: String((nftData.royalties || 0) * 100),
       };
     },
     async getClaimData(hash, helpers) {
       try {
-        /*const sourceNonce = Array.from(CHAIN_INFO.values()).find((c) => c.v3_chainId === "MULTIVERSX")?.nonce;
-
-                if (!sourceNonce) {
-                    throw new Error("Source chain is undefined");
-                }
-                console.log(sourceNonce, "sourceNonce in elrond");
-
-                const sourceChain = helpers.get(sourceNonce as ChainNonce);
-
-                const data = (
-                    await axios(`${elrondParams.elrondApi}/transaction/${hash}?withResults=true`).catch(() => undefined)
-                )?.data?.data?.transaction;
-
-                // const x = provider.getTransaction();
-
-                if (!data) {
-                    throw new Error("Failed to get Multiversex trx data");
-                }
-
-                const topics = data.logs.events.find((e: any) => e.address === data.sender).topics;
-                console.log(topics, "topics");
-
-                const decodedData = decodeBase64Array(topics);
-
-                console.log(decodedData);
-
-                if (!decodedData) {
-                    throw new Error("Failed to get Multiversex trx data");
-                }
-
-                const tokenId = String(decodedData[1].charCodeAt(0));
-                const destinationChain = decodedData[2] as V3_ChainId;
-                const destinationUserAddress = decodedData[3];
-                const sourceNftContractAddress = decodedData[4];
-                const tokenAmount = String(decodedData[5].charCodeAt(0));
-                const nftType = decodedData[6] as "singular" | "multiple";
-                const sourceChain = decodedData[7] as V3_ChainId;*/
-
         const decoded = await multiversexApiService.getLockDecodedArgs(hash);
-
-        /*const decoded: DepTrxData = {
-                    destinationChain,
-                    destinationUserAddress,
-                    nftType,
-                    sourceChain,
-                    sourceNftContractAddress,
-                    tokenAmount,
-                    tokenId,
-                };*/
 
         const sourceNonce = Array.from(CHAIN_INFO.values()).find(
           (c) => c.v3_chainId === decoded.sourceChain
@@ -1219,9 +1193,14 @@ export async function elrondHelperFactory(
           "source_nft_contract_address"
         ),
         new Field(new XBytesValue(Buffer.from(claimData.name)), "name"),
-        new Field(new XBytesValue(Buffer.from(claimData.symbol)), "symbol"),
         new Field(
-          new XBigUIntValue(Number(claimData.royalty) / 100),
+          new XBytesValue(
+            Buffer.from("N" + claimData.sourceChain.toUpperCase())
+          ),
+          "symbol"
+        ),
+        new Field(
+          new XBigUIntValue(new XNonce(Number(claimData.royalty)).hex()),
           "royalty"
         ),
         new Field(
@@ -1289,6 +1268,29 @@ export async function elrondHelperFactory(
 
       await provider.sendTransaction(txs as unknown as Transaction);
       return txs;
+    },
+    async getNftOrigin(address) {
+      const native = { origin: String(elrondParams.nonce) };
+      if (!originalContractMapping) return native;
+
+      const decodedMapping = originalContractMapping.map((pair: []) => {
+        return pair.flatMap((item: []) => {
+          return Object.keys(item).map((key: any) => ({
+            [key]: Buffer.from(item[key]).toString(),
+          }));
+        });
+      });
+
+      const pair = decodedMapping.find((item: []) =>
+        item.find((obj) => Object.values(obj)?.find((val) => val === address))
+      );
+
+      if (!pair) return native;
+
+      return {
+        origin: pair[1].field1 as string,
+        contract: pair[0].field0 as string,
+      };
     },
   };
 }

@@ -30,7 +30,7 @@ export namespace AppConfigs {
       heartbeatUri: "https://tools.xp.network/testnet-pinger/",
       wrappedNftPrefix: "https://tools.xp.network/testnet-wnft/", //"https://bridge-wnftapi.herokuapp.com/",
       scVerifyUri: "https://tools.xp.network/testnet-sc-verify/",
-      storageContract: "0x54194d68528B72EEb96d0a7ce7ffabaF14bD250D", //"0x8F1fd3a5DbBd5659579aE7d9b258CC6CbcB3e53d", //"0xDb2a42f40158B1Cb29703e2a95a6fa3094294f05",
+      storageContract: "0x0263A038014505881E33d4201950fa11c29793F3", //"0x8F1fd3a5DbBd5659579aE7d9b258CC6CbcB3e53d", //"0xDb2a42f40158B1Cb29703e2a95a6fa3094294f05",
       storegeNetwork: "https://optimism-goerli.publicnode.com",
       network: "testnet",
     };

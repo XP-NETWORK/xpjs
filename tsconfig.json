@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "incremental": false,
-    "target": "ES2021",
+    "target": "ES2022",
     "outDir": "./dist",
     //"outDir": "../bridge-interface/node_modules/xp.network/dist",
     //"outDir": "../bridge-tests/node_modules/xp.network/dist",

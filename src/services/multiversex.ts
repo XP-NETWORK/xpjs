@@ -24,6 +24,8 @@ export function multiversexService(
     baseURL: indexerUrl,
   });
 
+  index;
+
   return {
     async getTokenInfo(collection, tokenId) {
       const nftData = (
@@ -48,31 +50,36 @@ export function multiversexService(
       return collectionData;
     },
     async getLockDecodedArgs(hash) {
-      const data = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          _source: ["events"],
-          query: {
-            bool: {
-              should: [
-                {
-                  terms: {
-                    originalTxHash: [hash],
-                  },
+      /*const data = {
+                headers: {
+                    "Content-Type": "application/json",
                 },
-              ],
-            },
-          },
-        },
-      };
-      const event = (
-        await index("/logs/_search", data)
-      )?.data?.hits?.hits[0]?._source?.events?.find(
-        (e: any) => e.identifier === "lock721"
-      );
+                data: {
+                    _source: ["events"],
+                    query: {
+                        bool: {
+                            should: [
+                                {
+                                    terms: {
+                                        originalTxHash: [hash],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+            const event = (
+                await index.get("/logs/_search", data).catch((e) => {
+                    console.log(e, "ee");
+                    return undefined;
+                })
+            )?.data?.hits?.hits[0]?._source?.events?.find((e: any) => e.identifier === "lock721");*/
 
+      const res = await api.get(`/transactions/${hash}?withResults=true`);
+      const event = res?.data?.results
+        ?.find((r: any) => r.logs)
+        ?.logs?.events?.find((e: any) => e.identifier === "lock721");
       if (!event) {
         throw new Error(`Failed to get ${hash} events`);
       }

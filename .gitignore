@@ -11,3 +11,4 @@ src/test.ts
 .env*
 test*
 *.DS_Store
+src/helpers/elrond/elrond-test.ts

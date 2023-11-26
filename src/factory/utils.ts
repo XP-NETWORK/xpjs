@@ -2,6 +2,7 @@ import { NftInfo, FullChain } from "..";
 import { CHAIN_INFO, ChainType, Chain } from "../consts";
 import axios from "axios";
 import BigNumber from "bignumber.js";
+import { V3_ChainId } from "../type-utils";
 
 export const _headers = {
   "Content-Type": "application/json",
@@ -167,3 +168,8 @@ export const decodeBase64Array = (encodedArray: string[]): string[] | null => {
     return Buffer.from(encodedString, "base64").toString("utf-8");
   });
 };
+
+export const v3BridgeIdToNonce = (id: V3_ChainId) =>
+  Array.from(CHAIN_INFO.values())
+    .find((c) => c.v3_chainId === id)!
+    .nonce.toString();
