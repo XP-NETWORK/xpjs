@@ -19,7 +19,7 @@ import {
   WhitelistCheck,
 } from "../chain";
 
-import { ChainNonce, PreTransfer } from "../..";
+import { ChainNonce, PreTransfer, ClaimV3NFT } from "../..";
 
 import { BridgeContract } from "./ton-bridge";
 
@@ -75,7 +75,8 @@ export type TonHelper = ChainNonceGet &
   WhitelistCheck<TonNft> &
   GetExtraFees &
   NftListUtils &
-  ScVerifyUtils;
+  ScVerifyUtils &
+  ClaimV3NFT<TonSigner, string>;
 
 export type TonParams = {
   tonweb: TonWeb;
@@ -85,6 +86,7 @@ export type TonParams = {
   xpnftAddr: string;
   feeMargin: FeeMargins;
   extraFees: Map<ChainNonce, string>;
+  v3_bridge: string;
 };
 
 type MethodMap = {
@@ -480,6 +482,67 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     },
     getScVerifyAddr(address) {
       return address.replace(/[^a-zA-Z0-9]/g, "");
+    },
+    async claimV3NFT(
+      sender,
+      helpers,
+      from,
+      transactionHash,
+      storageContract,
+      initialClaimData
+    ) {
+      const [claimDataRes] = await Promise.allSettled([
+        // bridge.validatorsCount(),
+        from.getClaimData(transactionHash, helpers),
+      ]);
+
+      if (claimDataRes.status === "rejected") {
+        throw new Error("Failed to get claimData from dep chain");
+      }
+
+      const claimData = claimDataRes.value;
+      console.log(
+        { ...claimData, ...initialClaimData, transactionHash },
+        "claim data"
+      );
+
+      /*const encodedClaimData: ClaimData = {
+                $$type: "ClaimData",
+                data1: {
+                    $$type: "ClaimData1",
+                    tokenId: BigInt(tokenId),
+                    destinationChain,
+                    destinationUserAddress: Address.parseFriendly(destinationUserAddress).address,
+                    sourceChain,
+                    tokenAmount: BigInt(tokenAmount),
+                },
+                data2: {
+                    $$type: "ClaimData2",
+                    name,
+                    nftType,
+                    symbol,
+                },
+                data3: {
+                    $$type: "ClaimData3",
+                    fee: BigInt(fee),
+                    metadata,
+                    royaltyReceiver: Address.parseFriendly(royaltyReceiver).address,
+                    sourceNftContractAddress: sourceNftContractAddress_,
+                },
+                data4: {
+                    $$type: "ClaimData4",
+                    newContent: beginCell().storeInt(0x01, 8).storeStringRefTail(metadata).endCell(),
+                    royalty: {
+                        $$type: "RoyaltyParams",
+                        numerator: BigInt(SalePriceToGetTotalRoyalityPercentage),
+                        denominator: BigInt(royalty),
+                        destination: Address.parseFriendly(royaltyReceiver).address,
+                    },
+                    transactionHash,
+                },
+            };*/
+
+      return "";
     },
   };
 }

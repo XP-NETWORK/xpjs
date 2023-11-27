@@ -50,49 +50,33 @@ export function multiversexService(
       return collectionData;
     },
     async getLockDecodedArgs(hash) {
-      /*const data = {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: {
-                    _source: ["events"],
-                    query: {
-                        bool: {
-                            should: [
-                                {
-                                    terms: {
-                                        originalTxHash: [hash],
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                },
-            };
-            const event = (
-                await index.get("/logs/_search", data).catch((e) => {
-                    console.log(e, "ee");
-                    return undefined;
-                })
-            )?.data?.hits?.hits[0]?._source?.events?.find((e: any) => e.identifier === "lock721");*/
+      let event: any = undefined;
+      let timedout = false;
 
-      const res = await api.get(`/transactions/${hash}?withResults=true`);
-      const event = res?.data?.results
-        ?.find((r: any) => r.logs)
-        ?.logs?.events?.find((e: any) => e.identifier === "lock721");
-      if (!event) {
-        throw new Error(`Failed to get ${hash} events`);
+      const tm1 = setTimeout(() => {
+        timedout = true;
+      }, 1000 * 60 * 3);
+
+      while (!event && !timedout) {
+        const res = await api.get(`/transactions/${hash}?withResults=true`);
+        event = res?.data?.results
+          ?.find((r: any) => r.logs)
+          ?.logs?.events?.find((e: any) => e.identifier === "lock721");
+
+        !event && (await new Promise((r) => setTimeout(r, 10_000)));
       }
 
-      console.log(event, "event");
+      if (!event) {
+        throw new Error(`Failed to get ${hash} event logs`);
+      }
+
+      clearTimeout(tm1);
 
       const args = decodeBase64Array(event.topics);
 
       if (!args) {
         throw new Error(`Failed to decode ${hash} topics`);
       }
-
-      console.log(args, "decoded args");
 
       return {
         tokenId: String(args[1].charCodeAt(0)),

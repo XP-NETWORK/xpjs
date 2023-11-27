@@ -96,6 +96,7 @@ export namespace ChainFactoryConfigs {
         bridgeAddr: "kQBwUu-b4O6qDYq3iDRvsYUnTD6l3WCxLXkv0aH6ywAaPs3c",
         burnerAddr: "kQCbH9gGgqJzXuusUVajW_40brrl2fxTYqMkk6HUhJnIgOQA",
         xpnftAddr: "EQDji0YH-SNT-qi6o5dQQBLeWL0Xmm46fnqj34EYhOL34WDc",
+        v3_bridge: "EQDI6P9gheuWLh1euThjFE2muUpa9tp2y49TD6Zz5oOF5gWL",
         feeMargin,
         extraFees: new Map().set(Chain.ETHEREUM, "1"),
         notifier,
@@ -564,6 +565,7 @@ export namespace ChainFactoryConfigs {
               "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
           })
         ),
+        v3_bridge: "",
         xpnftAddr: "EQCgk1I2zujGrXaNXnWZEtFD93tSKNjvRfqKV0xp7EswHgw9",
         feeMargin,
       },
@@ -870,6 +872,7 @@ export namespace ChainFactoryConfigs {
               "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
           })
         ),
+        v3_bridge: "",
         xpnftAddr: "EQABqbZubs5e3QQF3lxVZMvdaxlaIdNQWq8W1rn8rvVvWHys",
         extraFees: new Map().set(Chain.ETHEREUM, "1"),
         feeMargin: { min: 1.5, max: 5 },

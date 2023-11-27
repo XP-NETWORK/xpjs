@@ -28,8 +28,8 @@ import {
   Address,
 } from "@elrondnetwork/erdjs";
 
-import { CHAIN_INFO } from "../..";
-
+import { CHAIN_INFO, v3BridgeIdToNonce } from "../..";
+import { V3_ChainId } from "../../type-utils";
 import {
   Transaction as XTRX,
   Address as XADDR,
@@ -314,26 +314,28 @@ export async function elrondHelperFactory(
     elrondParams.elrondIndex
   );
 
-  let originalContractMapping: any;
-  const queryResponse = await proxyNetworkProvider
-    .queryContract(
+  let cachedV3ContractMapping = await queryMappedV3Contracts().catch(
+    () => undefined
+  );
+
+  async function queryMappedV3Contracts() {
+    setTimeout(() => {
+      cachedV3ContractMapping = undefined;
+    }, 60_000);
+
+    const queryResponse = await proxyNetworkProvider.queryContract(
       bridgeContract.createQuery({
         func: "originalToDuplicateMapping",
         args: [],
       })
-    )
-    .catch((e) => {
-      console.log(e, "originalToDuplicateMapping query multivers");
-    });
+    );
 
-  if (queryResponse) {
     const def = bridgeContract.getEndpoint("originalToDuplicateMapping");
-
     const { firstValue } = new ResultsParser().parseQueryResponse(
       queryResponse,
       def
     );
-    originalContractMapping = firstValue?.valueOf();
+    return firstValue?.valueOf();
   }
 
   async function notifyValidator(
@@ -1172,7 +1174,7 @@ export async function elrondHelperFactory(
       const claimDataArgs = new Struct(structClaimData, [
         new Field(
           new XBytesValue(
-            Buffer.from(Number(claimData.tokenId).toString(16), "hex")
+            Buffer.from(new XNonce(Number(claimData.tokenId)).hex(), "hex")
           ),
           "token_id"
         ),
@@ -1185,7 +1187,7 @@ export async function elrondHelperFactory(
           "destination_chain"
         ),
         new Field(
-          new XAddressValue(new XADDR(claimData.destinationUserAddress)),
+          new XAddressValue(new Address(claimData.destinationUserAddress)),
           "destination_user_address"
         ),
         new Field(
@@ -1199,12 +1201,9 @@ export async function elrondHelperFactory(
           ),
           "symbol"
         ),
+        new Field(new XBigUIntValue(Number(claimData.royalty)), "royalty"),
         new Field(
-          new XBigUIntValue(new XNonce(Number(claimData.royalty)).hex()),
-          "royalty"
-        ),
-        new Field(
-          new XAddressValue(new XADDR(initialClaimData.royaltyReceiver)),
+          new XAddressValue(new Address(initialClaimData.royaltyReceiver)),
           "royalty_receiver"
         ),
         new Field(new XBytesValue(Buffer.from(claimData.metadata)), "attrs"),
@@ -1214,10 +1213,7 @@ export async function elrondHelperFactory(
         ),
         new Field(new XBigUIntValue(claimData.tokenAmount), "token_amount"),
         new Field(new XBytesValue(Buffer.from(claimData.nftType)), "nft_type"),
-        new Field(
-          new XBigUIntValue(new BigNumber(initialClaimData.fee)),
-          "fee"
-        ),
+        new Field(new XBigUIntValue(initialClaimData.fee), "fee"),
       ]);
 
       const address = new XADDR((await signer.getAddress()) as string);
@@ -1232,6 +1228,8 @@ export async function elrondHelperFactory(
       const image =
         (await axios(claimData.metadata).catch(() => undefined))?.data?.image ||
         "";
+
+      console.log(image);
 
       const sigArgs = signatures.map((item) => {
         return {
@@ -1271,9 +1269,13 @@ export async function elrondHelperFactory(
     },
     async getNftOrigin(address) {
       const native = { origin: String(elrondParams.nonce) };
-      if (!originalContractMapping) return native;
 
-      const decodedMapping = originalContractMapping.map((pair: []) => {
+      const v3ContractMapping =
+        cachedV3ContractMapping || (await queryMappedV3Contracts());
+
+      if (!v3ContractMapping) return native;
+
+      const decodedMapping = v3ContractMapping.map((pair: []) => {
         return pair.flatMap((item: []) => {
           return Object.keys(item).map((key: any) => ({
             [key]: Buffer.from(item[key]).toString(),
@@ -1288,7 +1290,7 @@ export async function elrondHelperFactory(
       if (!pair) return native;
 
       return {
-        origin: pair[1].field1 as string,
+        origin: v3BridgeIdToNonce(pair[1].field1 as V3_ChainId),
         contract: pair[0].field0 as string,
       };
     },

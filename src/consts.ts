@@ -243,6 +243,7 @@ export enum v3_ChainId {
   POLYGON = "MATIC",
   ETHEREUM = "ETH",
   ELROND = "MULTIVERSX",
+  TON = "TON",
   DEFAULT = "",
 }
 
@@ -753,7 +754,7 @@ CHAIN_INFO.set(Chain.TON, {
   currencySymbol: SupportedCurrencyName.TON,
   decimals: Decimals.TON,
   nonce: Chain.TON,
-  v3_chainId: v3_ChainId.DEFAULT,
+  v3_chainId: v3_ChainId.TON,
   type: ChainType.TON,
   tnBlockExplorerUrl: "https://testnet.tonscan.org/tx/",
   blockExplorerUrl: "https://tonscan.org/tx/",

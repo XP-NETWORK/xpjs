@@ -1119,7 +1119,7 @@ export async function web3HelperFactory(
         tokenId: String(parsed.args[0]),
         destinationChain: parsed.args[1],
         destinationUserAddress: parsed.args[2],
-        sourceNftContractAddress: parsed.args[3],
+        sourceNftContractAddress: (parsed.args[3] as string).toLowerCase(),
         tokenAmount: String(parsed.args[4]),
         nftType: parsed.args[5],
         sourceChain: parsed.args[6],
@@ -1222,6 +1222,8 @@ export async function web3HelperFactory(
           gasLimit: "2000000",
         }
       );
+
+      console.log(trx);
 
       const tx = await signer.sendTransaction(trx);
 
