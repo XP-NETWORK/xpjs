@@ -3,7 +3,7 @@ import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { EvNotifier } from "../../services/notifier";
 import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck } from "../chain";
-import { ChainNonce, PreTransfer } from "../..";
+import { ChainNonce, PreTransfer, ClaimV3NFT } from "../..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { NftListUtils } from "../../services/nftList";
 import { ScVerifyUtils } from "../../services/scVerify";
@@ -36,7 +36,7 @@ export type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
-} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils & ScVerifyUtils;
+} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils & ScVerifyUtils & ClaimV3NFT<TonSigner, string>;
 export type TonParams = {
     tonweb: TonWeb;
     notifier: EvNotifier;
@@ -45,6 +45,7 @@ export type TonParams = {
     xpnftAddr: string;
     feeMargin: FeeMargins;
     extraFees: Map<ChainNonce, string>;
+    v3_bridge: string;
 };
 type MethodMap = {
     ton_requestAccounts: [undefined, string];

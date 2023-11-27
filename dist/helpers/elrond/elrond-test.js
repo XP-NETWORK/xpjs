@@ -28,8 +28,8 @@ import { Nonce } from "@multiversx/sdk-network-providers/out/primitives";
 //import { decodeBase64Array } from "../../factory";
 //import axios from "axios";
 import BigNumber from "bignumber.js";
-import { decodeBase64Array } from "../../factory";
-import { inspect } from "node:util";
+//import { decodeBase64Array } from "../../factory";
+//import { inspect } from "node:util";
 
 const f = Mnemonic.fromString(
     `evidence liberty culture stuff canal minute toward trash boil cry verb recall during citizen social upper budget ranch distance business excite fox icon tool`
@@ -233,18 +233,18 @@ async function claim(account: Account, signer: UserSigner) {
     ]);
 
     //copied from validator logs
-    const claimData = {
-        tokenId: "33",
-        sourceChain: "BSC",
+    const nftTransferDetailsObject = {
+        tokenId: "46",
+        sourceChain: "MULTIVERSX",
         destinationChain: "MULTIVERSX",
         destinationUserAddress: "erd1ymdj4ze52a0tmcjzeyhcntzaf5uxpn2d6t203yreh6qx6fqeftgqmz9ly6",
-        sourceNftContractAddress: "0xc679bdad7c2a34ca93552eae75e4bc03bf505adc",
-        name: "Istra",
-        symbol: "NSA",
-        royalty: "0",
+        sourceNftContractAddress: "ALX-afef0b",
+        name: "Alex",
+        symbol: "ALX-afef0b",
+        royalty: "49",
         royaltyReceiver: "9fb927c978225cb7a93b8b3cd8d8423e176e009dc284c536d9c4372bbe128487",
-        metadata: "https://meta.polkamon.com/meta?id=10002366748",
-        transactionHash: "0x4e7cc1b533361fc39f013391c6fead3f0a55a4656f8e7f1a84af7740ff5a2abf",
+        metadata: "https://ipfs.io/ipfs/QmSaY9zZnKWGa8jmMFNN6LrDGykjSiryUz8YeUjjJ97A8w/9999.json",
+        transactionHash: "0x79b660e873dd647c0adf57d85dddb1ffb5b64ced5f2e021a58d9612df1e8dcfc",
         tokenAmount: "1",
         nftType: "singular",
         fee: "100000000000000",
@@ -252,25 +252,35 @@ async function claim(account: Account, signer: UserSigner) {
 
     //sig copied validator logs
     const signature = {
-        sig: "0xdccd31367579bfd82e46881e28c2201f7e9e58327e1c4366e972c170ad9b3b1924861101446bdc8ea1c5b364361fa12cabcea32c473e2f759a01e699e24bdc07",
+        sig: "0xc911280927e090af571df0de3cbc22b04288150623a5725917172a81f59c85dc4c53fd4902b70ebb9d558a89895b0f982a8e780d3d2c33f031bf10130992d306",
         public_key: "9fb927c978225cb7a93b8b3cd8d8423e176e009dc284c536d9c4372bbe128487",
     };
 
+
     const claimDataArgs = new Struct(structClaimData, [
-        new Field(new BytesValue(Buffer.from(new Nonce(Number(claimData.tokenId)).hex(), "hex")), "token_id"),
-        new Field(new BytesValue(Buffer.from(claimData.sourceChain)), "source_chain"),
-        new Field(new BytesValue(Buffer.from(claimData.destinationChain)), "destination_chain"),
-        new Field(new AddressValue(new Address(claimData.destinationUserAddress)), "destination_user_address"),
-        new Field(new BytesValue(Buffer.from(claimData.sourceNftContractAddress)), "source_nft_contract_address"),
-        new Field(new BytesValue(Buffer.from(claimData.name)), "name"),
-        new Field(new BytesValue(Buffer.from("N" + claimData.sourceChain.toUpperCase())), "symbol"),
-        new Field(new BigUIntValue(new Nonce(Number(claimData.royalty)).hex()), "royalty"),
-        new Field(new AddressValue(new Address(claimData.royaltyReceiver)), "royalty_receiver"),
-        new Field(new BytesValue(Buffer.from(claimData.metadata)), "attrs"),
-        new Field(new BytesValue(Buffer.from(claimData.transactionHash)), "transaction_hash"),
-        new Field(new BigUIntValue(claimData.tokenAmount), "token_amount"),
-        new Field(new BytesValue(Buffer.from(claimData.nftType)), "nft_type"),
-        new Field(new BigUIntValue(claimData.fee), "fee"),
+        new Field(
+            new BytesValue(Buffer.from(new Nonce(Number(nftTransferDetailsObject.tokenId)).hex(), "hex")),
+            "token_id"
+        ),
+        new Field(new BytesValue(Buffer.from(nftTransferDetailsObject.sourceChain)), "source_chain"),
+        new Field(new BytesValue(Buffer.from(nftTransferDetailsObject.destinationChain)), "destination_chain"),
+        new Field(
+            new AddressValue(new Address(nftTransferDetailsObject.destinationUserAddress)),
+            "destination_user_address"
+        ),
+        new Field(
+            new BytesValue(Buffer.from(nftTransferDetailsObject.sourceNftContractAddress)),
+            "source_nft_contract_address"
+        ),
+        new Field(new BytesValue(Buffer.from(nftTransferDetailsObject.name)), "name"),
+        new Field(new BytesValue(Buffer.from("N" + nftTransferDetailsObject.sourceChain.toUpperCase())), "symbol"),
+        new Field(new BigUIntValue(Number(nftTransferDetailsObject.royalty)), "royalty"),
+        new Field(new AddressValue(new Address(nftTransferDetailsObject.royaltyReceiver)), "royalty_receiver"),
+        new Field(new BytesValue(Buffer.from(nftTransferDetailsObject.metadata)), "attrs"),
+        new Field(new BytesValue(Buffer.from(nftTransferDetailsObject.transactionHash)), "transaction_hash"),
+        new Field(new BigUIntValue(nftTransferDetailsObject.tokenAmount), "token_amount"),
+        new Field(new BytesValue(Buffer.from(nftTransferDetailsObject.nftType)), "nft_type"),
+        new Field(new BigUIntValue(nftTransferDetailsObject.fee), "fee"),
     ]);
 
     const data = [
@@ -283,12 +293,9 @@ async function claim(account: Account, signer: UserSigner) {
         ],
         VariadicValue.fromItems(
             new BytesValue(
-                Buffer.from(
-                    "https://drive.polychainmonsters.com/ipfs/QmXBAiT4um5WSJZfoJ1arCbcJh89yBEYvi17bVM91rj3t4",
-                    "utf-8"
-                )
+                Buffer.from("https://ipfs.io/ipfs/QmUBFTnxZpaM7xrJ62Z9kNi3dfQwEWPQhthsnXdLEjJhDb/9999.png", "utf-8")
             ),
-            new BytesValue(Buffer.from(claimData.metadata, "utf-8"))
+            new BytesValue(Buffer.from(nftTransferDetailsObject.metadata, "utf-8"))
         ),
     ];
 
@@ -325,7 +332,7 @@ const account = new Account(address);
 
     false && (await claim(account, signer));
     //transferToSc(bridgeAddress, account, signer, "ALX-afef0b-01", "01");
-    //await createNft("ALX-afef0b-51", address, account, signer);
+    await createNft("ALX-afef0b-55", address, account, signer);
 
     const query = bridgeContract.createQuery({
         func: "originalToDuplicateMapping",
@@ -359,7 +366,6 @@ const account = new Account(address);
     //await createNft("ALX-afef0b-08", address, account, signer);
     //await createNft("ALX-afef0b-09", address, account, signer);
     //await createNft("ALX-afef0b-10", address, account, signer);
-})();
-
-//console.log(bridgeContract);*/
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZWxyb25kLXRlc3QuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvaGVscGVycy9lbHJvbmQvZWxyb25kLXRlc3QudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IjtBQUFBLGtEQUFrRDtBQUNsRDs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztnQ0F5V2dDIn0=
+})();*/
+//console.log(bridgeContract);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZWxyb25kLXRlc3QuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvaGVscGVycy9lbHJvbmQvZWxyb25kLXRlc3QudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IjtBQUFBLGtEQUFrRDtBQUNsRDs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O09BOFdPO0FBRVAsOEJBQThCIn0=

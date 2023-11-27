@@ -204,6 +204,7 @@ export declare enum v3_ChainId {
     POLYGON = "MATIC",
     ETHEREUM = "ETH",
     ELROND = "MULTIVERSX",
+    TON = "TON",
     DEFAULT = ""
 }
 interface ChainData<T extends ChainNonce> {
