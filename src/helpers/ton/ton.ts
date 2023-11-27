@@ -491,6 +491,7 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       storageContract,
       initialClaimData
     ) {
+      console.log(sender, storageContract);
       const [claimDataRes] = await Promise.allSettled([
         // bridge.validatorsCount(),
         from.getClaimData(transactionHash, helpers),
