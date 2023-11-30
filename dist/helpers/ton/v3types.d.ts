@@ -1,4 +1,4 @@
-import { Cell, Slice, Address, Builder, Dictionary, ContractProvider, Sender, Contract, ContractABI } from "ton-core";
+import { Cell, Slice, Address, Builder, Dictionary, ContractProvider, Sender, Contract, ContractABI } from "newton";
 export type ClaimData1 = {
     $$type: "ClaimData1";
     tokenId: bigint;
