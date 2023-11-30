@@ -31,7 +31,7 @@ import BigNumber from "bignumber.js";
 //import { inspect } from "node:util";
 
 const f = Mnemonic.fromString(
-    `evidence liberty culture stuff canal minute toward trash boil cry verb recall during citizen social upper budget ranch distance business excite fox icon tool`
+    ``
 );
 const proxyNetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
 const apiNetworkProvider = new ApiNetworkProvider("https://devnet2-api.multiversx.com");

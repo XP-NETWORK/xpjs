@@ -94,6 +94,7 @@ export namespace ChainFactoryConfigs {
           })
         ),
         nonce: Chain.TON,
+        proxy: "https://sheltered-crag-76748.herokuapp.com/",
         bridgeAddr: "kQBwUu-b4O6qDYq3iDRvsYUnTD6l3WCxLXkv0aH6ywAaPs3c",
         burnerAddr: "kQCbH9gGgqJzXuusUVajW_40brrl2fxTYqMkk6HUhJnIgOQA",
         xpnftAddr: "EQDji0YH-SNT-qi6o5dQQBLeWL0Xmm46fnqj34EYhOL34WDc",
@@ -562,6 +563,7 @@ export namespace ChainFactoryConfigs {
         bridgeAddr: "kQAhrkiW7pA5eE_7vtz7_AQhHznfqR0VFyTGs4mgyaVLPgfG",
         burnerAddr: "kQBo5aNuDXghpZ2u9yMdfaR9oVQEuRddNLCoNg8YgI_k2MOE",
         notifier,
+        proxy: "https://sheltered-crag-76748.herokuapp.com/",
         nonce: Chain.TON,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
@@ -871,6 +873,7 @@ export namespace ChainFactoryConfigs {
         bridgeAddr: "kQBpucKquLw9uwGfLe_KHt65YWnchjoY2VPSsKDTI7JqrcLm",
         burnerAddr: "kQBR45AvvaO9a-rGfVkR0INx3JwoR-HngYA3tfctlGM1_Ml7",
         notifier,
+        proxy: "https://sheltered-crag-76748.herokuapp.com/",
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
             apiKey:

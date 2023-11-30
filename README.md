@@ -792,3 +792,12 @@ P.S. The library is a work in progress. More features will be added soon.
   console.log(`The estimated fee on Tezos is: ${feeEstimation} Algos`);
 })();
 ```
+
+## Enabling Bridge version 3 transfers (early beta)
+
+To implement v3 transfers for chain:
+
+1. Specify _v3_chainId_ for the chain in src/consts.ts
+2. Specify _v3_bridge_ contract address for the chain params in src/factory/factories.ts
+3. Implement _getTokenInfo, getClaimData, lockNFT, claimV3NFT_ methods for the chain helper (see examples - src/helpers/elrond/elrond.ts, src/helpers/evm/web3.ts)
+4. In order to allow UI to identify NFT origin chain implement _getNftOrigin_ for the chain helper

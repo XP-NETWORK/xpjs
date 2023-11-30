@@ -993,8 +993,6 @@ export async function elrondHelperFactory(
       return "";
     },
     async getTokenInfo(depTrxData) {
-      console.log(depTrxData, "depTrxData");
-
       const nftData = await multiversexApiService.getTokenInfo(
         depTrxData.sourceNftContractAddress,
         Number(depTrxData.tokenId).toString(16)
@@ -1003,8 +1001,6 @@ export async function elrondHelperFactory(
       const collectionData = await multiversexApiService.getCollectionInfo(
         depTrxData.sourceNftContractAddress
       );
-
-      console.log(collectionData, "collectionData");
 
       return {
         metadata: Base64.decode(nftData?.uris?.at(1) || ""),
@@ -1025,7 +1021,6 @@ export async function elrondHelperFactory(
         if (!sourceNonce) {
           throw new Error("Source chain is undefined");
         }
-        console.log(sourceNonce, "sourceNonce in elrond");
 
         const sourceChainHelper = helpers.get(sourceNonce as ChainNonce);
 

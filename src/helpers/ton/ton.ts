@@ -17,8 +17,11 @@ import {
   BalanceCheck,
   GetExtraFees,
   WhitelistCheck,
-  //GetClaimData,
+  GetClaimData,
+  LockNFT,
   GetTokenInfo,
+  DepTrxData,
+  TokenInfo,
 } from "../chain";
 
 import { ChainNonce, PreTransfer, ClaimV3NFT } from "../..";
@@ -38,16 +41,15 @@ import base64url from "base64url";
 
 import { TonClient, Address, beginCell, Dictionary } from "newton";
 
-//import { sign } from "ton-crypto";
 import {
   ClaimData,
   storeClaimData,
   SignerAndSignature,
-  //ClaimNFT721,
   storeClaimNFT721,
   NftItem,
   NftCollection,
 } from "./v3types";
+
 import { CHAIN_INFO } from "../../consts";
 
 export type TonSigner = {
@@ -93,13 +95,16 @@ export type TonHelper = ChainNonceGet &
   NftListUtils &
   ScVerifyUtils &
   ClaimV3NFT<TonSigner, string> &
-  GetTokenInfo;
+  GetTokenInfo &
+  GetClaimData &
+  LockNFT<TonSigner, TonNft, string>;
 
 export type TonParams = {
   tonweb: TonWeb;
   notifier: EvNotifier;
   nonce: ChainNonce;
   bridgeAddr: string;
+  proxy: string;
   burnerAddr: string;
   xpnftAddr: string;
   feeMargin: FeeMargins;
@@ -501,8 +506,28 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     getScVerifyAddr(address) {
       return address.replace(/[^a-zA-Z0-9]/g, "");
     },
+    //TODO: complete getClaimData method for TON
+    async getClaimData(hash, helpers) {
+      hash;
+      //TODO: fetch and decode TON trx;
+      const decoded = {} as DepTrxData;
+
+      const sourceNonce = Array.from(CHAIN_INFO.values()).find(
+        (c) => c.v3_chainId === decoded.sourceChain
+      )?.nonce;
+
+      const sourceChainHelper = helpers.get(sourceNonce as ChainNonce);
+
+      const tokenInfo: TokenInfo = await (
+        sourceChainHelper as any
+      ).getTokenInfo(decoded);
+
+      return {
+        ...tokenInfo,
+        ...decoded,
+      };
+    },
     async getTokenInfo(depTrxData) {
-      console.log(args.tonweb.provider.host, "host");
       const client = new TonClient({
         endpoint: args.tonweb.provider.host,
         apiKey: args.tonweb.provider.options.apiKey,
@@ -510,38 +535,62 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       const addr = Address.parseFriendly(
         depTrxData.sourceNftContractAddress
       ).address;
-      console.log(addr);
+
       const nftItem = client.open(NftItem.fromAddress(addr));
       const nftData = await nftItem.getGetNftData();
-      console.log(nftData, "nftData");
+
       let metaDataURL: string = "";
+      let royalty: string = "0";
+
       if (nftData.collection_address) {
         const nftCollection = client.open(
           NftCollection.fromAddress(nftData.collection_address)
         );
+        const [collectionData, royaltyData] = await Promise.allSettled([
+          nftCollection.getGetCollectionData(),
+          nftCollection.getRoyaltyParams(),
+        ]);
 
-        const { collection_content } =
-          await nftCollection.getGetCollectionData();
-        const collectionContentSlice = collection_content.asSlice();
-        collectionContentSlice.loadUint(8);
-        metaDataURL = collectionContentSlice.loadStringTail();
-        console.log(metaDataURL, "metaDataURL");
+        if (collectionData.status === "fulfilled") {
+          const { collection_content } = collectionData.value;
+          const collectionContentSlice = collection_content.asSlice();
+          collectionContentSlice.loadUint(8);
+          metaDataURL = collectionContentSlice.loadStringTail();
+        }
+
+        if (royaltyData.status === "fulfilled") {
+          const royaltyParams = royaltyData.value;
+          const royaltyInNum =
+            royaltyParams.numerator / royaltyParams.denominator;
+          const standardRoyalty = royaltyInNum * BigInt(10);
+          royalty = standardRoyalty.toString();
+        }
+      } else {
+        const individualContentSlice = nftData.individual_content.asSlice();
+        individualContentSlice.loadBits(8);
+        metaDataURL = individualContentSlice.loadStringTail();
       }
-      const individualContentSlice = nftData.individual_content.asSlice();
-      individualContentSlice.loadBits(8);
-      metaDataURL = individualContentSlice.loadStringTail();
 
-      const metaData = (await axios.get(metaDataURL)).data;
+      const metaData = (
+        await axios.get(
+          typeof window !== "undefined" ? args.proxy + metaDataURL : metaDataURL
+        )
+      ).data;
 
       console.log(metaData);
 
       return {
         name: metaData.name || "",
         symbol: "",
-        metadata: "",
-        royalty: "",
-        image: "",
+        metadata: metaDataURL,
+        royalty,
+        //image: "",
       };
+    },
+    //TODO: lock trx in TON
+    async lockNFT(sender, toChain, id, receiver) {
+      console.log(sender, toChain, id, receiver);
+      return "";
     },
     async claimV3NFT(
       sender,

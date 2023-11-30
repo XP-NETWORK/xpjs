@@ -1133,7 +1133,6 @@ export async function web3HelperFactory(
       if (!sourceNonce) {
         throw new Error("Source chain is undefined");
       }
-      console.log(sourceNonce, "sourceNonce");
 
       const sourceChain = helpers.get(sourceNonce as ChainNonce);
 
@@ -1189,11 +1188,7 @@ export async function web3HelperFactory(
             console.log(e.message);
             return [];
           });
-        console.log(
-          signatures,
-          transactionHash,
-          CHAIN_INFO.get(from.getNonce())?.v3_chainId!
-        );
+
         if (signatures.length < sigNumber) return getSignatures(tryNumber + 1);
         return signatures;
       };
@@ -1223,8 +1218,6 @@ export async function web3HelperFactory(
           gasLimit: "2000000",
         }
       );
-
-      console.log(trx);
 
       const tx = await signer.sendTransaction(trx);
 
