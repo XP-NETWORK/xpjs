@@ -2,7 +2,7 @@ import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { EvNotifier } from "../../services/notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck, GetTokenInfo } from "../chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck, GetClaimData, LockNFT, GetTokenInfo } from "../chain";
 import { ChainNonce, PreTransfer, ClaimV3NFT } from "../..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { NftListUtils } from "../../services/nftList";
@@ -36,12 +36,13 @@ export type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
-} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils & ScVerifyUtils & ClaimV3NFT<TonSigner, string> & GetTokenInfo;
+} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils & ScVerifyUtils & ClaimV3NFT<TonSigner, string> & GetTokenInfo & GetClaimData & LockNFT<TonSigner, TonNft, string>;
 export type TonParams = {
     tonweb: TonWeb;
     notifier: EvNotifier;
     nonce: ChainNonce;
     bridgeAddr: string;
+    proxy: string;
     burnerAddr: string;
     xpnftAddr: string;
     feeMargin: FeeMargins;
