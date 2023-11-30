@@ -1,6 +1,7 @@
 import { Web3Helper } from "../evm/web3";
 import { HederaService } from "../../services/hederaApi";
-import { Web3Params } from "./depricated";
+import { Web3Params } from "../evm/web3";
+import { GetExtraFees } from "../chain";
 type HSDK = typeof import("@hashgraph/sdk");
 type tokenListResponce = {
     contract: string;
@@ -21,11 +22,12 @@ type HederaHelperFactory = Web3Helper & {
     associateToken(tokens: tokenListResponce[], signer: any): Promise<boolean>;
     injectSDK?(sdk: HSDK): HederaHelperFactory & {
         isInjected: boolean;
-    };
+    } & GetExtraFees;
 };
 type HederaParams = {
     htcToken: string;
     Xpnfthtsclaims: string;
+    extraFees?: string;
     hederaApi: HederaService;
     noWhitelist?: boolean;
 };

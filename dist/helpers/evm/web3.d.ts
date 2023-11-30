@@ -95,6 +95,7 @@ export interface Web3Params {
     erc1155Minter: string;
     nonce: ChainNonce;
     feeMargin: FeeMargins;
+    extraFees?: string;
     noWhitelist?: boolean;
     v3_bridge?: string;
 }

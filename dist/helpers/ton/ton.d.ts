@@ -2,7 +2,7 @@ import TonWeb from "tonweb";
 import TonWebMnemonic from "tonweb-mnemonic";
 import type { Cell } from "tonweb/dist/types/boc/cell";
 import { EvNotifier } from "../../services/notifier";
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck } from "../chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees, WhitelistCheck, GetTokenInfo } from "../chain";
 import { ChainNonce, PreTransfer, ClaimV3NFT } from "../..";
 import { TonhubConnector, TonhubTransactionResponse } from "ton-x";
 import { NftListUtils } from "../../services/nftList";
@@ -36,10 +36,11 @@ export type TonHelper = ChainNonceGet & BalanceCheck & PreTransfer<any, any, any
     tonHubWrapper: (args: TonArgs) => TonSigner;
     tonWalletWrapper: (args: TonArgs) => TonSigner;
     tonKeeperWrapper: (args: TonArgs) => TonSigner;
-} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils & ScVerifyUtils & ClaimV3NFT<TonSigner, string>;
+} & GetFeeMargins & WhitelistCheck<TonNft> & GetExtraFees & NftListUtils & ScVerifyUtils & ClaimV3NFT<TonSigner, string> & GetTokenInfo;
 export type TonParams = {
     tonweb: TonWeb;
     notifier: EvNotifier;
+    nonce: ChainNonce;
     bridgeAddr: string;
     burnerAddr: string;
     xpnftAddr: string;
@@ -67,29 +68,21 @@ type TonWallet = {
 export declare function tonHelper(args: TonParams): Promise<TonHelper>;
 export {};
 /**
- *
- *     const ton = new TonWeb(
-      new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
-        apiKey:
-          "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
-      })
-    );
-
-    const trxs = await ton.provider.getTransactions(
-      "EQBhSfdrfydwE4Sl4-sWUYhNHsQcVTGR3p2JA14C2_PNdgfs",
-      20
-    );
-
-    console.log(trxs);
-
-    let data = new Cell();
-    console.log(data);
-    const dict = Cell.fromBoc(
-      Buffer.from(
-        "te6cckECDAEAAtkAA7V2FJ92t/J3AThKXj6xZRiE0exBxVMZHenYkDXgLb8812AAAdm2v+2EFpyXsCyPQOlDXCGvDlGdb9/YPNRPgD98AgAsIvgTYcYAAAHZqugyeDY2O1EgADRtIKRIAQIDAgHgBAUAgnIXMm/rsAMDO9FDdU/1I47b332HXYKcIvfN53pZj/VL8XxAXw8HICdzOmVFlgwy6XfTfJTbuplVQh4PnMQir/B3AhEMgouGGZPPBEAKCwHhiADCk+7W/k7gJwlLx9YsoxCaPYg4qmMjvTsSBrwFt+ea7AHPX0P+BlViv5FLRo4uUALd1xnuqimnA//t0BCCufv3iVjYINGcRw+ljDnirrtKYcGN629BfyEuTEj2eIBH7pAxTU0YuxsdqmAAAABAABwGAQHfBwFoYgBuLG9sHzPjFfimuHMhmTMm2J2PjG2QS0wA58SpRc6PpiAmJaAAAAAAAAAAAAAAAAAAAQgBsWgAwpPu1v5O4CcJS8fWLKMQmj2IOKpjI707Ega8Bbfnmu0ANxY3tg+Z8Yr8U1w5kMyZk2xOx8Y2yCWmAHPiVKLnR9MQExLQAAYuoZgAADs21/2whMbHaiTACAGfX8w9FAAAAAAAAAAAgAhTrcJncddU9sZlDMvNz2ZSqJDp5YplXYGBr0ckiINkEAPcWJzy2hGXRIgyzC2jzCbLkfjUINlQYAjIgr3kCXkEFBgJAHIHACoweDQ3QmYwZGFlNmU5MmU0OWEzYzk1ZTViMGM3MTQyMjg5MUQ1Y2Q0RkUAAAAAAAAAAAAAAAAAnUGdgxOIAAAAAAAAAAARAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAb8mRfJBMLqFQAAAAAAACAAAAAAADChE7JLQbmSipXzKEUnUNwnWjHPBXefxRxAbt/uNGHeZA0DgsouCJ3A==",
-        "base64"
-      )
-    )[0].hash();
-    console.log("Hash: " + dict.toString("base64"));
+{
+    "tokenId": "42",
+    "destinationChain": "TON",
+    "destinationUserAddress": "EQDrOJsbEcJHbzSjWQDefr2YDD-D999BhZZ_XT-lxlbiDmN3",
+    "sourceNftContractAddress": "0xc679bdad7c2a34ca93552eae75e4bc03bf505adc",
+    "tokenAmount": "1",
+    "nftType": "singular",
+    "sourceChain": "BSC",
+    "name": "Istra",
+    "symbol": "NSA",
+    "metadata": "https://meta.polkamon.com/meta?id=10002362332",
+    "royalty": "0",
+    "fee": "100000000000000",
+    "royaltyReceiver": "EQAV8tH2WDuWYU7zAmkJmIwP8Ph_uIC4zBqJNIfKgRUUQewh",
+    "transactionHash": "0x984e0c85404bd5419b33026f507b0e432e4ab35687e9478bf26bf234be41fed1"
+}
  */
 //# sourceMappingURL=ton.d.ts.map
