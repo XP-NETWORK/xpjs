@@ -18,7 +18,7 @@ import {
   ABIReceiver,
   TupleBuilder,
   DictionaryValue,
-} from "ton-core";
+} from "newton";
 
 export type ClaimData1 = {
   $$type: "ClaimData1";

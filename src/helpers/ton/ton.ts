@@ -36,8 +36,8 @@ import { ScVerifyUtils } from "../../services/scVerify";
 
 import base64url from "base64url";
 
-import { Address, beginCell, Dictionary } from "ton-core";
-import { TonClient } from "@ton/ton";
+import { TonClient, Address, beginCell, Dictionary } from "newton";
+
 //import { sign } from "ton-crypto";
 import {
   ClaimData,
@@ -507,11 +507,11 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         endpoint: args.tonweb.provider.host,
         apiKey: args.tonweb.provider.options.apiKey,
       });
-      const nftItem = client.open(
-        NftItem.fromAddress(
-          Address.parseFriendly(depTrxData.sourceNftContractAddress).address
-        )
-      );
+      const addr = Address.parseFriendly(
+        depTrxData.sourceNftContractAddress
+      ).address;
+      console.log(addr);
+      const nftItem = client.open(NftItem.fromAddress(addr));
       const nftData = await nftItem.getGetNftData();
       console.log(nftData, "nftData");
       let metaDataURL: string = "";
