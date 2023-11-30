@@ -41,7 +41,7 @@ const signatureSvc_prod = signatureService(signature_service_uri_prod);
 
 export namespace ChainFactoryConfigs {
   export const TestNet: () => Promise<Partial<ChainParams>> = async () => {
-    const feeMargin = { min: 1, max: 5 };
+    const feeMargin = { min: 0.5, max: 5 };
     const testnet_oracle = signatureService(
       "https://tools.xp.network/testnet-oracle/"
     );
@@ -93,11 +93,13 @@ export namespace ChainFactoryConfigs {
               "abe8c1222f19b0891a9a35889d112dc88562093467db8dda39961eeacd50f9b1",
           })
         ),
+        nonce: Chain.TON,
         bridgeAddr: "kQBwUu-b4O6qDYq3iDRvsYUnTD6l3WCxLXkv0aH6ywAaPs3c",
         burnerAddr: "kQCbH9gGgqJzXuusUVajW_40brrl2fxTYqMkk6HUhJnIgOQA",
         xpnftAddr: "EQDji0YH-SNT-qi6o5dQQBLeWL0Xmm46fnqj34EYhOL34WDc",
         v3_bridge: "EQDI6P9gheuWLh1euThjFE2muUpa9tp2y49TD6Zz5oOF5gWL",
         feeMargin,
+
         extraFees: new Map().set(Chain.ETHEREUM, "1"),
         notifier,
       },
@@ -461,9 +463,10 @@ export namespace ChainFactoryConfigs {
         evmProvider: new ethers.providers.JsonRpcProvider(
           TestNetRpcUri.HEDERA_RELAY
         ),
-        feeMargin,
+        feeMargin: { min: 1.5, max: 5 },
         nonce: Chain.HEDERA,
         noWhitelist: false,
+        extraFees: "10",
         htcToken: "0xc4348F9b1B04Faa58DD94202B97bc89F62771B1E",
         erc721_addr: "0x1aE75f1e6cdf374604F041805280927f38493dAc",
         erc1155_addr: "0x1aE75f1e6cdf374604F041805280927f38493dAc",
@@ -547,7 +550,7 @@ export namespace ChainFactoryConfigs {
   };
 
   export const Staging: () => Promise<Partial<ChainParams>> = async () => {
-    const feeMargin: FeeMargins = { min: 1, max: 5 };
+    const feeMargin: FeeMargins = { min: 0.5, max: 5 };
     const notifier = evNotifier("https://tools.xp.network/notifier");
     const signatureSvc_staging = signatureService(
       "https://tools.xp.network/fee-oracle"
@@ -559,6 +562,7 @@ export namespace ChainFactoryConfigs {
         bridgeAddr: "kQAhrkiW7pA5eE_7vtz7_AQhHznfqR0VFyTGs4mgyaVLPgfG",
         burnerAddr: "kQBo5aNuDXghpZ2u9yMdfaR9oVQEuRddNLCoNg8YgI_k2MOE",
         notifier,
+        nonce: Chain.TON,
         tonweb: new TonWeb(
           new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
             apiKey:
@@ -622,8 +626,9 @@ export namespace ChainFactoryConfigs {
         ),
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
         evmProvider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
-        feeMargin,
+        feeMargin: { min: 1.5, max: 5 },
         nonce: Chain.HEDERA,
+        extraFees: "10",
         noWhitelist: true,
         htcToken: "0x04CEb24a3228aF70765dc28ffBF64dadc011679f",
         erc721_addr: "0x9Bf86174B058a45565EC73c15712A9a19321B862",
@@ -849,7 +854,7 @@ export namespace ChainFactoryConfigs {
   };
 
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
-    const feeMargin = { min: 1, max: 5 };
+    const feeMargin = { min: 0.5, max: 5 };
     const notifier = evNotifier(middleware_uri);
 
     // VeChain related:
@@ -872,6 +877,7 @@ export namespace ChainFactoryConfigs {
               "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
           })
         ),
+        nonce: Chain.TON,
         v3_bridge: "",
         xpnftAddr: "EQABqbZubs5e3QQF3lxVZMvdaxlaIdNQWq8W1rn8rvVvWHys",
         extraFees: new Map().set(Chain.ETHEREUM, "1"),
@@ -1270,6 +1276,7 @@ export namespace ChainFactoryConfigs {
         helperUrl: "https://helper.mainnet.near.org",
         signatureSvc: signatureSvc_prod,
       },
+      //extraFees(departure side) in native currency (15 means 15 HBAR), feeMargin(dest side) in usd
       hederaParams: {
         notifier,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.HEDERA),
@@ -1277,7 +1284,8 @@ export namespace ChainFactoryConfigs {
         hederaApi: hederaService(
           "https://mainnet-public.mirrornode.hedera.com/api/v1"
         ),
-        feeMargin,
+        feeMargin: { min: 1.5, max: 5 },
+        extraFees: "15",
         nonce: Chain.HEDERA,
         noWhitelist: false,
         Xpnfthtsclaims: "0x00000000000000000000000000000000002db2d8",

@@ -17,6 +17,8 @@ import {
   BalanceCheck,
   GetExtraFees,
   WhitelistCheck,
+  //GetClaimData,
+  GetTokenInfo,
 } from "../chain";
 
 import { ChainNonce, PreTransfer, ClaimV3NFT } from "../..";
@@ -33,6 +35,20 @@ import { NftListUtils } from "../../services/nftList";
 import { ScVerifyUtils } from "../../services/scVerify";
 
 import base64url from "base64url";
+
+import { Address, beginCell, Dictionary } from "ton-core";
+import { TonClient } from "@ton/ton";
+//import { sign } from "ton-crypto";
+import {
+  ClaimData,
+  storeClaimData,
+  SignerAndSignature,
+  //ClaimNFT721,
+  storeClaimNFT721,
+  NftItem,
+  NftCollection,
+} from "./v3types";
+import { CHAIN_INFO } from "../../consts";
 
 export type TonSigner = {
   wallet?: TonWallet;
@@ -76,11 +92,13 @@ export type TonHelper = ChainNonceGet &
   GetExtraFees &
   NftListUtils &
   ScVerifyUtils &
-  ClaimV3NFT<TonSigner, string>;
+  ClaimV3NFT<TonSigner, string> &
+  GetTokenInfo;
 
 export type TonParams = {
   tonweb: TonWeb;
   notifier: EvNotifier;
+  nonce: ChainNonce;
   bridgeAddr: string;
   burnerAddr: string;
   xpnftAddr: string;
@@ -483,6 +501,48 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
     getScVerifyAddr(address) {
       return address.replace(/[^a-zA-Z0-9]/g, "");
     },
+    async getTokenInfo(depTrxData) {
+      console.log(args.tonweb.provider.host, "host");
+      const client = new TonClient({
+        endpoint: args.tonweb.provider.host,
+        apiKey: args.tonweb.provider.options.apiKey,
+      });
+      const nftItem = client.open(
+        NftItem.fromAddress(
+          Address.parseFriendly(depTrxData.sourceNftContractAddress).address
+        )
+      );
+      const nftData = await nftItem.getGetNftData();
+      console.log(nftData, "nftData");
+      let metaDataURL: string = "";
+      if (nftData.collection_address) {
+        const nftCollection = client.open(
+          NftCollection.fromAddress(nftData.collection_address)
+        );
+
+        const { collection_content } =
+          await nftCollection.getGetCollectionData();
+        const collectionContentSlice = collection_content.asSlice();
+        collectionContentSlice.loadUint(8);
+        metaDataURL = collectionContentSlice.loadStringTail();
+        console.log(metaDataURL, "metaDataURL");
+      }
+      const individualContentSlice = nftData.individual_content.asSlice();
+      individualContentSlice.loadBits(8);
+      metaDataURL = individualContentSlice.loadStringTail();
+
+      const metaData = (await axios.get(metaDataURL)).data;
+
+      console.log(metaData);
+
+      return {
+        name: metaData.name || "",
+        symbol: "",
+        metadata: "",
+        royalty: "",
+        image: "",
+      };
+    },
     async claimV3NFT(
       sender,
       helpers,
@@ -491,7 +551,6 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
       storageContract,
       initialClaimData
     ) {
-      console.log(sender, storageContract);
       const [claimDataRes] = await Promise.allSettled([
         // bridge.validatorsCount(),
         from.getClaimData(transactionHash, helpers),
@@ -507,70 +566,157 @@ export async function tonHelper(args: TonParams): Promise<TonHelper> {
         "claim data"
       );
 
-      /*const encodedClaimData: ClaimData = {
-                $$type: "ClaimData",
-                data1: {
-                    $$type: "ClaimData1",
-                    tokenId: BigInt(tokenId),
-                    destinationChain,
-                    destinationUserAddress: Address.parseFriendly(destinationUserAddress).address,
-                    sourceChain,
-                    tokenAmount: BigInt(tokenAmount),
-                },
-                data2: {
-                    $$type: "ClaimData2",
-                    name,
-                    nftType,
-                    symbol,
-                },
-                data3: {
-                    $$type: "ClaimData3",
-                    fee: BigInt(fee),
-                    metadata,
-                    royaltyReceiver: Address.parseFriendly(royaltyReceiver).address,
-                    sourceNftContractAddress: sourceNftContractAddress_,
-                },
-                data4: {
-                    $$type: "ClaimData4",
-                    newContent: beginCell().storeInt(0x01, 8).storeStringRefTail(metadata).endCell(),
-                    royalty: {
-                        $$type: "RoyaltyParams",
-                        numerator: BigInt(SalePriceToGetTotalRoyalityPercentage),
-                        denominator: BigInt(royalty),
-                        destination: Address.parseFriendly(royaltyReceiver).address,
-                    },
-                    transactionHash,
-                },
-            };*/
+      let sourceNftContractAddress_ = beginCell()
+        .storeSlice(
+          beginCell()
+            .storeStringTail(claimData.sourceNftContractAddress)
+            .endCell()
+            .asSlice()
+        )
+        .endCell();
+      try {
+        sourceNftContractAddress_ = beginCell()
+          .storeSlice(
+            beginCell()
+              .storeAddress(
+                Address.parseFriendly(claimData.sourceNftContractAddress)
+                  .address
+              )
+              .endCell()
+              .asSlice()
+          )
+          .endCell();
+      } catch (e) {
+        console.log("Not Native TON Address");
+      }
 
+      const encodedClaimData: ClaimData = {
+        $$type: "ClaimData",
+        data1: {
+          $$type: "ClaimData1",
+          tokenId: BigInt(claimData.tokenId),
+          destinationChain: claimData.destinationChain,
+          destinationUserAddress: Address.parseFriendly(
+            claimData.destinationUserAddress
+          ).address,
+          sourceChain: claimData.sourceChain,
+          tokenAmount: BigInt(claimData.tokenAmount),
+        },
+        data2: {
+          $$type: "ClaimData2",
+          name: claimData.name,
+          nftType: claimData.nftType,
+          symbol: claimData.symbol,
+        },
+        data3: {
+          $$type: "ClaimData3",
+          fee: BigInt(initialClaimData.fee),
+          metadata: claimData.metadata,
+          royaltyReceiver: Address.parseFriendly(
+            initialClaimData.royaltyReceiver
+          ).address,
+          sourceNftContractAddress: sourceNftContractAddress_,
+        },
+        data4: {
+          $$type: "ClaimData4",
+          newContent: beginCell()
+            .storeInt(0x01, 8)
+            .storeStringRefTail(claimData.metadata)
+            .endCell(),
+          royalty: {
+            $$type: "RoyaltyParams",
+            numerator: BigInt(10000),
+            denominator: BigInt(claimData.royalty),
+            destination: Address.parseFriendly(initialClaimData.royaltyReceiver)
+              .address,
+          },
+          transactionHash,
+        },
+      };
+
+      console.log(
+        storeClaimData(encodedClaimData).toString(),
+        "encodedClaimData"
+      );
+
+      const signatures = await storageContract.getLockNftSignatures(
+        transactionHash,
+        CHAIN_INFO.get(from.getNonce())?.v3_chainId!
+      );
+
+      const publicKey = beginCell()
+        .storeBuffer(Buffer.from(signatures[0].signerAddress, "hex"))
+        .endCell()
+        .beginParse()
+        .loadUintBig(256);
+
+      console.log(signatures);
+
+      const sig: SignerAndSignature = {
+        $$type: "SignerAndSignature",
+        key: publicKey,
+        signature: beginCell()
+          .storeBuffer(
+            Buffer.from(signatures[0].signature.replace(/^0x/, ""), "hex")
+          )
+          .endCell(),
+      };
+
+      const dictA = Dictionary.empty<bigint, SignerAndSignature>().set(0n, sig);
+      console.log(dictA, "encoded Sigs");
+
+      const data = beginCell()
+        .store(
+          storeClaimNFT721({
+            $$type: "ClaimNFT721",
+            data: encodedClaimData,
+            len: 1n,
+            signatures: dictA,
+          })
+        )
+        .endCell()
+        .toBoc({ idx: false });
+
+      await (sender as any).send("ton_sendTransaction", [
+        {
+          to: args.v3_bridge,
+          value: new BN(TonWeb.utils.toNano("0.8")).toString(),
+          dataType: "boc",
+          data: fromUint8Array(data),
+        },
+      ]);
+      //console.log(x, "x");
+
+      /* await bridge.send(
+                provider.sender(),
+                {
+                    value: toNano('0.8')
+                }, {
+                $$type: "ClaimNFT721",
+                data: claimData,
+                len: 1n,
+                signatures: dictA
+            });*/
       return "";
     },
   };
 }
 
 /**
- * 
- *     const ton = new TonWeb(
-      new TonWeb.HttpProvider("https://toncenter.com/api/v2/jsonRPC", {
-        apiKey:
-          "05645d6b549f33bf80cee8822bd63df720c6781bd00020646deb7b2b2cd53b73",
-      })
-    );
-
-    const trxs = await ton.provider.getTransactions(
-      "EQBhSfdrfydwE4Sl4-sWUYhNHsQcVTGR3p2JA14C2_PNdgfs",
-      20
-    );
-
-    console.log(trxs);
-
-    let data = new Cell();
-    console.log(data);
-    const dict = Cell.fromBoc(
-      Buffer.from(
-        "te6cckECDAEAAtkAA7V2FJ92t/J3AThKXj6xZRiE0exBxVMZHenYkDXgLb8812AAAdm2v+2EFpyXsCyPQOlDXCGvDlGdb9/YPNRPgD98AgAsIvgTYcYAAAHZqugyeDY2O1EgADRtIKRIAQIDAgHgBAUAgnIXMm/rsAMDO9FDdU/1I47b332HXYKcIvfN53pZj/VL8XxAXw8HICdzOmVFlgwy6XfTfJTbuplVQh4PnMQir/B3AhEMgouGGZPPBEAKCwHhiADCk+7W/k7gJwlLx9YsoxCaPYg4qmMjvTsSBrwFt+ea7AHPX0P+BlViv5FLRo4uUALd1xnuqimnA//t0BCCufv3iVjYINGcRw+ljDnirrtKYcGN629BfyEuTEj2eIBH7pAxTU0YuxsdqmAAAABAABwGAQHfBwFoYgBuLG9sHzPjFfimuHMhmTMm2J2PjG2QS0wA58SpRc6PpiAmJaAAAAAAAAAAAAAAAAAAAQgBsWgAwpPu1v5O4CcJS8fWLKMQmj2IOKpjI707Ega8Bbfnmu0ANxY3tg+Z8Yr8U1w5kMyZk2xOx8Y2yCWmAHPiVKLnR9MQExLQAAYuoZgAADs21/2whMbHaiTACAGfX8w9FAAAAAAAAAAAgAhTrcJncddU9sZlDMvNz2ZSqJDp5YplXYGBr0ckiINkEAPcWJzy2hGXRIgyzC2jzCbLkfjUINlQYAjIgr3kCXkEFBgJAHIHACoweDQ3QmYwZGFlNmU5MmU0OWEzYzk1ZTViMGM3MTQyMjg5MUQ1Y2Q0RkUAAAAAAAAAAAAAAAAAnUGdgxOIAAAAAAAAAAARAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAb8mRfJBMLqFQAAAAAAACAAAAAAADChE7JLQbmSipXzKEUnUNwnWjHPBXefxRxAbt/uNGHeZA0DgsouCJ3A==",
-        "base64"
-      )
-    )[0].hash();
-    console.log("Hash: " + dict.toString("base64"));
+{
+    "tokenId": "42",
+    "destinationChain": "TON",
+    "destinationUserAddress": "EQDrOJsbEcJHbzSjWQDefr2YDD-D999BhZZ_XT-lxlbiDmN3",
+    "sourceNftContractAddress": "0xc679bdad7c2a34ca93552eae75e4bc03bf505adc",
+    "tokenAmount": "1",
+    "nftType": "singular",
+    "sourceChain": "BSC",
+    "name": "Istra",
+    "symbol": "NSA",
+    "metadata": "https://meta.polkamon.com/meta?id=10002362332",
+    "royalty": "0",
+    "fee": "100000000000000",
+    "royaltyReceiver": "EQAV8tH2WDuWYU7zAmkJmIwP8Ph_uIC4zBqJNIfKgRUUQewh",
+    "transactionHash": "0x984e0c85404bd5419b33026f507b0e432e4ab35687e9478bf26bf234be41fed1"
+}
  */

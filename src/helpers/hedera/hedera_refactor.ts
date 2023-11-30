@@ -2,10 +2,10 @@ import { Web3Helper, web3HelperFactory } from "../evm/web3";
 import { hethers } from "@hashgraph/hethers";
 import { HederaService } from "../../services/hederaApi";
 import { ethers } from "ethers";
-import { Web3Params } from "./depricated";
+import { Web3Params } from "../evm/web3";
 //import BigNumber from "bignumber.js";
 
-import { NftInfo } from "../chain";
+import { NftInfo, GetExtraFees } from "../chain";
 import { EthNftInfo } from "../evm/web3";
 import { BigNumber } from "bignumber.js";
 
@@ -41,12 +41,15 @@ type HederaHelperFactory = Web3Helper & {
   ): Promise<boolean>;
   checkAndAssociate(tokens: tokenListRequest[], signer: any): Promise<boolean>;
   associateToken(tokens: tokenListResponce[], signer: any): Promise<boolean>;
-  injectSDK?(sdk: HSDK): HederaHelperFactory & { isInjected: boolean };
+  injectSDK?(
+    sdk: HSDK
+  ): HederaHelperFactory & { isInjected: boolean } & GetExtraFees;
 };
 
 type HederaParams = {
   htcToken: string;
   Xpnfthtsclaims: string;
+  extraFees?: string;
   //evmProvider: ethers.providers.JsonRpcProvider;
   hederaApi: HederaService;
   noWhitelist?: boolean;
@@ -200,8 +203,14 @@ export const HederaHelperFactory = async (
     return array.join("");
   };
 
+  const getExtraFees = () => {
+    const extra = params.extraFees || "0";
+    return new BigNumber(extra).multipliedBy(1e18);
+  };
+
   return {
     ...base,
+
     injectSDK(hashSDK: HSDK) {
       const toSolidityAddress = async (address: string) => {
         return hethers.utils.getAddressFromAccount(address);
@@ -416,6 +425,7 @@ export const HederaHelperFactory = async (
         claimNFT,
         associateToken,
         isNftWhitelisted,
+        getExtraFees,
         checkAndAssociate,
         isApprovedForMinter,
         approveForMinter,

@@ -289,7 +289,6 @@ export enum ChainType {
 }
 
 export const CHAIN_INFO: ChainInfo = new Map();
-console.log(elrondHelperFactory, "elrondHelperFactory");
 
 CHAIN_INFO.set(Chain.HECO, {
   name: "HECO",

@@ -531,11 +531,12 @@ export function ChainFactory(
       Math.max(toChainFee.min, feeR.times(toExRate * 0.1).toNumber()),
       toChainFee.max
     );
+
     const feeProfit = usdFee / fromExRate;
 
     return feeR
       .times(toExRate / fromExRate)
-      .plus(feeProfit * 0.5)
+      .plus(feeProfit)
       .times(CHAIN_INFO.get(fromChain)!.decimals)
       .integerValue(BigNumber.ROUND_CEIL);
   }
