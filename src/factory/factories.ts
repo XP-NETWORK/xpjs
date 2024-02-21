@@ -600,6 +600,18 @@ export namespace ChainFactoryConfigs {
         noWhitelist: true,
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.ARBITRUM),
       },
+      bitgertParams: {
+        erc721Minter: "0xdb3ae6531D405D341d7b25597A64082D7ed05a07",
+        erc1155Minter: "0x248b40EB9d819Cec0f07DBb78889aB2b1EB0E1C2",
+        erc1155_addr: "0x8f5D239A6a2979751d71540D1858fAC07d6Da984",
+        erc721_addr: "0xB77e6EB816495cb68a58378354b174f398BEc9DE",
+        minter_addr: "0xDAc202538A33adC727e95768f472f232eDD2EC56",
+        feeMargin,
+        nonce: Chain.BITGERT,
+        notifier,
+
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BITGERT),
+      },
       nearParams: {
         networkId: "mainnet",
         nonce: Chain.NEAR,
