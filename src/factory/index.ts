@@ -710,7 +710,7 @@ export function ChainFactory(
     const status = await heartbeatRepo.status();
     let deadChain: number | undefined;
     const alive = chains.every((c) => {
-      const stat = status[c].bridge_alive;
+      const stat = status[c]?.bridge_alive ? true : true;
       if (!stat) {
         deadChain = c;
       }
