@@ -1,16 +1,4 @@
 import {
-  BalanceCheck,
-  Chain,
-  ChainNonceGet,
-  EstimateTxFees,
-  MintNft,
-  NftInfo,
-  PreTransfer,
-  TransferNftForeign,
-  UnfreezeForeignNft,
-  ValidateAddress,
-} from "..";
-import {
   BigMapAbstraction,
   ContractAbstraction,
   ContractMethod,
@@ -24,18 +12,30 @@ import {
   Wallet,
   WalletProvider,
 } from "@taquito/taquito";
+import {
+  BalanceCheck,
+  Chain,
+  ChainNonceGet,
+  EstimateTxFees,
+  MintNft,
+  NftInfo,
+  PreTransfer,
+  TransferNftForeign,
+  UnfreezeForeignNft,
+  ValidateAddress,
+} from "..";
 
 import * as utils from "@taquito/utils";
 import BigNumber from "bignumber.js";
 import { EvNotifier } from "../services/notifier";
 import {
+  EstimateTxFeesBatch,
   FeeMargins,
   GetFeeMargins,
-  WhitelistCheck,
   GetTokenURI,
   TransferNftForeignBatch,
   UnfreezeForeignNftBatch,
-  EstimateTxFeesBatch,
+  WhitelistCheck,
 } from "./chain";
 
 type TezosSigner = WalletProvider | Signer;
@@ -44,6 +44,7 @@ export type TezosNftInfo = {
   contract: string;
   token_id: string;
   amt: number;
+  tokenId: string;
 };
 
 type TezosMintArgs = {
@@ -175,11 +176,11 @@ export async function tezosHelperFactory({
 
     const storageOperator = storage.operator || storage.operators;
     const args = storage.operator
-      ? [bridgeAddress, nft.native.token_id, owner]
+      ? [bridgeAddress, nft.native.tokenId, owner]
       : {
           owner,
           operator: bridgeAddress,
-          token_id: nft.native.token_id,
+          token_id: nft.native.tokenId,
         };
 
     const op = await storageOperator?.get(args);
@@ -202,7 +203,7 @@ export async function tezosHelperFactory({
           add_operator: {
             owner,
             operator: bridgeAddress,
-            token_id: nft.native.token_id,
+            token_id: nft.native.tokenId,
           },
         },
       ])
@@ -218,13 +219,14 @@ export async function tezosHelperFactory({
     mw: string,
     amt: number
   ) => {
+    console.log(`bruh`);
     //       await preTransfer(sender, nft);
     const hash = await withBridge(
       sender,
       (bridge) =>
         bridge.methodsObject.freeze_fa2({
           fa2_address: nft.collectionIdent,
-          token_id: parseInt(nft.native.token_id),
+          token_id: nft.native.tokenId,
           chain_nonce: chain,
           to,
           mint_with: mw,
@@ -253,7 +255,7 @@ export async function tezosHelperFactory({
           burner: nft.native.contract,
           chain_nonce: nonce,
           to,
-          token_id: parseInt(nft.native.token_id),
+          token_id: nft.native.tokenId,
         }) as any;
       },
       { amount: fee.toNumber() / 1e6 }
