@@ -9,6 +9,7 @@ import {
   UnfreezeForeignNft,
   ValidateAddress,
   BalanceCheck,
+  GetExtraFees,
 } from "../chain";
 
 import {
@@ -70,7 +71,7 @@ export type AptosHelper = ChainNonceGet &
   ClaimNFT<AptosAccount, AptosClaimArgs, string> &
   BalanceCheck & {
     setPetraSigner(signer: any): void;
-  };
+  } & GetExtraFees;
 
 export type AptosParams = {
   feeMargin: FeeMargins;
@@ -128,6 +129,9 @@ export async function aptosHelper({
       return new BigNumber(0);
     },
     async estimateValidateUnfreezeNft(_to, _metadata, _mintWith) {
+      return new BigNumber(0);
+    },
+    getExtraFees: () => {
       return new BigNumber(0);
     },
     async transferNftToForeign(
