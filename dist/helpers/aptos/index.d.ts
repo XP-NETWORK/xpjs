@@ -1,4 +1,4 @@
-import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck } from "../chain";
+import { ChainNonceGet, EstimateTxFees, FeeMargins, GetFeeMargins, GetProvider, MintNft, TransferNftForeign, UnfreezeForeignNft, ValidateAddress, BalanceCheck, GetExtraFees } from "../chain";
 import { AptosAccount, AptosClient, HexString } from "aptos";
 import { EvNotifier } from "../../services/notifier";
 export type AptosNFT = {
@@ -35,7 +35,7 @@ export type AptosHelper = ChainNonceGet & TransferNftForeign<AptosAccount, Aptos
     XpNft: string;
 } & GetFeeMargins & MintNft<AptosAccount, AptosMintArgs, string> & GetProvider<AptosClient> & ClaimNFT<AptosAccount, AptosClaimArgs, string> & BalanceCheck & {
     setPetraSigner(signer: any): void;
-};
+} & GetExtraFees;
 export type AptosParams = {
     feeMargin: FeeMargins;
     rpcUrl: string;
