@@ -244,6 +244,7 @@ export enum v3_ChainId {
   ETHEREUM = "ETH",
   ELROND = "MULTIVERSX",
   TON = "TON",
+  CASPER = "CASPER",
   DEFAULT = "",
 }
 
@@ -836,7 +837,7 @@ CHAIN_INFO.set(Chain.CASPER, {
   decimals: Decimals.CSPR,
   name: "Casper",
   nonce: Chain.CASPER,
-  v3_chainId: v3_ChainId.DEFAULT,
+  v3_chainId: v3_ChainId.CASPER,
   type: ChainType.CASPER,
 });
 

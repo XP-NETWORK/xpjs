@@ -898,6 +898,19 @@ export namespace ChainFactoryConfigs {
         extraFees: new Map().set(Chain.ETHEREUM, "1"),
         feeMargin: { min: 1.5, max: 5 },
       },
+      casperParams: {
+        nwl: true,
+        bridge:
+          "hash-c69069b57ace632413560f3961cfb307eaa596c152279235affaae1e5f7abd55",
+        feeMargin,
+        network: "casper",
+        notifier,
+        rpc: MainNetRpcUri.CASPER,
+        sig: signatureSvc_prod,
+        umt: "to be filled",
+        xpnft:
+          "hash-63658101ba6b711ce0db13c1806513b155a6f901fbbb13eeafffc2f863f98c8a",
+      },
       elrondParams: {
         node_uri: MainNetRpcUri.ELROND,
         minter_address:
