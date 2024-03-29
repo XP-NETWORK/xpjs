@@ -612,6 +612,17 @@ export namespace ChainFactoryConfigs {
 
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BITGERT),
       },
+      baseParams: {
+        erc721Minter: "0xD830c11257C985f0f874537bF36AC142C6Fc74a6",
+        erc1155Minter: "0x463E4A5eA947D9DFC250687E469AA487cbD8e1A7",
+        erc1155_addr: "0xDeef1B63258D22422597A630D725Fa7DDa0F5457",
+        erc721_addr: "0x97feC8ed7203Ea3cE58e2A4F44056Fd954a35BE4",
+        minter_addr: "0xBd68244C35E660A328266c9cc1411a69992D022D",
+        feeMargin,
+        nonce: Chain.BASE,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BASE),
+      },
       nearParams: {
         networkId: "mainnet",
         nonce: Chain.NEAR,
@@ -984,6 +995,17 @@ export namespace ChainFactoryConfigs {
         notifier,
 
         provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BITGERT),
+      },
+      baseParams: {
+        erc721Minter: "0xD830c11257C985f0f874537bF36AC142C6Fc74a6",
+        erc1155Minter: "0x463E4A5eA947D9DFC250687E469AA487cbD8e1A7",
+        erc1155_addr: "0xDeef1B63258D22422597A630D725Fa7DDa0F5457",
+        erc721_addr: "0x97feC8ed7203Ea3cE58e2A4F44056Fd954a35BE4",
+        minter_addr: "0xBd68244C35E660A328266c9cc1411a69992D022D",
+        feeMargin,
+        nonce: Chain.BASE,
+        notifier,
+        provider: new ethers.providers.JsonRpcProvider(MainNetRpcUri.BASE),
       },
       dfinityParams: {
         agent: new HttpAgent({

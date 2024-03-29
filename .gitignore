@@ -12,3 +12,4 @@ src/test.ts
 test*
 *.DS_Store
 src/helpers/elrond/elrond-test.ts
+run1.ts

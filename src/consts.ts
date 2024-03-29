@@ -126,7 +126,7 @@ export enum MainNetRpcUri {
   CASPER = "https://rpc.mainnet.casperlabs.io/rpc",
   ZETA = "",
   ENERGI = "",
-  BASE = "",
+  BASE = "https://base.llamarpc.com",
   FINDORA = "",
   // TODO: Algorand
 }
