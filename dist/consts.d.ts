@@ -92,7 +92,7 @@ export declare enum MainNetRpcUri {
     CASPER = "https://rpc.mainnet.casperlabs.io/rpc",
     ZETA = "",
     ENERGI = "",
-    BASE = "",
+    BASE = "https://base.llamarpc.com",
     FINDORA = ""
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
