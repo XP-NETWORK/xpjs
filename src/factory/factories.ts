@@ -880,6 +880,7 @@ export namespace ChainFactoryConfigs {
 
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 0.5, max: 5 };
+    const solFeeMargin = { min: 7, max: 7 };
     const notifier = evNotifier(middleware_uri);
 
     // VeChain related:
@@ -1289,7 +1290,7 @@ export namespace ChainFactoryConfigs {
         bridgeContractAddr: "8bJT5J4tFzeBcxhd7i3KhYUVr7oAV4z7ijau2mTCcXD1",
         endpoint: MainNetRpcUri.SOLANA,
         notifier,
-        feeMargin,
+        feeMargin: solFeeMargin,
       },
       secretParams: {
         notifier,
