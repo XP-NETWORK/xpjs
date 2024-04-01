@@ -893,13 +893,13 @@ CHAIN_INFO.set(Chain.ENERGI, {
 });
 
 CHAIN_INFO.set(Chain.BASE, {
-  blockExplorerUrl: "https://explorer.baseledger.net/tx/",
-  blockExplorerUrlAddr: "https://explorer.baseledger.net/address/",
+  blockExplorerUrl: "https://basescan.org/tx/",
+  blockExplorerUrlAddr: "https://basescan.org/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ETH,
   currencySymbol: SupportedCurrencyName.ETH,
   decimals: Decimals.ETH,
-  name: "Base Goerli",
+  name: "Base",
   nonce: Chain.BASE,
   v3_chainId: v3_ChainId.DEFAULT,
   type: ChainType.EVM,
