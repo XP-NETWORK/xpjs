@@ -892,7 +892,7 @@ export namespace ChainFactoryConfigs {
 
   export const MainNet: () => Promise<Partial<ChainParams>> = async () => {
     const feeMargin = { min: 0.5, max: 5 };
-    const solFeeMargin = { min: 7, max: 7 };
+    const solFeeMargin = { min: 5, max: 5 };
     const notifier = evNotifier(middleware_uri);
 
     // VeChain related:
