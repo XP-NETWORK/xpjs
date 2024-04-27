@@ -854,7 +854,7 @@ var ChainFactoryConfigs;
     };
     ChainFactoryConfigs.MainNet = async () => {
         const feeMargin = { min: 0.5, max: 5 };
-        const solFeeMargin = { min: 5, max: 5 };
+        const solFeeMargin = { min: 4, max: 4 };
         const notifier = (0, notifier_1.evNotifier)(middleware_uri);
         // VeChain related:
         const net = new connex_driver_1.SimpleNet(consts_1.MainNetRpcUri.VECHAIN);
