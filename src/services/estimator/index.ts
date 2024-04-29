@@ -40,20 +40,21 @@ export function signatureService(url: string): SignatureService {
     async getSignatureNear(
       fromChain: ChainNonce,
       toChain: ChainNonce,
-      nft: string,
+      _nft: string,
       tokenContract: string,
       tokenId: string,
       to: string
     ) {
       const result = await signer.post<{
         data: SignatureServiceResponse;
-      }>("/api/get-signature/", {
-        fromChain,
-        toChain,
-        nft,
-        to,
-        tokenId,
-        tokenContract,
+      }>("/api/near/", {
+        from: fromChain,
+        to: toChain,
+        receiver: to,
+        nft: {
+          token_id: tokenId,
+          contract: tokenContract,
+        },
       });
       console.log("near signature response", result);
       return result.data.data;
@@ -61,12 +62,11 @@ export function signatureService(url: string): SignatureService {
     async getSignatureDfinity(fc, tc, to, num: number) {
       const result = await signer.post<{
         data: SignatureServiceResponse;
-      }>("/api/get-signature/", {
-        fromChain: fc,
-        toChain: tc,
-        to,
+      }>("/api/dfinity/", {
+        from: fc,
+        to: tc,
+        receiver: to,
         num,
-        nft: {},
       });
       return result.data.data;
     },
