@@ -84,6 +84,7 @@ export enum TestNetRpcUri {
   ENERGI = "https://nodeapi.test.energi.network",
   BASE = "https://base-goerli.diamondswap.org/rpc",
   FINDORA = "https://prod-testnet.prod.findora.org:8545",
+  BLAST = "https://blast-sepolia.blockpi.network/v1/rpc/public",
   // TODO: Algorand
   // TODO: Fuse
 }
@@ -128,6 +129,7 @@ export enum MainNetRpcUri {
   ENERGI = "",
   BASE = "https://base.llamarpc.com",
   FINDORA = "",
+  BLAST = "https://blastl2-mainnet.public.blastapi.io",
   // TODO: Algorand
 }
 
@@ -191,6 +193,7 @@ export type MetaMap = {
   0x2a: Web3Meta;
   0x2b: Web3Meta;
   0x2c: Web3Meta;
+  0x2d: Web3Meta;
 } & MetaMapAssert;
 
 export namespace Chain {
@@ -236,6 +239,7 @@ export namespace Chain {
   export const ENERGI = 0x2a; //42
   export const BASE = 0x2b; //43
   export const FINDORA = 0x2c; //44
+  export const BLAST = 0x2d; //45
 }
 
 export enum v3_ChainId {
@@ -924,6 +928,24 @@ CHAIN_INFO.set(Chain.FINDORA, {
   tnBlockExplorerUrlAddr: "https://testnet-anvil.evm.findorascan.io/address/",
   tnChainId: 2153,
 });
+
+CHAIN_INFO.set(Chain.BASE, {
+  blockExplorerUrl: "https://blastscan.io/tx",
+  blockExplorerUrlAddr: "https://blastscan.io/address/",
+  constructor: web3HelperFactory,
+  currency: SupportedCurrency.ETH,
+  currencySymbol: SupportedCurrencyName.ETH,
+  decimals: Decimals.ETH,
+  name: "Blast",
+  nonce: Chain.BLAST,
+  v3_chainId: v3_ChainId.DEFAULT,
+  type: ChainType.EVM,
+  chainId: 81457,
+  tnBlockExplorerUrl: "https://sepolia.blastexplorer.io/tx/",
+  tnBlockExplorerUrlAddr: "https://sepolia.blastexplorer.io/address/",
+  tnChainId: 168587773,
+});
+
 setTimeout(() => {
   CHAIN_INFO.set(Chain.ELROND, {
     name: "Elrond",
