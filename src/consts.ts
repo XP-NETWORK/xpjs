@@ -930,7 +930,7 @@ CHAIN_INFO.set(Chain.FINDORA, {
 });
 
 CHAIN_INFO.set(Chain.BLAST, {
-  blockExplorerUrl: "https://blastscan.io/tx",
+  blockExplorerUrl: "https://blastscan.io/tx/",
   blockExplorerUrlAddr: "https://blastscan.io/address/",
   constructor: web3HelperFactory,
   currency: SupportedCurrency.ETH,
