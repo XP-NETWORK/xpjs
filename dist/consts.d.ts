@@ -52,7 +52,8 @@ export declare enum TestNetRpcUri {
     ZETA = "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
     ENERGI = "https://nodeapi.test.energi.network",
     BASE = "https://base-goerli.diamondswap.org/rpc",
-    FINDORA = "https://prod-testnet.prod.findora.org:8545"
+    FINDORA = "https://prod-testnet.prod.findora.org:8545",
+    BLAST = "https://blast-sepolia.blockpi.network/v1/rpc/public"
 }
 export declare enum MainNetRpcUri {
     ELROND = "https://gateway.multiversx.com",
@@ -93,7 +94,8 @@ export declare enum MainNetRpcUri {
     ZETA = "",
     ENERGI = "",
     BASE = "https://base.llamarpc.com",
-    FINDORA = ""
+    FINDORA = "",
+    BLAST = "https://blastl2-mainnet.public.blastapi.io"
 }
 type ElrondMeta = [ElrondHelper, ElrondParams];
 type Web3Meta = [Web3Helper, Web3Params];
@@ -154,6 +156,7 @@ export type MetaMap = {
     0x2a: Web3Meta;
     0x2b: Web3Meta;
     0x2c: Web3Meta;
+    0x2d: Web3Meta;
 } & MetaMapAssert;
 export declare namespace Chain {
     const ELROND = 2;
@@ -198,6 +201,7 @@ export declare namespace Chain {
     const ENERGI = 42;
     const BASE = 43;
     const FINDORA = 44;
+    const BLAST = 45;
 }
 export declare enum v3_ChainId {
     BSC = "BSC",
