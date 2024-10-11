@@ -929,7 +929,7 @@ CHAIN_INFO.set(Chain.FINDORA, {
   tnChainId: 2153,
 });
 
-CHAIN_INFO.set(Chain.BASE, {
+CHAIN_INFO.set(Chain.BLAST, {
   blockExplorerUrl: "https://blastscan.io/tx",
   blockExplorerUrlAddr: "https://blastscan.io/address/",
   constructor: web3HelperFactory,
